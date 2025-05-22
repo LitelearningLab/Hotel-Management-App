@@ -1,0 +1,404 @@
+{
+  "FrontOfficeCollection": {
+    "doc1": {
+      "category": "INTRODUCTION - TOURISM AND ITS IMPORTANCE",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc2": {
+      "category": "INTRODUCTION - HOSPITALITY AND ITS ORIGIN",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc3": {
+      "category": "INTRODUCTION - HOTELS, THEIR EVOLUTION AND GROWTH",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc4": {
+      "category": "INTRODUCTION - CORE AREAS FRONT OFFICE",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc5": {
+      "category": "INTRODUCTION - TRAVEL AND HOTEL INDUSTRY AND THEIR INTER-RELATIONSHIP",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc6": {
+      "category": "INTRODUCTION - INTERDEPENDENCY OF TOURISM, TRAVEL, AND HOSPITALITY INDUSTRY",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc7": {
+      "category": "INTRODUCTION - CLASSIFICATION OF HOTELS",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc8": {
+      "category": "STAFFING AND ORGANIZATIONAL STRUCTURE OF HOTEL",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc9": {
+      "category": "FRONT OFFICE ORGANIZATION",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc10": {
+      "category": "UPDATED FRONT OFFICE LAYOUT AND EQUIPMENT",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc11": {
+      "category": "JOB DESCRIPTION OF FRONT OFFICE PERSONNEL",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc12": {
+      "category": "ATTRIBUTES OF FRONT OFFICE STAFF",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc13": {
+      "category": "GRE AND LOBBY MANAGER",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc14": {
+      "category": "GUEST CYCLE",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc15": {
+      "category": "TYPES OF HOTEL GUESTS",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc16": {
+      "category": "RESERVATION",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc17": {
+      "category": "GROUP RESERVATION AND CANCELLATIONS",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc18": {
+      "category": "REGISTRATION",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc19": {
+      "category": "FRONT OFFICE COMMUNICATION",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    },
+    "doc20": {
+      "category": "SECURITY DEPARTMENT",
+      "subcategory": [
+        {
+          "name": "E-learning",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8",
+          "order": 1
+        },
+        {
+          "name": "FAQ",
+          "link": "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a",
+          "order": 2
+        },
+        {
+          "name": "Checking",
+          "link": "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91",
+          "order": 3
+        }
+      ]
+    }
+  }
+}

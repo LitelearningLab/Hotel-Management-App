@@ -23,6 +23,7 @@ dependencies:
   flutter_inappwebview: ^5.7.2+3
   after_layout: ^1.2.0
   get: ^4.7.2
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:

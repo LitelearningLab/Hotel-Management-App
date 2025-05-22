@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:hotelmanagementapp/model/front_office_model.dart';
+import 'package:hotelmanagementapp/response/front_office_responce.dart';
 
 class FrontOfficeController extends GetxController {
   String title = '';
@@ -11,6 +13,10 @@ class FrontOfficeController extends GetxController {
   late List<bool> isExpanded;
   int expandedIndex = -1;
   List<List<String>> allLinks = [];
+  FrontOfficeResponse frontOfficeResponse = FrontOfficeResponse();
+  List<FrontOfficeDocument> frontOfficeData = [];
+  bool loading = false;
+
   final List<String> hospitalityTopics = [
     "INTRODUCTION - TOURISM AND ITS IMPORTANCE",
     "INTRODUCTION - HOSPITALITY AND ITS ORIGIN",
@@ -39,33 +45,38 @@ class FrontOfficeController extends GetxController {
     final args = Get.arguments as Map<String, dynamic>?;
     title = args?['title'] ?? "";
     image = args?['image'] ?? "";
-    onLink();
+    init();
     isExpanded = List.generate(itemCount, (_) => false);
     update();
   }
 
-  onLink() async {
-    allLinks = await fetchAllLinks();
-  }
-
-  Future<List<List<String>>> fetchAllLinks() async {
-    List<List<String>> allLinks = [];
-
-    try {
-      QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('FrontOffice').get();
-
-      for (var doc in snapshot.docs) {
-        var data = doc.data() as Map<String, dynamic>;
-        if (data['links'] != null && data['links'] is List) {
-          List<String> links = List<String>.from(data['links']);
-          allLinks.add(links);
-        }
-      }
-    } catch (e) {
-      print('Error fetching links: $e');
-    }
-
-    return allLinks;
+  init() async {
+    loading = true;
+    update();
+    frontOfficeData = await frontOfficeResponse.getFrontOfficeCollection();
+    loading = false;
+    update();
   }
 }
+
+//   Future<List<List<String>>> fetchAllLinks() async {
+//     List<List<String>> allLinks = [];
+
+//     try {
+//       QuerySnapshot snapshot =
+//           await FirebaseFirestore.instance.collection('FrontOffice').get();
+
+//       for (var doc in snapshot.docs) {
+//         var data = doc.data() as Map<String, dynamic>;
+//         if (data['links'] != null && data['links'] is List) {
+//           List<String> links = List<String>.from(data['links']);
+//           allLinks.add(links);
+//         }
+//       }
+//     } catch (e) {
+//       print('Error fetching links: $e');
+//     }
+
+//     return allLinks;
+//   }
+// }

@@ -88,239 +88,270 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
               height: getWidgetHeight(height: 15),
             ),
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.symmetric(
-                    vertical: getWidgetHeight(height: 10),
-                    horizontal: getWidgetWidth(width: 20)),
-                itemCount: controller.hospitalityTopics.length,
-                itemBuilder: (context, index) {
-                  final isExpanded = controller.expandedIndex == index;
-                  final linkAvailable = index < controller.allLinks.length &&
-                      (controller.allLinks[index][0].isNotEmpty ||
-                          controller.allLinks[index][0] != "");
-                  final linkAvailable1 = index < controller.allLinks.length &&
-                      (controller.allLinks[index][0].isNotEmpty ||
-                          controller.allLinks[index][1] != "");
-                  final linkAvailable2 = index < controller.allLinks.length &&
-                      (controller.allLinks[index][0].isNotEmpty ||
-                          controller.allLinks[index][2] != "");
-
-                  return Column(
-                    children: [
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     controller.expandedIndex = isExpanded ? -1 : index;
-                      //     controller.update();
-                      //   },
-                      //   child: Container(
-                      //     width: getWidgetWidth(width: 375),
-                      //     // height: getWidgetHeight(height: 60),
-                      //     margin: const EdgeInsets.symmetric(vertical: 5),
-                      //     decoration: BoxDecoration(
-                      //       borderRadius: BorderRadius.circular(12),
-                      //       boxShadow: [
-                      //         BoxShadow(
-                      //           color: Colors.black.withOpacity(0.1),
-                      //           offset: const Offset(0, 4),
-                      //           blurRadius: 10,
-                      //         ),
-                      //       ],
-                      //     ),
-                      //     child: Container(
-                      //       width: getWidgetWidth(width: 375),
-                      //       // height: getWidgetHeight(height: 75),
-                      //       decoration: BoxDecoration(
-                      //         borderRadius: BorderRadius.circular(12),
-                      //         color: Colors.white,
-                      //       ),
-                      //       child: Padding(
-                      //         padding: EdgeInsets.symmetric(
-                      //             vertical: getWidgetHeight(height: 20),
-                      //             horizontal: getWidgetWidth(width: 20)),
-                      //         child: Text(
-                      //           controller.hospitalityTopics[index],
-                      //           style: GoogleFonts.inter(
-                      //             fontWeight: FontWeight.w500,
-                      //             fontSize: 14,
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-
-                      // Expandable Section
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            vertical: getWidgetHeight(height: 5)),
-                        child: GestureDetector(
-                            onTap: () {
-                              controller.expandedIndex =
-                                  isExpanded ? -1 : index;
-                              controller.update();
-                            },
-                            child: AnimatedSize(
-                              duration: const Duration(milliseconds: 200),
-                              curve: Curves.fastOutSlowIn,
-                              child: Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      offset: const Offset(0, 4),
-                                      blurRadius: 10,
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: getWidgetHeight(height: 12),
-                                        horizontal: getWidgetWidth(width: 20),
-                                      ),
-                                      child: Text(
-                                        controller.hospitalityTopics[index],
-                                        style: GoogleFonts.inter(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                    if (isExpanded)
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: getWidgetWidth(width: 10),
-                                        ),
-                                        child: const Divider(
-                                          color: Color.fromARGB(
-                                              255, 107, 107, 107),
-                                        ),
-                                      ),
-                                    if (isExpanded)
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: getWidgetWidth(width: 15),
-                                          vertical: getWidgetHeight(height: 5),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: linkAvailable
-                                                  ? () {
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  InAppWebViewPage(
-                                                                    url: controller
-                                                                            .allLinks[
-                                                                        index][0],
-                                                                  )));
-                                                    }
-                                                  : null,
-                                              child: Image.asset(
-                                                AllAssets.interaction,
-                                                color: linkAvailable
-                                                    ? Colors.black
-                                                    : Colors.grey,
-                                                width:
-                                                    getWidgetWidth(width: 30),
-                                                height:
-                                                    getWidgetHeight(height: 30),
-                                              ),
-                                            ),
-                                            GestureDetector(
-                                              onTap: linkAvailable1
-                                                  ? () {
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  InAppWebViewPage(
-                                                                    url: controller
-                                                                            .allLinks[
-                                                                        index][1],
-                                                                  )));
-                                                    }
-                                                  : null,
-                                              child: Image.asset(
-                                                AllAssets.faq,
-                                                color: linkAvailable1
-                                                    ? Colors.black
-                                                    : Colors.grey,
-                                                width:
-                                                    getWidgetWidth(width: 30),
-                                                height:
-                                                    getWidgetHeight(height: 30),
-                                              ),
-                                            ),
-                                            GestureDetector(
-                                              onTap: linkAvailable2
-                                                  ? () {
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  InAppWebViewPage(
-                                                                    url: controller
-                                                                            .allLinks[
-                                                                        index][2],
-                                                                  )));
-                                                    }
-                                                  : null,
-                                              child: Image.asset(
-                                                AllAssets.approval,
-                                                color: linkAvailable2
-                                                    ? Colors.black
-                                                    : Colors.grey,
-                                                width:
-                                                    getWidgetWidth(width: 26),
-                                                height:
-                                                    getWidgetHeight(height: 26),
-                                              ),
-                                            ),
-                                            InkWell(
-                                              onTap: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            PronunciationLabSub(
-                                                              title: controller
-                                                                      .hospitalityTopics[
-                                                                  index],
-                                                            )));
-                                              },
-                                              child: SizedBox(
-                                                width:
-                                                    getWidgetWidth(width: 35),
-                                                height:
-                                                    getWidgetHeight(height: 35),
-                                                child: const Icon(
-                                                  Icons.mic,
-                                                  size: 30,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            )),
+              child: controller.loading
+                  ? Center(
+                      child: SizedBox(
+                        width: getWidgetWidth(width: 40),
+                        height: getWidgetHeight(height: 40),
+                        child: CircularProgressIndicator(
+                          color: linearColor,
+                        ),
                       ),
-                    ],
-                  );
-                },
-              ),
+                    )
+                  : ListView.builder(
+                      padding: EdgeInsets.symmetric(
+                          vertical: getWidgetHeight(height: 10),
+                          horizontal: getWidgetWidth(width: 20)),
+                      itemCount: controller.frontOfficeData.length,
+                      itemBuilder: (context, index) {
+                        final isExpanded = controller.expandedIndex == index;
+                        final linkAvailable = index <
+                                controller.frontOfficeData[index].subcategory
+                                    .length &&
+                            (controller.frontOfficeData[index].subcategory[0]
+                                    .link.isNotEmpty ||
+                                controller.frontOfficeData[index].subcategory[0]
+                                        .link !=
+                                    "");
+                        final linkAvailable1 = index <
+                                controller.frontOfficeData[index].subcategory
+                                    .length &&
+                            (controller.frontOfficeData[index].subcategory[1]
+                                    .link.isNotEmpty ||
+                                controller.frontOfficeData[index].subcategory[1]
+                                        .link !=
+                                    "");
+                        final linkAvailable2 = index <
+                                controller.frontOfficeData[index].subcategory
+                                    .length &&
+                            (controller.frontOfficeData[index].subcategory[2]
+                                    .link.isNotEmpty ||
+                                controller.frontOfficeData[index].subcategory[2]
+                                        .link !=
+                                    "");
+
+                        return Column(
+                          children: [
+                            // GestureDetector(
+                            //   onTap: () {
+                            //     controller.expandedIndex = isExpanded ? -1 : index;
+                            //     controller.update();
+                            //   },
+                            //   child: Container(
+                            //     width: getWidgetWidth(width: 375),
+                            //     // height: getWidgetHeight(height: 60),
+                            //     margin: const EdgeInsets.symmetric(vertical: 5),
+                            //     decoration: BoxDecoration(
+                            //       borderRadius: BorderRadius.circular(12),
+                            //       boxShadow: [
+                            //         BoxShadow(
+                            //           color: Colors.black.withOpacity(0.1),
+                            //           offset: const Offset(0, 4),
+                            //           blurRadius: 10,
+                            //         ),
+                            //       ],
+                            //     ),
+                            //     child: Container(
+                            //       width: getWidgetWidth(width: 375),
+                            //       // height: getWidgetHeight(height: 75),
+                            //       decoration: BoxDecoration(
+                            //         borderRadius: BorderRadius.circular(12),
+                            //         color: Colors.white,
+                            //       ),
+                            //       child: Padding(
+                            //         padding: EdgeInsets.symmetric(
+                            //             vertical: getWidgetHeight(height: 20),
+                            //             horizontal: getWidgetWidth(width: 20)),
+                            //         child: Text(
+                            //           controller.hospitalityTopics[index],
+                            //           style: GoogleFonts.inter(
+                            //             fontWeight: FontWeight.w500,
+                            //             fontSize: 14,
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
+
+                            // Expandable Section
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: getWidgetHeight(height: 5)),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    controller.expandedIndex =
+                                        isExpanded ? -1 : index;
+                                    controller.update();
+                                  },
+                                  child: AnimatedSize(
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.fastOutSlowIn,
+                                    child: Container(
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                            offset: const Offset(0, 4),
+                                            blurRadius: 10,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              vertical:
+                                                  getWidgetHeight(height: 12),
+                                              horizontal:
+                                                  getWidgetWidth(width: 20),
+                                            ),
+                                            child: Text(
+                                              controller.frontOfficeData[index]
+                                                  .category,
+                                              style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ),
+                                          if (isExpanded)
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal:
+                                                    getWidgetWidth(width: 10),
+                                              ),
+                                              child: const Divider(
+                                                color: Color.fromARGB(
+                                                    255, 107, 107, 107),
+                                              ),
+                                            ),
+                                          if (isExpanded)
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal:
+                                                    getWidgetWidth(width: 15),
+                                                vertical:
+                                                    getWidgetHeight(height: 5),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: linkAvailable
+                                                        ? () {
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            InAppWebViewPage(
+                                                                              url: controller.frontOfficeData[index].subcategory[0].link,
+                                                                            )));
+                                                          }
+                                                        : null,
+                                                    child: Image.asset(
+                                                      AllAssets.interaction,
+                                                      color: linkAvailable
+                                                          ? Colors.black
+                                                          : Colors.grey,
+                                                      width: getWidgetWidth(
+                                                          width: 30),
+                                                      height: getWidgetHeight(
+                                                          height: 30),
+                                                    ),
+                                                  ),
+                                                  GestureDetector(
+                                                    onTap: linkAvailable1
+                                                        ? () {
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            InAppWebViewPage(
+                                                                              url: controller.frontOfficeData[index].subcategory[1].link,
+                                                                            )));
+                                                          }
+                                                        : null,
+                                                    child: Image.asset(
+                                                      AllAssets.faq,
+                                                      color: linkAvailable1
+                                                          ? Colors.black
+                                                          : Colors.grey,
+                                                      width: getWidgetWidth(
+                                                          width: 30),
+                                                      height: getWidgetHeight(
+                                                          height: 30),
+                                                    ),
+                                                  ),
+                                                  GestureDetector(
+                                                    onTap: linkAvailable2
+                                                        ? () {
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            InAppWebViewPage(
+                                                                              url: controller.frontOfficeData[index].subcategory[2].link,
+                                                                            )));
+                                                          }
+                                                        : null,
+                                                    child: Image.asset(
+                                                      AllAssets.approval,
+                                                      color: linkAvailable2
+                                                          ? Colors.black
+                                                          : Colors.grey,
+                                                      width: getWidgetWidth(
+                                                          width: 26),
+                                                      height: getWidgetHeight(
+                                                          height: 26),
+                                                    ),
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  PronunciationLabSub(
+                                                                    title: controller
+                                                                            .hospitalityTopics[
+                                                                        index],
+                                                                  )));
+                                                    },
+                                                    child: SizedBox(
+                                                      width: getWidgetWidth(
+                                                          width: 35),
+                                                      height: getWidgetHeight(
+                                                          height: 35),
+                                                      child: const Icon(
+                                                        Icons.mic,
+                                                        size: 30,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  )),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
             ),
           ],
         );
