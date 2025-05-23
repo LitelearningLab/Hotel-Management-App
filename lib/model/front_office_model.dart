@@ -2,11 +2,13 @@ class FrontOfficeDocument {
   final String category;
   final List<SubCategory> subcategory;
   final int order;
+  final String key;
 
   FrontOfficeDocument({
     required this.category,
     required this.subcategory,
     required this.order,
+    required this.key,
   });
 
   factory FrontOfficeDocument.fromMap(Map<String, dynamic> map) {
@@ -18,10 +20,10 @@ class FrontOfficeDocument {
     }
 
     return FrontOfficeDocument(
-      category: map['category'] ?? '',
-      subcategory: subcatList,
-      order: map['order'] ?? 0,
-    );
+        category: map['category'] ?? '',
+        subcategory: subcatList,
+        order: map['order'] ?? 0,
+        key: map['key'] ?? "");
   }
 
   Map<String, dynamic> toMap() {
@@ -29,6 +31,7 @@ class FrontOfficeDocument {
       'category': category,
       'subcategory': subcategory.map((e) => e.toMap()).toList(),
       'order': order,
+      'key': key
     };
   }
 }

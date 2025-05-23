@@ -3,11 +3,11 @@ import 'package:hotelmanagementapp/model/front_office_model.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 
 class FrontOfficeResponse {
-  Future<List<FrontOfficeDocument>> getFrontOfficeCollection() async {
+  Future<List<FrontOfficeDocument>> getFrontOfficeCollection(
+      String collectionName) async {
     try {
       final firestore = FirebaseFirestore.instance;
-      final snapshot =
-          await firestore.collection(CollectionNames.frontOffice).get();
+      final snapshot = await firestore.collection(collectionName).get();
 
       List<FrontOfficeDocument> documents = snapshot.docs.map((doc) {
         return FrontOfficeDocument.fromMap(doc.data());

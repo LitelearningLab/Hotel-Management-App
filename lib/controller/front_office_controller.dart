@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/front_office_model.dart';
+import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/response/front_office_responce.dart';
 
 class FrontOfficeController extends GetxController {
@@ -16,6 +17,8 @@ class FrontOfficeController extends GetxController {
   FrontOfficeResponse frontOfficeResponse = FrontOfficeResponse();
   List<FrontOfficeDocument> frontOfficeData = [];
   bool loading = false;
+  String collectionName = "";
+  int index = 0;
 
   final List<String> hospitalityTopics = [
     "INTRODUCTION - TOURISM AND ITS IMPORTANCE",
@@ -42,18 +45,31 @@ class FrontOfficeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    final args = Get.arguments as Map<String, dynamic>?;
-    title = args?['title'] ?? "";
-    image = args?['image'] ?? "";
+
     init();
-    isExpanded = List.generate(itemCount, (_) => false);
+
     update();
   }
 
   init() async {
     loading = true;
     update();
-    frontOfficeData = await frontOfficeResponse.getFrontOfficeCollection();
+    final args = Get.arguments as Map<String, dynamic>?;
+    title = args?['title'] ?? "";
+    image = args?['image'] ?? "";
+    index = args?['index'] ?? "";
+    isExpanded = List.generate(itemCount, (_) => false);
+    collectionName = index == 0
+        ? CollectionNames.frontOffice
+        : index == 1
+            ? CollectionNames.foodAndBeverage
+            : index == 2
+                ? CollectionNames.foodProduction
+                : index == 3
+                    ? CollectionNames.houseKeeping
+                    : "";
+    frontOfficeData =
+        await frontOfficeResponse.getFrontOfficeCollection(collectionName);
     loading = false;
     update();
   }

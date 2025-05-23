@@ -11,14 +11,14 @@ import 'package:hotelmanagementapp/route/binding.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/route/route_service.dart';
 import 'package:hotelmanagementapp/view/home.dart';
-import 'package:uuid/uuid.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  uploadBulkData();
+  // uploadBulkData();
+  // bulkEditDocuments();
   runApp(const MyApp());
 }
 
@@ -45,23 +45,73 @@ class MyApp extends StatelessWidget {
 }
 
 Future<void> uploadBulkData() async {
-  Future<void> uploadBulkData() async {
-    String jsonString = await rootBundle
-        .loadString('assets/front_office_bulk_upload_with_order.json');
-    Map<String, dynamic> jsonData = json.decode(jsonString);
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    var uuid = Uuid();
+  // Load JSON from assets
+  String jsonString =
+      await rootBundle.loadString('assets/front_office_final_upload.json');
+  Map<String, dynamic> jsonData = json.decode(jsonString);
 
-    Map<String, dynamic> collectionData = jsonData["FrontOfficeCollection"];
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    for (var entry in collectionData.entries) {
-      String docId = uuid.v4(); // Generate unique ID
+  // Access your specific collection from JSON
+  final documents = jsonData['FrontOfficeCollection'];
+
+  if (documents != null && documents is Map<String, dynamic>) {
+    for (final docId in documents.keys) {
+      final fields = documents[docId];
       await firestore
           .collection("FrontOfficeCollection")
           .doc(docId)
-          .set(entry.value);
+          .set(fields);
     }
 
-    print("Bulk upload with unique IDs completed!");
+    print("✅ Bulk upload completed to 'FrontOfficeCollection'!");
+  } else {
+    print("⚠️ 'FrontOfficeCollection' not found or invalid in JSON.");
+  }
+}
+
+Future<void> bulkEditDocuments() async {
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  try {
+    // Get all documents from the collection
+    final querySnapshot =
+        await firestore.collection("FrontOfficeCollection").get();
+
+    // Batch write for better performance (limit 500 operations per batch)
+    final batch = firestore.batch();
+    int batchCounter = 0;
+
+    for (final doc in querySnapshot.docs) {
+      // Create a map with the new field(s) you want to add
+      final updates = {
+        'key': '', // Replace with your field name and value
+        // 'anotherField': anotherValue, // Add more fields if needed
+        // Optional: add update timestamp
+      };
+
+      // Add the update to the batch
+      batch.update(doc.reference, updates);
+      batchCounter++;
+
+      // Commit batch if we reach the limit (500 operations)
+      if (batchCounter % 500 == 0) {
+        await batch.commit();
+        print('✅ Updated $batchCounter documents');
+        // Start a new batch
+        batchCounter = 0;
+      }
+    }
+
+    // Commit any remaining operations
+    if (batchCounter > 0) {
+      await batch.commit();
+      print('✅ Updated $batchCounter documents');
+    }
+
+    print(
+        '🎉 Bulk edit completed! Total documents updated: ${querySnapshot.size}');
+  } catch (e) {
+    print('⚠️ Error during bulk edit: $e');
   }
 }

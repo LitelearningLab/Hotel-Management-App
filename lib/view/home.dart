@@ -161,7 +161,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         onTap: () {
                           Get.toNamed(AppRoutes.frontOffice, arguments: {
                             'title': controller.cardNames[index],
-                            'image': controller.cardImages[index]
+                            'image': controller.cardImages[index],
+                            'index': index
                           });
                         },
                         child: Container(
