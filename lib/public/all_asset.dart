@@ -71,7 +71,7 @@ class AllAssets {
   static const String softSkill = 'assets/images/softSkill.png';
   static const String profluentEnglish = 'assets/images/profluentEnglish.png';
   static const String arCallSimulation = 'assets/images/arCallSimulation.png';
-  static const String drawerIcon = 'assets/images/drawerIcon.png';
+  static const String drawerIcon = 'assets/drawerIcon.png';
   static const String quickLinkPL = 'assets/images/quickLinkPL.png';
   static const String quickLinkDM = 'assets/images/quickLinkDM.png';
   static const String quickLinkNDFU = 'assets/images/quickLinkNDFU.png';
@@ -162,4 +162,6 @@ class AllAssets {
   static const String foodAndBevarage = "assets/foodandbeverage.svg";
   static const String houseKeeping = "assets/accomodationManagement.svg";
   static const String interactiveSimulations = "assets/images/bottomIS.png";
+  static const String videoIcon = "assets/video.png";
+  static const String bookIcon = "assets/book.png";
 }
