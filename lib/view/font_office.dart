@@ -142,9 +142,6 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                               horizontal: getWidgetWidth(width: 20)),
                           itemCount: controller.frontOfficeData.length,
                           itemBuilder: (context, index) {
-                            // log("${index}");
-
-                            // log("l${controller.frontOfficeData[index].subcategory[0].link}l ${index}");
                             final isExpanded =
                                 controller.expandedIndex == index;
                             final linkAvailable = (controller
@@ -174,49 +171,6 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
 
                             return Column(
                               children: [
-                                // GestureDetector(
-                                //   onTap: () {
-                                //     controller.expandedIndex = isExpanded ? -1 : index;
-                                //     controller.update();
-                                //   },
-                                //   child: Container(
-                                //     width: getWidgetWidth(width: 375),
-                                //     // height: getWidgetHeight(height: 60),
-                                //     margin: const EdgeInsets.symmetric(vertical: 5),
-                                //     decoration: BoxDecoration(
-                                //       borderRadius: BorderRadius.circular(12),
-                                //       boxShadow: [
-                                //         BoxShadow(
-                                //           color: Colors.black.withOpacity(0.1),
-                                //           offset: const Offset(0, 4),
-                                //           blurRadius: 10,
-                                //         ),
-                                //       ],
-                                //     ),
-                                //     child: Container(
-                                //       width: getWidgetWidth(width: 375),
-                                //       // height: getWidgetHeight(height: 75),
-                                //       decoration: BoxDecoration(
-                                //         borderRadius: BorderRadius.circular(12),
-                                //         color: Colors.white,
-                                //       ),
-                                //       child: Padding(
-                                //         padding: EdgeInsets.symmetric(
-                                //             vertical: getWidgetHeight(height: 20),
-                                //             horizontal: getWidgetWidth(width: 20)),
-                                //         child: Text(
-                                //           controller.hospitalityTopics[index],
-                                //           style: GoogleFonts.inter(
-                                //             fontWeight: FontWeight.w500,
-                                //             fontSize: 14,
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ),
-                                //   ),
-                                // ),
-
-                                // Expandable Section
                                 Padding(
                                   padding: EdgeInsets.symmetric(
                                       vertical: getWidgetHeight(height: 5)),
