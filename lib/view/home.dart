@@ -13,6 +13,7 @@ import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
+import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/interactive_simulations.dart';
 
@@ -134,10 +135,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     child: Container(
                       height: getWidgetHeight(height: 40),
                       width: getWidgetWidth(width: 40),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: getWidgetWidth(width: 8),
+                          vertical: getWidgetHeight(height: 10)),
                       decoration: BoxDecoration(
                           color: const Color(0xFFF7F8F8),
                           borderRadius: BorderRadius.circular(8)),
-                      child: const Icon(Icons.menu),
+                      child: Image.asset(
+                        AllAssets.drawerIcon,
+                        color: Colors.black,
+                      ),
                     ),
                   );
                 })
@@ -275,13 +282,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         ),
                         child: GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => InteractiveSimulatiion(
-                                    title: controller.smartShorts[index]),
-                              ),
-                            );
+                            index == 0
+                                ? Get.toNamed(AppRoutes.simulation)
+                                : Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          InteractiveSimulatiion(
+                                              title: controller
+                                                  .smartShorts[index]),
+                                    ),
+                                  );
                           },
                           child: Container(
                             height: getWidgetHeight(height: 75),
@@ -317,10 +328,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         ),
                                         Padding(
                                           padding: EdgeInsets.symmetric(
-                                            vertical:
-                                                getWidgetHeight(height: 22),
-                                            horizontal:
-                                                getWidgetWidth(width: 16),
+                                            vertical: index == 1
+                                                ? 0
+                                                : getWidgetHeight(height: 22),
+                                            horizontal: index == 1
+                                                ? 0
+                                                : getWidgetWidth(width: 16),
                                           ),
                                           child: index == 0
                                               ? Image.asset(
@@ -332,6 +345,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                   ? const Icon(
                                                       Icons.mic,
                                                       color: Colors.white,
+                                                      size: 28,
                                                     )
                                                   : SvgPicture.asset(
                                                       "assets/calendar.svg"),

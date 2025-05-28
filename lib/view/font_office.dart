@@ -125,8 +125,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                         ),
                       ),
                     )
-                  : controller.frontOfficeData.isEmpty ||
-                          controller.frontOfficeData.first.category == ""
+                  : controller.frontOfficeData.isEmpty
                       ? Center(
                           child: Text(
                           "No data",
@@ -143,34 +142,35 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                               horizontal: getWidgetWidth(width: 20)),
                           itemCount: controller.frontOfficeData.length,
                           itemBuilder: (context, index) {
-                            log("${controller.frontOfficeData.length}");
-                            log("l${controller.frontOfficeData[index].category}l");
+                            // log("${index}");
+
+                            // log("l${controller.frontOfficeData[index].subcategory[0].link}l ${index}");
                             final isExpanded =
                                 controller.expandedIndex == index;
-                            final linkAvailable = index <
-                                    controller.frontOfficeData[index]
-                                        .subcategory.length &&
-                                (controller.frontOfficeData[index]
-                                        .subcategory[0].link.isNotEmpty ||
-                                    controller.frontOfficeData[index]
-                                            .subcategory[0].link !=
-                                        "");
-                            final linkAvailable1 = index <
-                                    controller.frontOfficeData[index]
-                                        .subcategory.length &&
-                                (controller.frontOfficeData[index]
-                                        .subcategory[1].link.isNotEmpty ||
-                                    controller.frontOfficeData[index]
-                                            .subcategory[1].link !=
-                                        "");
-                            final linkAvailable2 = index <
-                                    controller.frontOfficeData[index]
-                                        .subcategory.length &&
-                                (controller.frontOfficeData[index]
-                                        .subcategory[2].link.isNotEmpty ||
-                                    controller.frontOfficeData[index]
-                                            .subcategory[2].link !=
-                                        "");
+                            final linkAvailable = (controller
+                                    .frontOfficeData[index]
+                                    .subcategory[0]
+                                    .link
+                                    .isNotEmpty ||
+                                controller.frontOfficeData[index].subcategory[0]
+                                        .link !=
+                                    "");
+                            final linkAvailable1 = (controller
+                                    .frontOfficeData[index]
+                                    .subcategory[1]
+                                    .link
+                                    .isNotEmpty ||
+                                controller.frontOfficeData[index].subcategory[1]
+                                        .link !=
+                                    "");
+                            final linkAvailable2 = (controller
+                                    .frontOfficeData[index]
+                                    .subcategory[2]
+                                    .link
+                                    .isNotEmpty ||
+                                controller.frontOfficeData[index].subcategory[2]
+                                        .link !=
+                                    "");
 
                             return Column(
                               children: [
@@ -283,7 +283,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                     horizontal: getWidgetWidth(
                                                         width: 15),
                                                     vertical: getWidgetHeight(
-                                                        height: 5),
+                                                        height: 8),
                                                   ),
                                                   child: Row(
                                                     mainAxisAlignment:
@@ -308,10 +308,10 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                               ? Colors.black
                                                               : Colors.grey,
                                                           width: getWidgetWidth(
-                                                              width: 30),
+                                                              width: 28),
                                                           height:
                                                               getWidgetHeight(
-                                                                  height: 30),
+                                                                  height: 28),
                                                         ),
                                                       ),
                                                       GestureDetector(
@@ -327,15 +327,15 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                               }
                                                             : null,
                                                         child: Image.asset(
-                                                          AllAssets.faq,
+                                                          AllAssets.bookIcon,
                                                           color: linkAvailable1
                                                               ? Colors.black
                                                               : Colors.grey,
                                                           width: getWidgetWidth(
-                                                              width: 30),
+                                                              width: 28),
                                                           height:
                                                               getWidgetHeight(
-                                                                  height: 30),
+                                                                  height: 26),
                                                         ),
                                                       ),
                                                       GestureDetector(
@@ -356,7 +356,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                               ? Colors.black
                                                               : Colors.grey,
                                                           width: getWidgetWidth(
-                                                              width: 26),
+                                                              width: 22),
                                                           height:
                                                               getWidgetHeight(
                                                                   height: 26),
@@ -376,10 +376,10 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                         },
                                                         child: SizedBox(
                                                           width: getWidgetWidth(
-                                                              width: 35),
+                                                              width: 32),
                                                           height:
                                                               getWidgetHeight(
-                                                                  height: 35),
+                                                                  height: 28),
                                                           child: const Icon(
                                                             Icons.mic,
                                                             size: 30,

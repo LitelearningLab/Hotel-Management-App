@@ -4,6 +4,7 @@ import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
 
 class InAppWebViewPage extends StatefulWidget {
   InAppWebViewPage(
@@ -81,53 +82,58 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
                   Expanded(
                     child: Container(
                       color: Colors.white,
-                      child: InAppWebView(
-                        onLoadStop: (controller, url) {
-                          setState(() {
-                            onLoad = false;
-                          });
-                        },
-                        onLoadStart: (controller, url) {
-                          setState(() {
-                            onLoad = true;
-                          });
-                        },
-                        initialUrlRequest:
-                            URLRequest(url: Uri.parse(widget.url)),
-                        initialOptions: InAppWebViewGroupOptions(
-                          crossPlatform: InAppWebViewOptions(
-                              mediaPlaybackRequiresUserGesture: false,
-                              disableContextMenu: true),
-                          android: AndroidInAppWebViewOptions(
-                            // Disable file access
-                            allowFileAccess: false,
-                            // Disable content access
-                            allowContentAccess: false,
+                      child: Padding(
+                        padding:
+                            EdgeInsets.only(top: getWidgetHeight(height: 50)),
+                        child: InAppWebView(
+                          onLoadStop: (controller, url) {
+                            setState(() {
+                              onLoad = false;
+                            });
+                          },
+                          onLoadStart: (controller, url) {
+                            setState(() {
+                              onLoad = true;
+                            });
+                          },
+                          initialUrlRequest:
+                              URLRequest(url: Uri.parse(widget.url)),
+                          initialOptions: InAppWebViewGroupOptions(
+                            crossPlatform: InAppWebViewOptions(
+                                mediaPlaybackRequiresUserGesture: false,
+                                disableContextMenu: true),
+                            android: AndroidInAppWebViewOptions(
+                              // Disable file access
+                              allowFileAccess: false,
+                              // Disable content access
+                              allowContentAccess: false,
+                            ),
+                            ios: IOSInAppWebViewOptions(
+                              // Disable file access on iOS
+                              allowsLinkPreview: false,
+                            ),
                           ),
-                          ios: IOSInAppWebViewOptions(
-                            // Disable file access on iOS
-                            allowsLinkPreview: false,
-                          ),
+                          onWebViewCreated:
+                              (InAppWebViewController controller) {
+                            // _webViewController = controller;
+                          },
+                          onDownloadStartRequest: (controller, request) async {
+                            // Block all download requests
+                            return;
+                          },
+                          shouldOverrideUrlLoading:
+                              (controller, navigationAction) async {
+                            // You can add additional URL filtering here if needed
+                            return NavigationActionPolicy.ALLOW;
+                          },
+                          androidOnPermissionRequest:
+                              (InAppWebViewController controller, String origin,
+                                  List<String> resources) async {
+                            return PermissionRequestResponse(
+                                resources: resources,
+                                action: PermissionRequestResponseAction.GRANT);
+                          },
                         ),
-                        onWebViewCreated: (InAppWebViewController controller) {
-                          // _webViewController = controller;
-                        },
-                        onDownloadStartRequest: (controller, request) async {
-                          // Block all download requests
-                          return;
-                        },
-                        shouldOverrideUrlLoading:
-                            (controller, navigationAction) async {
-                          // You can add additional URL filtering here if needed
-                          return NavigationActionPolicy.ALLOW;
-                        },
-                        androidOnPermissionRequest:
-                            (InAppWebViewController controller, String origin,
-                                List<String> resources) async {
-                          return PermissionRequestResponse(
-                              resources: resources,
-                              action: PermissionRequestResponseAction.GRANT);
-                        },
                       ),
                     ),
                   ),
