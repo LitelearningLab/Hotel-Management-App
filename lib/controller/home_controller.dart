@@ -6,13 +6,15 @@ class HomeController extends GetxController {
     "Accommodation\nManagement - Front Office",
     "Food & Beverage Service\nManagement",
     "Food Production",
-    "Accommodation\nManagement - Housekeeping"
+    "Accommodation\nManagement - Housekeeping",
+    "Mock Interview"
   ];
   List<String> cardImages = [
     AllAssets.frontOffice,
     AllAssets.foodAndBevarage,
     AllAssets.foodProduction,
-    AllAssets.houseKeeping
+    AllAssets.houseKeeping,
+    // AllAssets.interview
   ];
   List<String> smartShorts = [
     "Interactive Simulations",

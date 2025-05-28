@@ -68,6 +68,7 @@ class FrontOfficeController extends GetxController {
                 : index == 3
                     ? CollectionNames.houseKeeping
                     : "";
+    log(collectionName);
     frontOfficeData =
         await frontOfficeResponse.getFrontOfficeCollection(collectionName);
     loading = false;

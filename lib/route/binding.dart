@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/controller/front_office_controller.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
+import 'package:hotelmanagementapp/controller/simulation_controller.dart';
 
 class InitialBinding with Bindings {
   @override
@@ -14,5 +15,12 @@ class FrontOfficeBinding with Bindings {
   @override
   void dependencies() {
     Get.put(FrontOfficeController());
+  }
+}
+
+class SimulationBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(SimulationController());
   }
 }

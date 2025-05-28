@@ -2,6 +2,7 @@ import 'package:get/get_navigation/src/routes/default_route.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:hotelmanagementapp/route/binding.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
+import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/home.dart';
 
@@ -15,6 +16,10 @@ class RouteService {
     GetPage(
         name: AppRoutes.frontOffice,
         page: () => const FrontOfficeHotelReception(),
-        binding: FrontOfficeBinding())
+        binding: FrontOfficeBinding()),
+    GetPage(
+        name: AppRoutes.simulation,
+        page: () => ARCallSimulation(),
+        binding: SimulationBinding())
   ];
 }
