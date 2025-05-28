@@ -47,19 +47,19 @@ class MyApp extends StatelessWidget {
 Future<void> uploadBulkData() async {
   // Load JSON from assets
   String jsonString =
-      await rootBundle.loadString('assets/front_office_final_upload.json');
+      await rootBundle.loadString('assets/HousekeepingCollection.json');
   Map<String, dynamic> jsonData = json.decode(jsonString);
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   // Access your specific collection from JSON
-  final documents = jsonData['HousekeepingCollection'];
+  final documents = jsonData['InteractiveSimulationCollection'];
 
   if (documents != null && documents is Map<String, dynamic>) {
     for (final docId in documents.keys) {
       final fields = documents[docId];
       await firestore
-          .collection("HousekeepingCollection")
+          .collection("InteractiveSimulationCollection")
           .doc(docId)
           .set(fields);
     }

@@ -4,4 +4,5 @@ class CollectionNames {
   static String foodAndBeverage = 'FoodAndBevarageCollection';
   static String foodProduction = 'FoodProductionCollection';
   static String houseKeeping = 'HousekeepingCollection';
+  static String simulation = 'InteractiveSimulationCollection';
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 
 class ARGridTile extends StatelessWidget {
@@ -67,14 +68,11 @@ class ARGridTile extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 10, top: 10, right: 20),
                   child: Text(
                     title,
-                    // _categories[index].category!,
-                    // gridTileDatas[0]['title']!,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Roboto',
-                      letterSpacing: 0,
+                    textAlign: TextAlign.start,
+                    overflow: TextOverflow.fade,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
                     ),
                   ),
                 ),

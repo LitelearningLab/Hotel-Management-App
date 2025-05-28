@@ -1,3 +1,25 @@
-import 'package:get/get.dart';
+import 'dart:math';
 
-class SimulationController extends GetxController {}
+import 'package:get/get.dart';
+import 'package:hotelmanagementapp/model/simulation_model.dart';
+import 'package:hotelmanagementapp/public/api.dart';
+import 'package:hotelmanagementapp/response/simulation_responce.dart';
+
+class SimulationController extends GetxController {
+  List<SimulationModel> simulations = [];
+  SimulationResponse simulationResponce = SimulationResponse();
+  bool loading = true;
+  @override
+  void onInit() {
+    init();
+    super.onInit();
+  }
+
+  init() async {
+    simulations = await simulationResponce
+        .getSimulationCollection(CollectionNames.simulation);
+    log(simulations.length);
+    loading = false;
+    update();
+  }
+}

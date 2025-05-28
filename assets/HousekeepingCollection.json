@@ -1,0 +1,471 @@
+{
+  "InteractiveSimulationCollection": {
+    "doc1": {
+      "category": "Accommodation Management - Front Office",
+      "order": 1,
+      "key": "",
+      "subcategory": [
+        {
+          "title": "Guest Check-in Process",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Guest Check-out Process",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Room Reservation Handling",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Billing Procedures",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Handling Guest Complaints",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Telephone Etiquette",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Guest History Record Management",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Managing Front Office Cash",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Night Audit Process",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Interdepartmental Communication",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        }
+      ]
+    },
+    "doc2": {
+      "category": "Food & Beverage Service Management",
+      "order": 2,
+      "key": "",
+      "subcategory": [
+        {
+          "title": "Table Setting Styles",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Types of Service",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Menu Planning",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Order Taking Techniques",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Customer Complaint Handling",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Food & Beverage Terminology",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Buffet Management",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Service SOPs",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Wine Service",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Table Reservation System",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        }
+      ]
+    },
+    "doc3": {
+      "category": "Food Production",
+      "order": 3,
+      "key": "",
+      "subcategory": [
+        {
+          "title": "Kitchen Safety Guidelines",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Knife Skills",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Soup & Sauce Preparation",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Baking Basics",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Vegetarian & Non-Vegetarian Prep",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "HACCP Standards",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Plating Techniques",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Portion Control",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Food Storage Techniques",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Continental Cuisine",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Indian Regional Cuisine",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Recipe Standardization",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        }
+      ]
+    },
+    "doc4": {
+      "category": "Accommodation Management - Housekeeping",
+      "order": 4,
+      "key": "",
+      "subcategory": [
+        {
+          "title": "Daily Room Cleaning Checklist",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Linen Handling",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Lost & Found Procedure",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Guest Amenities Setup",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Pest Control Measures",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Public Area Maintenance",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Laundry Operations",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Cleaning Equipment Usage",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Bed Making Techniques",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Spring Cleaning Plan",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        }
+      ]
+    },
+    "doc5": {
+      "category": "Mock Interview",
+      "order": 5,
+      "key": "",
+      "subcategory": [
+        {
+          "title": "Interview Preparation",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Common HR Questions",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Grooming & Body Language",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Resume Review Tips",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Communication Skills",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Technical Round Prep",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Do\u2019s and Don\u2019ts",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Group Discussion Practice",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Mock Q&A Scripts",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Follow-up Etiquette",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Online Interview Setup",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        },
+        {
+          "title": "Dress Code Guidelines",
+          "links": [
+            "link1",
+            "link2",
+            "link3"
+          ]
+        }
+      ]
+    }
+  }
+}
