@@ -5,6 +5,7 @@ import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/home.dart';
+import 'package:hotelmanagementapp/view/simulation_sub.dart';
 
 class RouteService {
   static List<GetPage<dynamic>>? getPages = [
@@ -20,6 +21,10 @@ class RouteService {
     GetPage(
         name: AppRoutes.simulation,
         page: () => ARCallSimulation(),
-        binding: SimulationBinding())
+        binding: SimulationBinding()),
+    // GetPage(
+    //     name: AppRoutes.simulationSub,
+    //     page: () => SimulationSub(),
+    //     binding: SimulationSubBinding())
   ];
 }

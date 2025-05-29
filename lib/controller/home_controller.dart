@@ -3,7 +3,7 @@ import 'package:hotelmanagementapp/public/all_asset.dart';
 
 class HomeController extends GetxController {
   List<String> cardNames = [
-    "Accommodation\nManagement - Front Office",
+    "Front Office\nManagement",
     "Food & Beverage Service\nManagement",
     "Food Production",
     "Accommodation\nManagement - Housekeeping",

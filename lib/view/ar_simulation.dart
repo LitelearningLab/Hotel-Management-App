@@ -1,12 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/simulation_controller.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/ar_grid_tile.dart';
+import 'package:hotelmanagementapp/view/simulation_sub.dart';
 
 class ARCallSimulation extends StatelessWidget {
   ARCallSimulation({super.key});
@@ -86,7 +89,16 @@ class ARCallSimulation extends StatelessWidget {
                             children: [
                               controller.simulations[0].category.isNotEmpty
                                   ? ARGridTile(
-                                      onTap: () async {},
+                                      onTap: () async {
+                                        // Get.toNamed(AppRoutes.simulationSub);
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SimulationSub(
+                                                        simulation: controller
+                                                            .simulations[0])));
+                                      },
                                       tileColor: gridTileDatas[0]['tileColor'],
                                       title: controller.simulations[0].category,
                                       icon: gridTileDatas[0]['image'],
@@ -98,7 +110,15 @@ class ARCallSimulation extends StatelessWidget {
                               ),
                               controller.simulations[3].category.isNotEmpty
                                   ? ARGridTile(
-                                      onTap: () async {},
+                                      onTap: () async {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SimulationSub(
+                                                        simulation: controller
+                                                            .simulations[3])));
+                                      },
                                       tileColor: gridTileDatas[3]['tileColor'],
                                       title: controller.simulations[3].category,
                                       icon: gridTileDatas[3]['image'],
@@ -110,7 +130,15 @@ class ARCallSimulation extends StatelessWidget {
                               ),
                               controller.simulations[4].category.isNotEmpty
                                   ? ARGridTile(
-                                      onTap: () async {},
+                                      onTap: () async {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SimulationSub(
+                                                        simulation: controller
+                                                            .simulations[4])));
+                                      },
                                       height: getWidgetHeight(height: 180),
                                       tileColor: gridTileDatas[4]['tileColor'],
                                       title: controller.simulations[4].category,
@@ -128,7 +156,15 @@ class ARCallSimulation extends StatelessWidget {
                               ),
                               controller.simulations[1].category.isNotEmpty
                                   ? ARGridTile(
-                                      onTap: () async {},
+                                      onTap: () async {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SimulationSub(
+                                                        simulation: controller
+                                                            .simulations[1])));
+                                      },
                                       tileColor: gridTileDatas[1]['tileColor'],
                                       title: controller.simulations[1].category,
                                       icon: gridTileDatas[1]['image'],
@@ -140,7 +176,15 @@ class ARCallSimulation extends StatelessWidget {
                               ),
                               controller.simulations[2].category.isNotEmpty
                                   ? ARGridTile(
-                                      onTap: () async {},
+                                      onTap: () async {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SimulationSub(
+                                                        simulation: controller
+                                                            .simulations[2])));
+                                      },
                                       tileColor: gridTileDatas[2]['tileColor'],
                                       title: controller.simulations[2].category,
                                       icon: gridTileDatas[2]['image'],
