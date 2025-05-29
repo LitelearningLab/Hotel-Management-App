@@ -22,9 +22,9 @@ class RouteService {
         name: AppRoutes.simulation,
         page: () => ARCallSimulation(),
         binding: SimulationBinding()),
-    // GetPage(
-    //     name: AppRoutes.simulationSub,
-    //     page: () => SimulationSub(),
-    //     binding: SimulationSubBinding())
+    GetPage(
+        name: AppRoutes.simulationSub,
+        page: () => SimulationSub(),
+        binding: SimulationSubBinding())
   ];
 }

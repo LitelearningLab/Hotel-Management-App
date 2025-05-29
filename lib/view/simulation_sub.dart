@@ -10,11 +10,12 @@ import 'package:hotelmanagementapp/controller/simulation_sub_controller.dart';
 import 'package:hotelmanagementapp/model/simulation_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 
 class SimulationSub extends StatefulWidget {
-  final SimulationController controller = Get.find<SimulationController>();
-  final SimulationModel simulation;
-  SimulationSub({required this.simulation, super.key});
+  final SimulationSubController controller = Get.put(SimulationSubController());
+
+  SimulationSub({super.key});
 
   @override
   State<SimulationSub> createState() => _SimulationSubState();
@@ -30,39 +31,44 @@ class _SimulationSubState extends State<SimulationSub> {
           forceMaterialTransparency: true,
           backgroundColor: Colors.white,
           titleSpacing: 0,
-          title: Text(
-            "Interactive Simulations",
-            textAlign: TextAlign.left,
-            style: GoogleFonts.inter(
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
-              color: Colors.black,
-            ),
-          )),
+          title: GetBuilder<SimulationSubController>(builder: (controller) {
+            return Text(
+              controller.title,
+              textAlign: TextAlign.left,
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
+                color: Colors.black,
+              ),
+            );
+          })),
       body: SafeArea(
           child: Column(
         children: [
-          Builder(builder: (context) {
+          GetBuilder<SimulationSubController>(builder: (controller) {
             return Expanded(
               child: ListView.builder(
                 padding: EdgeInsets.symmetric(
                     vertical: getWidgetHeight(height: 10),
                     horizontal: getWidgetWidth(width: 20)),
-                itemCount: widget.simulation.subcategory.length,
+                itemCount: controller.simulation.subcategory.length,
                 itemBuilder: (context, index) {
-                  final isExpanded = expandedIndex == index;
+                  final isExpanded = controller.expandedIndex == index;
 
-                  final linkAvailable = (widget
+                  final linkAvailable = (controller
                           .simulation.subcategory[index].links[0].isNotEmpty &&
-                      widget.simulation.subcategory[index].links[0] != "link1");
+                      controller.simulation.subcategory[index].links[0] !=
+                          "link1");
 
-                  final linkAvailable1 = (widget
+                  final linkAvailable1 = (controller
                           .simulation.subcategory[index].links[1].isNotEmpty &&
-                      widget.simulation.subcategory[index].links[1] != "link2");
+                      controller.simulation.subcategory[index].links[1] !=
+                          "link2");
 
-                  final linkAvailable2 = (widget
+                  final linkAvailable2 = (controller
                           .simulation.subcategory[index].links[2].isNotEmpty &&
-                      widget.simulation.subcategory[index].links[2] != "link3");
+                      controller.simulation.subcategory[index].links[2] !=
+                          "link3");
                   // final linkAvailable1 = (controller
                   //         .frontOfficeData[index]
                   //         .subcategory[1]
@@ -87,7 +93,8 @@ class _SimulationSubState extends State<SimulationSub> {
                             vertical: getWidgetHeight(height: 5)),
                         child: GestureDetector(
                             onTap: () {
-                              expandedIndex = isExpanded ? -1 : index;
+                              controller.expandedIndex =
+                                  isExpanded ? -1 : index;
                               setState(() {});
                               // controller.update();
                             },
@@ -116,7 +123,7 @@ class _SimulationSubState extends State<SimulationSub> {
                                         horizontal: getWidgetWidth(width: 20),
                                       ),
                                       child: Text(
-                                        widget.simulation.subcategory[index]
+                                        controller.simulation.subcategory[index]
                                             .title,
                                         style: GoogleFonts.inter(
                                           fontWeight: FontWeight.w500,
@@ -145,20 +152,21 @@ class _SimulationSubState extends State<SimulationSub> {
                                               MainAxisAlignment.spaceAround,
                                           children: [
                                             GestureDetector(
-                                              onTap: () {
-                                                // Navigator.push(
-                                                //     context,
-                                                //     MaterialPageRoute(
-                                                //         builder: (context) =>
-                                                //             InAppWebViewPage(
-                                                //               url: controller
-                                                //                   .frontOfficeData[
-                                                //                       index]
-                                                //                   .subcategory[
-                                                //                       2]
-                                                //                   .link,
-                                                //             )));
-                                              },
+                                              onTap: linkAvailable
+                                                  ? () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  InAppWebViewPage(
+                                                                    url: controller
+                                                                        .simulation
+                                                                        .subcategory[
+                                                                            index]
+                                                                        .links[0],
+                                                                  )));
+                                                    }
+                                                  : null,
                                               child: Wrap(
                                                 children: [
                                                   Text(
@@ -187,20 +195,21 @@ class _SimulationSubState extends State<SimulationSub> {
                                               ),
                                             ),
                                             GestureDetector(
-                                              onTap: () {
-                                                // Navigator.push(
-                                                //     context,
-                                                //     MaterialPageRoute(
-                                                //         builder: (context) =>
-                                                //             InAppWebViewPage(
-                                                //               url: controller
-                                                //                   .frontOfficeData[
-                                                //                       index]
-                                                //                   .subcategory[
-                                                //                       2]
-                                                //                   .link,
-                                                //             )));
-                                              },
+                                              onTap: linkAvailable1
+                                                  ? () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  InAppWebViewPage(
+                                                                    url: controller
+                                                                        .simulation
+                                                                        .subcategory[
+                                                                            index]
+                                                                        .links[1],
+                                                                  )));
+                                                    }
+                                                  : null,
                                               child: Wrap(
                                                 children: [
                                                   Text(
@@ -229,20 +238,21 @@ class _SimulationSubState extends State<SimulationSub> {
                                               ),
                                             ),
                                             GestureDetector(
-                                              onTap: () {
-                                                // Navigator.push(
-                                                //     context,
-                                                //     MaterialPageRoute(
-                                                //         builder: (context) =>
-                                                //             InAppWebViewPage(
-                                                //               url: controller
-                                                //                   .frontOfficeData[
-                                                //                       index]
-                                                //                   .subcategory[
-                                                //                       2]
-                                                //                   .link,
-                                                //             )));
-                                              },
+                                              onTap: linkAvailable2
+                                                  ? () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  InAppWebViewPage(
+                                                                    url: controller
+                                                                        .simulation
+                                                                        .subcategory[
+                                                                            index]
+                                                                        .links[2],
+                                                                  )));
+                                                    }
+                                                  : null,
                                               child: Wrap(
                                                 children: [
                                                   Text(

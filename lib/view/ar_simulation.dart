@@ -90,14 +90,24 @@ class ARCallSimulation extends StatelessWidget {
                               controller.simulations[0].category.isNotEmpty
                                   ? ARGridTile(
                                       onTap: () async {
-                                        // Get.toNamed(AppRoutes.simulationSub);
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SimulationSub(
-                                                        simulation: controller
-                                                            .simulations[0])));
+                                        Get.toNamed(AppRoutes.simulationSub,
+                                            arguments: {
+                                              'title': controller
+                                                  .simulations[0].category,
+                                              'simulation':
+                                                  controller.simulations[0]
+                                            });
+                                        // Navigator.push(
+                                        //     context,
+                                        //     MaterialPageRoute(
+                                        //         builder: (context) =>
+                                        //             SimulationSub(
+                                        //                 title:
+                                        //                     controller
+                                        //                         .simulations[0]
+                                        //                         .category,
+                                        //                 simulation: controller
+                                        //                     .simulations[0])));
                                       },
                                       tileColor: gridTileDatas[0]['tileColor'],
                                       title: controller.simulations[0].category,
@@ -111,13 +121,13 @@ class ARCallSimulation extends StatelessWidget {
                               controller.simulations[3].category.isNotEmpty
                                   ? ARGridTile(
                                       onTap: () async {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SimulationSub(
-                                                        simulation: controller
-                                                            .simulations[3])));
+                                        Get.toNamed(AppRoutes.simulationSub,
+                                            arguments: {
+                                              'title': controller
+                                                  .simulations[3].category,
+                                              'simulation':
+                                                  controller.simulations[3]
+                                            });
                                       },
                                       tileColor: gridTileDatas[3]['tileColor'],
                                       title: controller.simulations[3].category,
@@ -131,13 +141,13 @@ class ARCallSimulation extends StatelessWidget {
                               controller.simulations[4].category.isNotEmpty
                                   ? ARGridTile(
                                       onTap: () async {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SimulationSub(
-                                                        simulation: controller
-                                                            .simulations[4])));
+                                        Get.toNamed(AppRoutes.simulationSub,
+                                            arguments: {
+                                              'title': controller
+                                                  .simulations[4].category,
+                                              'simulation':
+                                                  controller.simulations[4]
+                                            });
                                       },
                                       height: getWidgetHeight(height: 180),
                                       tileColor: gridTileDatas[4]['tileColor'],
@@ -157,13 +167,13 @@ class ARCallSimulation extends StatelessWidget {
                               controller.simulations[1].category.isNotEmpty
                                   ? ARGridTile(
                                       onTap: () async {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SimulationSub(
-                                                        simulation: controller
-                                                            .simulations[1])));
+                                        Get.toNamed(AppRoutes.simulationSub,
+                                            arguments: {
+                                              'title': controller
+                                                  .simulations[1].category,
+                                              'simulation':
+                                                  controller.simulations[1]
+                                            });
                                       },
                                       tileColor: gridTileDatas[1]['tileColor'],
                                       title: controller.simulations[1].category,
@@ -177,13 +187,13 @@ class ARCallSimulation extends StatelessWidget {
                               controller.simulations[2].category.isNotEmpty
                                   ? ARGridTile(
                                       onTap: () async {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SimulationSub(
-                                                        simulation: controller
-                                                            .simulations[2])));
+                                        Get.toNamed(AppRoutes.simulationSub,
+                                            arguments: {
+                                              'title': controller
+                                                  .simulations[2].category,
+                                              'simulation':
+                                                  controller.simulations[2]
+                                            });
                                       },
                                       tileColor: gridTileDatas[2]['tileColor'],
                                       title: controller.simulations[2].category,
