@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/constant.dart';
 
 class InAppWebViewPage extends StatefulWidget {
   InAppWebViewPage(
@@ -65,81 +66,81 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    print(MediaQuery.of(context).size.height);
-    print(MediaQuery.of(context).size.width);
-
     return PopScope(
       onPopInvoked: (didPop) {
         // stopTimerMainCategory();
       },
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: Stack(
           children: [
-            Container(
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      color: Colors.white,
-                      child: Padding(
-                        padding:
-                            EdgeInsets.only(top: getWidgetHeight(height: 50)),
-                        child: InAppWebView(
-                          onLoadStop: (controller, url) {
-                            setState(() {
-                              onLoad = false;
-                            });
-                          },
-                          onLoadStart: (controller, url) {
-                            setState(() {
-                              onLoad = true;
-                            });
-                          },
-                          initialUrlRequest:
-                              URLRequest(url: Uri.parse(widget.url)),
-                          initialOptions: InAppWebViewGroupOptions(
-                            crossPlatform: InAppWebViewOptions(
-                                mediaPlaybackRequiresUserGesture: false,
-                                disableContextMenu: true),
-                            android: AndroidInAppWebViewOptions(
-                              // Disable file access
-                              allowFileAccess: false,
-                              // Disable content access
-                              allowContentAccess: false,
-                            ),
-                            ios: IOSInAppWebViewOptions(
-                              // Disable file access on iOS
-                              allowsLinkPreview: false,
-                            ),
+            Column(
+              children: <Widget>[
+                Expanded(
+                  child: Container(
+                    color: Colors.white,
+                    child: Padding(
+                      padding:
+                          EdgeInsets.only(top: getWidgetHeight(height: 50)),
+                      child: InAppWebView(
+                        onLoadStop: (controller, url) {
+                          setState(() {
+                            onLoad = false;
+                          });
+                        },
+                        onLoadStart: (controller, url) {
+                          setState(() {
+                            onLoad = true;
+                          });
+                        },
+                        initialUrlRequest:
+                            URLRequest(url: Uri.parse(widget.url)),
+                        initialOptions: InAppWebViewGroupOptions(
+                          crossPlatform: InAppWebViewOptions(
+                              mediaPlaybackRequiresUserGesture: false,
+                              disableContextMenu: true),
+                          android: AndroidInAppWebViewOptions(
+                            allowFileAccess: false,
+                            allowContentAccess: false,
                           ),
-                          onWebViewCreated:
-                              (InAppWebViewController controller) {
-                            // _webViewController = controller;
-                          },
-                          onDownloadStartRequest: (controller, request) async {
-                            // Block all download requests
-                            return;
-                          },
-                          shouldOverrideUrlLoading:
-                              (controller, navigationAction) async {
-                            // You can add additional URL filtering here if needed
-                            return NavigationActionPolicy.ALLOW;
-                          },
-                          androidOnPermissionRequest:
-                              (InAppWebViewController controller, String origin,
-                                  List<String> resources) async {
-                            return PermissionRequestResponse(
-                                resources: resources,
-                                action: PermissionRequestResponseAction.GRANT);
-                          },
+                          ios: IOSInAppWebViewOptions(
+                            allowsLinkPreview: false,
+                          ),
                         ),
+                        onWebViewCreated: (controller) {},
+                        onDownloadStartRequest: (controller, request) async {
+                          return;
+                        },
+                        shouldOverrideUrlLoading:
+                            (controller, navigationAction) async {
+                          return NavigationActionPolicy.ALLOW;
+                        },
+                        androidOnPermissionRequest:
+                            (controller, origin, resources) async {
+                          return PermissionRequestResponse(
+                              resources: resources,
+                              action: PermissionRequestResponseAction.GRANT);
+                        },
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+            // Loader Overlay
+            if (onLoad)
+              Container(
+                color: Colors.white,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: linearColor,
+                  ),
+                ),
+              ),
+
+            // Back Button
             Positioned(
               bottom: 20,
               left: 10,
@@ -149,19 +150,18 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2), // light shadow
+                      color: Colors.black.withOpacity(0.2),
                       spreadRadius: 1,
                       blurRadius: 4,
-                      offset: Offset(0, 2), // subtle downward shadow
+                      offset: Offset(0, 2),
                     ),
                   ],
                 ),
                 child: IconButton(
                   onPressed: () {
-                    // stopTimerMainCategory();
                     Navigator.pop(context);
                   },
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                 ),
               ),
             ),
