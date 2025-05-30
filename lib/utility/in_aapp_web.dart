@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
   @override
   void initState() {
     super.initState();
-
+    startTimerMainCategory("name");
     // Add the observer for lifecycle events
     WidgetsBinding.instance.addObserver(this);
   }
@@ -56,6 +57,23 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      if (count > 0) {
+        recordTiming("Paused");
+      }
+      log("User navigated to another app or attended a call.${count}");
+    } else if (state == AppLifecycleState.resumed) {
+      startTimings = DateTime.now();
+      resume = true;
+      // subResume = true;
+      log("User returned to the app.");
+    }
+  }
+
+  @override
   FutureOr<void> afterFirstLayout(BuildContext context) {
     if (widget.isMeetingEtiquite) {
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -70,7 +88,7 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvoked: (didPop) {
-        // stopTimerMainCategory();
+        stopTimerMainCategory();
       },
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -159,6 +177,7 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
                 ),
                 child: IconButton(
                   onPressed: () {
+                    stopTimerMainCategory();
                     Navigator.pop(context);
                   },
                   icon: const Icon(Icons.arrow_back),

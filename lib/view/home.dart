@@ -166,6 +166,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           top: getWidgetHeight(height: 10)),
                       child: InkWell(
                         onTap: () {
+                          timestampIndex = index;
+                          mianCategoryTitile = controller.cardNames[index];
                           Get.toNamed(AppRoutes.frontOffice, arguments: {
                             'title': controller.cardNames[index],
                             'image': controller.cardImages[index],
@@ -282,6 +284,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         ),
                         child: GestureDetector(
                           onTap: () {
+                            mianCategoryTitile = controller.smartShorts[index];
+                            timestampIndex = -1;
                             index == 0
                                 ? Get.toNamed(AppRoutes.simulation)
                                 : Navigator.push(

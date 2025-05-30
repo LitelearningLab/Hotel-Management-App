@@ -247,6 +247,8 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                       GestureDetector(
                                                         onTap: linkAvailable
                                                             ? () {
+                                                                activityName =
+                                                                    "E-Learning";
                                                                 Navigator.push(
                                                                     context,
                                                                     MaterialPageRoute(
@@ -271,6 +273,13 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                       GestureDetector(
                                                         onTap: linkAvailable1
                                                             ? () {
+                                                                activityName =
+                                                                    'video';
+
+                                                                controller
+                                                                    .frontOfficeData[
+                                                                        index]
+                                                                    .category;
                                                                 Navigator.push(
                                                                     context,
                                                                     MaterialPageRoute(
@@ -295,6 +304,14 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                       GestureDetector(
                                                         onTap: linkAvailable2
                                                             ? () {
+                                                                activityName =
+                                                                    "third option";
+
+                                                                subCategoryTitle =
+                                                                    controller
+                                                                        .frontOfficeData[
+                                                                            index]
+                                                                        .category;
                                                                 Navigator.push(
                                                                     context,
                                                                     MaterialPageRoute(
@@ -318,6 +335,14 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                       ),
                                                       InkWell(
                                                         onTap: () {
+                                                          activityName =
+                                                              "Prounciation Lab";
+
+                                                          subCategoryTitle =
+                                                              controller
+                                                                  .frontOfficeData[
+                                                                      index]
+                                                                  .category;
                                                           Navigator.push(
                                                               context,
                                                               MaterialPageRoute(

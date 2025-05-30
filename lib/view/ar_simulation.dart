@@ -90,6 +90,8 @@ class ARCallSimulation extends StatelessWidget {
                               controller.simulations[0].category.isNotEmpty
                                   ? ARGridTile(
                                       onTap: () async {
+                                        subCategoryTitle =
+                                            controller.simulations[0].category;
                                         Get.toNamed(AppRoutes.simulationSub,
                                             arguments: {
                                               'title': controller
@@ -121,6 +123,8 @@ class ARCallSimulation extends StatelessWidget {
                               controller.simulations[3].category.isNotEmpty
                                   ? ARGridTile(
                                       onTap: () async {
+                                        subCategoryTitle =
+                                            controller.simulations[3].category;
                                         Get.toNamed(AppRoutes.simulationSub,
                                             arguments: {
                                               'title': controller
@@ -141,6 +145,8 @@ class ARCallSimulation extends StatelessWidget {
                               controller.simulations[4].category.isNotEmpty
                                   ? ARGridTile(
                                       onTap: () async {
+                                        subCategoryTitle =
+                                            controller.simulations[4].category;
                                         Get.toNamed(AppRoutes.simulationSub,
                                             arguments: {
                                               'title': controller
@@ -167,6 +173,8 @@ class ARCallSimulation extends StatelessWidget {
                               controller.simulations[1].category.isNotEmpty
                                   ? ARGridTile(
                                       onTap: () async {
+                                        subCategoryTitle =
+                                            controller.simulations[1].category;
                                         Get.toNamed(AppRoutes.simulationSub,
                                             arguments: {
                                               'title': controller
@@ -187,6 +195,8 @@ class ARCallSimulation extends StatelessWidget {
                               controller.simulations[2].category.isNotEmpty
                                   ? ARGridTile(
                                       onTap: () async {
+                                        subCategoryTitle =
+                                            controller.simulations[2].category;
                                         Get.toNamed(AppRoutes.simulationSub,
                                             arguments: {
                                               'title': controller
