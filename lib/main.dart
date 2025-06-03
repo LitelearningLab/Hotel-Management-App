@@ -11,12 +11,17 @@ import 'package:hotelmanagementapp/route/binding.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/route/route_service.dart';
 import 'package:hotelmanagementapp/view/home.dart';
+import 'package:hotelmanagementapp/view/login.dart';
+import 'package:hotelmanagementapp/view/splash.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  debugPrint = (String? message, {int? wrapWidth}) {
+    if (message != null) print(message);
+  };
   // uploadBulkData();
   // bulkEditDocuments();
   runApp(const MyApp());
@@ -38,7 +43,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.white,
         colorScheme: ColorScheme.fromSwatch().copyWith(primary: Colors.white),
       ),
-      home: const Home(),
+      home: SplashScreen(),
       // Remove the builder as it's not needed - GetMaterialApp already provides the MaterialApp functionality
     );
   }

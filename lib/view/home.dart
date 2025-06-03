@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -16,6 +17,8 @@ import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/interactive_simulations.dart';
+import 'package:hotelmanagementapp/view/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 int currentIndex = 0;
 
@@ -33,6 +36,54 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
     super.initState();
+  }
+
+  Future<void> logout(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white, // White background
+        title: Text(
+          'Logout',
+          style: TextStyle(color: Colors.black), // Black title text
+        ),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(color: Colors.black), // Black content text
+        ),
+        actions: [
+          TextButton(
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.black), // Black button text
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: Text(
+              'Logout',
+              style: TextStyle(color: Colors.black), // Black button text
+            ),
+            onPressed: () async {
+              Navigator.pop(context); // Close dialog
+
+              // Firebase SignOut
+              await FirebaseAuth.instance.signOut();
+
+              // Clear SharedPreferences
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.clear();
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -66,7 +117,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(context); // close drawer
+                Future.delayed(
+                    Duration(milliseconds: 250), () => logout(context));
               },
             ),
           ],
@@ -351,8 +404,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                       color: Colors.white,
                                                       size: 28,
                                                     )
-                                                  : SvgPicture.asset(
-                                                      "assets/calendar.svg"),
+                                                  : Image.asset(
+                                                      "assets/language_lab.png"),
                                         ),
                                       ],
                                     ),

@@ -9,43 +9,42 @@ import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 
 class InAppWebViewPage extends StatefulWidget {
-  InAppWebViewPage(
-      {Key? key,
-      required this.url,
-      this.isLandscape = false,
-      this.isMeetingEtiquite = false})
-      : super(key: key);
-
   final String url;
   final bool isLandscape;
   final bool isMeetingEtiquite;
 
+  InAppWebViewPage({
+    Key? key,
+    required this.url,
+    this.isLandscape = false,
+    this.isMeetingEtiquite = false,
+  }) : super(key: key);
+
   @override
-  _InAppWebViewPageState createState() => new _InAppWebViewPageState();
+  _InAppWebViewPageState createState() => _InAppWebViewPageState();
 }
 
 class _InAppWebViewPageState extends State<InAppWebViewPage>
     with AfterLayoutMixin<InAppWebViewPage>, WidgetsBindingObserver {
-  bool onLoad = false;
+  bool onLoad = true;
 
   @override
   void initState() {
     super.initState();
-    startTimerMainCategory("name");
-    // Add the observer for lifecycle events
     WidgetsBinding.instance.addObserver(this);
+    startTimerMainCategory("name");
   }
-
-  start() async {}
 
   @override
   void dispose() {
-    // Remove the observer when the widget is disposed
     WidgetsBinding.instance.removeObserver(this);
+    resetOrientationIfNeeded();
+    super.dispose();
+  }
 
+  void resetOrientationIfNeeded() {
     if (widget.isLandscape || widget.isMeetingEtiquite) {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
         DeviceOrientation.portraitDown,
@@ -53,7 +52,6 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
         DeviceOrientation.landscapeRight,
       ]);
     }
-    super.dispose();
   }
 
   @override
@@ -61,14 +59,11 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) {
-      if (count > 0) {
-        recordTiming("Paused");
-      }
-      log("User navigated to another app or attended a call.${count}");
+      if (count > 0) recordTiming("Paused");
+      log("App paused or user left: $count");
     } else if (state == AppLifecycleState.resumed) {
       startTimings = DateTime.now();
       resume = true;
-      // subResume = true;
       log("User returned to the app.");
     }
   }
@@ -78,12 +73,13 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
     if (widget.isMeetingEtiquite) {
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     } else if (widget.isLandscape) {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
     }
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -94,71 +90,59 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
         backgroundColor: Colors.white,
         body: Stack(
           children: [
+            // Splash/white background behind webview to avoid black flicker
+            Container(color: Colors.white),
+
             Column(
-              children: <Widget>[
+              children: [
                 Expanded(
-                  child: Container(
-                    color: Colors.white,
-                    child: Padding(
-                      padding:
-                          EdgeInsets.only(top: getWidgetHeight(height: 50)),
-                      child: InAppWebView(
-                        onLoadStop: (controller, url) {
-                          setState(() {
-                            onLoad = false;
-                          });
-                        },
-                        onLoadStart: (controller, url) {
-                          setState(() {
-                            onLoad = true;
-                          });
-                        },
-                        initialUrlRequest:
-                            URLRequest(url: Uri.parse(widget.url)),
-                        initialOptions: InAppWebViewGroupOptions(
-                          crossPlatform: InAppWebViewOptions(
-                              mediaPlaybackRequiresUserGesture: false,
-                              disableContextMenu: true),
-                          android: AndroidInAppWebViewOptions(
-                            allowFileAccess: false,
-                            allowContentAccess: false,
-                          ),
-                          ios: IOSInAppWebViewOptions(
-                            allowsLinkPreview: false,
-                          ),
+                  child: Padding(
+                    padding: EdgeInsets.only(top: getWidgetHeight(height: 50)),
+                    child: InAppWebView(
+                      initialUrlRequest: URLRequest(url: Uri.parse(widget.url)),
+                      initialOptions: InAppWebViewGroupOptions(
+                        crossPlatform: InAppWebViewOptions(
+                          mediaPlaybackRequiresUserGesture: false,
+                          disableContextMenu: true,
                         ),
-                        onWebViewCreated: (controller) {},
-                        onDownloadStartRequest: (controller, request) async {
-                          return;
-                        },
-                        shouldOverrideUrlLoading:
-                            (controller, navigationAction) async {
-                          return NavigationActionPolicy.ALLOW;
-                        },
-                        androidOnPermissionRequest:
-                            (controller, origin, resources) async {
-                          return PermissionRequestResponse(
-                              resources: resources,
-                              action: PermissionRequestResponseAction.GRANT);
-                        },
+                        android: AndroidInAppWebViewOptions(
+                          allowFileAccess: false,
+                          allowContentAccess: false,
+                        ),
+                        ios: IOSInAppWebViewOptions(
+                          allowsLinkPreview: false,
+                        ),
                       ),
+                      onLoadStart: (controller, url) {
+                        setState(() => onLoad = true);
+                      },
+                      onLoadStop: (controller, url) {
+                        setState(() => onLoad = false);
+                      },
+                      shouldOverrideUrlLoading: (controller, action) async {
+                        return NavigationActionPolicy.ALLOW;
+                      },
+                      androidOnPermissionRequest:
+                          (controller, origin, resources) async {
+                        return PermissionRequestResponse(
+                          resources: resources,
+                          action: PermissionRequestResponseAction.GRANT,
+                        );
+                      },
                     ),
                   ),
                 ),
               ],
             ),
-            // Loader Overlay
+
             if (onLoad)
               Container(
                 color: Colors.white,
                 child: Center(
-                  child: CircularProgressIndicator(
-                    color: linearColor,
-                  ),
+                  child: CircularProgressIndicator(color: linearColor),
                 ),
               ),
 
-            // Back Button
             Positioned(
               bottom: 20,
               left: 10,
