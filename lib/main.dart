@@ -19,11 +19,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  debugPrint = (String? message, {int? wrapWidth}) {
-    if (message != null) print(message);
-  };
+  // debugPrint = (String? message, {int? wrapWidth}) {
+  //   if (message != null) print(message);
+  // };
   // uploadBulkData();
   // bulkEditDocuments();
+
   runApp(const MyApp());
 }
 
@@ -52,19 +53,19 @@ class MyApp extends StatelessWidget {
 Future<void> uploadBulkData() async {
   // Load JSON from assets
   String jsonString =
-      await rootBundle.loadString('assets/HousekeepingCollection.json');
+      await rootBundle.loadString('assets/front_office_final_upload.json');
   Map<String, dynamic> jsonData = json.decode(jsonString);
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   // Access your specific collection from JSON
-  final documents = jsonData['InteractiveSimulationCollection'];
+  final documents = jsonData['FoodProductionCollection'];
 
   if (documents != null && documents is Map<String, dynamic>) {
     for (final docId in documents.keys) {
       final fields = documents[docId];
       await firestore
-          .collection("InteractiveSimulationCollection")
+          .collection("FoodProductionCollection")
           .doc(docId)
           .set(fields);
     }
@@ -90,13 +91,32 @@ Future<void> bulkEditDocuments() async {
     for (final doc in querySnapshot.docs) {
       // Create a map with the new field(s) you want to add
       final updates = {
-        'key': '', // Replace with your field name and value
-        // 'anotherField': anotherValue, // Add more fields if needed
-        // Optional: add update timestamp
+        'key': '',
+        'id': doc.id,
+        'subcategory': [
+          {
+            "name": "E-Learning",
+            "link":
+                "https://new-acc-space-2807.ispring.com/app/preview/6040e2c0-117d-11ef-ba88-8a12e27a05a8"
+          },
+          {
+            "name": "Glossary",
+            "link":
+                "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FLong%20vowels%2FLong%20vowel%20u%20or%20u%3A%2FVowels%20u%CB%90%20Monophthongs.mp4?alt=media&token=a2321bb2-8bca-48f9-b831-680c4c1f0c2a"
+          },
+          {
+            "name": "Knowledge check",
+            "link":
+                "https://new-acc-space-2807.ispring.com/app/preview/b744c324-1288-11ee-9bc6-dec30c56cf91"
+          }
+        ],
+        // Optionally add more fields like a timestamp here
+        // 'updatedAt': FieldValue.serverTimestamp(),
       };
 
-      // Add the update to the batch
+// Add the update to the batch
       batch.update(doc.reference, updates);
+
       batchCounter++;
 
       // Commit batch if we reach the limit (500 operations)

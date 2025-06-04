@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:hotelmanagementapp/main.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 
 class HomeController extends GetxController {
@@ -21,4 +22,9 @@ class HomeController extends GetxController {
     "Language Lab",
     "Content Library"
   ];
+  @override
+  void onInit() {
+    // bulkEditDocuments();
+    super.onInit();
+  }
 }
