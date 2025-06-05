@@ -1,24 +1,26 @@
-import 'dart:ffi';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
+import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
+import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/interactive_simulations.dart';
 import 'package:hotelmanagementapp/view/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 int currentIndex = 0;
 
@@ -93,36 +95,63 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return Scaffold(
       key: _scaffoldKey,
       endDrawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            SizedBox(
-              height: getWidgetHeight(height: 60),
-            ),
-            ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
-              onTap: () {
-                Navigator.pop(context); // close drawer
-                Future.delayed(
-                    Duration(milliseconds: 250), () => logout(context));
-              },
-            ),
-          ],
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Menu items scrollable
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    SizedBox(height: getWidgetHeight(height: 60)),
+                    ListTile(
+                      leading: Icon(Icons.home),
+                      title: Text('Home'),
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.settings),
+                      title: Text('Settings'),
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.logout),
+                      title: Text('Logout'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Future.delayed(
+                            Duration(milliseconds: 250), () => logout(context));
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextButton(
+                  onPressed: () async {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => InAppWebViewPage(
+                                  url: ApiRoutes.privacyPolicy,
+                                )));
+                  },
+                  child: Text(
+                    "Privacy & Policy",
+                    style: GoogleFonts.inter(
+                      height: 0.5,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      color: lightWhite,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       extendBody: true,

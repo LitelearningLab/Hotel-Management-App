@@ -59,13 +59,13 @@ Future<void> uploadBulkData() async {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   // Access your specific collection from JSON
-  final documents = jsonData['FoodProductionCollection'];
+  final documents = jsonData['HousekeepingCollection'];
 
   if (documents != null && documents is Map<String, dynamic>) {
     for (final docId in documents.keys) {
       final fields = documents[docId];
       await firestore
-          .collection("FoodProductionCollection")
+          .collection("HousekeepingCollection")
           .doc(docId)
           .set(fields);
     }

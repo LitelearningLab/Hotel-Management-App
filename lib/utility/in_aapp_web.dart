@@ -5,6 +5,7 @@ import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 
@@ -32,7 +33,9 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    startTimerMainCategory("name");
+    if (widget.url != ApiRoutes.privacyPolicy) {
+      startTimerMainCategory("name");
+    }
   }
 
   @override

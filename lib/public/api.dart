@@ -12,3 +12,8 @@ class CollectionNames {
   static String interactiveSimulationTimestamp =
       'InteractiveSimulationTimeStamp';
 }
+
+class ApiRoutes {
+  static String privacyPolicy =
+      'https://litelearninglab.github.io/privacy-policy/';
+}

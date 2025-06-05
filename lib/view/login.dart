@@ -8,10 +8,12 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/auth/email_auth_service.dart';
 import 'package:hotelmanagementapp/auth/google_auth_service.dart';
+import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custom_button.dart';
+import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -273,7 +275,29 @@ class _LoginPageState extends State<LoginPage> {
                               },
                             ),
                     ),
-
+                    Spacer(),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: TextButton(
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => InAppWebViewPage(
+                                        url: ApiRoutes.privacyPolicy,
+                                      )));
+                        },
+                        child: Text(
+                          "Privacy & Policy",
+                          style: GoogleFonts.inter(
+                            height: 0.5,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            color: lightWhite,
+                          ),
+                        ),
+                      ),
+                    ),
                     SizedBox(height: 30),
                   ],
                 ),
