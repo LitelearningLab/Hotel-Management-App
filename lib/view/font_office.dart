@@ -274,7 +274,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                         onTap: linkAvailable1
                                                             ? () {
                                                                 activityName =
-                                                                    'video';
+                                                                    'Glossary';
 
                                                                 controller
                                                                     .frontOfficeData[
@@ -305,7 +305,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                         onTap: linkAvailable2
                                                             ? () {
                                                                 activityName =
-                                                                    "third option";
+                                                                    "Knowledge check";
 
                                                                 subCategoryTitle =
                                                                     controller
