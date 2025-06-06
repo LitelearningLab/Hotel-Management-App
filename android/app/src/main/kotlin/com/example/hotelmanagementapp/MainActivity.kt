@@ -1,4 +1,5 @@
-package com.example.hotelmanagementapp
+package com.profluent.hotelier.app
+
 
 import io.flutter.embedding.android.FlutterActivity
 

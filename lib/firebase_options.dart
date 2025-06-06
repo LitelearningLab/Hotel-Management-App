@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '233565329277',
     projectId: 'hotel-management-app-d25d5',
     storageBucket: 'hotel-management-app-d25d5.firebasestorage.app',
-    iosBundleId: 'com.example.hotelmanagementapp',
+    iosBundleId: 'com.profluent.hotelier.app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -73,7 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '233565329277',
     projectId: 'hotel-management-app-d25d5',
     storageBucket: 'hotel-management-app-d25d5.firebasestorage.app',
-    iosBundleId: 'com.example.hotelmanagementapp',
+    iosBundleId: 'com.profluent.hotelier.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
