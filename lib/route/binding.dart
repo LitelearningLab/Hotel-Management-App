@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/controller/front_office_controller.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
+import 'package:hotelmanagementapp/controller/language_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_sub_controller.dart';
 
@@ -30,5 +31,12 @@ class SimulationSubBinding with Bindings {
   @override
   void dependencies() {
     Get.put(SimulationSubController());
+  }
+}
+
+class LanguageLabBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(LanguageLabController());
   }
 }

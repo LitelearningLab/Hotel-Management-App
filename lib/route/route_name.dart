@@ -3,4 +3,5 @@ class AppRoutes {
   static const frontOffice = '/front_office';
   static const simulation = '/interactive_simulation';
   static const simulationSub = '/simulation_sub';
+  static const languageLab = '/language_lab';
 }

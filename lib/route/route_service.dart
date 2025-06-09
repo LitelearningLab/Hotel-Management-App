@@ -5,6 +5,7 @@ import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/home.dart';
+import 'package:hotelmanagementapp/view/language_lab.dart';
 import 'package:hotelmanagementapp/view/simulation_sub.dart';
 
 class RouteService {
@@ -25,6 +26,10 @@ class RouteService {
     GetPage(
         name: AppRoutes.simulationSub,
         page: () => SimulationSub(),
-        binding: SimulationSubBinding())
+        binding: SimulationSubBinding()),
+    GetPage(
+        name: AppRoutes.languageLab,
+        page: () => Languagelab(),
+        binding: LanguageLabBinding()),
   ];
 }

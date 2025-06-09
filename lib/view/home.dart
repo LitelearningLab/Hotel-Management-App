@@ -18,6 +18,7 @@ import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/interactive_simulations.dart';
+import 'package:hotelmanagementapp/view/language_lab.dart';
 import 'package:hotelmanagementapp/view/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -370,15 +371,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             timestampIndex = -1;
                             index == 0
                                 ? Get.toNamed(AppRoutes.simulation)
-                                : Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          InteractiveSimulatiion(
-                                              title: controller
-                                                  .smartShorts[index]),
-                                    ),
-                                  );
+                                : index == 1
+                                    ? Get.toNamed(AppRoutes.languageLab)
+                                    : Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              InteractiveSimulatiion(
+                                                  title: controller
+                                                      .smartShorts[index]),
+                                        ),
+                                      );
                           },
                           child: Container(
                             height: getWidgetHeight(height: 75),
