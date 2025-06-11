@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/public/keys.dart';
 
 class PronunciationLabSub extends StatefulWidget {
   final String title;
-  const PronunciationLabSub({required this.title, super.key});
+  final List<SubcategoryPro> subcategories;
+  const PronunciationLabSub(
+      {required this.subcategories, required this.title, super.key});
 
   @override
   State<PronunciationLabSub> createState() => _PronunciationLabSubState();
@@ -43,7 +47,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
         padding: EdgeInsets.symmetric(
             vertical: getWidgetHeight(height: 10),
             horizontal: getWidgetWidth(width: 10)),
-        itemCount: 10,
+        itemCount: widget.subcategories.length,
         itemBuilder: (context, index) {
           final isExpanded = expandedIndex == index;
 
@@ -78,7 +82,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                     ),
                     child: Padding(
                       padding: EdgeInsets.symmetric(
-                          vertical: getWidgetHeight(height: 15),
+                          vertical: getWidgetHeight(height: 6),
                           horizontal: getWidgetWidth(width: 10)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -92,13 +96,11 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                               SizedBox(
                                 width: getWidgetWidth(width: 10),
                               ),
-                              Text(
-                                "Index ${index + 1}",
-                                style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                ),
-                              ),
+                              Text(widget.subcategories[index].text,
+                                  style: TextStyle(
+                                    fontFamily: Keys.fontFamily,
+                                    letterSpacing: 0,
+                                  )),
                             ],
                           ),
                           Row(
@@ -155,11 +157,11 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                             SizedBox(
                               height: getWidgetHeight(height: 6),
                             ),
-                            Text(
-                              "Mon . day",
-                              style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
+                            RichText(
+                              textAlign: TextAlign.justify,
+                              text: TextSpan(
+                                children: _buildTextSpans(
+                                    widget.subcategories[index].syllables),
                               ),
                             ),
                             SizedBox(
@@ -181,13 +183,21 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                     SizedBox(
                                       height: getWidgetHeight(height: 6),
                                     ),
-                                    Text(
-                                      "Muhn_dey",
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 18,
+                                    FittedBox(
+                                      child: Text(
+                                        widget.subcategories[index].pronun
+                                                    .trim() ==
+                                                ""
+                                            ? "no data"
+                                            : widget.subcategories[index].pronun
+                                                .replaceAll("/", ""),
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 20,
+                                          fontFamily: Keys.fontFamily,
+                                        ),
                                       ),
-                                    ),
+                                    )
                                   ],
                                 ),
                                 Container(
@@ -238,5 +248,53 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
         },
       ),
     );
+  }
+
+  List<TextSpan> _buildTextSpans(String text) {
+    List<TextSpan> spans = [];
+    bool isWithinParentheses = false;
+    StringBuffer buffer = StringBuffer();
+
+    for (int i = 0; i < text.length; i++) {
+      if (text[i] == '(') {
+        if (buffer.isNotEmpty) {
+          spans.add(TextSpan(
+            text: buffer.toString(),
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                fontFamily: Keys.lucidaFontFamily),
+          ));
+          buffer.clear();
+        }
+        isWithinParentheses = true;
+      } else if (text[i] == ')') {
+        spans.add(TextSpan(
+          text: ' ${buffer.toString()} ',
+          style: TextStyle(
+              color: Colors.yellow,
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              fontFamily: Keys.lucidaFontFamily),
+        ));
+        buffer.clear();
+        isWithinParentheses = false;
+      } else {
+        buffer.write(text[i]);
+      }
+    }
+    if (buffer.isNotEmpty) {
+      spans.add(TextSpan(
+        text: buffer.toString(),
+        style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            fontFamily: Keys.lucidaFontFamily),
+      ));
+    }
+
+    return spans;
   }
 }

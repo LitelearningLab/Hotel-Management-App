@@ -27,7 +27,7 @@ class ARGridTile extends StatelessWidget {
       },
       child: Container(
         // height: getWidgetHeight(height: 230),
-        width: getWidgetWidth(width: 158),
+        width: getWidgetWidth(width: 160),
         height: height,
         padding: EdgeInsets.symmetric(vertical: getWidgetHeight(height: 5)),
         decoration: BoxDecoration(
@@ -69,10 +69,10 @@ class ARGridTile extends StatelessWidget {
                   child: Text(
                     title,
                     textAlign: TextAlign.start,
-                    overflow: TextOverflow.fade,
+                    // overflow: TextOverflow.fade,
                     style: GoogleFonts.inter(
                       // fontWeight: FontWeight.w600,
-                      fontSize: 15,
+                      fontSize: 13,
                     ),
                   ),
                 ),

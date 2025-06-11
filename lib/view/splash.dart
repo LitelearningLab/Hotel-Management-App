@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hotelmanagementapp/main.dart';
 import 'package:hotelmanagementapp/view/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
@@ -18,6 +19,9 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+    // FirebaseUploader firebaseUploader = FirebaseUploader();
+    // firebaseUploader.uploadJsonData(
+    //     'assets/EnglishLab.json', 'EnglishLabCollection');
     _initAnimation();
     startTimer();
   }

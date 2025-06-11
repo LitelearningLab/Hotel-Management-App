@@ -1,0 +1,79 @@
+{
+  "EnglishLabCollection": [
+    {
+      "category": "Days, Dates, Months & Numbers",
+      "subcategories": [
+        { "file": "day1.mp3", "isPriority": true, "syllables": "Mon-day", "text": "Monday.", "pronun": "/ˈmʌn.deɪ/" },
+        { "file": "day2.mp3", "isPriority": false, "syllables": "Tues-day", "text": "Tuesday.", "pronun": "/ˈtjuːz.deɪ/" },
+        { "file": "day3.mp3", "isPriority": false, "syllables": "Wednes-day", "text": "Wednesday.", "pronun": "/ˈwɛnz.deɪ/" },
+        { "file": "day4.mp3", "isPriority": false, "syllables": "Thurs-day", "text": "Thursday.", "pronun": "/ˈθɜːrz.deɪ/" },
+        { "file": "day5.mp3", "isPriority": false, "syllables": "Fri-day", "text": "Friday.", "pronun": "/ˈfraɪ.deɪ/" },
+        { "file": "day6.mp3", "isPriority": false, "syllables": "Satur-day", "text": "Saturday.", "pronun": "/ˈsæt.ə.deɪ/" },
+        { "file": "day7.mp3", "isPriority": false, "syllables": "Sun-day", "text": "Sunday.", "pronun": "/ˈsʌn.deɪ/" },
+        { "file": "date1.mp3", "isPriority": false, "syllables": "First", "text": "1st of the month.", "pronun": "/fɜːst/" },
+        { "file": "date2.mp3", "isPriority": false, "syllables": "Sec-ond", "text": "2nd of the month.", "pronun": "/ˈsek.ənd/" },
+        { "file": "month1.mp3", "isPriority": false, "syllables": "Jan-u-ary", "text": "January.", "pronun": "/ˈdʒæn.ju.er.i/" },
+        { "file": "month2.mp3", "isPriority": false, "syllables": "Feb-ru-ary", "text": "February.", "pronun": "/ˈfeb.ruː.er.i/" },
+        { "file": "month3.mp3", "isPriority": false, "syllables": "March", "text": "March.", "pronun": "/mɑːrtʃ/" },
+        { "file": "month4.mp3", "isPriority": false, "syllables": "A-pril", "text": "April.", "pronun": "/ˈeɪ.prəl/" },
+        { "file": "month5.mp3", "isPriority": false, "syllables": "May", "text": "May.", "pronun": "/meɪ/" },
+        { "file": "month6.mp3", "isPriority": false, "syllables": "June", "text": "June.", "pronun": "/dʒuːn/" },
+        { "file": "month7.mp3", "isPriority": false, "syllables": "Ju-ly", "text": "July.", "pronun": "/dʒuˈlaɪ/" },
+        { "file": "month8.mp3", "isPriority": false, "syllables": "Au-gust", "text": "August.", "pronun": "/ˈɔː.gəst/" },
+        { "file": "number1.mp3", "isPriority": true, "syllables": "Twen-ty one", "text": "Twenty-one.", "pronun": "/ˈtwɛn.ti wʌn/" },
+        { "file": "number2.mp3", "isPriority": false, "syllables": "Fif-ty", "text": "Fifty.", "pronun": "/ˈfɪf.ti/" },
+        { "file": "number3.mp3", "isPriority": false, "syllables": "Hund-red", "text": "One hundred.", "pronun": "/ˈhʌn.drəd/" }
+      ]
+    },
+    {
+      "category": "Food and Beverage Terms",
+      "subcategories": [
+        { "file": "buffet.mp3", "isPriority": true, "syllables": "Buf-fet", "text": "Buffet.", "pronun": "/ˈbʌf.eɪ/" },
+        { "file": "starter.mp3", "isPriority": false, "syllables": "Start-er", "text": "Starter.", "pronun": "/ˈstɑː.tər/" },
+        { "file": "main_course.mp3", "isPriority": false, "syllables": "Main course", "text": "Main course.", "pronun": "/ˌmeɪn ˈkɔːs/" },
+        { "file": "dessert.mp3", "isPriority": false, "syllables": "Des-sert", "text": "Dessert.", "pronun": "/dɪˈzɜːt/" },
+        { "file": "beverage.mp3", "isPriority": false, "syllables": "Bev-er-age", "text": "Beverage.", "pronun": "/ˈbev.ər.ɪdʒ/" },
+        { "file": "bill.mp3", "isPriority": false, "syllables": "Bill", "text": "Please bring the bill.", "pronun": "/bɪl/" },
+        { "file": "menu.mp3", "isPriority": false, "syllables": "Men-u", "text": "Menu.", "pronun": "/ˈmen.juː/" },
+        { "file": "plate.mp3", "isPriority": false, "syllables": "Plate", "text": "Take a plate.", "pronun": "/pleɪt/" },
+        { "file": "napkin.mp3", "isPriority": false, "syllables": "Nap-kin", "text": "Use a napkin.", "pronun": "/ˈnæp.kɪn/" },
+        { "file": "glass.mp3", "isPriority": false, "syllables": "Glass", "text": "Water glass.", "pronun": "/ɡlɑːs/" },
+        { "file": "breakfast.mp3", "isPriority": false, "syllables": "Break-fast", "text": "Breakfast.", "pronun": "/ˈbrek.fəst/" },
+        { "file": "lunch.mp3", "isPriority": false, "syllables": "Lunch", "text": "Lunch.", "pronun": "/lʌntʃ/" },
+        { "file": "dinner.mp3", "isPriority": false, "syllables": "Din-ner", "text": "Dinner.", "pronun": "/ˈdɪn.ər/" },
+        { "file": "waiter.mp3", "isPriority": false, "syllables": "Wait-er", "text": "Waiter.", "pronun": "/ˈweɪ.tər/" },
+        { "file": "tip.mp3", "isPriority": false, "syllables": "Tip", "text": "Leave a tip.", "pronun": "/tɪp/" },
+        { "file": "vegetarian.mp3", "isPriority": false, "syllables": "Veg-e-tar-i-an", "text": "Vegetarian meal.", "pronun": "/ˌvedʒ.əˈteə.ri.ən/" },
+        { "file": "non_veg.mp3", "isPriority": false, "syllables": "Non-veg", "text": "Non-veg meal.", "pronun": "/nɒn vedʒ/" },
+        { "file": "combo.mp3", "isPriority": false, "syllables": "Com-bo", "text": "Combo meal.", "pronun": "/ˈkɒm.bəʊ/" },
+        { "file": "taste.mp3", "isPriority": false, "syllables": "Taste", "text": "Good taste.", "pronun": "/teɪst/" },
+        { "file": "kitchen.mp3", "isPriority": false, "syllables": "Kitch-en", "text": "Kitchen.", "pronun": "/ˈkɪtʃ.ən/" }
+      ]
+    },
+    {
+      "category": "Letters of the English Alphabet",
+      "subcategories": [
+        { "file": "a.mp3", "isPriority": true, "syllables": "A", "text": "A", "pronun": "/eɪ/" },
+        { "file": "b.mp3", "isPriority": false, "syllables": "Bee", "text": "B", "pronun": "/biː/" },
+        { "file": "c.mp3", "isPriority": false, "syllables": "See", "text": "C", "pronun": "/siː/" },
+        { "file": "d.mp3", "isPriority": false, "syllables": "Dee", "text": "D", "pronun": "/diː/" },
+        { "file": "e.mp3", "isPriority": false, "syllables": "E", "text": "E", "pronun": "/iː/" },
+        { "file": "f.mp3", "isPriority": false, "syllables": "Eff", "text": "F", "pronun": "/ef/" },
+        { "file": "g.mp3", "isPriority": false, "syllables": "Gee", "text": "G", "pronun": "/dʒiː/" },
+        { "file": "h.mp3", "isPriority": false, "syllables": "Aitch", "text": "H", "pronun": "/eɪtʃ/" },
+        { "file": "i.mp3", "isPriority": false, "syllables": "Eye", "text": "I", "pronun": "/aɪ/" },
+        { "file": "j.mp3", "isPriority": false, "syllables": "Jay", "text": "J", "pronun": "/dʒeɪ/" },
+        { "file": "k.mp3", "isPriority": false, "syllables": "Kay", "text": "K", "pronun": "/keɪ/" },
+        { "file": "l.mp3", "isPriority": false, "syllables": "El", "text": "L", "pronun": "/el/" },
+        { "file": "m.mp3", "isPriority": false, "syllables": "Em", "text": "M", "pronun": "/em/" },
+        { "file": "n.mp3", "isPriority": false, "syllables": "En", "text": "N", "pronun": "/en/" },
+        { "file": "o.mp3", "isPriority": false, "syllables": "Oh", "text": "O", "pronun": "/əʊ/" },
+        { "file": "p.mp3", "isPriority": false, "syllables": "Pee", "text": "P", "pronun": "/piː/" },
+        { "file": "q.mp3", "isPriority": false, "syllables": "Queue", "text": "Q", "pronun": "/kjuː/" },
+        { "file": "r.mp3", "isPriority": false, "syllables": "Ar", "text": "R", "pronun": "/ɑːr/" },
+        { "file": "s.mp3", "isPriority": false, "syllables": "Ess", "text": "S", "pronun": "/es/" },
+        { "file": "t.mp3", "isPriority": false, "syllables": "Tee", "text": "T", "pronun": "/tiː/" }
+      ]
+    }
+  ]
+}

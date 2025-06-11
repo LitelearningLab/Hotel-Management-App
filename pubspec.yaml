@@ -32,6 +32,7 @@ dependencies:
   url_launcher: ^6.3.1
   flutter_launcher_icons: ^0.14.3
   flutter_colorful_tab: ^0.1.1
+  firebase_database: ^11.1.1
 
 dev_dependencies:
   flutter_test:
@@ -63,7 +64,33 @@ flutter:
     - assets/images/AR_workersComp.png
     - assets/images/
     - assets/language_lab.png
-    - assets/app icon.png
+    - assets/app icon.png 
+    
+    
+  fonts:
+    - family: Varela
+      fonts:
+        - asset: assets/font/varela.ttf
+    - family: Symbola
+      fonts:
+        - asset: assets/font/symbola.ttf
+    - family: Lucida
+      fonts:
+        - asset: assets/font/lucida-sans-unicode.ttf
+    - family: Kaushan
+      fonts:
+        - asset: assets/font/KaushanScript-Regular.ttf
+    - family: Quicksand
+      fonts:
+        - asset: assets/font/Quicksand-VariableFont_wght.ttf
+    - family: Roboto
+      fonts:
+        - asset: assets/font/Roboto-Regular.ttf
+          weight: 500
+        - asset: assets/font/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/font/Roboto-Thin.ttf
+          weight: 400
 
   # fonts:
   #   - family: Inter

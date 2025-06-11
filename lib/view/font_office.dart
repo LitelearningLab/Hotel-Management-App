@@ -216,7 +216,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                       .category,
                                                   style: GoogleFonts.inter(
                                                     fontWeight: FontWeight.w500,
-                                                    fontSize: 14,
+                                                    fontSize: 15,
                                                   ),
                                                 ),
                                               ),
@@ -343,15 +343,15 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                   .frontOfficeData[
                                                                       index]
                                                                   .category;
-                                                          Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                  builder:
-                                                                      (context) =>
-                                                                          PronunciationLabSub(
-                                                                            title:
-                                                                                controller.hospitalityTopics[index],
-                                                                          )));
+                                                          // Navigator.push(
+                                                          //     context,
+                                                          //     MaterialPageRoute(
+                                                          //         builder:
+                                                          //             (context) =>
+                                                          //                 PronunciationLabSub(
+                                                          //                   title:
+                                                          //                       controller.hospitalityTopics[index],
+                                                          //                 )));
                                                         },
                                                         child: SizedBox(
                                                           width: getWidgetWidth(

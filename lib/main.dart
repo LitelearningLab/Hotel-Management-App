@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
@@ -19,6 +21,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   // debugPrint = (String? message, {int? wrapWidth}) {
   //   if (message != null) print(message);
   // };
@@ -35,6 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     kHeight = MediaQuery.of(context).size.height;
     kWidth = MediaQuery.of(context).size.width;
+    kText = MediaQuery.of(context).textScaler;
     return GetMaterialApp(
       getPages: RouteService.getPages,
       initialBinding: InitialBinding(),
@@ -138,5 +142,53 @@ Future<void> bulkEditDocuments() async {
         '🎉 Bulk edit completed! Total documents updated: ${querySnapshot.size}');
   } catch (e) {
     print('⚠️ Error during bulk edit: $e');
+  }
+}
+
+class FirebaseUploader {
+  final DatabaseReference _databaseRef;
+
+  FirebaseUploader() : _databaseRef = FirebaseDatabase.instance.ref();
+
+  // Method to upload JSON data to a specific path
+  Future<void> uploadJsonData(String jsonPath, String firebasePath) async {
+    try {
+      // Load the JSON file from assets
+      final String jsonString = await rootBundle.loadString(jsonPath);
+      final dynamic jsonData = json.decode(jsonString);
+
+      // Upload to Firebase
+      await _databaseRef.child(firebasePath).set(jsonData);
+
+      log('Bulk upload completed successfully!');
+    } catch (e) {
+      log('Error during bulk upload: $e');
+      rethrow;
+    }
+  }
+
+  // Alternative method for large datasets (uploads in chunks)
+  Future<void> uploadLargeJsonData(String jsonPath, String firebasePath) async {
+    try {
+      final String jsonString = await rootBundle.loadString(jsonPath);
+      final dynamic jsonData = json.decode(jsonString);
+
+      if (jsonData is Map) {
+        // For JSON objects (Map)
+        for (final key in jsonData.keys) {
+          await _databaseRef.child('$firebasePath/$key').set(jsonData[key]);
+        }
+      } else if (jsonData is List) {
+        // For JSON arrays (List)
+        for (int i = 0; i < jsonData.length; i++) {
+          await _databaseRef.child('$firebasePath/$i').set(jsonData[i]);
+        }
+      }
+
+      print('Bulk upload completed successfully!');
+    } catch (e) {
+      print('Error during bulk upload: $e');
+      rethrow;
+    }
   }
 }

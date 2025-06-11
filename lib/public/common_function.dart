@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 
 double kHeight = 0.0;
@@ -24,6 +25,7 @@ String sessionName = "";
 String subCategoryTitle = "";
 String activityName = "";
 int timestampIndex = 0;
+late TextScaler kText;
 // double fullScreenHeight = 805.33;
 
 double getWidgetHeight({required double height}) {

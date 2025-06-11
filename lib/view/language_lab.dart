@@ -1,12 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/language_lab_controller.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/pe_top_categories_card.dart';
+import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
+import 'package:hotelmanagementapp/view/pronounciation_lab.dart';
 
 class Languagelab extends StatelessWidget {
   const Languagelab({super.key});
@@ -58,7 +62,10 @@ class Languagelab extends StatelessWidget {
                     width: getWidgetWidth(width: 96.11),
                     title: 'English Pronunciation',
                     imageUrl: AllAssets.pePl,
-                    onTap: () async {},
+                    onTap: () async {
+                      Get.toNamed(AppRoutes.pronunciationLab,
+                          arguments: {"title": "English Pronunciation"});
+                    },
                     cardColor: Color(0xFF398480),
                   ),
                   PETopCategoriesCard(

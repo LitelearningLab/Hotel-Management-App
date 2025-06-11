@@ -35,6 +35,26 @@ class InteractiveSimulatiion extends StatelessWidget {
         ),
         body: Column(
           children: [
+            Text(
+              'Be Ready & Confident For AR Calls.',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 15,
+                fontFamily: 'Roboto',
+                letterSpacing: 0,
+              ),
+            ),
+            SizedBox(height: getWidgetHeight(height: 10)),
+            Text(
+              'Practice Fearlessly...',
+              style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF6C63FF),
+                  fontSize: 31,
+                  fontFamily: 'Kaushan',
+                  letterSpacing: 0),
+            ),
             Expanded(
               child: ListView.builder(
                 padding: EdgeInsets.symmetric(
