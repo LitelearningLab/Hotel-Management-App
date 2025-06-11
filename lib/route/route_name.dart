@@ -5,4 +5,5 @@ class AppRoutes {
   static const simulationSub = '/simulation_sub';
   static const languageLab = '/language_lab';
   static const pronunciationLab = '/pronunciation_lab';
+  static const sentenceLab = "/sentence_lab";
 }

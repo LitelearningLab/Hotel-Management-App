@@ -77,3 +77,75 @@
     }
   ]
 }
+{
+  "FrenchLabCollection": [
+    {
+      "category": "Jours, Mois & Nombres",
+      "subcategories": [
+        { "file": "jour1.mp3", "isPriority": true, "syllables": "Lun-di", "text": "Lundi.", "pronun": "/lœ̃.di/" },
+        { "file": "jour2.mp3", "isPriority": false, "syllables": "Mar-di", "text": "Mardi.", "pronun": "/maʁ.di/" },
+        { "file": "jour3.mp3", "isPriority": false, "syllables": "Mer-cre-di", "text": "Mercredi.", "pronun": "/mɛʁ.kʁə.di/" },
+        { "file": "jour4.mp3", "isPriority": false, "syllables": "Jeu-di", "text": "Jeudi.", "pronun": "/ʒø.di/" },
+        { "file": "jour5.mp3", "isPriority": false, "syllables": "Ven-dre-di", "text": "Vendredi.", "pronun": "/vɑ̃.dʁə.di/" },
+        { "file": "jour6.mp3", "isPriority": false, "syllables": "Sa-me-di", "text": "Samedi.", "pronun": "/sa.mə.di/" },
+        { "file": "jour7.mp3", "isPriority": false, "syllables": "Di-man-che", "text": "Dimanche.", "pronun": "/di.mɑ̃ʃ/" },
+        { "file": "mois1.mp3", "isPriority": false, "syllables": "Jan-vi-er", "text": "Janvier.", "pronun": "/ʒɑ̃.vje/" },
+        { "file": "mois2.mp3", "isPriority": false, "syllables": "Fév-ri-er", "text": "Février.", "pronun": "/fe.vʁi.je/" },
+        { "file": "mois3.mp3", "isPriority": false, "syllables": "Mars", "text": "Mars.", "pronun": "/maʁs/" },
+        { "file": "mois4.mp3", "isPriority": false, "syllables": "Av-ril", "text": "Avril.", "pronun": "/a.vʁil/" },
+        { "file": "mois5.mp3", "isPriority": false, "syllables": "Mai", "text": "Mai.", "pronun": "/mɛ/" },
+        { "file": "mois6.mp3", "isPriority": false, "syllables": "Juin", "text": "Juin.", "pronun": "/ʒɥɛ̃/" },
+        { "file": "mois7.mp3", "isPriority": false, "syllables": "Juil-let", "text": "Juillet.", "pronun": "/ʒɥi.jɛ/" },
+        { "file": "mois8.mp3", "isPriority": false, "syllables": "Août", "text": "Août.", "pronun": "/ut/" },
+        { "file": "nombre1.mp3", "isPriority": true, "syllables": "Vingt et un", "text": "Vingt et un.", "pronun": "/vɛ̃.te.œ̃/" },
+        { "file": "nombre2.mp3", "isPriority": false, "syllables": "Cinquante", "text": "Cinquante.", "pronun": "/sɛ̃.kɑ̃t/" },
+        { "file": "nombre3.mp3", "isPriority": false, "syllables": "Cent", "text": "Cent.", "pronun": "/sɑ̃/" }
+      ]
+    },
+    {
+      "category": "Termes de Restauration",
+      "subcategories": [
+        { "file": "buffet.mp3", "isPriority": true, "syllables": "Buf-fet", "text": "Buffet.", "pronun": "/by.fɛ/" },
+        { "file": "entree.mp3", "isPriority": false, "syllables": "En-trée", "text": "Entrée.", "pronun": "/ɑ̃.tʁe/" },
+        { "file": "plat_principal.mp3", "isPriority": false, "syllables": "Plat prin-ci-pal", "text": "Plat principal.", "pronun": "/pla pʁɛ̃.si.pal/" },
+        { "file": "dessert.mp3", "isPriority": false, "syllables": "Des-sert", "text": "Dessert.", "pronun": "/de.sɛʁ/" },
+        { "file": "boisson.mp3", "isPriority": false, "syllables": "Bois-son", "text": "Boisson.", "pronun": "/bwa.sɔ̃/" },
+        { "file": "addition.mp3", "isPriority": false, "syllables": "Ad-di-tion", "text": "L'addition, s’il vous plaît.", "pronun": "/la.di.sjɔ̃ si.l‿vu plɛ/" },
+        { "file": "menu.mp3", "isPriority": false, "syllables": "Me-nu", "text": "Menu.", "pronun": "/mə.ny/" },
+        { "file": "assiette.mp3", "isPriority": false, "syllables": "As-siette", "text": "Assiette.", "pronun": "/a.sjɛt/" },
+        { "file": "serviette.mp3", "isPriority": false, "syllables": "Ser-viette", "text": "Serviette.", "pronun": "/sɛʁ.vjɛt/" },
+        { "file": "verre.mp3", "isPriority": false, "syllables": "Verre", "text": "Un verre d’eau.", "pronun": "/vɛʁ/" },
+        { "file": "petit_dejeuner.mp3", "isPriority": false, "syllables": "Pe-tit dé-jeu-ner", "text": "Petit déjeuner.", "pronun": "/pə.ti de.ʒœ.ne/" },
+        { "file": "dejeuner.mp3", "isPriority": false, "syllables": "Dé-jeu-ner", "text": "Déjeuner.", "pronun": "/de.ʒœ.ne/" },
+        { "file": "diner.mp3", "isPriority": false, "syllables": "Di-ner", "text": "Dîner.", "pronun": "/di.ne/" },
+        { "file": "serveur.mp3", "isPriority": false, "syllables": "Ser-veur", "text": "Serveur.", "pronun": "/sɛʁ.vœʁ/" },
+        { "file": "pourboire.mp3", "isPriority": false, "syllables": "Pour-boi-re", "text": "Pourboire.", "pronun": "/puʁ.bwaʁ/" }
+      ]
+    },
+    {
+      "category": "Lettres de l'Alphabet Français",
+      "subcategories": [
+        { "file": "a.mp3", "isPriority": true, "syllables": "A", "text": "A", "pronun": "/a/" },
+        { "file": "b.mp3", "isPriority": false, "syllables": "Bé", "text": "B", "pronun": "/be/" },
+        { "file": "c.mp3", "isPriority": false, "syllables": "Cé", "text": "C", "pronun": "/se/" },
+        { "file": "d.mp3", "isPriority": false, "syllables": "Dé", "text": "D", "pronun": "/de/" },
+        { "file": "e.mp3", "isPriority": false, "syllables": "E", "text": "E", "pronun": "/ə/" },
+        { "file": "f.mp3", "isPriority": false, "syllables": "Eff", "text": "F", "pronun": "/ɛf/" },
+        { "file": "g.mp3", "isPriority": false, "syllables": "Jé", "text": "G", "pronun": "/ʒe/" },
+        { "file": "h.mp3", "isPriority": false, "syllables": "Hache", "text": "H", "pronun": "/aʃ/" },
+        { "file": "i.mp3", "isPriority": false, "syllables": "I", "text": "I", "pronun": "/i/" },
+        { "file": "j.mp3", "isPriority": false, "syllables": "Ji", "text": "J", "pronun": "/ʒi/" },
+        { "file": "k.mp3", "isPriority": false, "syllables": "Ka", "text": "K", "pronun": "/ka/" },
+        { "file": "l.mp3", "isPriority": false, "syllables": "Elle", "text": "L", "pronun": "/ɛl/" },
+        { "file": "m.mp3", "isPriority": false, "syllables": "Emme", "text": "M", "pronun": "/ɛm/" },
+        { "file": "n.mp3", "isPriority": false, "syllables": "Enne", "text": "N", "pronun": "/ɛn/" },
+        { "file": "o.mp3", "isPriority": false, "syllables": "O", "text": "O", "pronun": "/o/" },
+        { "file": "p.mp3", "isPriority": false, "syllables": "Pé", "text": "P", "pronun": "/pe/" },
+        { "file": "q.mp3", "isPriority": false, "syllables": "Ku", "text": "Q", "pronun": "/ky/" },
+        { "file": "r.mp3", "isPriority": false, "syllables": "Air", "text": "R", "pronun": "/ɛʁ/" },
+        { "file": "s.mp3", "isPriority": false, "syllables": "Ess", "text": "S", "pronun": "/ɛs/" },
+        { "file": "t.mp3", "isPriority": false, "syllables": "Té", "text": "T", "pronun": "/te/" }
+      ]
+    }
+  ]
+}

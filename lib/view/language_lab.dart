@@ -73,7 +73,10 @@ class Languagelab extends StatelessWidget {
                     width: getWidgetWidth(width: 103.76),
                     title: 'French Pronunciation',
                     imageUrl: AllAssets.peScl,
-                    onTap: () async {},
+                    onTap: () async {
+                      Get.toNamed(AppRoutes.pronunciationLab,
+                          arguments: {"title": "French Pronunciation"});
+                    },
                     cardColor: Color(0xFF445EA9),
                   ),
                   PETopCategoriesCard(
@@ -81,7 +84,10 @@ class Languagelab extends StatelessWidget {
                     width: getWidgetWidth(width: 106.03),
                     title: 'Sentence Lab',
                     imageUrl: AllAssets.peCfpl,
-                    onTap: () async {},
+                    onTap: () async {
+                      Get.toNamed(AppRoutes.sentenceLab,
+                          arguments: {"title": "Sentence Lab"});
+                    },
                     cardColor: Color(0xFF636CFF),
                   ),
                   PETopCategoriesCard(

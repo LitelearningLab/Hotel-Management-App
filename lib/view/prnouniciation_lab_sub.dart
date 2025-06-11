@@ -32,7 +32,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
           widget.title, maxLines: 2,
           // textAlign: TextAlign.start,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),

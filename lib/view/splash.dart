@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     // FirebaseUploader firebaseUploader = FirebaseUploader();
     // firebaseUploader.uploadJsonData(
-    //     'assets/EnglishLab.json', 'EnglishLabCollection');
+    //     'assets/EnglishLab.json', 'FrenchLabCollection');
     _initAnimation();
     startTimer();
   }

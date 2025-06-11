@@ -1,0 +1,103 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:hotelmanagementapp/model/sentence_model.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/view/sentence_lab_sub_cat.dart';
+
+class SentenceLabSub extends StatefulWidget {
+  final String title;
+  final List<SubCategoryModelSentence> subcategories;
+  const SentenceLabSub(
+      {required this.title, required this.subcategories, super.key});
+
+  @override
+  State<SentenceLabSub> createState() => _SentenceLabSubState();
+}
+
+class _SentenceLabSubState extends State<SentenceLabSub> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        forceMaterialTransparency: true,
+        surfaceTintColor: Colors.white,
+        shadowColor: Colors.white,
+        backgroundColor: Colors.white,
+        titleSpacing: 0,
+        title: Text(
+          widget.title, maxLines: 2,
+          // textAlign: TextAlign.start,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
+      ),
+      body: ListView.builder(
+        padding: EdgeInsets.symmetric(
+            vertical: getWidgetHeight(height: 10),
+            horizontal: getWidgetWidth(width: 10)),
+        itemCount: widget.subcategories.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SentenceLabSubCat(
+                            title: widget.subcategories[index].subcategory,
+                            files: widget.subcategories[index].file,
+                          )));
+            },
+            child: Container(
+              width: getWidgetWidth(width: 375),
+              // height: getWidgetHeight(height: 60),
+              margin: const EdgeInsets.symmetric(vertical: 5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    offset: const Offset(0, 4),
+                    blurRadius: 10,
+                  ),
+                ],
+              ),
+              child: Container(
+                width: getWidgetWidth(width: 375),
+                // height: getWidgetHeight(height: 75),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white,
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: getWidgetHeight(height: 16),
+                      horizontal: getWidgetWidth(width: 15)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(widget.subcategories[index].subcategory,
+                          style: TextStyle(
+                              fontFamily: Keys.fontFamily,
+                              letterSpacing: 0,
+                              fontSize: 16)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

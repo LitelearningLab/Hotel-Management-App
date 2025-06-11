@@ -80,22 +80,6 @@ class _SimulationSubState extends State<SimulationSub> {
                             .subcategory[index].links[2].isNotEmpty &&
                         controller.simulation.subcategory[index].links[2] !=
                             "link3");
-                    // final linkAvailable1 = (controller
-                    //         .frontOfficeData[index]
-                    //         .subcategory[1]
-                    //         .link
-                    //         .isNotEmpty ||
-                    //     controller.frontOfficeData[index].subcategory[1]
-                    //             .link !=
-                    //         "");
-                    // final linkAvailable2 = (controller
-                    //         .frontOfficeData[index]
-                    //         .subcategory[2]
-                    //         .link
-                    //         .isNotEmpty ||
-                    //     controller.frontOfficeData[index].subcategory[2]
-                    //             .link !=
-                    //         "");
 
                     return Column(
                       children: [

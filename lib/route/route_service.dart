@@ -8,6 +8,7 @@ import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/home.dart';
 import 'package:hotelmanagementapp/view/language_lab.dart';
 import 'package:hotelmanagementapp/view/pronounciation_lab.dart';
+import 'package:hotelmanagementapp/view/sentence_lab.dart';
 import 'package:hotelmanagementapp/view/simulation_sub.dart';
 
 class RouteService {
@@ -37,6 +38,11 @@ class RouteService {
       name: AppRoutes.pronunciationLab,
       page: () => PronounciationLab(),
       binding: PronunciationLabBinding(),
-    )
+    ),
+    GetPage(
+      name: AppRoutes.sentenceLab,
+      page: () => SentenceLab(),
+      binding: SentenceLabBinding(),
+    ),
   ];
 }
