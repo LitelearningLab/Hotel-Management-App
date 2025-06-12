@@ -6,4 +6,6 @@ class AppRoutes {
   static const languageLab = '/language_lab';
   static const pronunciationLab = '/pronunciation_lab';
   static const sentenceLab = "/sentence_lab";
+  static const pronunciationLabSub = '/pronunciation_lab_sub';
+  static const grmmaerLab = '/grammar_lab';
 }

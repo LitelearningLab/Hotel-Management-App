@@ -174,18 +174,18 @@ class _SimulationSubState extends State<SimulationSub> {
                                                     : null,
                                                 child: Wrap(
                                                   children: [
-                                                    Text(
-                                                      "#1",
-                                                      style: TextStyle(
-                                                        color: linkAvailable
-                                                            ? Colors.black
-                                                            : Colors.grey,
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: getWidgetWidth(
-                                                          width: 5),
-                                                    ),
+                                                    // Text(
+                                                    //   "#1",
+                                                    //   style: TextStyle(
+                                                    //     color: linkAvailable
+                                                    //         ? Colors.black
+                                                    //         : Colors.grey,
+                                                    //   ),
+                                                    // ),
+                                                    // SizedBox(
+                                                    //   width: getWidgetWidth(
+                                                    //       width: 5),
+                                                    // ),
                                                     Image.asset(
                                                       AllAssets.interb,
                                                       color: linkAvailable
@@ -223,18 +223,18 @@ class _SimulationSubState extends State<SimulationSub> {
                                                     : null,
                                                 child: Wrap(
                                                   children: [
-                                                    Text(
-                                                      "#2",
-                                                      style: TextStyle(
-                                                        color: linkAvailable1
-                                                            ? Colors.black
-                                                            : Colors.grey,
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: getWidgetWidth(
-                                                          width: 5),
-                                                    ),
+                                                    // Text(
+                                                    //   "#2",
+                                                    //   style: TextStyle(
+                                                    //     color: linkAvailable1
+                                                    //         ? Colors.black
+                                                    //         : Colors.grey,
+                                                    //   ),
+                                                    // ),
+                                                    // SizedBox(
+                                                    //   width: getWidgetWidth(
+                                                    //       width: 5),
+                                                    // ),
                                                     Image.asset(
                                                       AllAssets.interb,
                                                       color: linkAvailable1
@@ -272,18 +272,18 @@ class _SimulationSubState extends State<SimulationSub> {
                                                     : null,
                                                 child: Wrap(
                                                   children: [
-                                                    Text(
-                                                      "#3",
-                                                      style: TextStyle(
-                                                        color: linkAvailable2
-                                                            ? Colors.black
-                                                            : Colors.grey,
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: getWidgetWidth(
-                                                          width: 5),
-                                                    ),
+                                                    // Text(
+                                                    // //   "#3",
+                                                    // //   style: TextStyle(
+                                                    // //     color: linkAvailable2
+                                                    // //         ? Colors.black
+                                                    // //         : Colors.grey,
+                                                    // //   ),
+                                                    // // ),
+                                                    // // SizedBox(
+                                                    // //   width: getWidgetWidth(
+                                                    // //       width: 5),
+                                                    // // ),
                                                     Image.asset(
                                                       AllAssets.interb,
                                                       color: linkAvailable2

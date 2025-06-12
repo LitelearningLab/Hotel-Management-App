@@ -57,21 +57,18 @@ class MyApp extends StatelessWidget {
 Future<void> uploadBulkData() async {
   // Load JSON from assets
   String jsonString =
-      await rootBundle.loadString('assets/front_office_final_upload.json');
+      await rootBundle.loadString('assets/front_office_bulk_upload.json');
   Map<String, dynamic> jsonData = json.decode(jsonString);
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   // Access your specific collection from JSON
-  final documents = jsonData['HousekeepingCollection'];
+  final documents = jsonData['GrammerLabCollection'];
 
   if (documents != null && documents is Map<String, dynamic>) {
     for (final docId in documents.keys) {
       final fields = documents[docId];
-      await firestore
-          .collection("HousekeepingCollection")
-          .doc(docId)
-          .set(fields);
+      await firestore.collection("GrammerLabCollection").doc(docId).set(fields);
     }
 
     print("✅ Bulk upload completed to 'FrontOfficeCollection'!");

@@ -198,7 +198,6 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
               ),
             ),
           );
-          ;
         },
       ),
     );

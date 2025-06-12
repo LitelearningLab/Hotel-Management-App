@@ -51,4 +51,33 @@ class SubcategoryPro {
       'pronun': pronun,
     };
   }
+
+  factory SubcategoryPro.fromMap(Map<String, dynamic> map) {
+    return SubcategoryPro(
+      file: map['file'] ?? '',
+      isPriority: map['isPriority'] ?? false,
+      syllables: map['syllables'] ?? '',
+      text: map['text'] ?? '',
+      pronun: map['pronun'] ?? '',
+    );
+  }
+}
+
+class CategoryModel {
+  final String category;
+  final List<SubcategoryPro> subcategories;
+
+  CategoryModel({
+    required this.category,
+    required this.subcategories,
+  });
+
+  factory CategoryModel.fromMap(Map<String, dynamic> map) {
+    return CategoryModel(
+      category: map['category'] ?? '',
+      subcategories: (map['subcategories'] as List<dynamic>)
+          .map((item) => SubcategoryPro.fromMap(item))
+          .toList(),
+    );
+  }
 }

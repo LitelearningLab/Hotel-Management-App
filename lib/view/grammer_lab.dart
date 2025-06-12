@@ -1,26 +1,24 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hotelmanagementapp/controller/pronunciation_lab_controller.dart';
+import 'package:hotelmanagementapp/controller/grammer_lab_controller.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
-import 'package:hotelmanagementapp/route/route_name.dart';
-import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
+import 'package:hotelmanagementapp/view/grammer_lab_sub.dart';
 
-class PronounciationLab extends StatefulWidget {
-  // final String title;
-  const PronounciationLab({super.key});
+class GrammerLab extends StatefulWidget {
+  const GrammerLab({super.key});
 
   @override
-  State<PronounciationLab> createState() => _PronounciationLabState();
+  State<GrammerLab> createState() => _GrammerLabState();
 }
 
-class _PronounciationLabState extends State<PronounciationLab> {
+class _GrammerLabState extends State<GrammerLab> {
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<PronunciationLabController>(builder: (controller) {
+    return GetBuilder<GrammerLabController>(builder: (controller) {
       return Scaffold(
         appBar: AppBar(
             forceMaterialTransparency: true,
@@ -45,22 +43,22 @@ class _PronounciationLabState extends State<PronounciationLab> {
                     color: linearColor,
                   ),
                 )
-              : controller.categories.length < 1
+              : controller.grammarDocs.length < 1
                   ? Center(child: Text("No data found"))
                   : ListView.builder(
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      itemCount: controller.categories!.length,
+                      itemCount: controller.grammarDocs.length,
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
-                            Get.toNamed(
-                              AppRoutes.pronunciationLabSub,
-                              arguments: {
-                                'title': controller.categories[index].category,
-                                'subcategories':
-                                    controller.categories[index].subcategories,
-                              },
-                            );
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => GrammerLabSub(
+                                          title: controller
+                                              .grammarDocs[index].category,
+                                          doc: controller.grammarDocs[index],
+                                        )));
                           },
                           child: Container(
                             width: getWidgetWidth(width: 375),
@@ -93,16 +91,15 @@ class _PronounciationLabState extends State<PronounciationLab> {
                                       height: getWidgetHeight(height: 36),
                                       width: getWidgetWidth(width: 36),
                                       decoration: BoxDecoration(
-                                          color:
-                                              controller.pronunciationLabList[
-                                                      index]['bgColor'] ??
-                                                  Colors.white,
+                                          color: controller.grammarCheckLabList[
+                                                  index]['bgColor'] ??
+                                              Colors.white,
                                           shape: BoxShape.circle),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: ImageIcon(
                                           AssetImage(
-                                            controller.pronunciationLabList[
+                                            controller.grammarCheckLabList[
                                                     index]['image'] ??
                                                 AllAssets.plDays,
                                           ),
@@ -114,7 +111,7 @@ class _PronounciationLabState extends State<PronounciationLab> {
                                       width: getWidgetWidth(width: 10),
                                     ),
                                     Text(
-                                      controller.categories[index].category,
+                                      controller.grammarDocs[index].category,
                                       style: GoogleFonts.inter(
                                         fontWeight: FontWeight.w500,
                                         fontSize: 16,

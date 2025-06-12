@@ -20,6 +20,8 @@ class FrontOfficeController extends GetxController {
   String collectionName = "";
   int index = 0;
 
+  String pronunCollectionName = "";
+
   final List<String> hospitalityTopics = [
     "INTRODUCTION - TOURISM AND ITS IMPORTANCE",
     "INTRODUCTION - HOSPITALITY AND ITS ORIGIN",
@@ -59,6 +61,16 @@ class FrontOfficeController extends GetxController {
     image = args?['image'] ?? "";
     index = args?['index'] ?? "";
     isExpanded = List.generate(itemCount, (_) => false);
+    pronunCollectionName = index == 0
+        ? CollectionNames.frontOfficePronun
+        : index == 1
+            ? CollectionNames.foodAndBeveragePronun
+            : index == 2
+                ? CollectionNames.foodProductionPronun
+                : index == 3
+                    ? CollectionNames.houseKeepingPronun
+                    : "";
+
     collectionName = index == 0
         ? CollectionNames.frontOffice
         : index == 1

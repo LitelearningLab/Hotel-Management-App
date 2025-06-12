@@ -6,12 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/front_office_controller.dart';
+import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
 
@@ -343,6 +346,24 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                   .frontOfficeData[
                                                                       index]
                                                                   .category;
+                                                          Get.toNamed(
+                                                              AppRoutes
+                                                                  .pronunciationLabSub,
+                                                              arguments: {
+                                                                'title': controller
+                                                                    .frontOfficeData[
+                                                                        index]
+                                                                    .category,
+                                                                'subcategories':
+                                                                    <SubcategoryPro>[],
+                                                                "id": controller
+                                                                    .frontOfficeData[
+                                                                        index]
+                                                                    .pronunID,
+                                                                "pronunCollectionName":
+                                                                    controller
+                                                                        .pronunCollectionName,
+                                                              });
                                                           // Navigator.push(
                                                           //     context,
                                                           //     MaterialPageRoute(

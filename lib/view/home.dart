@@ -257,7 +257,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                 ? "Front Office Management"
                                 : controller.cardNames[index],
                             'image': controller.cardImages[index],
-                            'index': index
+                            'index': index,
                           });
                         },
                         child: Container(

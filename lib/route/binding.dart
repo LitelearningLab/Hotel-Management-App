@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/controller/front_office_controller.dart';
+import 'package:hotelmanagementapp/controller/grammer_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
 import 'package:hotelmanagementapp/controller/language_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/pronunciation_lab_controller.dart';
+import 'package:hotelmanagementapp/controller/pronunciation_lab_sub_controller.dart';
 import 'package:hotelmanagementapp/controller/sentence_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_sub_controller.dart';
@@ -54,5 +56,19 @@ class SentenceLabBinding with Bindings {
   @override
   void dependencies() {
     Get.put(SentenceLabController());
+  }
+}
+
+class PronunciationLabSubBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(PronunciationLabSubController());
+  }
+}
+
+class GrammerLabBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(GrammerLabController());
   }
 }

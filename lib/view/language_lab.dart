@@ -95,7 +95,10 @@ class Languagelab extends StatelessWidget {
                     width: getWidgetWidth(width: 130.04),
                     title: 'Grammer Lab',
                     imageUrl: AllAssets.peGl,
-                    onTap: () {},
+                    onTap: () {
+                      Get.toNamed(AppRoutes.grmmaerLab,
+                          arguments: {"title": "Grammer Lab"});
+                    },
                     cardColor: Color(0xFFDC6379),
                   ),
                 ],

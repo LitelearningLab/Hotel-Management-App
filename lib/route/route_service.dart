@@ -7,9 +7,12 @@ import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/home.dart';
 import 'package:hotelmanagementapp/view/language_lab.dart';
+import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
 import 'package:hotelmanagementapp/view/pronounciation_lab.dart';
 import 'package:hotelmanagementapp/view/sentence_lab.dart';
 import 'package:hotelmanagementapp/view/simulation_sub.dart';
+
+import '../view/grammer_lab.dart';
 
 class RouteService {
   static List<GetPage<dynamic>>? getPages = [
@@ -43,6 +46,16 @@ class RouteService {
       name: AppRoutes.sentenceLab,
       page: () => SentenceLab(),
       binding: SentenceLabBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.pronunciationLabSub,
+      page: () => PronunciationLabSub(),
+      binding: PronunciationLabSubBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.grmmaerLab,
+      page: () => GrammerLab(),
+      binding: GrammerLabBinding(),
     ),
   ];
 }
