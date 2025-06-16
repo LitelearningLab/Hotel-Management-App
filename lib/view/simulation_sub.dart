@@ -88,219 +88,43 @@ class _SimulationSubState extends State<SimulationSub> {
                               vertical: getWidgetHeight(height: 5)),
                           child: GestureDetector(
                               onTap: () {
-                                controller.expandedIndex =
-                                    isExpanded ? -1 : index;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => InAppWebViewPage(
+                                      url: controller.simulation
+                                          .subcategory[index].links[0],
+                                    ),
+                                  ),
+                                );
                                 setState(() {});
                                 // controller.update();
                               },
-                              child: AnimatedSize(
-                                duration: const Duration(milliseconds: 200),
-                                curve: Curves.fastOutSlowIn,
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: Colors.white,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        offset: const Offset(0, 4),
-                                        blurRadius: 10,
-                                      ),
-                                    ],
+                              child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      offset: const Offset(0, 4),
+                                      blurRadius: 10,
+                                    ),
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: getWidgetHeight(height: 12),
+                                    horizontal: getWidgetWidth(width: 20),
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: getWidgetHeight(height: 12),
-                                          horizontal: getWidgetWidth(width: 20),
-                                        ),
-                                        child: Text(
-                                          controller.simulation
-                                              .subcategory[index].title,
-                                          style: GoogleFonts.inter(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
-                                      if (isExpanded)
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal:
-                                                getWidgetWidth(width: 10),
-                                          ),
-                                          child: const Divider(
-                                            color: Color.fromARGB(
-                                                255, 107, 107, 107),
-                                          ),
-                                        ),
-                                      if (isExpanded)
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal:
-                                                getWidgetWidth(width: 15),
-                                            vertical:
-                                                getWidgetHeight(height: 8),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: linkAvailable
-                                                    ? () {
-                                                        sessionName = controller
-                                                            .simulation
-                                                            .subcategory[index]
-                                                            .title;
-                                                        activityName =
-                                                            "Simulation 1";
-                                                        Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        InAppWebViewPage(
-                                                                          url: controller
-                                                                              .simulation
-                                                                              .subcategory[index]
-                                                                              .links[0],
-                                                                        )));
-                                                      }
-                                                    : null,
-                                                child: Wrap(
-                                                  children: [
-                                                    // Text(
-                                                    //   "#1",
-                                                    //   style: TextStyle(
-                                                    //     color: linkAvailable
-                                                    //         ? Colors.black
-                                                    //         : Colors.grey,
-                                                    //   ),
-                                                    // ),
-                                                    // SizedBox(
-                                                    //   width: getWidgetWidth(
-                                                    //       width: 5),
-                                                    // ),
-                                                    Image.asset(
-                                                      AllAssets.interb,
-                                                      color: linkAvailable
-                                                          ? Colors.black
-                                                          : Colors.grey,
-                                                      width: getWidgetWidth(
-                                                          width: 26),
-                                                      height: getWidgetHeight(
-                                                          height: 28),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              GestureDetector(
-                                                onTap: linkAvailable1
-                                                    ? () {
-                                                        sessionName = controller
-                                                            .simulation
-                                                            .subcategory[index]
-                                                            .title;
-                                                        activityName =
-                                                            "Simulation 2";
-                                                        Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        InAppWebViewPage(
-                                                                          url: controller
-                                                                              .simulation
-                                                                              .subcategory[index]
-                                                                              .links[1],
-                                                                        )));
-                                                      }
-                                                    : null,
-                                                child: Wrap(
-                                                  children: [
-                                                    // Text(
-                                                    //   "#2",
-                                                    //   style: TextStyle(
-                                                    //     color: linkAvailable1
-                                                    //         ? Colors.black
-                                                    //         : Colors.grey,
-                                                    //   ),
-                                                    // ),
-                                                    // SizedBox(
-                                                    //   width: getWidgetWidth(
-                                                    //       width: 5),
-                                                    // ),
-                                                    Image.asset(
-                                                      AllAssets.interb,
-                                                      color: linkAvailable1
-                                                          ? Colors.black
-                                                          : Colors.grey,
-                                                      width: getWidgetWidth(
-                                                          width: 26),
-                                                      height: getWidgetHeight(
-                                                          height: 28),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              GestureDetector(
-                                                onTap: linkAvailable2
-                                                    ? () {
-                                                        sessionName = controller
-                                                            .simulation
-                                                            .subcategory[index]
-                                                            .title;
-                                                        activityName =
-                                                            "Simulation 3";
-                                                        Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        InAppWebViewPage(
-                                                                          url: controller
-                                                                              .simulation
-                                                                              .subcategory[index]
-                                                                              .links[2],
-                                                                        )));
-                                                      }
-                                                    : null,
-                                                child: Wrap(
-                                                  children: [
-                                                    // Text(
-                                                    // //   "#3",
-                                                    // //   style: TextStyle(
-                                                    // //     color: linkAvailable2
-                                                    // //         ? Colors.black
-                                                    // //         : Colors.grey,
-                                                    // //   ),
-                                                    // // ),
-                                                    // // SizedBox(
-                                                    // //   width: getWidgetWidth(
-                                                    // //       width: 5),
-                                                    // // ),
-                                                    Image.asset(
-                                                      AllAssets.interb,
-                                                      color: linkAvailable2
-                                                          ? Colors.black
-                                                          : Colors.grey,
-                                                      width: getWidgetWidth(
-                                                          width: 26),
-                                                      height: getWidgetHeight(
-                                                          height: 28),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                    ],
+                                  child: Text(
+                                    controller
+                                        .simulation.subcategory[index].title,
+                                    style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ),
                               )),
