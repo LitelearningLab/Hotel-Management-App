@@ -8,6 +8,7 @@ import 'package:hotelmanagementapp/controller/pronunciation_lab_sub_controller.d
 import 'package:hotelmanagementapp/controller/sentence_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_sub_controller.dart';
+import 'package:hotelmanagementapp/controller/sound_page_controller.dart';
 
 class InitialBinding with Bindings {
   @override
@@ -70,5 +71,12 @@ class GrammerLabBinding with Bindings {
   @override
   void dependencies() {
     Get.put(GrammerLabController());
+  }
+}
+
+class SoundPageBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(SoundPageController());
   }
 }

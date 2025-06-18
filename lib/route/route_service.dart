@@ -11,6 +11,7 @@ import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
 import 'package:hotelmanagementapp/view/pronounciation_lab.dart';
 import 'package:hotelmanagementapp/view/sentence_lab.dart';
 import 'package:hotelmanagementapp/view/simulation_sub.dart';
+import 'package:hotelmanagementapp/view/sound_page.dart';
 
 import '../view/grammer_lab.dart';
 
@@ -56,6 +57,11 @@ class RouteService {
       name: AppRoutes.grmmaerLab,
       page: () => GrammerLab(),
       binding: GrammerLabBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.soundPage,
+      page: () => SoundPage(),
+      binding: SoundPageBinding(),
     ),
   ];
 }

@@ -8,4 +8,5 @@ class AppRoutes {
   static const sentenceLab = "/sentence_lab";
   static const pronunciationLabSub = '/pronunciation_lab_sub';
   static const grmmaerLab = '/grammar_lab';
+  static const soundPage = '/sound_page';
 }

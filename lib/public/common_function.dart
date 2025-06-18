@@ -28,6 +28,11 @@ int timestampIndex = 0;
 late TextScaler kText;
 // double fullScreenHeight = 805.33;
 
+Size displaySize(BuildContext context) {
+  //debugPrint('Size = ' + MediaQuery.of(context).size.toString());
+  return MediaQuery.of(context).size;
+}
+
 double getWidgetHeight({required double height}) {
   double variableHeightValue = 812 / height;
   return kHeight / variableHeightValue;
@@ -36,6 +41,11 @@ double getWidgetHeight({required double height}) {
 double getWidgetWidth({required double width}) {
   double variableWidthValue = 375 / width;
   return kWidth / variableWidthValue;
+}
+
+double displayWidth(BuildContext context) {
+  // debugPrint('Width = ' + displaySize(context).width.toString());
+  return displaySize(context).width;
 }
 
 void recordTiming(String state) {
