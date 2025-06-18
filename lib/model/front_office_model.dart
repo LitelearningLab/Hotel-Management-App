@@ -1,7 +1,7 @@
 class FrontOfficeDocument {
   final String category;
   final List<SubCategory> subcategory;
-  final int order;
+  final double order;
   final String key;
   final String pronunID;
 
@@ -23,7 +23,7 @@ class FrontOfficeDocument {
     return FrontOfficeDocument(
         category: map['category'] ?? '',
         subcategory: subcatList,
-        order: map['order'] ?? 0,
+        order: (map['order'] ?? 0).toDouble(),
         key: map['key'] ?? "",
         pronunID: map['pronunID'] ?? "");
   }

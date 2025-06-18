@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/main.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
 
 class HomeController extends GetxController {
   List<String> cardNames = [
@@ -26,5 +28,20 @@ class HomeController extends GetxController {
   void onInit() {
     // bulkEditDocuments();
     super.onInit();
+  }
+
+  void showPopupAtTap(Offset tapPosition) {
+    final overlay = Get.overlayContext!;
+    late OverlayEntry entry;
+
+    entry = OverlayEntry(
+      builder: (_) => Positioned(
+        left: tapPosition.dx,
+        top: tapPosition.dy,
+        child: TapPopup(onFinish: () => entry.remove()),
+      ),
+    );
+
+    Overlay.of(overlay).insert(entry);
   }
 }

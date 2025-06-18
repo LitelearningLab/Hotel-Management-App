@@ -336,44 +336,54 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                   height: 26),
                                                         ),
                                                       ),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          activityName =
-                                                              "Prounciation Lab";
-
-                                                          subCategoryTitle =
-                                                              controller
-                                                                  .frontOfficeData[
-                                                                      index]
-                                                                  .category;
-                                                          Get.toNamed(
-                                                              AppRoutes
-                                                                  .pronunciationLabSub,
-                                                              arguments: {
-                                                                'title': controller
-                                                                    .frontOfficeData[
-                                                                        index]
-                                                                    .category,
-                                                                'subcategories':
-                                                                    <SubcategoryPro>[],
-                                                                "id": controller
-                                                                    .frontOfficeData[
-                                                                        index]
-                                                                    .pronunID,
-                                                                "pronunCollectionName":
-                                                                    controller
-                                                                        .pronunCollectionName,
-                                                              });
-                                                          // Navigator.push(
-                                                          //     context,
-                                                          //     MaterialPageRoute(
-                                                          //         builder:
-                                                          //             (context) =>
-                                                          //                 PronunciationLabSub(
-                                                          //                   title:
-                                                          //                       controller.hospitalityTopics[index],
-                                                          //                 )));
+                                                      GestureDetector(
+                                                        onTapDown:
+                                                            (TapDownDetails
+                                                                details) {
+                                                          final tapPosition =
+                                                              details
+                                                                  .globalPosition;
+                                                          controller
+                                                              .showPopupAtTap(
+                                                                  tapPosition);
                                                         },
+                                                        // onTap: () {
+                                                        //   activityName =
+                                                        //       "Prounciation Lab";
+
+                                                        //   subCategoryTitle =
+                                                        //       controller
+                                                        //           .frontOfficeData[
+                                                        //               index]
+                                                        //           .category;
+                                                        //   Get.toNamed(
+                                                        //       AppRoutes
+                                                        //           .pronunciationLabSub,
+                                                        //       arguments: {
+                                                        //         'title': controller
+                                                        //             .frontOfficeData[
+                                                        //                 index]
+                                                        //             .category,
+                                                        //         'subcategories':
+                                                        //             <SubcategoryPro>[],
+                                                        //         "id": controller
+                                                        //             .frontOfficeData[
+                                                        //                 index]
+                                                        //             .pronunID,
+                                                        //         "pronunCollectionName":
+                                                        //             controller
+                                                        //                 .pronunCollectionName,
+                                                        //       });
+                                                        //   // Navigator.push(
+                                                        //   //     context,
+                                                        //   //     MaterialPageRoute(
+                                                        //   //         builder:
+                                                        //   //             (context) =>
+                                                        //   //                 PronunciationLabSub(
+                                                        //   //                   title:
+                                                        //   //                       controller.hospitalityTopics[index],
+                                                        //   //                 )));
+                                                        // },
                                                         child: SizedBox(
                                                           width: getWidgetWidth(
                                                               width: 32),

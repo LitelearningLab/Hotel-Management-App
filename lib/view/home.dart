@@ -176,7 +176,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       radius: 25,
                       child: ClipOval(
                         child: Image.asset(
-                          "assets/Hotel_Green.png",
+                          "assets/appIcon.png",
                           fit: BoxFit.contain,
                           width: getWidgetWidth(width: 48),
                           height: getWidgetHeight(height: 48),
@@ -369,23 +369,35 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           vertical: getWidgetHeight(height: 6),
                         ),
                         child: GestureDetector(
-                          onTap: () {
-                            mianCategoryTitile = controller.smartShorts[index];
-                            timestampIndex = -1;
+                          onTapDown: (TapDownDetails details) {
+                            final tapPosition = details.globalPosition;
                             index == 0
                                 ? Get.toNamed(AppRoutes.simulation)
-                                : index == 1
-                                    ? Get.toNamed(AppRoutes.languageLab)
-                                    : Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              InteractiveSimulatiion(
-                                                  title: controller
-                                                      .smartShorts[index]),
-                                        ),
-                                      );
+                                : controller.showPopupAtTap(tapPosition);
                           },
+                          // onTap: () {
+                          //   mianCategoryTitile = controller.smartShorts[index];
+                          //   timestampIndex = -1;
+                          //   index == 0
+                          //       ? Get.toNamed(AppRoutes.simulation)
+                          //       : index == 1
+                          //           ? openDialog(context)
+                          //           : openDialog(context);
+
+                          //   //      index == 0
+                          //   // ? Get.toNamed(AppRoutes.simulation)
+                          //   // : index == 1
+                          //   //     ? Get.toNamed(AppRoutes.languageLab)
+                          //   //     : Navigator.push(
+                          //   //         context,
+                          //   //         MaterialPageRoute(
+                          //   //           builder: (context) =>
+                          //   //               InteractiveSimulatiion(
+                          //   //                   title: controller
+                          //   //                       .smartShorts[index]),
+                          //   //         ),
+                          //   //       );
+                          // },
                           child: Container(
                             height: getWidgetHeight(height: 75),
                             decoration: BoxDecoration(

@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 
 double kHeight = 0.0;
@@ -46,6 +46,19 @@ double getWidgetWidth({required double width}) {
 double displayWidth(BuildContext context) {
   // debugPrint('Width = ' + displaySize(context).width.toString());
   return displaySize(context).width;
+}
+
+void openDialog(BuildContext context) {
+  Get.snackbar(
+    'Coming Soon', // Title
+    '', // Message (can be empty)
+    snackPosition: SnackPosition.BOTTOM,
+    duration: Duration(seconds: 3),
+    backgroundColor: Colors.black87,
+    colorText: Colors.white,
+    margin: EdgeInsets.all(16),
+    borderRadius: 10,
+  );
 }
 
 void recordTiming(String state) {
@@ -228,5 +241,67 @@ Future<void> startPracticeTime({
   } catch (e, stack) {
     log('❌ Unexpected Error: $e\nStack Trace: $stack');
     throw Exception('An unexpected error occurred');
+  }
+}
+
+class TapPopup extends StatefulWidget {
+  final VoidCallback onFinish;
+  const TapPopup({required this.onFinish});
+
+  @override
+  State<TapPopup> createState() => _TapPopupState();
+}
+
+class _TapPopupState extends State<TapPopup>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 300),
+      reverseDuration: Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+
+    _controller.forward();
+
+    Future.delayed(Duration(seconds: 3), () async {
+      await _controller.reverse();
+      widget.onFinish();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Material(
+        elevation: 4,
+        color: Colors.black.withOpacity(0.85),
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Text(
+            'Coming Soon',
+            style: TextStyle(color: Colors.white, fontSize: 14),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

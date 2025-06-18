@@ -1,9 +1,11 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/front_office_model.dart';
 import 'package:hotelmanagementapp/public/api.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/response/front_office_responce.dart';
 
 class FrontOfficeController extends GetxController {
@@ -85,6 +87,25 @@ class FrontOfficeController extends GetxController {
         await frontOfficeResponse.getFrontOfficeCollection(collectionName);
     loading = false;
     update();
+  }
+
+  void showPopupAtTap(Offset tapPosition) {
+    final overlay = Get.overlayContext!;
+    late OverlayEntry entry;
+    final adjustedPosition = Offset(
+      tapPosition.dx - 60, // shift to the left
+      tapPosition.dy - 0, // shift slightly up
+    );
+
+    entry = OverlayEntry(
+      builder: (_) => Positioned(
+        left: adjustedPosition.dx,
+        top: adjustedPosition.dy,
+        child: TapPopup(onFinish: () => entry.remove()),
+      ),
+    );
+
+    Overlay.of(overlay).insert(entry);
   }
 }
 
