@@ -5,10 +5,10 @@ description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 
-version: 1.0.2+3
+version: 1.0.3+6
 
 environment:
-  sdk: '>=3.3.4 <4.0.0'
+  sdk: '>=3.3.4 <7.0.0'
 
 dependencies:
   flutter:
@@ -23,7 +23,7 @@ dependencies:
   flutter_inappwebview: ^5.7.2+3
   after_layout: ^1.2.0
   get: ^4.7.2
-  uuid: ^4.5.1
+  # uuid: ^4.5.1
   connectivity_plus: ^6.1.4
   google_sign_in: ^6.2.2
   firebase_auth: ^5.2.0
@@ -34,7 +34,9 @@ dependencies:
   flutter_colorful_tab: ^0.1.1
   firebase_database: ^11.1.1
   video_player: ^2.9.2
-  flutter_cache_manager: ^3.4.1
+  flutter_cache_manager: ^3.3.1
+  encrypt: ^5.0.3
+  # audioplayers: ^4.1.0
 
 dev_dependencies:
   flutter_test:

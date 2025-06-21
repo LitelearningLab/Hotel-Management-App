@@ -258,57 +258,68 @@ class _SoundPageState extends State<SoundPage> {
                       ),
                       itemCount: 6, // Total number of items in the grid
                       itemBuilder: (BuildContext context, int index) {
-                        return InkWell(
-                          splashColor: Colors.transparent,
-                          onTap: () async {
-                            controller.onClick(index);
+                        return GestureDetector(
+                          onTapDown: (TapDownDetails onTapDetails) {
+                            controller.onClick(
+                                index, onTapDetails.globalPosition);
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: getWidgetWidth(width: 10),
-                                vertical: getWidgetHeight(height: 5)),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Color(0xff34425D),
-                            ),
-                            child: Row(
-                              children: [
-                                if (index != 5)
-                                  Image.asset(
-                                    "assets/images/pl${index + 1}.png",
-                                    width: getWidgetWidth(width: 35),
-                                  ),
-                                if (index == 5)
-                                  SizedBox(width: getWidgetWidth(width: 5)),
-                                if (index == 5)
-                                  Icon(
-                                    Icons.mic,
-                                    color: Colors.white,
-                                    size: getWidgetHeight(height: 33),
-                                  ),
-                                if (index == 5)
-                                  SizedBox(
-                                    width: getWidgetWidth(width: 0),
-                                  ),
-                                SizedBox(width: getWidgetWidth(width: 10)),
-                                Text(
-                                  index == 0
-                                      ? "Front View"
-                                      : index == 1
-                                          ? "Side View"
-                                          : index == 2
-                                              ? "Front Closer"
-                                              : index == 3
-                                                  ? "Side Closer"
-                                                  : index == 4
-                                                      ? "Animation"
-                                                      : "Practice",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: kText.scale(15),
-                                      fontWeight: FontWeight.w500),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  offset: const Offset(0, 4),
+                                  blurRadius: 10,
                                 ),
                               ],
+                            ),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: getWidgetWidth(width: 10),
+                                  vertical: getWidgetHeight(height: 5)),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                              ),
+                              child: Row(
+                                children: [
+                                  if (index != 5)
+                                    Image.asset(
+                                      "assets/images/pl${index + 1}.png",
+                                      width: getWidgetWidth(width: 35),
+                                    ),
+                                  if (index == 5)
+                                    SizedBox(width: getWidgetWidth(width: 5)),
+                                  if (index == 5)
+                                    Icon(
+                                      Icons.mic,
+                                      color: Colors.black,
+                                      size: getWidgetHeight(height: 33),
+                                    ),
+                                  if (index == 5)
+                                    SizedBox(
+                                      width: getWidgetWidth(width: 0),
+                                    ),
+                                  SizedBox(width: getWidgetWidth(width: 10)),
+                                  Text(
+                                    index == 0
+                                        ? "Front View"
+                                        : index == 1
+                                            ? "Side View"
+                                            : index == 2
+                                                ? "Front Closer"
+                                                : index == 3
+                                                    ? "Side Closer"
+                                                    : index == 4
+                                                        ? "Animation"
+                                                        : "Practice",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: kText.scale(15),
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );
@@ -321,7 +332,7 @@ class _SoundPageState extends State<SoundPage> {
                         horizontal: getWidgetWidth(width: 5)),
                     padding: EdgeInsets.symmetric(
                         horizontal: getWidgetWidth(width: 10),
-                        vertical: getWidgetHeight(height: 10)),
+                        vertical: getWidgetHeight(height: 20)),
                     child: Column(
                       children: [
                         Text(
@@ -332,13 +343,16 @@ class _SoundPageState extends State<SoundPage> {
                               fontWeight: FontWeight.w500,
                               fontSize: kText.scale(15)),
                         ),
-                        Text(
-                          "Empty",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: Keys.fontFamily,
-                              fontWeight: FontWeight.w500,
-                              fontSize: kText.scale(15)),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            controller.soundModel?.ULR ?? "Empty",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontFamily: Keys.fontFamily,
+                                fontWeight: FontWeight.w500,
+                                fontSize: kText.scale(15)),
+                          ),
                         ),
                       ],
                     ),

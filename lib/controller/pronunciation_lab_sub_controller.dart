@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
 
 import 'package:hotelmanagementapp/model/category_model.dart';
+import 'package:hotelmanagementapp/utility/audio_player_manager.dart';
 
 class PronunciationLabSubController extends GetxController {
   late String title;
@@ -9,12 +10,13 @@ class PronunciationLabSubController extends GetxController {
   late CategoryModel category;
   bool isLoading = true;
   String collectionName = '';
+  late AudioPlayerManager audioPlayerManager;
   @override
   void onInit() {
     title = Get.arguments['title'];
     subcategories = Get.arguments['subcategories'] as List<SubcategoryPro>;
     collectionName = Get.arguments['pronunCollectionName'] ?? '';
-
+    audioPlayerManager = AudioPlayerManager();
     fetchPronunById(Get.arguments['id'] ?? '');
 
     super.onInit();

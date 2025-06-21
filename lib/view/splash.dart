@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/main.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/view/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
@@ -66,10 +68,25 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.hotel, size: 100, color: Colors.deepPurple),
+              SizedBox(
+                height: getWidgetHeight(height: 200),
+                width: getWidgetWidth(width: 200),
+                child: CircleAvatar(
+                  backgroundColor: Colors.transparent,
+                  radius: 25,
+                  child: ClipOval(
+                    child: Image.asset(
+                      "assets/appIcon.png",
+                      fit: BoxFit.fill,
+                      width: getWidgetWidth(width: 200),
+                      height: getWidgetHeight(height: 200),
+                    ),
+                  ),
+                ),
+              ),
               SizedBox(height: 20),
               Text(
-                "Hotel Management",
+                "Profluent Hotelier",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

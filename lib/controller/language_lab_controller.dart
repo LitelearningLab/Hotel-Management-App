@@ -1,38 +1,82 @@
 import 'dart:developer';
-
+import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:hotelmanagementapp/model/sound_model.dart';
 
 class LanguageLabController extends GetxController {
   int selectedIndex = 0;
-  List<SoundModel> soundPageModel = [];
   bool isLoading = true;
+  bool isExpanded = false;
+  int expandedIndex = -1;
+  int subSelectedIndex = -1;
+
+  List<SoundModel> soundPageModel = [];
+  SoundModel? importantSound;
+  List<SoundModel> vowelSoundsList = [];
+  List<SoundModel> consonantSoundsList = [];
+
+  List<Color> colorList = [
+    Color(0xFF5AB963),
+    Color(0xFFDDD639),
+    Color(0xFF9C2780),
+    Color(0xFFFF9800),
+    Color(0xFFE91E63),
+  ];
 
   @override
   void onInit() {
     super.onInit();
-    fetchAndPrintProfluentEnglishData();
+    fetchAndCategorizeSounds();
   }
 
-  ontapTab(int index) {
+  void ontapTab(int index) {
     selectedIndex = index;
     update();
   }
 
-  Future<void> fetchAndPrintProfluentEnglishData() async {
+  Future<void> fetchAndCategorizeSounds() async {
     try {
-      final FirebaseFirestore firestore = FirebaseFirestore.instance;
+      isLoading = true;
+      update();
 
+      final FirebaseFirestore firestore = FirebaseFirestore.instance;
       final QuerySnapshot snapshot =
-          await firestore.collection('ProfluentEnglish').get();
+          await firestore.collection('profluentEnglish').get();
+
+      soundPageModel.clear();
+      vowelSoundsList.clear();
+      consonantSoundsList.clear();
+      importantSound = null;
 
       for (var doc in snapshot.docs) {
-        final data = SoundModel.fromJson(doc.data() as Map<String, dynamic>);
-        soundPageModel.add(data);
+        try {
+          final data = SoundModel.fromJson(doc.data() as Map<String, dynamic>);
+          soundPageModel.add(data);
+
+          final category = data.category.trim().toLowerCase();
+
+          if (category.contains("important")) {
+            importantSound = data;
+          } else if (category == 'short vowel' ||
+              category == 'long vowels' ||
+              category == 'diphthong') {
+            vowelSoundsList.add(data);
+          } else if (category.startsWith("consonants")) {
+            consonantSoundsList.add(data);
+            log("${data.category}");
+          }
+        } catch (e) {
+          log("❌ Error parsing doc ${doc.id}: $e");
+        }
       }
+
       soundPageModel.sort((a, b) => a.order.compareTo(b.order));
-      log("sound length :- ${soundPageModel.length}");
+
+      log("Total categories: ${soundPageModel.length}");
+      log("Vowel models: ${vowelSoundsList.length}");
+      log("Consonant models: ${consonantSoundsList.length}");
+      log("Important sound present: ${importantSound != null}");
 
       isLoading = false;
       update();

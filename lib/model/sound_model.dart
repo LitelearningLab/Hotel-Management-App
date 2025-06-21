@@ -11,25 +11,19 @@ class SoundModel {
 
   factory SoundModel.fromJson(Map<String, dynamic> json) {
     return SoundModel(
-      category: json['category'],
-      order: json['order'],
-      subcategories: (json['subcategories'] as List)
+      category: json['category'] ?? '',
+      order: json['order'] ?? 0,
+      subcategories: (json['subcategories'] as List? ?? [])
           .map((e) => SoundSubcategory.fromJson(e))
           .toList(),
     );
   }
-
-  Map<String, dynamic> toJson() => {
-        'category': category,
-        'order': order,
-        'subcategories': subcategories.map((e) => e.toJson()).toList(),
-      };
 }
 
 class SoundSubcategory {
   final String name;
   final String ULR;
-  final dynamic links; // Can be Links or String (if "same as")
+  final Links links;
   final Word? words;
   final List<SoundPractice>? soundsPractice;
 
@@ -44,11 +38,11 @@ class SoundSubcategory {
   factory SoundSubcategory.fromJson(Map<String, dynamic> json) {
     final linksValue = json['links'];
     return SoundSubcategory(
-      name: json['name'],
-      ULR: json['ULR'],
+      name: json['name'] ?? '',
+      ULR: json['ULR'] ?? '',
       links: linksValue is Map
           ? Links.fromJson(Map<String, dynamic>.from(linksValue))
-          : linksValue,
+          : Links.empty(),
       words: json['words'] != null ? Word.fromJson(json['words']) : null,
       soundsPractice: json['soundsPractice'] != null
           ? (json['soundsPractice'] as List)
@@ -57,15 +51,6 @@ class SoundSubcategory {
           : null,
     );
   }
-
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'ULR': ULR,
-        'links': links is Links ? (links as Links).toJson() : links,
-        if (words != null) 'words': words!.toJson(),
-        if (soundsPractice != null)
-          'soundsPractice': soundsPractice!.map((e) => e.toJson()).toList(),
-      };
 }
 
 class Links {
@@ -84,20 +69,14 @@ class Links {
   });
 
   factory Links.fromJson(Map<String, dynamic> json) => Links(
-        v1: json['v1'],
-        v2: json['v2'],
-        v3: json['v3'],
-        v4: json['v4'],
-        v5: json['v5'],
+        v1: json['v1'] ?? '',
+        v2: json['v2'] ?? '',
+        v3: json['v3'] ?? '',
+        v4: json['v4'] ?? '',
+        v5: json['v5'] ?? '',
       );
 
-  Map<String, dynamic> toJson() => {
-        'v1': v1,
-        'v2': v2,
-        'v3': v3,
-        'v4': v4,
-        'v5': v5,
-      };
+  factory Links.empty() => Links(v1: '', v2: '', v3: '', v4: '', v5: '');
 }
 
 class Word {
@@ -114,18 +93,11 @@ class Word {
   });
 
   factory Word.fromJson(Map<String, dynamic> json) => Word(
-        file: json['file'],
-        pronun: json['pronun'],
-        syllables: json['syllables'],
-        text: json['text'],
+        file: json['file'] ?? '',
+        pronun: json['pronun'] ?? '',
+        syllables: json['syllables'] ?? '',
+        text: json['text'] ?? '',
       );
-
-  Map<String, dynamic> toJson() => {
-        'file': file,
-        'pronun': pronun,
-        'syllables': syllables,
-        'text': text,
-      };
 }
 
 class SoundPractice {
@@ -142,16 +114,9 @@ class SoundPractice {
   });
 
   factory SoundPractice.fromJson(Map<String, dynamic> json) => SoundPractice(
-        file: json['file'],
-        pronun: json['pronun'],
-        syllables: json['syllables'],
-        text: json['text'],
+        file: json['file'] ?? '',
+        pronun: json['pronun'] ?? '',
+        syllables: json['syllables'] ?? '',
+        text: json['text'] ?? '',
       );
-
-  Map<String, dynamic> toJson() => {
-        'file': file,
-        'pronun': pronun,
-        'syllables': syllables,
-        'text': text,
-      };
 }

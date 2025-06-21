@@ -12,6 +12,7 @@ import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
@@ -255,7 +256,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             'title': controller.cardNames[index] ==
                                     "Front Office\nManagement"
                                 ? "Front Office Management"
-                                : controller.cardNames[index],
+                                : controller.cardNames[index] ==
+                                        "Food & Beverage Service\nManagement"
+                                    ? "Food & Beverage Service Management"
+                                    : controller.cardNames[index] ==
+                                            "Accommodation\nManagement - Housekeeping"
+                                        ? "Accommodation Management - Housekeeping"
+                                        : controller.cardNames[index],
                             'image': controller.cardImages[index],
                             'index': index,
                           });
@@ -357,7 +364,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               children: [
                 GetBuilder<HomeController>(builder: (controller) {
                   return ListView.builder(
-                    // shrinkWrap: true,
+                    shrinkWrap: true,
                     itemCount: 3,
                     padding: EdgeInsets.only(
                         top: getWidgetHeight(height: 10),
@@ -371,33 +378,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         child: GestureDetector(
                           onTapDown: (TapDownDetails details) {
                             final tapPosition = details.globalPosition;
+                            // index == 0
+                            //     ? Get.toNamed(AppRoutes.simulation)
+                            //     : index == 1
+                            //         ? Get.toNamed(AppRoutes.languageLab)
+                            //         : controller.showPopupAtTap(tapPosition);
+                            // for playstore
                             index == 0
                                 ? Get.toNamed(AppRoutes.simulation)
                                 : controller.showPopupAtTap(tapPosition);
                           },
-                          // onTap: () {
-                          //   mianCategoryTitile = controller.smartShorts[index];
-                          //   timestampIndex = -1;
-                          //   index == 0
-                          //       ? Get.toNamed(AppRoutes.simulation)
-                          //       : index == 1
-                          //           ? openDialog(context)
-                          //           : openDialog(context);
-
-                          //   //      index == 0
-                          //   // ? Get.toNamed(AppRoutes.simulation)
-                          //   // : index == 1
-                          //   //     ? Get.toNamed(AppRoutes.languageLab)
-                          //   //     : Navigator.push(
-                          //   //         context,
-                          //   //         MaterialPageRoute(
-                          //   //           builder: (context) =>
-                          //   //               InteractiveSimulatiion(
-                          //   //                   title: controller
-                          //   //                       .smartShorts[index]),
-                          //   //         ),
-                          //   //       );
-                          // },
                           child: Container(
                             height: getWidgetHeight(height: 75),
                             decoration: BoxDecoration(
@@ -471,10 +461,21 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         fontSize: 16,
                                       ),
                                     ),
-                                    Text(
-                                      "View Schedule, Progress Report...",
-                                      style: TextStyle(
-                                          color: lightWhite, fontSize: 12),
+                                    SizedBox(
+                                      width: getWidgetWidth(width: 240),
+                                      child: Text(
+                                        maxLines: 2,
+                                        index == 0
+                                            ? "150+ Simulations - Experiential learning for handling challenging situations & interviews."
+                                            : index == 1
+                                                ? "English & French Pronunciation, Sentence Lab, Grammar, and Phonetic Sounds. "
+                                                : "Excellent collection of content for casual and enjoyable micro-learning",
+                                        style: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          color: lightWhite,
+                                          fontSize: kText.scale(10),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),

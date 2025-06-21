@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -100,10 +101,20 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                     children: [
                                       Row(
                                         children: [
-                                          ImageIcon(
-                                            const AssetImage(
-                                                AllAssets.roundPlay),
-                                            color: linearColor,
+                                          GestureDetector(
+                                            onTap: () {
+                                              controller.audioPlayerManager
+                                                  .play(
+                                                      controller
+                                                          .subcategories[index]
+                                                          .file,
+                                                      context: context);
+                                            },
+                                            child: ImageIcon(
+                                              const AssetImage(
+                                                  AllAssets.roundPlay),
+                                              color: linearColor,
+                                            ),
                                           ),
                                           SizedBox(
                                             width: getWidgetWidth(width: 10),

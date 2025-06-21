@@ -8,6 +8,7 @@ import 'package:hotelmanagementapp/controller/language_lab_controller.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/pe_top_categories_card.dart';
 import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
@@ -52,12 +53,14 @@ class Languagelab extends StatelessWidget {
                   ),
                 )
               : ListView(
-                  padding: const EdgeInsets.all(20),
+                  // padding: const EdgeInsets.all(20),
                   children: [
                     // Grid View inside a fixed height
                     GridView.count(
                       crossAxisCount: 2,
                       shrinkWrap: true,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: getWidgetHeight(height: 20)),
                       physics:
                           const NeverScrollableScrollPhysics(), // prevent inner scrolling
                       crossAxisSpacing: getWidgetWidth(width: 10),
@@ -113,44 +116,48 @@ class Languagelab extends StatelessWidget {
                     SizedBox(
                       height: getWidgetHeight(height: 20),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Sounds',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Roboto',
-                            letterSpacing: 0,
-                            fontSize: 18,
-                          ),
-                        ),
-                        SizedBox(
-                          width: getWidgetWidth(width: 7),
-                        ),
-                        Column(
-                          children: [
-                            Text(
-                              '( Know more... )',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'Roboto',
-                                letterSpacing: 0,
-                                fontSize: 13,
-                                wordSpacing: 2,
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(top: 2),
-                              height: getWidgetHeight(height: 2),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: getWidgetHeight(height: 20)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Sounds',
+                            style: TextStyle(
                               color: Colors.black,
-                              width: getWidgetWidth(width: 80),
-                            )
-                          ],
-                        ),
-                      ],
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Roboto',
+                              letterSpacing: 0,
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(
+                            width: getWidgetWidth(width: 7),
+                          ),
+                          Column(
+                            children: [
+                              Text(
+                                '( Know more... )',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Roboto',
+                                  letterSpacing: 0,
+                                  fontSize: 13,
+                                  wordSpacing: 2,
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(top: 2),
+                                height: getWidgetHeight(height: 2),
+                                color: Colors.black,
+                                width: getWidgetWidth(width: 80),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                     SizedBox(
                       height: getWidgetHeight(height: 8),
@@ -158,11 +165,12 @@ class Languagelab extends StatelessWidget {
                     Column(
                       children: [
                         DefaultTabController(
-                          length: controller.soundPageModel.length,
+                          length: 3,
                           child: Column(
                             children: [
                               TabBar(
-                                padding: EdgeInsets.zero,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: getWidgetWidth(width: 20)),
                                 splashFactory: InkSplash.splashFactory,
                                 splashBorderRadius: BorderRadius.circular(30),
                                 enableFeedback: false,
@@ -185,7 +193,7 @@ class Languagelab extends StatelessWidget {
                                   color: Color(0xFF6C63FE),
                                 ),
                                 tabs: List.generate(
-                                  controller.soundPageModel.length,
+                                  3,
                                   (index) => Tab(
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(
@@ -211,8 +219,11 @@ class Languagelab extends StatelessWidget {
                                       child: Align(
                                         alignment: Alignment.center,
                                         child: Text(
-                                          controller
-                                              .soundPageModel[index].category,
+                                          index == 0
+                                              ? "Important Sounds"
+                                              : index == 1
+                                                  ? "Vowels"
+                                                  : "Consonants",
                                           style: TextStyle(
                                             color: controller.selectedIndex ==
                                                     index
@@ -233,74 +244,331 @@ class Languagelab extends StatelessWidget {
                         )
                       ],
                     ),
-                    Scrollbar(
-                      thickness: 2,
-                      thumbVisibility: true,
-                      radius: Radius.circular(10),
-                      child: ListView.builder(
-                        // physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        // separatorBuilder:
-                        //     (context, index) => Divider(
-                        //   color: Color(0xFF34425D),
-                        // ),
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 3),
-                                child: InkWell(
-                                  onTap: () {
-                                    Get.toNamed(AppRoutes.soundPage,
-                                        arguments: {
-                                          "title": "Important Sounds"
-                                        });
-                                  },
-                                  child: Container(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 12),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          controller
-                                              .soundPageModel[
-                                                  controller.selectedIndex]
-                                              .subcategories[index]
-                                              .name,
-                                          style: TextStyle(
-                                            letterSpacing: 0,
-                                            color: const Color.fromARGB(
-                                                255, 82, 82, 82),
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: 'Roboto',
-                                            fontSize: 15,
+                    controller.selectedIndex == 0
+                        ? SizedBox(
+                            height: getWidgetHeight(height: 255),
+                            child: Scrollbar(
+                              thickness: 2,
+                              thumbVisibility: true,
+                              radius: Radius.circular(10),
+                              child: ListView.builder(
+                                itemCount: controller
+                                        .importantSound?.subcategories.length ??
+                                    0,
+                                itemBuilder: (context, index) {
+                                  return Column(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical:
+                                                getWidgetHeight(height: 3),
+                                            horizontal:
+                                                getWidgetWidth(width: 15)),
+                                        child: InkWell(
+                                          onTap: () {
+                                            Get.toNamed(AppRoutes.soundPage,
+                                                arguments: {
+                                                  "title": controller
+                                                      .importantSound!
+                                                      .subcategories[index]
+                                                      .name,
+                                                  "soundModel": controller
+                                                      .soundPageModel[controller
+                                                          .selectedIndex]
+                                                      .subcategories[index]
+                                                });
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  controller
+                                                      .importantSound!
+                                                      .subcategories[index]
+                                                      .name,
+                                                  style: TextStyle(
+                                                    letterSpacing: 0,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontFamily:
+                                                        Keys.lucidaFontFamily,
+                                                    fontSize: kText.scale(15),
+                                                  ),
+                                                ),
+                                                const Spacer(),
+                                                const Icon(
+                                                  Icons.chevron_right_rounded,
+                                                  size: 30,
+                                                  color: Color.fromARGB(
+                                                      45, 82, 82, 82),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                        Spacer(),
-                                        Icon(
-                                          Icons.chevron_right_rounded,
-                                          size: 30,
-                                          color: const Color.fromARGB(
-                                              255, 82, 82, 82),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                      const Divider(
+                                        color: Color.fromARGB(45, 82, 82, 82),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                          )
+                        : ((controller.selectedIndex == 1) ||
+                                (controller.selectedIndex == 2))
+                            ? SizedBox(
+                                height: getWidgetHeight(height: 255),
+                                child: Scrollbar(
+                                  thickness: 2,
+                                  thumbVisibility: true,
+                                  radius: Radius.circular(10),
+                                  child: ListView.builder(
+                                    itemCount: controller.selectedIndex == 1
+                                        ? controller.vowelSoundsList.length
+                                        : controller.consonantSoundsList.length,
+                                    itemBuilder: (context, index) {
+                                      final isExpanded =
+                                          controller.expandedIndex == index;
+                                      return Column(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              controller.expandedIndex =
+                                                  isExpanded ? -1 : index;
+                                              controller.update();
+                                            },
+                                            child: Container(
+                                              width: getWidgetWidth(width: 375),
+                                              // height: getWidgetHeight(height: 60),
+                                              margin: EdgeInsets.symmetric(
+                                                  vertical: getWidgetHeight(
+                                                      height: 5),
+                                                  horizontal: getWidgetWidth(
+                                                      width: 15)),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.1),
+                                                    offset: const Offset(0, 4),
+                                                    blurRadius: 10,
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Container(
+                                                width:
+                                                    getWidgetWidth(width: 375),
+                                                // height: getWidgetHeight(height: 75),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  color: Colors.white,
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      vertical: getWidgetHeight(
+                                                          height: 6),
+                                                      horizontal:
+                                                          getWidgetWidth(
+                                                              width: 10)),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          CircleAvatar(
+                                                            backgroundColor:
+                                                                controller
+                                                                        .colorList[
+                                                                    index],
+                                                            child: Image.asset(
+                                                              AllAssets
+                                                                  .quickLinkPL,
+                                                              scale: displayWidth(
+                                                                      context) /
+                                                                  101.5,
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            width:
+                                                                getWidgetWidth(
+                                                                    width: 10),
+                                                          ),
+                                                          Text(
+                                                              controller.selectedIndex ==
+                                                                      1
+                                                                  ? controller
+                                                                      .vowelSoundsList[
+                                                                          index]
+                                                                      .category
+                                                                      .split(
+                                                                          ':')
+                                                                      .last
+                                                                      .trim()
+                                                                  : controller
+                                                                      .consonantSoundsList[
+                                                                          index]
+                                                                      .category
+                                                                      .split(
+                                                                          ':')
+                                                                      .last
+                                                                      .trim(),
+                                                              style: TextStyle(
+                                                                fontFamily: Keys
+                                                                    .fontFamily,
+                                                                letterSpacing:
+                                                                    0,
+                                                              )),
+                                                        ],
+                                                      ),
+                                                      Spacer(),
+                                                      IconButton(
+                                                          onPressed: () {},
+                                                          icon: Icon(
+                                                            Icons.expand_more,
+                                                            color: Color(
+                                                                0xFF64748B),
+                                                          ))
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          if (controller.expandedIndex > -1)
+
+                                            // Expandable Section
+                                            AnimatedCrossFade(
+                                              duration: const Duration(
+                                                  milliseconds: 300),
+                                              firstChild:
+                                                  const SizedBox.shrink(),
+                                              secondChild: ListView.builder(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: controller
+                                                            .selectedIndex ==
+                                                        1
+                                                    ? controller
+                                                        .vowelSoundsList[
+                                                            controller
+                                                                .expandedIndex]
+                                                        .subcategories
+                                                        .length
+                                                    : controller
+                                                        .consonantSoundsList[
+                                                            controller
+                                                                .expandedIndex]
+                                                        .subcategories
+                                                        .length,
+                                                itemBuilder: (context, index) {
+                                                  final sub = controller
+                                                              .selectedIndex ==
+                                                          1
+                                                      ? controller
+                                                          .vowelSoundsList[
+                                                              controller
+                                                                  .expandedIndex]
+                                                          .subcategories[index]
+                                                      : controller
+                                                          .consonantSoundsList[
+                                                              controller
+                                                                  .expandedIndex]
+                                                          .subcategories[index];
+                                                  return Column(
+                                                    children: [
+                                                      Padding(
+                                                        padding: EdgeInsets.symmetric(
+                                                            vertical:
+                                                                getWidgetHeight(
+                                                                    height: 3),
+                                                            horizontal:
+                                                                getWidgetWidth(
+                                                                    width: 15)),
+                                                        child: InkWell(
+                                                          onTap: () {
+                                                            Get.toNamed(
+                                                                AppRoutes
+                                                                    .soundPage,
+                                                                arguments: {
+                                                                  "title":
+                                                                      sub.name,
+                                                                  "soundModel":
+                                                                      sub,
+                                                                });
+                                                          },
+                                                          child: Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        12),
+                                                            child: Row(
+                                                              children: [
+                                                                Text(
+                                                                  sub.name,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    letterSpacing:
+                                                                        0,
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    fontFamily:
+                                                                        Keys.lucidaFontFamily,
+                                                                    fontSize: kText
+                                                                        .scale(
+                                                                            15),
+                                                                  ),
+                                                                ),
+                                                                const Spacer(),
+                                                                const Icon(
+                                                                  Icons
+                                                                      .chevron_right_rounded,
+                                                                  size: 30,
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          45,
+                                                                          82,
+                                                                          82,
+                                                                          82),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const Divider(
+                                                          color: Color.fromARGB(
+                                                              45, 82, 82, 82)),
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                              crossFadeState: isExpanded
+                                                  ? CrossFadeState.showSecond
+                                                  : CrossFadeState.showFirst,
+                                            )
+                                        ],
+                                      );
+                                    },
                                   ),
                                 ),
+                              )
+                            : Center(
+                                child: Text("No Data"),
                               ),
-                              Divider(
-                                color: const Color.fromARGB(255, 82, 82, 82),
-                              ),
-                            ],
-                          );
-                        },
-                        itemCount: controller
-                            .soundPageModel[controller.selectedIndex]
-                            .subcategories
-                            .length,
-                      ),
-                    ),
                   ],
                 );
         }),
