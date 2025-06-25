@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/pronunciation_lab_sub_controller.dart';
@@ -101,21 +102,66 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                     children: [
                                       Row(
                                         children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              controller.audioPlayerManager
-                                                  .play(
-                                                      controller
-                                                          .subcategories[index]
-                                                          .file,
-                                                      context: context);
-                                            },
-                                            child: ImageIcon(
-                                              const AssetImage(
-                                                  AllAssets.roundPlay),
-                                              color: linearColor,
-                                            ),
-                                          ),
+                                          (controller.loadingIndex == index)
+                                              ? SizedBox(
+                                                  height: getWidgetHeight(
+                                                      height: 25),
+                                                  width:
+                                                      getWidgetWidth(width: 25),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            3.0),
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color: linearColor,
+                                                    ),
+                                                  ),
+                                                )
+                                              : (controller
+                                                          .currentlyPlayingIndex ==
+                                                      index)
+                                                  ? InkWell(
+                                                      onTap: () {
+                                                        controller
+                                                            .handlePlayPause(
+                                                                index);
+                                                      },
+                                                      child: Icon(
+                                                        Icons
+                                                            .pause_circle_outline,
+                                                        color: linearColor,
+                                                        size: 26,
+                                                      ),
+                                                    )
+                                                  : controller.errorPlaying ==
+                                                          index
+                                                      ? GestureDetector(
+                                                          onTap: () {
+                                                            controller
+                                                                .handlePlayPause(
+                                                                    index);
+                                                          },
+                                                          child: Icon(
+                                                            Icons.info_outline,
+                                                            color: Colors.red,
+                                                            size: 25,
+                                                          ),
+                                                        )
+                                                      : GestureDetector(
+                                                          onTap: () {
+                                                            controller
+                                                                .handlePlayPause(
+                                                                    index);
+                                                          },
+                                                          child: ImageIcon(
+                                                            const AssetImage(
+                                                                AllAssets
+                                                                    .roundPlay),
+                                                            color: linearColor,
+                                                          ),
+                                                        ),
                                           SizedBox(
                                             width: getWidgetWidth(width: 10),
                                           ),
@@ -130,24 +176,44 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                       ),
                                       Row(
                                         children: [
-                                          SizedBox(
-                                            width: getWidgetWidth(width: 10),
-                                            child: IconButton(
-                                                onPressed: () {},
-                                                icon: const Icon(
-                                                  Icons.save_alt,
-                                                  size: 20,
-                                                )),
-                                          ),
-                                          SizedBox(
-                                            width: getWidgetWidth(width: 10),
+                                          GestureDetector(
+                                            onTap: () {
+                                              controller.saveUpdate(index);
+                                            },
+                                            child: SizedBox(
+                                              // width: displayWidth(context) / 18.75,
+                                              // height: displayHeight(context) / 40.6,
+                                              height: 19,
+                                              width: 19,
+                                              child: ImageIcon(
+                                                AssetImage(AllAssets.download),
+                                                color: controller
+                                                        .isPriorityList[index]
+                                                    ? linearColor
+                                                    : Colors.black,
+                                                // size: size.height * 0.03,
+                                              ),
+                                            ),
                                           ),
                                           IconButton(
-                                              onPressed: () {},
-                                              icon: const Icon(
-                                                Icons.check,
-                                                size: 20,
-                                              )),
+                                            onPressed: () {
+                                              controller.saveUpdate(index);
+                                            },
+                                            icon: SizedBox(
+                                              // width: displayWidth(context) / 18.75,
+                                              // height: displayHeight(context) / 40.6,
+                                              height: 19,
+                                              width: 19,
+                                              child: Image.asset(
+                                                AllAssets.save,
+                                                width: 18,
+                                                color: controller
+                                                        .isPriorityList[index]
+                                                    ? linearColor
+                                                    : Colors.black,
+                                              ),
+                                            ),
+                                          )
                                         ],
                                       ),
                                     ],
@@ -240,49 +306,58 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                 )
                                               ],
                                             ),
-                                            Container(
-                                              width: getWidgetWidth(width: 130),
-                                              height:
-                                                  getWidgetHeight(height: 45),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color: Colors.white,
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black
-                                                        .withOpacity(0.1),
-                                                    offset: const Offset(0, 4),
-                                                    blurRadius: 10,
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
-                                                children: [
-                                                  const Icon(
-                                                    Icons.mic,
-                                                    color: Color.fromARGB(
-                                                        255, 112, 112, 112),
-                                                  ),
-                                                  Text(
-                                                    "Practice",
-                                                    style: GoogleFonts.inter(
-                                                      color:
-                                                          const Color.fromARGB(
-                                                              255,
-                                                              112,
-                                                              112,
-                                                              112),
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 16,
+                                            GestureDetector(
+                                              onTap: () {
+                                                controller.kShowDialog(
+                                                    controller
+                                                        .subcategories[index]
+                                                        .text,
+                                                    false,
+                                                    context);
+                                              },
+                                              child: Container(
+                                                width:
+                                                    getWidgetWidth(width: 130),
+                                                height:
+                                                    getWidgetHeight(height: 45),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  color: Colors.white,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withOpacity(0.1),
+                                                      offset:
+                                                          const Offset(0, 4),
+                                                      blurRadius: 10,
                                                     ),
-                                                  ),
-                                                  const SizedBox()
-                                                ],
+                                                  ],
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  children: [
+                                                    const Icon(
+                                                      Icons.mic,
+                                                      color: Color.fromARGB(
+                                                          255, 112, 112, 112),
+                                                    ),
+                                                    Text(
+                                                      "Practice",
+                                                      style: GoogleFonts.inter(
+                                                        color: const Color
+                                                            .fromARGB(
+                                                            255, 112, 112, 112),
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                    const SizedBox()
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ],

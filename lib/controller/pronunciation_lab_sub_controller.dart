@@ -1,8 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:hotelmanagementapp/model/category_model.dart';
-import 'package:hotelmanagementapp/utility/audio_player_manager.dart';
+import 'package:hotelmanagementapp/utility/result_dialog.dart';
+import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
+
+import 'package:just_audio/just_audio.dart';
 
 class PronunciationLabSubController extends GetxController {
   late String title;
@@ -10,17 +15,121 @@ class PronunciationLabSubController extends GetxController {
   late CategoryModel category;
   bool isLoading = true;
   String collectionName = '';
-  late AudioPlayerManager audioPlayerManager;
+  String id = "";
+
+  late AudioPlayer audioPlayer;
+  int? currentlyPlayingIndex;
+  bool audioLoading = false;
+  int? loadingIndex;
+  List<bool> isPriorityList = [];
+  int errorPlaying = -1;
+
   @override
   void onInit() {
+    audioPlayer = AudioPlayer();
     title = Get.arguments['title'];
     subcategories = Get.arguments['subcategories'] as List<SubcategoryPro>;
     collectionName = Get.arguments['pronunCollectionName'] ?? '';
-    audioPlayerManager = AudioPlayerManager();
-    fetchPronunById(Get.arguments['id'] ?? '');
+    audioPlayer.playerStateStream.listen((state) {
+      if (state.playing && state.processingState == ProcessingState.ready) {
+        update();
+      }
+      if (state.processingState == ProcessingState.completed) {
+        currentlyPlayingIndex = null;
+        update();
+      }
+    });
+    id = Get.arguments['id'];
+
+    fetchPronunById(id);
 
     super.onInit();
     update();
+  }
+
+  void kShowDialog(String word, bool notCatch, BuildContext context) async {
+    Get.dialog(Container(
+      child: Dialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
+        child: SpeechAnalyticsDialog(
+          false,
+          isShowDidNotCatch: notCatch,
+          word: word,
+          title: "widget.title",
+          load: "widget.load",
+          main: "main",
+        ),
+      ),
+    )).then((value) {
+      if (value != null && value.isCorrect == "true" ||
+          value.isCorrect == "false") {
+        showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.0)),
+              child: SentenceResultDialog(
+                correctedWidget: value.formatedWords,
+                score: value.wordPer,
+                word: word,
+                isCorrect: value.isCorrect == "true" ? true : false,
+                practiceType: 'Sentence Construction Lab Report',
+              ),
+            );
+          },
+        );
+      } else if (value != null && value.isCorrect == "notCatch") {
+        kShowDialog(word, true, context);
+      } else if (value != null && value.isCorrect == "openDialog") {
+        kShowDialog(word, false, context);
+      }
+    });
+  }
+
+  void saveUpdate(int index) async {
+    try {
+      final DatabaseReference dbRef = FirebaseDatabase.instance.ref();
+      bool newValue = !isPriorityList[index];
+      await dbRef
+          .child(collectionName)
+          .child(id)
+          .child('subcategories')
+          .child(index.toString())
+          .update({'isPriority': newValue});
+      isPriorityList[index] = newValue;
+      update();
+      print("✅ isPriority updated to $newValue at index $index");
+    } catch (e) {
+      print("❌ Failed to update isPriority at index $index: $e");
+    }
+  }
+
+  void handlePlayPause(int index) async {
+    loadingIndex = index;
+    update();
+
+    try {
+      if (currentlyPlayingIndex == index) {
+        await audioPlayer.pause();
+        currentlyPlayingIndex = null;
+      } else {
+        await audioPlayer.stop();
+        await audioPlayer.setUrl(subcategories[index].file);
+        currentlyPlayingIndex = index;
+        update();
+        await audioPlayer.play();
+      }
+    } catch (e) {
+      print("Audio load error: $e");
+      currentlyPlayingIndex = null;
+      errorPlaying = index;
+      update();
+    } finally {
+      loadingIndex = null;
+      update();
+    }
   }
 
   Future<void> fetchPronunById(String id) async {
@@ -48,6 +157,8 @@ class PronunciationLabSubController extends GetxController {
 
           category = CategoryModel.fromMap(parsed);
           subcategories = category.subcategories;
+          isPriorityList =
+              subcategories.map((e) => e.isPriority == true).toList();
         } else {
           print('No data found for ID: $id');
         }

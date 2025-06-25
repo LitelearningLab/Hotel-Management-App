@@ -1,10 +1,5 @@
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
@@ -17,10 +12,6 @@ import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
-
-import 'package:hotelmanagementapp/view/pronounciation_lab.dart';
-
-import '../utility/custome_shape.dart';
 
 class FrontOfficeHotelReception extends StatefulWidget {
   const FrontOfficeHotelReception({super.key});
@@ -337,53 +328,50 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                         ),
                                                       ),
                                                       GestureDetector(
-                                                        onTapDown:
-                                                            (TapDownDetails
-                                                                details) {
-                                                          final tapPosition =
-                                                              details
-                                                                  .globalPosition;
-                                                          controller
-                                                              .showPopupAtTap(
-                                                                  tapPosition);
-                                                        },
-                                                        // onTap: () {
-                                                        //   activityName =
-                                                        //       "Prounciation Lab";
-
-                                                        //   subCategoryTitle =
-                                                        //       controller
-                                                        //           .frontOfficeData[
-                                                        //               index]
-                                                        //           .category;
-                                                        //   Get.toNamed(
-                                                        //       AppRoutes
-                                                        //           .pronunciationLabSub,
-                                                        //       arguments: {
-                                                        //         'title': controller
-                                                        //             .frontOfficeData[
-                                                        //                 index]
-                                                        //             .category,
-                                                        //         'subcategories':
-                                                        //             <SubcategoryPro>[],
-                                                        //         "id": controller
-                                                        //             .frontOfficeData[
-                                                        //                 index]
-                                                        //             .pronunID,
-                                                        //         "pronunCollectionName":
-                                                        //             controller
-                                                        //                 .pronunCollectionName,
-                                                        //       });
-                                                        //   // Navigator.push(
-                                                        //   //     context,
-                                                        //   //     MaterialPageRoute(
-                                                        //   //         builder:
-                                                        //   //             (context) =>
-                                                        //   //                 PronunciationLabSub(
-                                                        //   //                   title:
-                                                        //   //                       controller.hospitalityTopics[index],
-                                                        //   //                 )));
+                                                        // onTapDown:
+                                                        //     (TapDownDetails
+                                                        //         details) {
+                                                        //   final tapPosition =
+                                                        //       details
+                                                        //           .globalPosition;
+                                                        //   controller
+                                                        //       .showPopupAtTap(
+                                                        //           tapPosition);
                                                         // },
+                                                        onTap: () {
+                                                          activityName =
+                                                              "Prounciation Lab";
+
+                                                          subCategoryTitle =
+                                                              controller
+                                                                  .frontOfficeData[
+                                                                      index]
+                                                                  .category;
+                                                          Get.toNamed(
+                                                              AppRoutes
+                                                                  .pronunciationLabSub,
+                                                              arguments: {
+                                                                'title': controller
+                                                                    .frontOfficeData[
+                                                                        index]
+                                                                    .category,
+                                                                'subcategories':
+                                                                    <SubcategoryPro>[],
+                                                                "id": controller
+                                                                    .frontOfficeData[
+                                                                        index]
+                                                                    .pronunID,
+                                                                "pronunCollectionName":
+                                                                    controller
+                                                                        .pronunCollectionName,
+                                                              });
+                                                          // Navigator.push(
+                                                          //     context,
+                                                          //     MaterialPageRoute(
+                                                          //         builder:
+                                                          //             (context) =>
+                                                          //                 AudioListPage()));
+                                                        },
                                                         child: SizedBox(
                                                           width: getWidgetWidth(
                                                               width: 32),
