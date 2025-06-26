@@ -7,6 +7,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/sound_model.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:video_player/video_player.dart';
 
 class SoundPageController extends GetxController {
@@ -21,15 +22,13 @@ class SoundPageController extends GetxController {
   bool isLoading = false;
   int selected = 0;
   bool pageLoading = true;
-  SoundSubcategory? soundModel;
+  late SoundSubcategory soundModel;
 
   @override
   void onInit() {
     title = Get.arguments['title'] ?? "Sound Page";
     soundModel = Get.arguments['soundModel'];
-    initializeVideoPlayerFuture = initVideoPlayer(
-        url:
-            "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FShort%20Vowel%2FShort%20Vowel%20%C9%AA%2FVowels%20%20%C9%AA%20Front.mp4?alt=media&token=f061ea50-8f5c-4cad-826d-e61059b2ac31");
+    initializeVideoPlayerFuture = initVideoPlayer(url: soundModel.links.v1);
 
     update();
     super.onInit();
@@ -56,9 +55,6 @@ class SoundPageController extends GetxController {
     isPlaying = false;
     selected = index;
 
-    log("index inside the onclick : $index");
-
-    // Pause and dispose the current controller if it exists
     if (videoPlayerController.value.isInitialized) {
       await videoPlayerController.pause();
       await videoPlayerController.dispose();
@@ -68,14 +64,14 @@ class SoundPageController extends GetxController {
     String? url;
     if (index >= 0 && index <= 4) {
       url = index == 0
-          ? soundModel?.links.v1
+          ? soundModel.links.v1
           : index == 1
-              ? soundModel?.links.v2
+              ? soundModel.links.v2
               : index == 2
-                  ? soundModel?.links.v3
+                  ? soundModel.links.v3
                   : index == 3
-                      ? soundModel?.links.v4
-                      : soundModel?.links.v5;
+                      ? soundModel.links.v4
+                      : soundModel.links.v5;
       final file = await DefaultCacheManager().getSingleFile(url!);
       videoPlayerController = VideoPlayerController.file(file);
 
@@ -87,7 +83,13 @@ class SoundPageController extends GetxController {
       // isLoading = false;
       isPlaying = true;
     } else if (index == 5) {
-      showPopupAtTap(tapPosition);
+      // if (soundModel?.soundsPractice == null) {
+      //   showPopupAtTap(tapPosition);
+      // } else {
+      Get.toNamed(AppRoutes.soundLab,
+          arguments: {'soundSubcategory': soundModel});
+      // }
+
       return;
     }
 
@@ -95,9 +97,7 @@ class SoundPageController extends GetxController {
   }
 
   refreshScreen(int no) {
-    initializeVideoPlayerFuture = initVideoPlayer(
-        url:
-            "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Profluent%20English%2FSounds%20Animation%2FVowels%2FShort%20Vowel%2FShort%20Vowel%20%C9%AA%2FVowels%20%20%C9%AA%20Front.mp4?alt=media&token=f061ea50-8f5c-4cad-826d-e61059b2ac31");
+    initializeVideoPlayerFuture = initVideoPlayer(url: soundModel.links.v1);
 
     isPlaying = true;
     update();

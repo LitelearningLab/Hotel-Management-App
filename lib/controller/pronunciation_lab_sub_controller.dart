@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,8 @@ class PronunciationLabSubController extends GetxController {
   bool isLoading = true;
   String collectionName = '';
   String id = "";
-
+  String selectedWord = "";
+  bool isCorrect = false;
   late AudioPlayer audioPlayer;
   int? currentlyPlayingIndex;
   bool audioLoading = false;
@@ -48,45 +51,78 @@ class PronunciationLabSubController extends GetxController {
   }
 
   void kShowDialog(String word, bool notCatch, BuildContext context) async {
-    Get.dialog(Container(
-      child: Dialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
-        child: SpeechAnalyticsDialog(
-          false,
-          isShowDidNotCatch: notCatch,
-          word: word,
-          title: "widget.title",
-          load: "widget.load",
-          main: "main",
+    // log("message");
+    Get.dialog(
+      Container(
+        child: Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
+          child: SpeechAnalyticsDialog(
+            true,
+            isShowDidNotCatch: notCatch,
+            word: word,
+            title: "widget.title",
+            load: "widget.load",
+          ),
         ),
       ),
-    )).then((value) {
+    ).then((value) {
       if (value != null && value.isCorrect == "true" ||
           value.isCorrect == "false") {
-        showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25.0)),
-              child: SentenceResultDialog(
-                correctedWidget: value.formatedWords,
-                score: value.wordPer,
-                word: word,
-                isCorrect: value.isCorrect == "true" ? true : false,
-                practiceType: 'Sentence Construction Lab Report',
-              ),
-            );
-          },
-        );
+        selectedWord = word;
+        isCorrect = value.isCorrect == "true" ? true : false;
+        log("is correct or not ${isCorrect}");
+        update();
       } else if (value != null && value.isCorrect == "notCatch") {
         kShowDialog(word, true, context);
       } else if (value != null && value.isCorrect == "openDialog") {
         kShowDialog(word, false, context);
       }
+    }).onError((error, stackTrace) {
+      // log(error.toString());
     });
   }
+
+  // void kShowDialog(String word, bool notCatch, BuildContext context) async {
+  //   Get.dialog(Container(
+  //     child: Dialog(
+  //       shape:
+  //           RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
+  //       child: SpeechAnalyticsDialog(
+  //         false,
+  //         isShowDidNotCatch: notCatch,
+  //         word: word,
+  //         title: "widget.title",
+  //         load: "widget.load",
+  //         main: "main",
+  //       ),
+  //     ),
+  //   )).then((value) {
+  //     if (value != null && value.isCorrect == "true" ||
+  //         value.isCorrect == "false") {
+  //       showDialog(
+  //         context: context,
+  //         builder: (BuildContext buildContext) {
+  //           return Dialog(
+  //             shape: RoundedRectangleBorder(
+  //                 borderRadius: BorderRadius.circular(25.0)),
+  //             child: SentenceResultDialog(
+  //               correctedWidget: value.formatedWords,
+  //               score: value.wordPer,
+  //               word: word,
+  //               isCorrect: value.isCorrect == "true" ? true : false,
+  //               practiceType: 'Sentence Construction Lab Report',
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     } else if (value != null && value.isCorrect == "notCatch") {
+  //       kShowDialog(word, true, context);
+  //     } else if (value != null && value.isCorrect == "openDialog") {
+  //       kShowDialog(word, false, context);
+  //     }
+  //   });
+  // }
 
   void saveUpdate(int index) async {
     try {

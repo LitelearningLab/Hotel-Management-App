@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -273,8 +275,7 @@ class Languagelab extends StatelessWidget {
                                                       .subcategories[index]
                                                       .name,
                                                   "soundModel": controller
-                                                      .soundPageModel[controller
-                                                          .selectedIndex]
+                                                      .importantSound!
                                                       .subcategories[index]
                                                 });
                                           },

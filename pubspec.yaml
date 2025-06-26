@@ -5,7 +5,7 @@ description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 
-version: 1.0.3+6
+version: 1.0.3+7
 
 environment:
   sdk: '>=3.3.4 <7.0.0'
@@ -36,7 +36,13 @@ dependencies:
   video_player: ^2.9.2
   flutter_cache_manager: ^3.3.1
   encrypt: ^5.0.3
-  # audioplayers: ^4.1.0
+  # audioplayers: 
+  just_audio: ^0.9.42
+  speech_to_text: ^6.1.1
+  intl: ^0.20.2
+  auto_size_text: ^3.0.0
+  number_to_words_english: ^2.1.1
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:

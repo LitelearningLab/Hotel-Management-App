@@ -9,6 +9,7 @@ import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/public/spacing.dart';
 
 class PronunciationLabSub extends StatefulWidget {
   const PronunciationLabSub({super.key});
@@ -167,7 +168,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                           ),
                                           Text(
                                               controller
-                                                  .subcategories[index]!.text,
+                                                  .subcategories[index].text,
                                               style: TextStyle(
                                                 fontFamily: Keys.fontFamily,
                                                 letterSpacing: 0,
@@ -227,8 +228,15 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.fastOutSlowIn,
-                            height:
-                                isExpanded ? getWidgetHeight(height: 150) : 0,
+                            height: isExpanded
+                                ? getWidgetHeight(
+                                    height: (controller.selectedWord
+                                                .toLowerCase() ==
+                                            controller.subcategories[index].text
+                                                .toLowerCase())
+                                        ? 250
+                                        : 160)
+                                : 0,
                             width: double.infinity,
                             child: isExpanded
                                 ? Padding(
@@ -253,8 +261,8 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                         RichText(
                                           textAlign: TextAlign.justify,
                                           text: TextSpan(
-                                            children: _buildTextSpans(controller
-                                                .subcategories[index]!
+                                            children: buildTextSpans(controller
+                                                .subcategories[index]
                                                 .syllables),
                                           ),
                                         ),
@@ -285,14 +293,14 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                   child: Text(
                                                     controller
                                                                 .subcategories[
-                                                                    index]!
+                                                                    index]
                                                                 .pronun
                                                                 .trim() ==
                                                             ""
                                                         ? "no data"
                                                         : controller
                                                             .subcategories[
-                                                                index]!
+                                                                index]
                                                             .pronun
                                                             .replaceAll(
                                                                 "/", ""),
@@ -362,6 +370,37 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                             ),
                                           ],
                                         ),
+                                        if (controller.selectedWord
+                                                .toLowerCase() ==
+                                            controller.subcategories[index].text
+                                                .toLowerCase())
+                                          ListTile(
+                                            contentPadding: EdgeInsets.zero,
+                                            title: Text(
+                                              "Pronunciation Analysis Result",
+                                              style: TextStyle(
+                                                  color: Color(0xFF6C63FF),
+                                                  fontSize: 13,
+                                                  fontFamily: Keys.fontFamily),
+                                            ),
+                                            subtitle: Text(
+                                              "Note: This result only indicates intelligibility and does not confirm the accuracy of pronunciation.",
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 12,
+                                                  fontFamily: Keys.fontFamily,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                            trailing: Container(
+                                              height: 40,
+                                              width: 40,
+                                              child: Image.asset(controller
+                                                      .isCorrect
+                                                  ? "assets/images/right.png"
+                                                  : "assets/images/wrong.png"),
+                                            ),
+                                          ),
+                                        SPH(10)
                                       ],
                                     ),
                                   )
@@ -373,53 +412,5 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                   ),
       );
     });
-  }
-
-  List<TextSpan> _buildTextSpans(String text) {
-    List<TextSpan> spans = [];
-    bool isWithinParentheses = false;
-    StringBuffer buffer = StringBuffer();
-
-    for (int i = 0; i < text.length; i++) {
-      if (text[i] == '(') {
-        if (buffer.isNotEmpty) {
-          spans.add(TextSpan(
-            text: buffer.toString(),
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                fontFamily: Keys.lucidaFontFamily),
-          ));
-          buffer.clear();
-        }
-        isWithinParentheses = true;
-      } else if (text[i] == ')') {
-        spans.add(TextSpan(
-          text: ' ${buffer.toString()} ',
-          style: TextStyle(
-              color: Colors.yellow,
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              fontFamily: Keys.lucidaFontFamily),
-        ));
-        buffer.clear();
-        isWithinParentheses = false;
-      } else {
-        buffer.write(text[i]);
-      }
-    }
-    if (buffer.isNotEmpty) {
-      spans.add(TextSpan(
-        text: buffer.toString(),
-        style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-            fontFamily: Keys.lucidaFontFamily),
-      ));
-    }
-
-    return spans;
   }
 }

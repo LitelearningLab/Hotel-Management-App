@@ -250,13 +250,12 @@ class _SoundPageState extends State<SoundPage> {
                     child: GridView.builder(
                       shrinkWrap: true,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // Number of columns in the grid
-                        mainAxisSpacing: 18, // Spacing between rows
-                        crossAxisSpacing: 19, // Spacing between columns
-                        childAspectRatio:
-                            3, // Width to height ratio of each grid item
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 18,
+                        crossAxisSpacing: 19,
+                        childAspectRatio: 3,
                       ),
-                      itemCount: 6, // Total number of items in the grid
+                      itemCount: 6,
                       itemBuilder: (BuildContext context, int index) {
                         return GestureDetector(
                           onTapDown: (TapDownDetails onTapDetails) {
@@ -346,7 +345,10 @@ class _SoundPageState extends State<SoundPage> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            controller.soundModel?.ULR ?? "Empty",
+                            (controller.soundModel?.ULR == "" ||
+                                    controller.soundModel?.ULR == null)
+                                ? "Empty"
+                                : controller.soundModel!.ULR,
                             style: TextStyle(
                                 color: Colors.black,
                                 fontFamily: Keys.fontFamily,

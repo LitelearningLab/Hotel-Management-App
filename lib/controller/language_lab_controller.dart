@@ -58,6 +58,7 @@ class LanguageLabController extends GetxController {
 
           if (category.contains("important")) {
             importantSound = data;
+            log("sound page model practice section practice length ${data.subcategories[0].soundsPractice?.length}");
           } else if (category == 'short vowel' ||
               category == 'long vowels' ||
               category == 'diphthong') {

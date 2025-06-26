@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/public/api.dart';
+import 'package:hotelmanagementapp/public/keys.dart';
 
 double kHeight = 0.0;
 double kWidth = 0.0;
@@ -304,4 +305,52 @@ class _TapPopupState extends State<TapPopup>
     _controller.dispose();
     super.dispose();
   }
+}
+
+List<TextSpan> buildTextSpans(String text) {
+  List<TextSpan> spans = [];
+  bool isWithinParentheses = false;
+  StringBuffer buffer = StringBuffer();
+
+  for (int i = 0; i < text.length; i++) {
+    if (text[i] == '(') {
+      if (buffer.isNotEmpty) {
+        spans.add(TextSpan(
+          text: buffer.toString(),
+          style: TextStyle(
+              color: Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              fontFamily: Keys.lucidaFontFamily),
+        ));
+        buffer.clear();
+      }
+      isWithinParentheses = true;
+    } else if (text[i] == ')') {
+      spans.add(TextSpan(
+        text: ' ${buffer.toString()} ',
+        style: TextStyle(
+            color: Colors.yellow,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            fontFamily: Keys.lucidaFontFamily),
+      ));
+      buffer.clear();
+      isWithinParentheses = false;
+    } else {
+      buffer.write(text[i]);
+    }
+  }
+  if (buffer.isNotEmpty) {
+    spans.add(TextSpan(
+      text: buffer.toString(),
+      style: TextStyle(
+          color: Colors.black,
+          fontSize: 20,
+          fontWeight: FontWeight.w500,
+          fontFamily: Keys.lucidaFontFamily),
+    ));
+  }
+
+  return spans;
 }

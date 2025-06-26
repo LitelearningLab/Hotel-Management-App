@@ -378,15 +378,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         child: GestureDetector(
                           onTapDown: (TapDownDetails details) {
                             final tapPosition = details.globalPosition;
-                            // index == 0
-                            //     ? Get.toNamed(AppRoutes.simulation)
-                            //     : index == 1
-                            //         ? Get.toNamed(AppRoutes.languageLab)
-                            //         : controller.showPopupAtTap(tapPosition);
-                            // for playstore
                             index == 0
                                 ? Get.toNamed(AppRoutes.simulation)
-                                : controller.showPopupAtTap(tapPosition);
+                                : index == 1
+                                    ? Get.toNamed(AppRoutes.languageLab)
+                                    : controller.showPopupAtTap(tapPosition);
+                            // for playstore
+                            // index == 0
+                            //     ? Get.toNamed(AppRoutes.simulation)
+                            //     : controller.showPopupAtTap(tapPosition);
                           },
                           child: Container(
                             height: getWidgetHeight(height: 75),
