@@ -124,7 +124,7 @@ class SoundPageController extends GetxController {
     } catch (e1) {
       try {
         videoPlayerController = VideoPlayerController.networkUrl(
-          Uri.parse(url),
+          Uri.parse(url.trim()),
           videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
         );
         await videoPlayerController.initialize();

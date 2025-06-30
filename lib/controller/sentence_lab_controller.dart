@@ -8,7 +8,7 @@ import 'package:hotelmanagementapp/public/all_asset.dart';
 
 class SentenceLabController extends GetxController {
   RxString title = "Sentence Lab".obs;
-  List<SentenceLabModel> sentenceLabList = [];
+  late List<SentenceLabModel> sentenceLabList;
   final RxBool isLoading = true.obs;
   List<Map<String, dynamic>> sentenceConstructionLabList = [
     {
@@ -39,47 +39,65 @@ class SentenceLabController extends GetxController {
 
   @override
   void onInit() {
+    onFirst();
     super.onInit();
+  }
 
-    fetchSentenceLabData("SentenceLabCollection");
+  onFirst() async {
     final args = Get.arguments as Map<String, dynamic>?;
     title.value = args?['title'] ?? "Sentence Lab";
-
+    sentenceLabList = await fetchSentenceLabData();
+    isLoading.value = false;
     update();
   }
 
-  Future<void> fetchSentenceLabData(String title) async {
-    isLoading.value = true;
-    final databaseRef = FirebaseDatabase.instance.ref();
-    try {
-      final snapshot = await databaseRef.child(title).get();
+  Future<List<SentenceLabModel>> fetchSentenceLabData() async {
+    final ref = FirebaseDatabase.instance.ref().child("SentenceLabCollection");
+    final snapshot = await ref.get();
 
-      if (snapshot.exists) {
-        final List<dynamic> dataList = snapshot.value as List<dynamic>;
-
-        sentenceLabList = dataList
-            .map((item) =>
-                SentenceLabModel.fromMap(Map<String, dynamic>.from(item)))
-            .toList();
-        // Print for debugging
-        for (var category in sentenceLabList) {
-          log('Category: ${category.category}');
-          for (var sub in category.subcategory) {
-            log('  Subcategory: ${sub.subcategory}');
-            for (var file in sub.file) {
-              log('    Text: ${file.text}, Audio: ${file.audio}');
-            }
-          }
-        }
-        isLoading.value = false;
-      } else {
-        log("No data found at $title");
-        isLoading.value = false;
-      }
-    } catch (e) {
-      log("Error fetching data from Firebase: $e");
-      isLoading.value = false;
+    if (snapshot.exists) {
+      final Map<String, dynamic> data =
+          Map<String, dynamic>.from(snapshot.value as Map);
+      return parseSentenceLabCollection(data);
+    } else {
+      throw Exception('No data found');
     }
-    update();
+  }
+
+  List<SentenceLabModel> parseSentenceLabCollection(Map<String, dynamic> json) {
+    return json.entries.map((sectionEntry) {
+      String sectionName = sectionEntry.key;
+      Map<String, dynamic> categoriesMap =
+          Map<String, dynamic>.from(sectionEntry.value as Map);
+
+      List<CategoryModel> categoryList =
+          categoriesMap.entries.map((categoryEntry) {
+        String categoryName = categoryEntry.key;
+        Map<String, dynamic> sentencesMap =
+            Map<String, dynamic>.from(categoryEntry.value as Map);
+
+        List<SubCategoryModel> subCategoryList =
+            sentencesMap.entries.map((sentenceEntry) {
+          String sentenceId = sentenceEntry.key;
+          Map<String, dynamic> sentenceJson =
+              Map<String, dynamic>.from(sentenceEntry.value as Map);
+
+          return SubCategoryModel(
+            id: sentenceId,
+            sentence: SentenceModel.fromJson(sentenceJson),
+          );
+        }).toList();
+
+        return CategoryModel(
+          categoryName: categoryName,
+          subCategories: subCategoryList,
+        );
+      }).toList();
+
+      return SentenceLabModel(
+        sectionName: sectionName,
+        categories: categoryList,
+      );
+    }).toList();
   }
 }

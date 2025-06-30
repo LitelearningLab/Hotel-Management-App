@@ -1,55 +1,46 @@
+class SentenceModel {
+  final String file;
+  final bool isPriority;
+  final String text;
+
+  SentenceModel({
+    required this.file,
+    required this.isPriority,
+    required this.text,
+  });
+
+  factory SentenceModel.fromJson(Map<String, dynamic> json) {
+    return SentenceModel(
+      file: json['file'] ?? '',
+      isPriority: json['isPriority'].toString().toLowerCase() == 'true',
+      text: json['text'] ?? '',
+    );
+  }
+}
+
+class SubCategoryModel {
+  final String id;
+  final SentenceModel sentence;
+
+  SubCategoryModel({required this.id, required this.sentence});
+}
+
+class CategoryModel {
+  final String categoryName;
+  final List<SubCategoryModel> subCategories;
+
+  CategoryModel({
+    required this.categoryName,
+    required this.subCategories,
+  });
+}
+
 class SentenceLabModel {
-  final String category;
-  final List<SubCategoryModelSentence> subcategory;
+  final String sectionName;
+  final List<CategoryModel> categories;
 
   SentenceLabModel({
-    required this.category,
-    required this.subcategory,
+    required this.sectionName,
+    required this.categories,
   });
-
-  factory SentenceLabModel.fromMap(Map<String, dynamic> map) {
-    return SentenceLabModel(
-      category: map['category'] ?? '',
-      subcategory: (map['subcategory'] as List)
-          .map((e) =>
-              SubCategoryModelSentence.fromMap(Map<String, dynamic>.from(e)))
-          .toList(),
-    );
-  }
-}
-
-class SubCategoryModelSentence {
-  final String subcategory;
-  final List<FileModel> file;
-
-  SubCategoryModelSentence({
-    required this.subcategory,
-    required this.file,
-  });
-
-  factory SubCategoryModelSentence.fromMap(Map<String, dynamic> map) {
-    return SubCategoryModelSentence(
-      subcategory: map['subcategory'] ?? '',
-      file: (map['file'] as List)
-          .map((e) => FileModel.fromMap(Map<String, dynamic>.from(e)))
-          .toList(),
-    );
-  }
-}
-
-class FileModel {
-  final String text;
-  final String audio;
-
-  FileModel({
-    required this.text,
-    required this.audio,
-  });
-
-  factory FileModel.fromMap(Map<String, dynamic> map) {
-    return FileModel(
-      text: map['text'] ?? '',
-      audio: map['audio'] ?? '',
-    );
-  }
 }

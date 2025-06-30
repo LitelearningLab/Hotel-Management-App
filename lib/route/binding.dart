@@ -6,6 +6,7 @@ import 'package:hotelmanagementapp/controller/language_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/pronunciation_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/pronunciation_lab_sub_controller.dart';
 import 'package:hotelmanagementapp/controller/sentence_lab_controller.dart';
+import 'package:hotelmanagementapp/controller/sentence_lab_sub_cat_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_sub_controller.dart';
 import 'package:hotelmanagementapp/controller/sound_lab_controller.dart';
@@ -86,5 +87,12 @@ class SoundLabBinding with Bindings {
   @override
   void dependencies() {
     Get.put(SoundLabController());
+  }
+}
+
+class SentenceLabSubCatBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(SentenceLabSubCatController());
   }
 }

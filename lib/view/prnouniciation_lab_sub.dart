@@ -234,7 +234,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                 .toLowerCase() ==
                                             controller.subcategories[index].text
                                                 .toLowerCase())
-                                        ? 250
+                                        ? 230
                                         : 160)
                                 : 0,
                             width: double.infinity,
@@ -400,7 +400,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                   : "assets/images/wrong.png"),
                                             ),
                                           ),
-                                        SPH(10)
+                                        // SPH(10)
                                       ],
                                     ),
                                   )

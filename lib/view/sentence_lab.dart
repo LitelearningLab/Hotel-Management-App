@@ -57,10 +57,11 @@ class _SentenceLabState extends State<SentenceLab> {
                                 MaterialPageRoute(
                                     builder: (context) => SentenceLabSub(
                                           title: controller
-                                              .sentenceLabList[index].category,
+                                              .sentenceLabList[index]
+                                              .sectionName,
                                           subcategories: controller
                                               .sentenceLabList[index]
-                                              .subcategory,
+                                              .categories,
                                         )));
                           },
                           child: Container(
@@ -117,7 +118,7 @@ class _SentenceLabState extends State<SentenceLab> {
                                     ),
                                     Text(
                                       controller
-                                          .sentenceLabList[index].category,
+                                          .sentenceLabList[index].sectionName,
                                       style: GoogleFonts.inter(
                                         fontWeight: FontWeight.w500,
                                         fontSize: 16,

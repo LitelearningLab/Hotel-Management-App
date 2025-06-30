@@ -42,9 +42,13 @@ class PronunciationLabSubController extends GetxController {
         update();
       }
     });
-    id = Get.arguments['id'];
-
-    fetchPronunById(id);
+    id = Get.arguments['id'] ?? "";
+    if (id == "") {
+      isPriorityList = List.filled(subcategories.length, false);
+      isLoading = false;
+    } else {
+      fetchPronunById(id);
+    }
 
     super.onInit();
     update();
@@ -83,57 +87,16 @@ class PronunciationLabSubController extends GetxController {
     });
   }
 
-  // void kShowDialog(String word, bool notCatch, BuildContext context) async {
-  //   Get.dialog(Container(
-  //     child: Dialog(
-  //       shape:
-  //           RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
-  //       child: SpeechAnalyticsDialog(
-  //         false,
-  //         isShowDidNotCatch: notCatch,
-  //         word: word,
-  //         title: "widget.title",
-  //         load: "widget.load",
-  //         main: "main",
-  //       ),
-  //     ),
-  //   )).then((value) {
-  //     if (value != null && value.isCorrect == "true" ||
-  //         value.isCorrect == "false") {
-  //       showDialog(
-  //         context: context,
-  //         builder: (BuildContext buildContext) {
-  //           return Dialog(
-  //             shape: RoundedRectangleBorder(
-  //                 borderRadius: BorderRadius.circular(25.0)),
-  //             child: SentenceResultDialog(
-  //               correctedWidget: value.formatedWords,
-  //               score: value.wordPer,
-  //               word: word,
-  //               isCorrect: value.isCorrect == "true" ? true : false,
-  //               practiceType: 'Sentence Construction Lab Report',
-  //             ),
-  //           );
-  //         },
-  //       );
-  //     } else if (value != null && value.isCorrect == "notCatch") {
-  //       kShowDialog(word, true, context);
-  //     } else if (value != null && value.isCorrect == "openDialog") {
-  //       kShowDialog(word, false, context);
-  //     }
-  //   });
-  // }
-
   void saveUpdate(int index) async {
     try {
-      final DatabaseReference dbRef = FirebaseDatabase.instance.ref();
+      // final DatabaseReference dbRef = FirebaseDatabase.instance.ref();
       bool newValue = !isPriorityList[index];
-      await dbRef
-          .child(collectionName)
-          .child(id)
-          .child('subcategories')
-          .child(index.toString())
-          .update({'isPriority': newValue});
+      // await dbRef
+      //     .child(collectionName)
+      //     .child(id)
+      //     .child('subcategories')
+      //     .child(index.toString())
+      //     .update({'isPriority': newValue});
       isPriorityList[index] = newValue;
       update();
       print("✅ isPriority updated to $newValue at index $index");

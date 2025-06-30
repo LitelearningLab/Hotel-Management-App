@@ -1,14 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/view/sentence_lab_sub_cat.dart';
 
 class SentenceLabSub extends StatefulWidget {
   final String title;
-  final List<SubCategoryModelSentence> subcategories;
+  final List<CategoryModel> subcategories;
   const SentenceLabSub(
       {required this.title, required this.subcategories, super.key});
 
@@ -49,13 +51,10 @@ class _SentenceLabSubState extends State<SentenceLabSub> {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SentenceLabSubCat(
-                            title: widget.subcategories[index].subcategory,
-                            files: widget.subcategories[index].file,
-                          )));
+              Get.toNamed(AppRoutes.sentenceLabSub, arguments: {
+                "title": widget.subcategories[index].categoryName,
+                "CategoryModel": widget.subcategories[index].subCategories
+              });
             },
             child: Container(
               width: getWidgetWidth(width: 375),
@@ -85,7 +84,7 @@ class _SentenceLabSubState extends State<SentenceLabSub> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(widget.subcategories[index].subcategory,
+                      Text(widget.subcategories[index].categoryName,
                           style: TextStyle(
                               fontFamily: Keys.fontFamily,
                               letterSpacing: 0,
