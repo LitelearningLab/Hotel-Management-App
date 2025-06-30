@@ -209,7 +209,10 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                 AllAssets.save,
                                                 width: 18,
                                                 color: controller
-                                                        .isPriorityList[index]
+                                                            .subcategories[
+                                                                index]
+                                                            .isPriority ==
+                                                        "true"
                                                     ? linearColor
                                                     : Colors.black,
                                               ),
@@ -235,7 +238,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                             controller.subcategories[index].text
                                                 .toLowerCase())
                                         ? 230
-                                        : 160)
+                                        : 150)
                                 : 0,
                             width: double.infinity,
                             child: isExpanded
@@ -379,7 +382,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                             title: Text(
                                               "Pronunciation Analysis Result",
                                               style: TextStyle(
-                                                  color: Color(0xFF6C63FF),
+                                                  color: linearColor,
                                                   fontSize: 13,
                                                   fontFamily: Keys.fontFamily),
                                             ),
@@ -387,13 +390,14 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                               "Note: This result only indicates intelligibility and does not confirm the accuracy of pronunciation.",
                                               style: TextStyle(
                                                   color: Colors.black,
-                                                  fontSize: 12,
+                                                  fontSize: kText.scale(12),
                                                   fontFamily: Keys.fontFamily,
                                                   fontWeight: FontWeight.w500),
                                             ),
                                             trailing: Container(
-                                              height: 40,
-                                              width: 40,
+                                              height:
+                                                  getWidgetHeight(height: 40),
+                                              width: getWidgetWidth(width: 40),
                                               child: Image.asset(controller
                                                       .isCorrect
                                                   ? "assets/images/right.png"

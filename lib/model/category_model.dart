@@ -19,7 +19,7 @@ class Category {
 
 class SubcategoryPro {
   final String file;
-  final bool isPriority;
+  final String isPriority;
   final String syllables;
   final String text;
   final String pronun;
@@ -35,7 +35,7 @@ class SubcategoryPro {
   factory SubcategoryPro.fromJson(Map<String, dynamic> json) {
     return SubcategoryPro(
       file: json['file'] ?? '',
-      isPriority: json['isPriority'] ?? false,
+      isPriority: json['isPriority'].toString() ?? "false",
       syllables: json['syllables'] ?? '',
       text: json['text'] ?? '',
       pronun: json['pronun'] ?? '',
@@ -55,7 +55,7 @@ class SubcategoryPro {
   factory SubcategoryPro.fromMap(Map<String, dynamic> map) {
     return SubcategoryPro(
       file: map['file'] ?? '',
-      isPriority: map['isPriority'] ?? false,
+      isPriority: map['isPriority'].toString() ?? "false",
       syllables: map['syllables'] ?? '',
       text: map['text'] ?? '',
       pronun: map['pronun'] ?? '',

@@ -113,16 +113,20 @@ class PronunciationLabSubController extends GetxController {
       if (currentlyPlayingIndex == index) {
         await audioPlayer.pause();
         currentlyPlayingIndex = null;
+        loadingIndex = null;
+        update();
       } else {
         await audioPlayer.stop();
         await audioPlayer.setUrl(subcategories[index].file);
         currentlyPlayingIndex = index;
+        loadingIndex = null;
         update();
         await audioPlayer.play();
       }
     } catch (e) {
       print("Audio load error: $e");
       currentlyPlayingIndex = null;
+      loadingIndex = null;
       errorPlaying = index;
       update();
     } finally {
