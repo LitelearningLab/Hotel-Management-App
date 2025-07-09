@@ -11,9 +11,12 @@ import 'package:hotelmanagementapp/auth/google_auth_service.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/public/device_type.dart';
+import 'package:hotelmanagementapp/public/utils.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custom_button.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
+import 'package:intl/intl.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -58,29 +61,63 @@ class _LoginPageState extends State<LoginPage> {
     if (_isLogin) {
       _isLoading = true;
       setState(() {});
-      // Check password
       final email = emailController.text.trim().toLowerCase();
       final password = passwordController.text;
 
       try {
         final snapshot = await FirebaseFirestore.instance
-            .collection('UserNodes')
+            .collection('UserNode')
             .where('email', isEqualTo: email)
             .where('password', isEqualTo: password)
             .limit(1)
             .get();
 
         if (snapshot.docs.isNotEmpty) {
-          log("Password matched. Logging in...");
+          log("Password matched. Proceeding to device validation...");
 
-          // ✅ Save to SharedPreferences
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('email', email);
-          await prefs.setString('password', password);
-          await prefs.setBool("loginInfo", true);
+          final doc = snapshot.docs.first;
+          final userId = doc.id;
 
-          // Navigate to home or next screen
-          Get.offAllNamed(AppRoutes.home); // or your dashboard route
+          final deviceId = await Utils.getUUID();
+          final deviceName = await DeviceScreenInfo.getModelName();
+          final joiningDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+          final userRef =
+              FirebaseFirestore.instance.collection('UserNode').doc(userId);
+          final userData = doc.data();
+
+          if (userData.containsKey('imei')) {
+            if (userData['imei'] == deviceId) {
+              log("✅ Device match. Logging in...");
+
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('email', email);
+              await prefs.setString('password', password);
+              await prefs.setBool("loginInfo", true);
+
+              Get.offAllNamed(AppRoutes.home);
+            } else {
+              log("❌ Device mismatch. Access denied.");
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Login denied: Device not recognized.")),
+              );
+            }
+          } else {
+            await userRef.update({
+              'imei': deviceId,
+              'model': deviceName,
+              'firstTImeLogin': joiningDate,
+            });
+
+            log("📥 Device info saved. Logging in...");
+
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('email', email);
+            await prefs.setString('password', password);
+            await prefs.setBool("loginInfo", true);
+
+            Get.offAllNamed(AppRoutes.home);
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Invalid password.")),
@@ -92,6 +129,7 @@ class _LoginPageState extends State<LoginPage> {
           SnackBar(content: Text("Login failed. Please try again.")),
         );
       }
+
       _isLoading = false;
       setState(() {});
     } else {
@@ -114,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final snapshot = await FirebaseFirestore.instance
-          .collection('UserNodes')
+          .collection('UserNode')
           .where('email', isEqualTo: email)
           .limit(1)
           .get();

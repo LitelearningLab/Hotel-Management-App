@@ -13,12 +13,14 @@ class InAppWebViewPage extends StatefulWidget {
   final String url;
   final bool isLandscape;
   final bool isMeetingEtiquite;
+  final bool isSimulation;
 
   InAppWebViewPage({
     Key? key,
     required this.url,
     this.isLandscape = false,
     this.isMeetingEtiquite = false,
+    this.isSimulation = false,
   }) : super(key: key);
 
   @override
@@ -147,8 +149,9 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
               ),
 
             Positioned(
-              bottom: 20,
-              left: 10,
+              top: widget.isSimulation ? getWidgetHeight(height: 60) : null,
+              bottom: widget.isSimulation ? null : getWidgetHeight(height: 20),
+              left: getWidgetWidth(width: 10),
               child: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,

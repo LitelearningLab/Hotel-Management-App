@@ -20,6 +20,7 @@ class UserM implements Jsonable {
   String? lastLogin;
   String? companyId;
   String? firstTImeLogin;
+  String? password;
 
   UserM(
       {this.company,
@@ -39,7 +40,8 @@ class UserM implements Jsonable {
       this.fcmKey,
       this.lastLogin,
       this.companyId,
-      this.firstTImeLogin});
+      this.firstTImeLogin,
+      this.password});
 
   Map<String, dynamic> toJson() {
     return {
@@ -59,7 +61,11 @@ class UserM implements Jsonable {
       "fcmKey": fcmKey,
       "lastLogin": lastLogin,
       "companyid": companyId,
-      'firstTimeLogin': firstTImeLogin
+      'firstTimeLogin': firstTImeLogin,
+      'password': password,
+      // 'id': id, // Uncomment if you want to keep the original name
+      // Consistent naming with lowercase
+      // 'companyId': companyId, // Uncomment if you want to keep the original name
       // Consistent lowercase
     };
   }
@@ -80,6 +86,9 @@ class UserM implements Jsonable {
     this.UserMname = obj['username'];
     this.access = obj['access'];
     this.fcmKey = obj['fcmKey'];
+    this.fcmID = obj['fcmID'];
+    this.encryptionKey = obj['encryptionKey'];
+    this.password = obj['password'];
     this.firstTImeLogin = obj['firstTimeLogin'];
   }
 
@@ -101,6 +110,8 @@ class UserM implements Jsonable {
     if (status != null) map['status'] = status;
     if (UserMname != null) map['username'] = UserMname;
     if (fcmKey != null) map['fcmKey'] = fcmKey;
+    if (encryptionKey != null) map['encryptionKey'] = encryptionKey;
+    if (password != null) map['password'] = password;
     if (firstTImeLogin != null) map['firstTimeLogin'];
     return map;
   }
@@ -130,6 +141,8 @@ class UserM implements Jsonable {
         status: map['status'],
         UserMname: map['username'],
         fcmKey: map['fcmKey'],
+        encryptionKey: map['encryptionKey'],
+        password: map['password'],
         firstTImeLogin: map['firstTimeLogin']);
   }
 
@@ -154,6 +167,8 @@ class UserM implements Jsonable {
         UserMname = map['username'],
         fcmKey = map['fcmKey'],
         companyId = map['companyid'] ?? '',
+        encryptionKey = map['encryptionKey'],
+        password = map['password'] ?? '', // Ensure password is not null
         firstTImeLogin = map['firstTimeLogin'] ?? '';
   // Consistent with fallback
 

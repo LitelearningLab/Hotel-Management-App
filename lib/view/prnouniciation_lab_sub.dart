@@ -120,9 +120,9 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                     ),
                                                   ),
                                                 )
-                                              : (controller
-                                                          .currentlyPlayingIndex ==
-                                                      index)
+                                              : (controller.currentlyPlayingIndex ==
+                                                          index &&
+                                                      controller.isPlaying)
                                                   ? InkWell(
                                                       onTap: () {
                                                         controller
@@ -177,25 +177,25 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                       ),
                                       Row(
                                         children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              controller.saveUpdate(index);
-                                            },
-                                            child: SizedBox(
-                                              // width: displayWidth(context) / 18.75,
-                                              // height: displayHeight(context) / 40.6,
-                                              height: 19,
-                                              width: 19,
-                                              child: ImageIcon(
-                                                AssetImage(AllAssets.download),
-                                                color: controller
-                                                        .isPriorityList[index]
-                                                    ? linearColor
-                                                    : Colors.black,
-                                                // size: size.height * 0.03,
-                                              ),
-                                            ),
-                                          ),
+                                          // GestureDetector(
+                                          //   onTap: () {
+                                          //     controller.saveUpdate(index);
+                                          //   },
+                                          //   child: SizedBox(
+                                          //     // width: displayWidth(context) / 18.75,
+                                          //     // height: displayHeight(context) / 40.6,
+                                          //     height: 19,
+                                          //     width: 19,
+                                          //     child: ImageIcon(
+                                          //       AssetImage(AllAssets.download),
+                                          //       color: controller
+                                          //               .isPriorityList[index]
+                                          //           ? linearColor
+                                          //           : Colors.black,
+                                          //       // size: size.height * 0.03,
+                                          //     ),
+                                          //   ),
+                                          // ),
                                           IconButton(
                                             onPressed: () {
                                               controller.saveUpdate(index);
@@ -209,10 +209,17 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                 AllAssets.save,
                                                 width: 18,
                                                 color: controller
+                                                                .subcategories[
+                                                                    index]
+                                                                .isPriority ==
+                                                            "true" ||
+                                                        controller
+                                                                .isPriorityList[
+                                                            index] ||
+                                                        controller
                                                             .subcategories[
                                                                 index]
-                                                            .isPriority ==
-                                                        "true"
+                                                            .downloadStatus
                                                     ? linearColor
                                                     : Colors.black,
                                               ),
@@ -231,15 +238,6 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.fastOutSlowIn,
-                            height: isExpanded
-                                ? getWidgetHeight(
-                                    height: (controller.selectedWord
-                                                .toLowerCase() ==
-                                            controller.subcategories[index].text
-                                                .toLowerCase())
-                                        ? 230
-                                        : 150)
-                                : 0,
                             width: double.infinity,
                             child: isExpanded
                                 ? Padding(

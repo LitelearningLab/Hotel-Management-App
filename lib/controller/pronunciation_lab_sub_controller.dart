@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:hotelmanagementapp/model/category_model.dart';
-import 'package:hotelmanagementapp/utility/result_dialog.dart';
+import 'package:hotelmanagementapp/public/audio_helper.dart';
+import 'package:hotelmanagementapp/public/db_helper.dart';
 import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 
 import 'package:just_audio/just_audio.dart';
@@ -26,6 +27,7 @@ class PronunciationLabSubController extends GetxController {
   int? loadingIndex;
   List<bool> isPriorityList = [];
   int errorPlaying = -1;
+  bool isPlaying = false;
 
   @override
   void onInit() {
@@ -90,13 +92,9 @@ class PronunciationLabSubController extends GetxController {
   void saveUpdate(int index) async {
     try {
       // final DatabaseReference dbRef = FirebaseDatabase.instance.ref();
+      await DBHelper.toggleDownloadStatus(subcategories[index].file,
+          title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase());
       bool newValue = !isPriorityList[index];
-      // await dbRef
-      //     .child(collectionName)
-      //     .child(id)
-      //     .child('subcategories')
-      //     .child(index.toString())
-      //     .update({'isPriority': newValue});
       isPriorityList[index] = newValue;
       update();
       print("✅ isPriority updated to $newValue at index $index");
@@ -106,76 +104,117 @@ class PronunciationLabSubController extends GetxController {
   }
 
   void handlePlayPause(int index) async {
+    log("${subcategories[index].file}");
     loadingIndex = index;
+    isPlaying = true;
+
     update();
 
     try {
       if (currentlyPlayingIndex == index) {
         await audioPlayer.pause();
         currentlyPlayingIndex = null;
-        loadingIndex = null;
-        update();
       } else {
         await audioPlayer.stop();
-        await audioPlayer.setUrl(subcategories[index].file);
-        currentlyPlayingIndex = index;
-        loadingIndex = null;
-        update();
+
+        final decryptedPath = await AudioCryptoHelper.decryptFile(
+          subcategories[index].file,
+          subcategories[index].text.replaceAll(' ', '_'), // sanitized name
+        );
+        log("Decrypted path: $decryptedPath");
+        await audioPlayer.setUrl(decryptedPath);
         await audioPlayer.play();
+
+        currentlyPlayingIndex = index;
+        update();
       }
-    } catch (e) {
-      print("Audio load error: $e");
-      currentlyPlayingIndex = null;
-      loadingIndex = null;
+      errorPlaying = -1; // Reset error state
+    } on PlayerException catch (e) {
+      print("❌ Audio player error: ${e.message}");
+      if (e.code == 'MEDIA_UNAVAILABLE') {
+        errorPlaying = index;
+        currentlyPlayingIndex = null;
+      } else {
+        // Handle other player exceptions
+        print("❌ Other audio player error: ${e.code}");
+      }
+    } on Exception catch (e) {
+      print("❌ General audio error: $e");
       errorPlaying = index;
-      update();
+      currentlyPlayingIndex = null;
+    } catch (e) {
+      print("❌ Audio load error: $e");
+      errorPlaying = index;
+      currentlyPlayingIndex = null;
     } finally {
       loadingIndex = null;
+      isPlaying = false;
       update();
     }
   }
 
   Future<void> fetchPronunById(String id) async {
-    if (subcategories.isEmpty) {
-      final ref = FirebaseDatabase.instance.ref('$collectionName/$id');
+    final localData = await DBHelper.getAllSubcategories(
+        title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase());
 
-      try {
-        final snapshot = await ref.get();
-
-        if (snapshot.exists) {
-          final data = snapshot.value as Map<Object?, Object?>;
-          final parsed = data.map((key, value) {
-            if (value is Map) {
-              return MapEntry(
-                  key.toString(), Map<String, dynamic>.from(value as Map));
-            } else if (value is List) {
-              return MapEntry(
-                key.toString(),
-                value.map((e) => Map<String, dynamic>.from(e as Map)).toList(),
-              );
-            } else {
-              return MapEntry(key.toString(), value);
-            }
-          });
-
-          category = CategoryModel.fromMap(parsed);
-          subcategories = category.subcategories;
-          isPriorityList =
-              subcategories.map((e) => e.isPriority == true).toList();
-        } else {
-          print('No data found for ID: $id');
-        }
-      } catch (e) {
-        print('Error fetching data: $e');
-      }
-
-      isLoading = false;
-      update();
-      print('No subcategories found for title: $title $collectionName');
+    if (localData.isNotEmpty) {
+      subcategories = localData;
+      isPriorityList =
+          subcategories.map((e) => e.downloadStatus == true).toList();
+      print('Loaded from local database for $id');
     } else {
-      isLoading = false;
-      update();
-      print('Subcategories for $title: ${subcategories.length}');
+      final ref = FirebaseDatabase.instance.ref('$collectionName/$id');
+      final snapshot = await ref.get();
+
+      if (snapshot.exists) {
+        final data = snapshot.value as Map<Object?, Object?>;
+
+        final parsed = data.map((key, value) {
+          if (value is Map) {
+            return MapEntry(key.toString(), Map<String, dynamic>.from(value));
+          } else if (value is List) {
+            return MapEntry(
+              key.toString(),
+              value.map((e) => Map<String, dynamic>.from(e)).toList(),
+            );
+          } else {
+            return MapEntry(key.toString(), value);
+          }
+        });
+
+        category = CategoryModel.fromMap(parsed);
+
+        List<SubcategoryPro> tempList = [];
+
+        for (var item in category.subcategories) {
+          final encryptedPath = await AudioCryptoHelper.downloadAndEncryptFile(
+              item.file, item.text);
+          log("Encrypted path: $encryptedPath && time.file: ${item.file}");
+
+          final newItem = SubcategoryPro(
+            file: encryptedPath,
+            isPriority: item.isPriority,
+            syllables: item.syllables,
+            text: item.text,
+            pronun: item.pronun,
+            downloadStatus: false,
+          );
+
+          await DBHelper.insertSubcategory(
+              newItem, title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase());
+          tempList.add(newItem);
+        }
+
+        subcategories = tempList;
+        isPriorityList =
+            subcategories.map((e) => e.downloadStatus == true).toList();
+        print('Fetched from Firebase and saved locally for $title');
+      } else {
+        print('No Firebase data found for ID: $title');
+      }
     }
+
+    isLoading = false;
+    update();
   }
 }

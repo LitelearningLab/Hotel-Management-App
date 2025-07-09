@@ -9,6 +9,7 @@ import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/ar_grid_tile.dart';
+import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/view/simulation_sub.dart';
 
 class ARCallSimulation extends StatelessWidget {
@@ -50,6 +51,7 @@ class ARCallSimulation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: CustomeBottomNavigation(),
       appBar: AppBar(
           forceMaterialTransparency: true,
           backgroundColor: Colors.white,

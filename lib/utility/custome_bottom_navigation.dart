@@ -29,7 +29,16 @@ class CustomeBottomNavigation extends StatelessWidget {
             backgroundColor: Colors.white,
             type: BottomNavigationBarType.fixed,
             currentIndex: currentIndex,
-            onTap: (index) {},
+            onTap: (index) {
+              currentIndex == 0
+                  ? Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Home(),
+                      ),
+                    )
+                  : currentIndex = index;
+            },
             selectedItemColor: linearColor, // Your linearColor highlight
             unselectedItemColor: Colors.grey,
             showSelectedLabels: false,

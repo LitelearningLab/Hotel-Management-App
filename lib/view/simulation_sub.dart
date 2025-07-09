@@ -92,6 +92,7 @@ class _SimulationSubState extends State<SimulationSub> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => InAppWebViewPage(
+                                      isSimulation: true,
                                       url: controller.simulation
                                           .subcategory[index].links[0],
                                     ),

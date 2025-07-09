@@ -19,10 +19,11 @@ class Category {
 
 class SubcategoryPro {
   final String file;
-  final String isPriority;
+  String isPriority;
   final String syllables;
   final String text;
   final String pronun;
+  bool downloadStatus;
 
   SubcategoryPro({
     required this.file,
@@ -30,6 +31,7 @@ class SubcategoryPro {
     required this.syllables,
     required this.text,
     required this.pronun,
+    this.downloadStatus = false,
   });
 
   factory SubcategoryPro.fromJson(Map<String, dynamic> json) {
@@ -39,6 +41,7 @@ class SubcategoryPro {
       syllables: json['syllables'] ?? '',
       text: json['text'] ?? '',
       pronun: json['pronun'] ?? '',
+      downloadStatus: json['downloadStatus'] ?? false,
     );
   }
 
@@ -49,6 +52,7 @@ class SubcategoryPro {
       'syllables': syllables,
       'text': text,
       'pronun': pronun,
+      'downloadStatus': downloadStatus ? 1 : 0, // Convert bool to int
     };
   }
 
@@ -59,6 +63,7 @@ class SubcategoryPro {
       syllables: map['syllables'] ?? '',
       text: map['text'] ?? '',
       pronun: map['pronun'] ?? '',
+      downloadStatus: map['downloadStatus'] == 1 ? true : false,
     );
   }
 }
