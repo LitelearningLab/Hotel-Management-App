@@ -9,6 +9,7 @@ import 'package:hotelmanagementapp/view/home.dart';
 import 'package:hotelmanagementapp/view/language_lab.dart';
 import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
 import 'package:hotelmanagementapp/view/pronounciation_lab.dart';
+import 'package:hotelmanagementapp/view/search_screen.dart';
 import 'package:hotelmanagementapp/view/sentence_lab.dart';
 import 'package:hotelmanagementapp/view/sentence_lab_sub.dart';
 import 'package:hotelmanagementapp/view/sentence_lab_sub_cat.dart';
@@ -75,6 +76,11 @@ class RouteService {
       name: AppRoutes.sentenceLabSub,
       page: () => SentenceLabSubCat(),
       binding: SentenceLabSubCatBinding(),
-    )
+    ),
+    GetPage(
+      name: AppRoutes.searchScreen,
+      page: () => SearchScreen(),
+      binding: SearchScreenBinding(),
+    ),
   ];
 }

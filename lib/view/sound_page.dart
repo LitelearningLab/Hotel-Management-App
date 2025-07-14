@@ -6,6 +6,7 @@ import 'package:hotelmanagementapp/controller/sound_page_controller.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:video_player/video_player.dart';
 
 class SoundPage extends StatefulWidget {
@@ -20,6 +21,11 @@ class _SoundPageState extends State<SoundPage> {
   Widget build(BuildContext context) {
     return GetBuilder<SoundPageController>(builder: (controller) {
       return Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Align(
+          alignment: Alignment.bottomCenter,
+          child: CustomeBottomNavigation(),
+        ),
         appBar: AppBar(
           forceMaterialTransparency: true,
           surfaceTintColor: Colors.white,
@@ -47,7 +53,7 @@ class _SoundPageState extends State<SoundPage> {
                   color: linearColor,
                 ),
               )
-            : Column(
+            : ListView(
                 children: [
                   SizedBox(
                       width: kWidth,
@@ -248,6 +254,7 @@ class _SoundPageState extends State<SoundPage> {
                         right: getWidgetWidth(width: 20),
                         top: getWidgetHeight(height: 20)),
                     child: GridView.builder(
+                      physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -359,6 +366,9 @@ class _SoundPageState extends State<SoundPage> {
                       ],
                     ),
                   ),
+                  SizedBox(
+                    height: getWidgetHeight(height: 60),
+                  )
                 ],
               ),
       );

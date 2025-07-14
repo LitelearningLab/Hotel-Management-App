@@ -26,12 +26,24 @@ class SoundPageController extends GetxController {
 
   @override
   void onInit() {
+    log("🔁 onInit called");
     title = Get.arguments['title'] ?? "Sound Page";
     soundModel = Get.arguments['soundModel'];
-    initializeVideoPlayerFuture = initVideoPlayer(url: soundModel.links.v1);
-
-    update();
     super.onInit();
+  }
+
+  @override
+  void onReady() {
+    log("✅ onReady called");
+    initializeVideoPlayerFuture = initVideoPlayer(url: soundModel.links.v1);
+    super.onReady();
+  }
+
+  @override
+  void onClose() {
+    log("❌ SoundPageController closed");
+    videoPlayerController.dispose();
+    super.onClose();
   }
 
   void showPopupAtTap(Offset tapPosition) {
@@ -50,7 +62,6 @@ class SoundPageController extends GetxController {
   }
 
   void onClick(int index, Offset tapPosition) async {
-    // if (_selected == index) return;
     isLoading = true;
     isPlaying = false;
     selected = index;
@@ -60,7 +71,7 @@ class SoundPageController extends GetxController {
       await videoPlayerController.dispose();
     }
 
-    // Choose URL based on index
+    // Handle based on index
     String? url;
     if (index >= 0 && index <= 4) {
       url = index == 0
@@ -72,6 +83,7 @@ class SoundPageController extends GetxController {
                   : index == 3
                       ? soundModel.links.v4
                       : soundModel.links.v5;
+
       final file = await DefaultCacheManager().getSingleFile(url!);
       videoPlayerController = VideoPlayerController.file(file);
 
@@ -80,36 +92,38 @@ class SoundPageController extends GetxController {
       videoPlayerController.setVolume(1.0);
       videoPlayerController.play();
       videoPlayerController.addListener(update);
-      // isLoading = false;
       isPlaying = true;
     } else if (index == 5) {
-      // if (soundModel?.soundsPractice == null) {
-      //   showPopupAtTap(tapPosition);
-      // } else {
-      Get.toNamed(AppRoutes.soundLab,
-          arguments: {'soundSubcategory': soundModel});
-      // }
+      // 👇 This part is important
+      await Get.toNamed(
+        AppRoutes.soundLab,
+        arguments: {'soundSubcategory': soundModel},
+      );
 
+      log("🔁 Returned from third page, refreshing...");
+      refreshScreen(selected);
       return;
     }
 
     update();
   }
 
-  refreshScreen(int no) {
+  void refreshScreen(int index) {
+    log("🔄 refreshScreen called with index $index");
     initializeVideoPlayerFuture = initVideoPlayer(url: soundModel.links.v1);
-
     isPlaying = true;
     update();
   }
 
   Future<VideoPlayerController> initVideoPlayer({required String url}) async {
-    log("printing url : ${url}");
+    log("🎞️ Initializing video: $url");
+
     isLoading = true;
     isControllerInitializing = true;
     hasInitError = false;
     isPlaying = false;
     update();
+
     try {
       final file = await DefaultCacheManager().getSingleFile(url);
       videoPlayerController = VideoPlayerController.file(
@@ -120,7 +134,6 @@ class SoundPageController extends GetxController {
       await videoPlayerController.setVolume(1);
       await videoPlayerController.play();
       isPlaying = true;
-      update();
     } catch (e1) {
       try {
         videoPlayerController = VideoPlayerController.networkUrl(
@@ -131,21 +144,17 @@ class SoundPageController extends GetxController {
         await videoPlayerController.setVolume(1);
         await videoPlayerController.play();
         isPlaying = true;
-        isLoading = false;
-        update();
       } catch (e2) {
-        log("Video init failed: $e2");
+        log("❌ Video init failed: $e2");
         hasInitError = true;
-        isLoading = false;
-        update();
       }
-      update();
     }
 
     isControllerInitializing = false;
     isLoading = false;
     pageLoading = false;
     update();
+
     return videoPlayerController;
   }
 
@@ -158,36 +167,26 @@ class SoundPageController extends GetxController {
   void toggleControllerVisibility() {
     if (isControllerVisible) {
       hideControllerTimer?.cancel();
-
       isControllerVisible = false;
-      update();
     } else {
-      // If currently invisible, show it
       _showController();
     }
+    update();
   }
 
   void togglePlayPauseControllerVisibility() {
-    // Always show the controller for the play/pause action
     _showController();
   }
 
   void _showController() {
-    // if (_isControllerVisible) {
-    // If currently visible, make it immediately invisible
-    hideControllerTimer?.cancel(); // Cancel any existing hide timer
-    // }
-
+    hideControllerTimer?.cancel();
     isControllerVisible = true;
-    update();
 
-    // Cancel any existing timer
-    // _hideControllerTimer?.cancel();
-
-    // Start a new timer to hide the controller
     hideControllerTimer = Timer(Duration(seconds: 4), () {
       isControllerVisible = false;
+      update();
     });
+
     update();
   }
 }

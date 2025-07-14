@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -17,18 +18,21 @@ class AudioCryptoHelper {
 
       final response = await http.get(Uri.parse(url));
 
-      if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
-        final dir = await getApplicationDocumentsDirectory();
-        final filePath = join(dir.path, '$fileName.enc');
-        final file = File(filePath);
+      {
+        if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
+          final dir = await getApplicationDocumentsDirectory();
+          final filePath = join(dir.path, '$fileName.enc');
+          final file = File(filePath);
 
-        final encrypted = _encrypter.encryptBytes(response.bodyBytes, iv: _iv);
-        await file.writeAsBytes(encrypted.bytes, flush: true);
+          final encrypted =
+              _encrypter.encryptBytes(response.bodyBytes, iv: _iv);
+          await file.writeAsBytes(encrypted.bytes, flush: true);
 
-        print('✅ Encrypted and saved: $filePath');
-        return filePath;
-      } else {
-        throw Exception('❌ Failed to download or empty content: $url');
+          print('✅ Encrypted and saved: $filePath');
+          return filePath;
+        } else {
+          throw Exception('❌ Failed to download or empty content: $url');
+        }
       }
     } catch (e) {
       print('❌ Error in downloadAndEncryptFile: $e');

@@ -7,6 +7,7 @@ import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
+import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
 
 class PronounciationLab extends StatefulWidget {
@@ -22,6 +23,11 @@ class _PronounciationLabState extends State<PronounciationLab> {
   Widget build(BuildContext context) {
     return GetBuilder<PronunciationLabController>(builder: (controller) {
       return Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Align(
+          alignment: Alignment.bottomCenter,
+          child: CustomeBottomNavigation(),
+        ),
         appBar: AppBar(
             forceMaterialTransparency: true,
             backgroundColor: Colors.white,

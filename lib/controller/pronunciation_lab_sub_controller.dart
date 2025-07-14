@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -90,16 +91,18 @@ class PronunciationLabSubController extends GetxController {
   }
 
   void saveUpdate(int index) async {
-    try {
-      // final DatabaseReference dbRef = FirebaseDatabase.instance.ref();
-      await DBHelper.toggleDownloadStatus(subcategories[index].file,
-          title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase());
-      bool newValue = !isPriorityList[index];
-      isPriorityList[index] = newValue;
-      update();
-      print("✅ isPriority updated to $newValue at index $index");
-    } catch (e) {
-      print("❌ Failed to update isPriority at index $index: $e");
+    {
+      try {
+        // final DatabaseReference dbRef = FirebaseDatabase.instance.ref();
+        await DBHelper.toggleDownloadStatus(subcategories[index].file,
+            title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase());
+        bool newValue = !isPriorityList[index];
+        isPriorityList[index] = newValue;
+        update();
+        print("✅ isPriority updated to $newValue at index $index");
+      } catch (e) {
+        print("❌ Failed to update isPriority at index $index: $e");
+      }
     }
   }
 

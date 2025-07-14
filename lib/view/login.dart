@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
 
           if (userData.containsKey('imei')) {
             if (userData['imei'] == deviceId) {
-              log("✅ Device match. Logging in...");
+              log("✅ Device match. Logging in... %${userData["imei"]}  % $deviceId");
 
               final prefs = await SharedPreferences.getInstance();
               await prefs.setString('email', email);

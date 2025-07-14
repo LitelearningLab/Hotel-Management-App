@@ -6,7 +6,7 @@ import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
-import 'package:hotelmanagementapp/view/sentence_lab_sub_cat.dart';
+import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 
 class SentenceLabSub extends StatefulWidget {
   final String title;
@@ -22,6 +22,11 @@ class _SentenceLabSubState extends State<SentenceLabSub> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Align(
+        alignment: Alignment.bottomCenter,
+        child: CustomeBottomNavigation(),
+      ),
       appBar: AppBar(
         forceMaterialTransparency: true,
         surfaceTintColor: Colors.white,

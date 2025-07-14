@@ -1,4 +1,4 @@
-import 'dart:ffi';
+// import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +11,7 @@ import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/public/spacing.dart';
+import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 
 class SoundLab extends StatefulWidget {
   const SoundLab({super.key});
@@ -25,6 +26,11 @@ class _SoundLabState extends State<SoundLab> {
   Widget build(BuildContext context) {
     return GetBuilder<SoundLabController>(builder: (controller) {
       return Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Align(
+          alignment: Alignment.bottomCenter,
+          child: CustomeBottomNavigation(),
+        ),
         appBar: AppBar(
           forceMaterialTransparency: true,
           surfaceTintColor: Colors.white,

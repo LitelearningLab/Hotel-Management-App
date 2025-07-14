@@ -9,6 +9,7 @@ import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 
 class SentenceLabSubCat extends StatefulWidget {
   SentenceLabSubCat({super.key});
@@ -23,6 +24,11 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
   Widget build(BuildContext context) {
     return GetBuilder<SentenceLabSubCatController>(builder: (controller) {
       return Scaffold(
+        // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        // floatingActionButton: Align(
+        //   alignment: Alignment.bottomCenter,
+        //   child: CustomeBottomNavigation(),
+        // ),
         appBar: AppBar(
           forceMaterialTransparency: true,
           surfaceTintColor: Colors.white,

@@ -10,6 +10,7 @@ import 'package:hotelmanagementapp/controller/simulation_sub_controller.dart';
 import 'package:hotelmanagementapp/model/simulation_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 
 class SimulationSub extends StatefulWidget {
@@ -31,6 +32,11 @@ class _SimulationSubState extends State<SimulationSub> {
         sessionName = "";
       },
       child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Align(
+          alignment: Alignment.bottomCenter,
+          child: CustomeBottomNavigation(),
+        ),
         appBar: AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.black),

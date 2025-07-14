@@ -1,6 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/view/home.dart';
+import 'package:hotelmanagementapp/view/search_screen.dart';
 
 class CustomeBottomNavigation extends StatelessWidget {
   const CustomeBottomNavigation({
@@ -30,14 +35,18 @@ class CustomeBottomNavigation extends StatelessWidget {
             type: BottomNavigationBarType.fixed,
             currentIndex: currentIndex,
             onTap: (index) {
-              currentIndex == 0
-                  ? Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Home(),
-                      ),
-                    )
-                  : currentIndex = index;
+              log('BottomNavigationBar tapped: $index');
+              if (index == 0) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const Home()),
+                  (Route<dynamic> route) => false,
+                );
+              }
+              if (index == 1) {
+                Get.toNamed(AppRoutes.searchScreen);
+              } else {
+                currentIndex = index;
+              }
             },
             selectedItemColor: linearColor, // Your linearColor highlight
             unselectedItemColor: Colors.grey,

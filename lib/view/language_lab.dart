@@ -12,6 +12,7 @@ import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
+import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/utility/pe_top_categories_card.dart';
 import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
 import 'package:hotelmanagementapp/view/pronounciation_lab.dart';
@@ -22,6 +23,11 @@ class Languagelab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Align(
+        alignment: Alignment.bottomCenter,
+        child: CustomeBottomNavigation(),
+      ),
       appBar: AppBar(
         forceMaterialTransparency: true,
         backgroundColor: Colors.white,

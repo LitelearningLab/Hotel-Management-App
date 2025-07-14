@@ -7,6 +7,7 @@ import 'package:hotelmanagementapp/controller/sentence_lab_controller.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/view/sentence_lab_sub.dart';
 
 class SentenceLab extends StatefulWidget {
@@ -21,6 +22,11 @@ class _SentenceLabState extends State<SentenceLab> {
   Widget build(BuildContext context) {
     return GetBuilder<SentenceLabController>(builder: (controller) {
       return Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Align(
+          alignment: Alignment.bottomCenter,
+          child: CustomeBottomNavigation(),
+        ),
         appBar: AppBar(
             forceMaterialTransparency: true,
             backgroundColor: Colors.white,
