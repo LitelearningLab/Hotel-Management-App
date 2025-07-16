@@ -51,14 +51,14 @@ double displayWidth(BuildContext context) {
 
 void openDialog(BuildContext context) {
   Get.snackbar(
-    'Coming Soon', // Title
-    '', // Message (can be empty)
+    'Work in Progress',
+    '',
     snackPosition: SnackPosition.BOTTOM,
-    duration: Duration(seconds: 3),
-    backgroundColor: Colors.black87,
-    colorText: Colors.white,
-    margin: EdgeInsets.all(16),
-    borderRadius: 10,
+    duration: Duration(seconds: 1),
+    backgroundColor: Colors.transparent,
+    colorText: Colors.black,
+    margin: EdgeInsets.all(6),
+    borderRadius: 5,
   );
 }
 

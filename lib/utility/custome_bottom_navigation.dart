@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/view/home.dart';
@@ -43,7 +44,11 @@ class CustomeBottomNavigation extends StatelessWidget {
                 );
               }
               if (index == 1) {
-                Get.toNamed(AppRoutes.searchScreen);
+                // Get.toNamed(AppRoutes.searchScreen);
+                openDialog(context);
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   const SnackBar(content: Text("Work in progress")),
+                // );
               } else {
                 currentIndex = index;
               }

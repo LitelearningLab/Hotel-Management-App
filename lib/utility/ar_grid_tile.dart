@@ -72,7 +72,7 @@ class ARGridTile extends StatelessWidget {
                     // overflow: TextOverflow.fade,
                     style: GoogleFonts.inter(
                       // fontWeight: FontWeight.w600,
-                      fontSize: 13,
+                      fontSize: 14,
                     ),
                   ),
                 ),

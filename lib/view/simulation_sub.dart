@@ -142,6 +142,7 @@ class _SimulationSubState extends State<SimulationSub> {
                 ),
               );
             }),
+            SizedBox(height: getWidgetHeight(height: 80)),
           ],
         )),
       ),

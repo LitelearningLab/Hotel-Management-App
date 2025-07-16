@@ -164,4 +164,8 @@ class AllAssets {
   static const String interactiveSimulations = "assets/images/bottomIS.png";
   static const String videoIcon = "assets/video.png";
   static const String bookIcon = "assets/book.png";
+  static const String banquet = 'assets/Banquet V4.png';
+  static const String bar = 'assets/Pub.png';
+  static const String restuarant = 'assets/Restaurant.png';
+  static const String roomService = 'assets/Room Service V3.png';
 }

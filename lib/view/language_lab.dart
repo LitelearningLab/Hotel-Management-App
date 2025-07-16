@@ -15,7 +15,7 @@ import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/utility/pe_top_categories_card.dart';
 import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
-import 'package:hotelmanagementapp/view/pronounciation_lab.dart';
+// import 'package:hotelmanagementapp/view/pronounciation_lab.dart';
 
 class Languagelab extends StatelessWidget {
   const Languagelab({super.key});

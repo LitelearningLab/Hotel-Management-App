@@ -109,24 +109,23 @@ class FrontOfficeController extends GetxController {
   }
 }
 
-//   Future<List<List<String>>> fetchAllLinks() async {
-//     List<List<String>> allLinks = [];
+Future<List<List<String>>> fetchAllLinks() async {
+  List<List<String>> allLinks = [];
 
-//     try {
-//       QuerySnapshot snapshot =
-//           await FirebaseFirestore.instance.collection('FrontOffice').get();
+  try {
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection('FrontOffice').get();
 
-//       for (var doc in snapshot.docs) {
-//         var data = doc.data() as Map<String, dynamic>;
-//         if (data['links'] != null && data['links'] is List) {
-//           List<String> links = List<String>.from(data['links']);
-//           allLinks.add(links);
-//         }
-//       }
-//     } catch (e) {
-//       print('Error fetching links: $e');
-//     }
+    for (var doc in snapshot.docs) {
+      var data = doc.data() as Map<String, dynamic>;
+      if (data['links'] != null && data['links'] is List) {
+        List<String> links = List<String>.from(data['links']);
+        allLinks.add(links);
+      }
+    }
+  } catch (e) {
+    print('Error fetching links: $e');
+  }
 
-//     return allLinks;
-//   }
-// }
+  return allLinks;
+}
