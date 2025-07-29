@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:hotelmanagementapp/model/sound_model.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
 
 class LanguageLabController extends GetxController {
   int selectedIndex = 0;
@@ -27,6 +28,7 @@ class LanguageLabController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    timestampIndex = 6;
     fetchAndCategorizeSounds();
   }
 

@@ -44,8 +44,8 @@ class CustomeBottomNavigation extends StatelessWidget {
                 );
               }
               if (index == 1) {
-                // Get.toNamed(AppRoutes.searchScreen);
-                openDialog(context);
+                Get.toNamed(AppRoutes.searchScreen);
+                // openDialog(context);
                 // ScaffoldMessenger.of(context).showSnackBar(
                 //   const SnackBar(content: Text("Work in progress")),
                 // );

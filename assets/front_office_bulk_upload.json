@@ -1,44 +1,49 @@
 {
-  "GrammerLabCollection": {
-    "doc1": {
-      "category": "Tenses",
-      "order": 1,
-      "id": "doc1",
-      "key": "",
-      "subcategory": [
-        { "text": "Present Continuous Tense", "learningModule": "", "exercise": "" },
-        { "text": "Simple Present Tense", "learningModule": "", "exercise": "" },
-        { "text": "Past Perfect Tense", "learningModule": "", "exercise": "" },
-        { "text": "Future Tense", "learningModule": "", "exercise": "" },
-        { "text": "Present Perfect Continuous", "learningModule": "", "exercise": "" }
-      ]
-    },
-    "doc2": {
-      "category": "Articles",
-      "order": 2,
-      "id": "doc2",
-      "key": "",
-      "subcategory": [
-        { "text": "Definite and Indefinite Articles", "learningModule": "", "exercise": "" },
-        { "text": "Usage of 'a' and 'an'", "learningModule": "", "exercise": "" },
-        { "text": "Omission of Articles", "learningModule": "", "exercise": "" },
-        { "text": "Articles with Places", "learningModule": "", "exercise": "" },
-        { "text": "Articles in Context", "learningModule": "", "exercise": "" }
-      ]
-    },
-    "doc3": {
-      "category": "Prepositions",
-      "order": 3,
-      "id": "doc3",
-      "key": "",
-      "subcategory": [
-        { "text": "Prepositions of Place", "learningModule": "", "exercise": "" },
-        { "text": "Prepositions of Time", "learningModule": "", "exercise": "" },
-        { "text": "Prepositions of Direction", "learningModule": "", "exercise": "" },
-        { "text": "Compound Prepositions", "learningModule": "", "exercise": "" },
-        { "text": "Prepositional Phrases", "learningModule": "", "exercise": "" }
+  "UniversityCollection": {
+    "dept1": {
+      "collegeName": "Greenfield College",
+      "collegeId": "GFC123",
+      "category": [
+        {
+          "name": "Science Core Subjects",
+          "order": 1,
+          "id": "cat1",
+          "key": "",
+          "subcategory": [
+            { "text": "Physics" },
+            { "text": "Chemistry" },
+            { "text": "Biology" },
+            { "text": "Mathematics" },
+            { "text": "Computer Science" }
+          ]
+        },
+        {
+          "name": "Commerce Major Topics",
+          "order": 2,
+          "id": "cat2",
+          "key": "",
+          "subcategory": [
+            { "text": "Accountancy" },
+            { "text": "Business Studies" },
+            { "text": "Economics" },
+            { "text": "Mathematics for Commerce" },
+            { "text": "Entrepreneurship" }
+          ]
+        },
+        {
+          "name": "Arts Subject Overview",
+          "order": 3,
+          "id": "cat3",
+          "key": "",
+          "subcategory": [
+            { "text": "History" },
+            { "text": "Political Science" },
+            { "text": "Sociology" },
+            { "text": "Psychology" },
+            { "text": "English Literature" }
+          ]
+        }
       ]
     }
-    
   }
 }

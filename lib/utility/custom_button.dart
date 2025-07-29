@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hotelmanagementapp/public/constant.dart';
 // import 'package:litelearninglab/constants/app_colors.dart';
 
 class CustomButton extends StatefulWidget {
@@ -45,7 +46,7 @@ class _CustomButtonState extends State<CustomButton> {
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
-            color: Color(0XFF1848C4), borderRadius: BorderRadius.circular(10)),
+            color: linearColor, borderRadius: BorderRadius.circular(10)),
         child: TextButton(
           onPressed: () async {
             if (!_isLoading) {
@@ -66,7 +67,7 @@ class _CustomButtonState extends State<CustomButton> {
                   borderRadius: BorderRadius.circular(18.0),
                 ),
               ),
-              backgroundColor: MaterialStatePropertyAll(Color(0XFF1848C4)),
+              backgroundColor: MaterialStateProperty.all(linearColor),
               overlayColor: MaterialStateProperty.all(Colors.transparent)),
           /*onPressed: () async {
             print("hlooo");

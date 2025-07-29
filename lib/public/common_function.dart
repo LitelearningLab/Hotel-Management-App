@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 double kHeight = 0.0;
 double kWidth = 0.0;
@@ -118,6 +119,7 @@ stopTimerMainCategory() async {
       // sessionName: sessionName
     );
     activityName = "";
+    sessionName = "";
 
     log("printing the timing is working or not $finalDuration ${mianCategoryTitile}");
   }
@@ -137,41 +139,14 @@ Future<void> startPracticeTime({
   required List<String> topicNames,
 }) async {
   try {
-    // 1. Check network and validate inputs
+    // 1. Check network
     final connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
       throw Exception('No internet connection. Please check your network.');
     }
+    print('✅ Internet connectivity verified.');
 
-    // 2. Get user ID
-    // final userId = await SharedPref.getSavedString('userId');
-    // if (userId.isEmpty) throw Exception('User not authenticated');
-
-    // 3. Configure Firestore
-    final firestore = FirebaseFirestore.instance;
-    // log(mainCategory);
-    // String collectionName = "processLearningTimeStamp";
-    // if (mianCategoryTitile == "Process Learning") {
-    //   collectionName = "processLearningTimeStamp";
-    // } else if (mianCategoryTitile == "AR Call Simulation") {
-    //   collectionName = "ARCallSimulationTimeStamp";
-    // } else if (mianCategoryTitile == "Profluent English") {
-    //   collectionName = "ProfluentEnglishTimeStamp";
-    //   if (subCategory == "Sentence Lab" ||
-    //       subCategory == "Call Flow Lab" ||
-    //       subCategory == "Grammer Lab") {
-    //     activityName = sessionName2;
-    //   }
-    // } else if (mianCategoryTitile == "Soft Skills") {
-    //   collectionName = "SoftSkillsTimeStamp";
-    //   subCategory = sessionName;
-    // }
-    // if (duration.inSeconds <= 0) {
-    //   throw ArgumentError('Duration must be positive');
-    // }
-    // if (mainCategory.isEmpty) throw ArgumentError('Main category is required');
-    // if (subCategory.isEmpty) throw ArgumentError('Sub category is required');
-    // 4. Create query to find existing document with matching fields
+    // 2. Determine Firestore collection name based on index
     final String collectionName = index == 0
         ? CollectionNames.frontOfficeTimestamp
         : index == 1
@@ -182,8 +157,15 @@ Future<void> startPracticeTime({
                     ? CollectionNames.houseKeepingTimestamp
                     : index == -1
                         ? CollectionNames.interactiveSimulationTimestamp
-                        : "";
-    log(collectionName);
+                        : index == 6
+                            ? CollectionNames.langauqeLabTimestamp
+                            : throw Exception('Invalid index: $index');
+    print('📂 Collection Name: $collectionName');
+
+    // 3. Prepare Firestore instance
+    final firestore = FirebaseFirestore.instance;
+
+    // 4. Attempt to find existing session document
     final querySnapshot = await firestore
         .collection(collectionName)
         .where('userId', isEqualTo: "userId")
@@ -194,8 +176,16 @@ Future<void> startPracticeTime({
         // .where('topicNames', isEqualTo: topicNames)
         .limit(1)
         .get();
+    print('🔍 Query completed. Docs found: ${querySnapshot.docs.length}');
 
     // 5. Prepare session data
+    print('⏱️ Duration (seconds): ${duration.inSeconds}');
+    print('📌 Main Category: $mainCategory');
+    print('📌 Sub Category: $subCategory');
+    print('📌 Type: $type');
+    print('📌 Activity Name: $activityName');
+    print('📌 Topic Names: $topicNames');
+
     final newSession = {
       'duration': duration.inSeconds,
       'endTime': endTimings,
@@ -203,22 +193,37 @@ Future<void> startPracticeTime({
       // 'mainCategory': mainCategory,
       'recordTimings': timings,
     };
+    print('📘 New session data: $newSession');
 
-    // 6. Update existing doc or create new one
+    // 6. Update or Create Firestore document
     if (querySnapshot.docs.isNotEmpty) {
-      // Document exists - update it
       final docRef = querySnapshot.docs.first.reference;
+      print('📝 Updating existing document: ${docRef.id}');
+
       await docRef.update({
         'sessions': FieldValue.arrayUnion([newSession]),
         'totalPracticeTime': FieldValue.increment(duration.inSeconds),
         'lastUpdated': FieldValue.serverTimestamp(),
       });
+
+      print('✅ Existing document updated.');
     } else {
-      // String company = await SharedPref.getSavedString("companyId");
-      // String batch = await SharedPref.getSavedString("batch");
-      // Document doesn't exist - create new
+      // Get Shared Preferences
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString("userId") ?? "";
+      final collegeId = prefs.getString("collegeId") ?? "";
+      final batchName = prefs.getString("batchName") ?? "";
+
+      print('👤 User ID: $userId');
+      print('🏫 College ID: $collegeId');
+      print('🎓 Batch Name: $batchName');
+
+      if (userId.isEmpty) {
+        throw Exception('User ID is empty. Please log in again.');
+      }
+
       await firestore.collection(collectionName).add({
-        'userId': "userId",
+        'userId': userId,
         'category': mainCategory,
         'subCategory': subCategory,
         'type': type,
@@ -228,19 +233,19 @@ Future<void> startPracticeTime({
         'totalPracticeTime': duration.inSeconds,
         'lastUpdated': FieldValue.serverTimestamp(),
         'createdAt': FieldValue.serverTimestamp(),
-        'companyID': "company",
-        'batchName': "batch"
+        'collegeId': collegeId,
+        'batchName': batchName,
       });
+
+      print('✅ New document created successfully.');
     }
 
-    if (kDebugMode) {
-      log('✅ Session recorded successfully');
-    }
+    print('📌 Practice session recorded completely.');
   } on FirebaseException catch (e) {
-    log('🔥 Firestore Error: ${e.code} - ${e.message}');
+    print('🔥 Firestore Error: ${e.code} - ${e.message}');
     throw Exception('Failed to save session data: ${e.message}');
   } catch (e, stack) {
-    log('❌ Unexpected Error: $e\nStack Trace: $stack');
+    print('❌ Unexpected Error: $e\nStack Trace: $stack');
     throw Exception('An unexpected error occurred');
   }
 }

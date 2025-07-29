@@ -243,6 +243,11 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                             ? () {
                                                                 activityName =
                                                                     "E-Learning";
+                                                                subCategoryTitle =
+                                                                    controller
+                                                                        .frontOfficeData[
+                                                                            index]
+                                                                        .category;
                                                                 Navigator.push(
                                                                     context,
                                                                     MaterialPageRoute(
@@ -269,11 +274,12 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                             ? () {
                                                                 activityName =
                                                                     'Glossary';
+                                                                subCategoryTitle =
+                                                                    controller
+                                                                        .frontOfficeData[
+                                                                            index]
+                                                                        .category;
 
-                                                                controller
-                                                                    .frontOfficeData[
-                                                                        index]
-                                                                    .category;
                                                                 Navigator.push(
                                                                     context,
                                                                     MaterialPageRoute(

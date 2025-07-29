@@ -21,6 +21,7 @@ class CollectionNames {
   static String houseKeepingTimestamp = 'HouseKeepingTimeStamp';
   static String interactiveSimulationTimestamp =
       'InteractiveSimulationTimeStamp';
+  static String langauqeLabTimestamp = 'LanguageLabTimeStamp';
 }
 
 class ApiRoutes {

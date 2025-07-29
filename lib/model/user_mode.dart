@@ -3,7 +3,7 @@ import 'package:hotelmanagementapp/public/firebase_service.dart';
 
 class UserM implements Jsonable {
   String? id;
-  String? company;
+  String? college;
   String? email;
   String? imei;
   String? mobile;
@@ -23,7 +23,7 @@ class UserM implements Jsonable {
   String? password;
 
   UserM(
-      {this.company,
+      {this.college,
       this.email,
       this.imei,
       this.id,
@@ -45,7 +45,7 @@ class UserM implements Jsonable {
 
   Map<String, dynamic> toJson() {
     return {
-      "company": company,
+      "college": college,
       "email": email,
       "imei": imei,
       "mobile": mobile,
@@ -72,7 +72,7 @@ class UserM implements Jsonable {
 
   UserM.map(dynamic obj) {
     this.id = obj['id'];
-    this.company = obj['company'];
+    this.college = obj['college'];
     this.lastLogin = obj['lastLogin'];
     this.companyId = obj['companyid']; // Consistent lowercase
     this.email = obj['email'];
@@ -96,7 +96,7 @@ class UserM implements Jsonable {
     var map = <String, dynamic>{};
     if (id != null) map['id'] = id;
     if (companyId != null) map['companyid'] = companyId; // Consistent lowercase
-    if (company != null) map['company'] = company;
+    if (college != null) map['company'] = college;
     if (lastLogin != null) map['lastLogin'] = lastLogin;
     if (fcmID != null) map['fcmID'] = fcmID;
     if (email != null) map['email'] = email;
@@ -122,7 +122,8 @@ class UserM implements Jsonable {
 
     return UserM(
         id: doc.id,
-        company: map['company'],
+        college:
+            map['college'] ?? map['company'], // Consistent name with fallback
         lastLogin: map['lastLogin'],
         email: map['email'],
         companyId: map['companyid'] ?? '', // Consistent name with fallback
@@ -148,7 +149,8 @@ class UserM implements Jsonable {
 
   UserM.fromMap(Map<String, dynamic> map)
       : id = map['id'],
-        company = map['company'],
+        college =
+            map['college'] ?? map['company'], // Consistent name with fallback
         lastLogin = map['lastLogin'],
         email = map['email'],
         imei = map['imei'],

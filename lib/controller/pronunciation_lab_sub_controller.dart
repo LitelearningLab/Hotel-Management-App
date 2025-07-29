@@ -119,6 +119,8 @@ class PronunciationLabSubController extends GetxController {
         currentlyPlayingIndex = null;
       } else {
         await audioPlayer.stop();
+        currentlyPlayingIndex = index;
+        update();
 
         final decryptedPath = await AudioCryptoHelper.decryptFile(
           subcategories[index].file,
@@ -127,9 +129,6 @@ class PronunciationLabSubController extends GetxController {
         log("Decrypted path: $decryptedPath");
         await audioPlayer.setUrl(decryptedPath);
         await audioPlayer.play();
-
-        currentlyPlayingIndex = index;
-        update();
       }
       errorPlaying = -1; // Reset error state
     } on PlayerException catch (e) {

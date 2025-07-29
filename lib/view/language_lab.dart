@@ -81,6 +81,7 @@ class Languagelab extends StatelessWidget {
                           title: 'English Pronunciation',
                           imageUrl: AllAssets.pePl,
                           onTap: () async {
+                            mianCategoryTitile = 'English Pronunciation';
                             Get.toNamed(AppRoutes.pronunciationLab,
                                 arguments: {"title": "English Pronunciation"});
                           },
@@ -92,6 +93,7 @@ class Languagelab extends StatelessWidget {
                           title: 'French Pronunciation',
                           imageUrl: AllAssets.peScl,
                           onTap: () async {
+                            mianCategoryTitile = 'French Pronunciation';
                             Get.toNamed(AppRoutes.pronunciationLab,
                                 arguments: {"title": "French Pronunciation"});
                           },
@@ -103,6 +105,7 @@ class Languagelab extends StatelessWidget {
                           title: 'Sentence Lab',
                           imageUrl: AllAssets.peCfpl,
                           onTap: () async {
+                            mianCategoryTitile = 'Sentence Lab';
                             Get.toNamed(AppRoutes.sentenceLab,
                                 arguments: {"title": "Sentence Lab"});
                           },
@@ -114,6 +117,7 @@ class Languagelab extends StatelessWidget {
                           title: 'Grammer Lab',
                           imageUrl: AllAssets.peGl,
                           onTap: () {
+                            mianCategoryTitile = 'Grammer Lab';
                             Get.toNamed(AppRoutes.grmmaerLab,
                                 arguments: {"title": "Grammer Lab"});
                           },

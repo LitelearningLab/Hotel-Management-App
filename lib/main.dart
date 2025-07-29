@@ -12,6 +12,7 @@ import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/route/binding.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/route/route_service.dart';
+import 'package:hotelmanagementapp/utility/connectivity_wrapper.dart';
 import 'package:hotelmanagementapp/view/home.dart';
 import 'package:hotelmanagementapp/view/login.dart';
 import 'package:hotelmanagementapp/view/splash.dart';
@@ -56,18 +57,19 @@ class MyApp extends StatelessWidget {
 
 Future<void> uploadBulkData() async {
   // Load JSON from assets
-  String jsonString = await rootBundle.loadString('assets/soundsection.json');
+  String jsonString =
+      await rootBundle.loadString('assets/front_office_bulk_upload.json');
   Map<String, dynamic> jsonData = json.decode(jsonString);
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   // Access your specific collection from JSON
-  final documents = jsonData['ProfluentEnglish'];
+  final documents = jsonData['UniversityCollection'];
 
   if (documents != null && documents is Map<String, dynamic>) {
     for (final docId in documents.keys) {
       final fields = documents[docId];
-      await firestore.collection("ProfluentEnglish").doc(docId).set(fields);
+      await firestore.collection("UniversityCollection").doc(docId).set(fields);
     }
 
     print("✅ Bulk upload completed to 'FrontOfficeCollection'!");

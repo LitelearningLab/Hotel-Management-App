@@ -33,10 +33,13 @@ class SentenceLabSubCatController extends GetxController {
         currentlyPlayingIndex = null;
       } else {
         await audioPlayer.stop();
-        await audioPlayer.setUrl(subcategories[index].sentence.file);
         currentlyPlayingIndex = index;
         update();
+        await audioPlayer.setUrl(subcategories[index].sentence.file);
+
         await audioPlayer.play();
+        currentlyPlayingIndex = null;
+        update();
       }
     } catch (e) {
       print("Audio load error: $e");

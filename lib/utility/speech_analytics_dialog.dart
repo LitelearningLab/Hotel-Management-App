@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/close_value_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/public/shared_pref.dart';
 import 'package:hotelmanagementapp/public/size_helpers.dart';
@@ -207,7 +208,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            backgroundColor: Color(0XFF34425D));
+            backgroundColor: Color(0xFF61B3CA));
       },
     );
   }
@@ -610,14 +611,17 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
           print("mistake words add");
           focusWords.add(actWord);
           Widget wi = Container(
-              color: Colors.white,
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(5),
+              ),
               padding: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
               child: Text(
                 actWord,
                 style: TextStyle(
                     fontSize: 15,
                     fontFamily: Keys.fontFamily,
-                    color: Colors.red),
+                    color: Colors.white),
               ));
           formatedWords.add(wi);
         } else {
@@ -786,7 +790,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
       decoration: new BoxDecoration(
         borderRadius: new BorderRadius.all(Radius.circular(10.0)),
         // color: AppColors.c262626,
-        color: Color(0xFF293750),
+        color: Colors.white,
       ),
       // height: _isShowDidNotCatch ? 170 : 400,
       child: Column(
@@ -801,7 +805,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
                 borderRadius: new BorderRadius.only(
                     topLeft: Radius.circular(10.0),
                     topRight: Radius.circular(10.0)),
-                color: Color(0xff34425D),
+                color: Color.fromARGB(255, 74, 148, 168),
                 // boxShadow: [new BoxShadow(color: Colors.grey, blurRadius: 3.0, offset: new Offset(1.0, 1.0))],
               ),
               child: Row(
@@ -873,7 +877,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
                         child: Text(widget.word,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.grey,
                                 fontFamily: Keys.fontFamily,
                                 fontSize: globalFontSize(20, context),
                                 fontWeight: FontWeight.w600)),
@@ -893,7 +897,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
               //           fontSize: 10)),
               if (_isShowDidNotCatch)
                 Container(
-                  color: Color(0XFF34425D),
+                  color: Color(0xFF61B3CA),
                   width: 400,
                   child: Padding(
                     padding:
@@ -915,7 +919,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
                 IconButton(
                     icon: Icon(
                       Icons.mic,
-                      color: Colors.white,
+                      color: Colors.grey,
                     ),
                     onPressed: () {
                       CloseValue closeValue = CloseValue();
@@ -937,7 +941,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
                 Text("Touch mic when ready",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.grey,
                         fontFamily: Keys.fontFamily,
                         fontSize: 12)),
               SizedBox(

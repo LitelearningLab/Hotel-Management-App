@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/auth/email_auth_service.dart';
 import 'package:hotelmanagementapp/auth/google_auth_service.dart';
+import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
@@ -85,6 +86,8 @@ class _LoginPageState extends State<LoginPage> {
           final userRef =
               FirebaseFirestore.instance.collection('UserNode').doc(userId);
           final userData = doc.data();
+          final collegeId = userData['collegeId'] ?? '';
+          final batchName = userData['batchName'] ?? '';
 
           if (userData.containsKey('imei')) {
             if (userData['imei'] == deviceId) {
@@ -94,7 +97,10 @@ class _LoginPageState extends State<LoginPage> {
               await prefs.setString('email', email);
               await prefs.setString('password', password);
               await prefs.setBool("loginInfo", true);
-
+              await prefs.setString("userId", userId);
+              await prefs.setString("collegeId", collegeId);
+              await prefs.setString("batchName", batchName);
+              log("User ID saved: $userId");
               Get.offAllNamed(AppRoutes.home);
             } else {
               log("❌ Device mismatch. Access denied.");
@@ -115,6 +121,10 @@ class _LoginPageState extends State<LoginPage> {
             await prefs.setString('email', email);
             await prefs.setString('password', password);
             await prefs.setBool("loginInfo", true);
+            await prefs.setString("userId", userId);
+            await prefs.setString("collegeId", collegeId);
+            await prefs.setString("batchName", batchName);
+            log("User ID saved: $userId");
 
             Get.offAllNamed(AppRoutes.home);
           }
@@ -213,13 +223,21 @@ class _LoginPageState extends State<LoginPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            "HOTEL MANAGEMENT APP",
-                            style: GoogleFonts.inter(
-                                // height: 0.5,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 20,
-                                color: Colors.black),
+                          SizedBox(
+                            height: getWidgetHeight(height: 120),
+                            width: getWidgetWidth(width: 200),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              // radius: 25,
+                              child: ClipOval(
+                                child: Image.asset(
+                                  AllAssets.splashLogo,
+                                  fit: BoxFit.contain,
+                                  // width: getWidgetWidth(width: 200),
+                                  height: getWidgetHeight(height: 200),
+                                ),
+                              ),
+                            ),
                           ),
                           // Container(
                           //     height: 40,
@@ -229,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 40),
+                    SizedBox(height: getWidgetHeight(height: 30)),
                     Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: getWidgetHeight(height: 25),
@@ -239,12 +257,12 @@ class _LoginPageState extends State<LoginPage> {
                               //  isSplitScreen
                               //     ? getFullWidgetHeight(height: 280)
                               //     :
-                              getWidgetHeight(height: 280),
+                              getWidgetHeight(height: 200),
                           child: Image.asset(!_isLogin
                               ? 'assets/images/undraw_Messaging_app_re_aytg.png'
                               : 'assets/images/SMSOTP.png')),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: getWidgetHeight(height: 20)),
                     Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: getWidgetHeight(height: 25),
@@ -256,7 +274,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(color: Color(0XFFF8F8F8F)),
                       ),
                     ),
-                    SizedBox(height: 23),
+                    SizedBox(height: getWidgetHeight(height: 23)),
 
                     Padding(
                       padding: EdgeInsets.symmetric(

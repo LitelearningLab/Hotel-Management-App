@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/view/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -67,35 +68,36 @@ class _SplashScreenState extends State<SplashScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                height: getWidgetHeight(height: 200),
-                width: getWidgetWidth(width: 200),
+                height: getWidgetHeight(height: 300),
+                width: getWidgetWidth(width: 300),
                 child: CircleAvatar(
                   backgroundColor: Colors.transparent,
-                  radius: 25,
+                  // radius: 25,
                   child: ClipOval(
                     child: Image.asset(
-                      "assets/appIcon.png",
-                      fit: BoxFit.fill,
-                      width: getWidgetWidth(width: 200),
-                      height: getWidgetHeight(height: 200),
+                      AllAssets.splashLogo,
+                      fit: BoxFit.contain,
+                      // width: getWidgetWidth(width: 200),
+                      height: getWidgetHeight(height: 300),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              Text(
-                "Profluent Hotelier",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
-                ),
-              ),
-              SizedBox(height: 10),
+              // SizedBox(height: 20),
+              // Text(
+              //   "Profluent Hotelier",
+              //   style: TextStyle(
+              //     fontSize: 24,
+              //     fontWeight: FontWeight.bold,
+              //     color: Colors.deepPurple,
+              //   ),
+              // ),
+              // SizedBox(height: 10),
               Text(
                 "Loading...",
                 style: TextStyle(color: Colors.grey),
               ),
+              SizedBox(height: getWidgetHeight(height: 60)),
             ],
           ),
         ),

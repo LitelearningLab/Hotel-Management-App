@@ -168,4 +168,7 @@ class AllAssets {
   static const String bar = 'assets/Pub.png';
   static const String restuarant = 'assets/Restaurant.png';
   static const String roomService = 'assets/Room Service V3.png';
+  static const String appIcon = 'assets/ph-logo-element-pebble-01.png';
+  static const String headerLogo = 'assets/ph-logo-for-app-01.png';
+  static const String splashLogo = 'assets/ph-logo-transperant-bg-01.png';
 }

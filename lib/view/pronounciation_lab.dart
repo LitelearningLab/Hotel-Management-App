@@ -59,6 +59,8 @@ class _PronounciationLabState extends State<PronounciationLab> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
+                            subCategoryTitle =
+                                controller.categories[index].category;
                             Get.toNamed(
                               AppRoutes.pronunciationLabSub,
                               arguments: {

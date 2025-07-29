@@ -58,6 +58,8 @@ class _SentenceLabState extends State<SentenceLab> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
+                            subCategoryTitle =
+                                controller.sentenceLabList[index].sectionName;
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(

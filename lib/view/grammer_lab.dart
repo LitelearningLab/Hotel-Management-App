@@ -57,6 +57,8 @@ class _GrammerLabState extends State<GrammerLab> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
+                            subCategoryTitle =
+                                controller.grammarDocs[index].category;
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
