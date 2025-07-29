@@ -94,6 +94,9 @@ class _SimulationSubState extends State<SimulationSub> {
                               vertical: getWidgetHeight(height: 5)),
                           child: GestureDetector(
                               onTap: () {
+                                subCategoryTitle = controller
+                                    .simulation.subcategory[index].title;
+                                activityName = 'simulation';
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

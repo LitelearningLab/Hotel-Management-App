@@ -189,6 +189,11 @@ class Languagelab extends StatelessWidget {
                                 indicatorPadding:
                                     EdgeInsets.symmetric(vertical: 5),
                                 onTap: (index) {
+                                  mianCategoryTitile = index == 0
+                                      ? "Important Sounds"
+                                      : index == 1
+                                          ? "Vowels"
+                                          : "Consonants";
                                   controller.ontapTab(index);
                                 },
                                 labelPadding: EdgeInsets.only(right: 10),
@@ -278,6 +283,12 @@ class Languagelab extends StatelessWidget {
                                                 getWidgetWidth(width: 15)),
                                         child: InkWell(
                                           onTap: () {
+                                            mianCategoryTitile =
+                                                "Important Sounds";
+                                            subCategoryTitle = controller
+                                                .importantSound!
+                                                .subcategories[index]
+                                                .name;
                                             Get.toNamed(AppRoutes.soundPage,
                                                 arguments: {
                                                   "title": controller
@@ -348,6 +359,16 @@ class Languagelab extends StatelessWidget {
                                         children: [
                                           GestureDetector(
                                             onTap: () {
+                                              subCategoryTitle = controller
+                                                          .selectedIndex ==
+                                                      1
+                                                  ? controller
+                                                      .vowelSoundsList[index]
+                                                      .category
+                                                  : controller
+                                                      .consonantSoundsList[
+                                                          index]
+                                                      .category;
                                               controller.expandedIndex =
                                                   isExpanded ? -1 : index;
                                               controller.update();
@@ -507,6 +528,8 @@ class Languagelab extends StatelessWidget {
                                                                     width: 15)),
                                                         child: InkWell(
                                                           onTap: () {
+                                                            sessionName =
+                                                                sub.name;
                                                             Get.toNamed(
                                                                 AppRoutes
                                                                     .soundPage,

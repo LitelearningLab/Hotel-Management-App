@@ -422,6 +422,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           ),
                           child: GestureDetector(
                             onTapDown: (TapDownDetails details) {
+                              // timestampIndex = index;
                               final tapPosition = details.globalPosition;
                               index == 0
                                   ? Get.toNamed(AppRoutes.simulation)

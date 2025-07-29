@@ -16,7 +16,7 @@ import 'package:hotelmanagementapp/controller/sound_page_controller.dart';
 class InitialBinding with Bindings {
   @override
   void dependencies() {
-    Get.put(HomeController(), permanent: true);
+    // Get.put(HomeController(), permanent: true);
     // Get.put(LanguageDropDownController(), permanent: true);
   }
 }
@@ -102,5 +102,12 @@ class SearchScreenBinding with Bindings {
   @override
   void dependencies() {
     Get.put(SearchScreenController());
+  }
+}
+
+class ContentLabBinding with Bindings {
+  @override
+  void dependencies() {
+    // Add any dependencies needed for the content library here
   }
 }

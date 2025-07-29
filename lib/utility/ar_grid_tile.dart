@@ -23,6 +23,7 @@ class ARGridTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        mianCategoryTitile = title;
         onTap();
       },
       child: Container(

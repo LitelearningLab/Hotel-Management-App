@@ -4,6 +4,7 @@ import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:hotelmanagementapp/route/binding.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/view/ar_simulation.dart';
+import 'package:hotelmanagementapp/view/content_lab.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/home.dart';
 import 'package:hotelmanagementapp/view/language_lab.dart';
@@ -81,6 +82,11 @@ class RouteService {
       name: AppRoutes.searchScreen,
       page: () => SearchScreen(),
       binding: SearchScreenBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.contentLibrary,
+      page: () => ContentLab(),
+      binding: ContentLabBinding(),
     ),
   ];
 }

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/simulation_model.dart';
 import 'package:hotelmanagementapp/public/api.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/response/simulation_responce.dart';
 
 class SimulationController extends GetxController {
@@ -12,6 +13,7 @@ class SimulationController extends GetxController {
   @override
   void onInit() {
     init();
+    timestampIndex = 4;
     super.onInit();
   }
 

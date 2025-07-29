@@ -155,7 +155,7 @@ Future<void> startPracticeTime({
                 ? CollectionNames.foodProductionTimestamp
                 : index == 3
                     ? CollectionNames.houseKeepingTimestamp
-                    : index == -1
+                    : index == 4
                         ? CollectionNames.interactiveSimulationTimestamp
                         : index == 6
                             ? CollectionNames.langauqeLabTimestamp

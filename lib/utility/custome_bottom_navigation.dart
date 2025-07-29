@@ -38,6 +38,7 @@ class CustomeBottomNavigation extends StatelessWidget {
             onTap: (index) {
               log('BottomNavigationBar tapped: $index');
               if (index == 0) {
+                stopTimerMainCategory();
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const Home()),
                   (Route<dynamic> route) => false,
