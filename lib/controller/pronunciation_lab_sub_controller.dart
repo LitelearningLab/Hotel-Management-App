@@ -47,8 +47,7 @@ class PronunciationLabSubController extends GetxController {
     });
     id = Get.arguments['id'] ?? "";
     if (id == "") {
-      isPriorityList = List.filled(subcategories.length, false);
-      isLoading = false;
+      elseCase();
     } else {
       fetchPronunById(id);
     }
@@ -121,13 +120,15 @@ class PronunciationLabSubController extends GetxController {
         await audioPlayer.stop();
         currentlyPlayingIndex = index;
         update();
+        final url = subcategories[index].file;
+        log("Playing audio from URL: $url");
 
-        final decryptedPath = await AudioCryptoHelper.decryptFile(
-          subcategories[index].file,
-          subcategories[index].text.replaceAll(' ', '_'), // sanitized name
-        );
-        log("Decrypted path: $decryptedPath");
-        await audioPlayer.setUrl(decryptedPath);
+        // final decryptedPath = await AudioCryptoHelper.decryptFile(
+        //   subcategories[index].file,
+        //   subcategories[index].text.replaceAll(' ', '_'), // sanitized name
+        // );
+        log("Decrypted path: $url");
+        await audioPlayer.setUrl(url);
         await audioPlayer.play();
       }
       errorPlaying = -1; // Reset error state
@@ -153,6 +154,30 @@ class PronunciationLabSubController extends GetxController {
       isPlaying = false;
       update();
     }
+  }
+
+  Future<void> elseCase() async {
+    final formattedTitle =
+        title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
+    final localData = await DBHelper.getAllSubcategories(formattedTitle);
+
+    if (localData.isNotEmpty) {
+      subcategories = localData;
+      isPriorityList =
+          subcategories.map((e) => e.downloadStatus == true).toList();
+      print('Loaded from local database (no ID case) for $title');
+    } else {
+      // Store the passed subcategories locally
+      for (var item in subcategories) {
+        await DBHelper.insertSubcategory(item, formattedTitle);
+      }
+      isPriorityList =
+          subcategories.map((e) => e.downloadStatus == true).toList();
+      print('No local DB. Stored passed subcategories for $title');
+    }
+
+    isLoading = false;
+    update();
   }
 
   Future<void> fetchPronunById(String id) async {
@@ -189,12 +214,12 @@ class PronunciationLabSubController extends GetxController {
         List<SubcategoryPro> tempList = [];
 
         for (var item in category.subcategories) {
-          final encryptedPath = await AudioCryptoHelper.downloadAndEncryptFile(
-              item.file, item.text);
-          log("Encrypted path: $encryptedPath && time.file: ${item.file}");
+          // final encryptedPath = await AudioCryptoHelper.downloadAndEncryptFile(
+          //     item.file, item.text);
+          // log("Encrypted path: $encryptedPath && time.file: ${item.file}");
 
           final newItem = SubcategoryPro(
-            file: encryptedPath,
+            file: item.file,
             isPriority: item.isPriority,
             syllables: item.syllables,
             text: item.text,
@@ -210,10 +235,12 @@ class PronunciationLabSubController extends GetxController {
         subcategories = tempList;
         isPriorityList =
             subcategories.map((e) => e.downloadStatus == true).toList();
-        print('Fetched from Firebase and saved locally for $title');
+        print(
+            'Fetched from Firebase and saved locally for $title ${subcategories.length} items');
       } else {
         print('No Firebase data found for ID: $title');
       }
+      update();
     }
 
     isLoading = false;

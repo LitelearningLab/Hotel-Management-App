@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:intl/intl.dart';
 
 class ContentLab extends StatelessWidget {
@@ -31,6 +32,7 @@ class ContentLab extends StatelessWidget {
     ];
 
     return Scaffold(
+      bottomNavigationBar: CustomeBottomNavigation(),
       appBar: AppBar(
         forceMaterialTransparency: true,
         backgroundColor: Colors.white,

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:android_id/android_id.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -78,8 +79,8 @@ class _LoginPageState extends State<LoginPage> {
 
           final doc = snapshot.docs.first;
           final userId = doc.id;
-
-          final deviceId = await Utils.getUUID();
+          final deviceId = await const AndroidId().getId();
+          // final deviceId = await Utils.getUUID();
           final deviceName = await DeviceScreenInfo.getModelName();
           final joiningDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
