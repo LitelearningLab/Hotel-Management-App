@@ -60,90 +60,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   login() async {
-    if (_isLogin) {
-      _isLoading = true;
-      setState(() {});
-      final email = emailController.text.trim().toLowerCase();
-      final password = passwordController.text;
-
-      try {
-        final snapshot = await FirebaseFirestore.instance
-            .collection('UserNode')
-            .where('email', isEqualTo: email)
-            .where('password', isEqualTo: password)
-            .limit(1)
-            .get();
-
-        if (snapshot.docs.isNotEmpty) {
-          log("Password matched. Proceeding to device validation...");
-
-          final doc = snapshot.docs.first;
-          final userId = doc.id;
-          final deviceId = await const AndroidId().getId();
-          // final deviceId = await Utils.getUUID();
-          final deviceName = await DeviceScreenInfo.getModelName();
-          final joiningDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-          final userRef =
-              FirebaseFirestore.instance.collection('UserNode').doc(userId);
-          final userData = doc.data();
-          final collegeId = userData['collegeId'] ?? '';
-          final batchName = userData['batchName'] ?? '';
-
-          if (userData.containsKey('imei')) {
-            if (userData['imei'] == deviceId) {
-              log("✅ Device match. Logging in... %${userData["imei"]}  % $deviceId");
-
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setString('email', email);
-              await prefs.setString('password', password);
-              await prefs.setBool("loginInfo", true);
-              await prefs.setString("userId", userId);
-              await prefs.setString("collegeId", collegeId);
-              await prefs.setString("batchName", batchName);
-              log("User ID saved: $userId");
-              Get.offAllNamed(AppRoutes.home);
-            } else {
-              log("❌ Device mismatch. Access denied.");
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Login denied: Device not recognized.")),
-              );
-            }
-          } else {
-            await userRef.update({
-              'imei': deviceId,
-              'model': deviceName,
-              'firstTImeLogin': joiningDate,
-            });
-
-            log("📥 Device info saved. Logging in...");
-
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setString('email', email);
-            await prefs.setString('password', password);
-            await prefs.setBool("loginInfo", true);
-            await prefs.setString("userId", userId);
-            await prefs.setString("collegeId", collegeId);
-            await prefs.setString("batchName", batchName);
-            log("User ID saved: $userId");
-
-            Get.offAllNamed(AppRoutes.home);
-          }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Invalid password.")),
-          );
-        }
-      } catch (e) {
-        log("Login error: $e");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Login failed. Please try again.")),
-        );
-      }
-
-      _isLoading = false;
-      setState(() {});
-    } else {
+    if (!_isLogin) {
       if (_formKey.currentState!.validate()) {
         error = false;
         setState(() {});
@@ -153,7 +70,81 @@ class _LoginPageState extends State<LoginPage> {
           SnackBar(content: Text('Please enter a valid email')),
         );
       }
+      return;
     }
+
+    _isLoading = true;
+    setState(() {});
+
+    final email = emailController.text.trim().toLowerCase();
+    final password = passwordController.text;
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('UserNode')
+          .where('email', isEqualTo: email)
+          .where('password', isEqualTo: password)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Invalid password.")),
+        );
+        _isLoading = false;
+        setState(() {});
+        return;
+      }
+
+      final doc = snapshot.docs.first;
+      final userData = doc.data();
+      final userId = doc.id;
+      final deviceId = await const AndroidId().getId();
+      final deviceName = await DeviceScreenInfo.getModelName();
+      final prefs = await SharedPreferences.getInstance();
+
+      if (userData.containsKey('imei')) {
+        if (userData['imei'] != deviceId) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Login denied: Device not recognized.")),
+          );
+          _isLoading = false;
+          setState(() {});
+          return;
+        }
+      } else {
+        await doc.reference.update({
+          'imei': deviceId,
+          'model': deviceName,
+          'firstTImeLogin': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+        });
+      }
+
+      await prefs.setString('email', email);
+      await prefs.setString('password', password);
+      await prefs.setBool("loginInfo", true);
+      await prefs.setString("userId", userId);
+      await prefs.setString("collegeId", userData['collegeId'] ?? '');
+      await prefs.setString("batchName", userData['batchName'] ?? '');
+      await prefs.setString("userName", userData['username'] ?? '');
+      await prefs.setString("collegeName", userData['college'] ?? '');
+      await prefs.setString("city", userData['city'] ?? '');
+      await prefs.setString("country", userData['country'] ?? '');
+      await prefs.setString("mobile", userData['mobile'] ?? '');
+      await prefs.setString("joindate", userData['joindate'] ?? '');
+      await prefs.setString("enddate", userData['enddate'] ?? '');
+
+      log("User ID saved: $userId");
+      Get.offAllNamed(AppRoutes.home);
+    } catch (e) {
+      log("Login error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Login failed. Please try again.")),
+      );
+    }
+
+    _isLoading = false;
+    setState(() {});
   }
 
   Future<bool> isUserRegistered(String email) async {

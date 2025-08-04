@@ -1,15 +1,12 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/sentence_lab_sub_cat_controller.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
-import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
-import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
+import 'package:intl/intl.dart';
 
 class SentenceLabSubCat extends StatefulWidget {
   SentenceLabSubCat({super.key});
@@ -20,6 +17,7 @@ class SentenceLabSubCat extends StatefulWidget {
 
 class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
   int expandedIndex = -1;
+
   @override
   void initState() {
     startTimerMainCategory("");
@@ -34,11 +32,6 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
           stopTimerMainCategory();
         },
         child: Scaffold(
-          // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-          // floatingActionButton: Align(
-          //   alignment: Alignment.bottomCenter,
-          //   child: CustomeBottomNavigation(),
-          // ),
           appBar: AppBar(
             forceMaterialTransparency: true,
             surfaceTintColor: Colors.white,
@@ -46,12 +39,9 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
             backgroundColor: Colors.white,
             titleSpacing: 0,
             title: Text(
-              controller.title, maxLines: 2,
-              // textAlign: TextAlign.start,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              controller.title,
+              maxLines: 2,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             leading: IconButton(
               onPressed: () {
@@ -59,169 +49,197 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
               },
               icon: const Icon(Icons.arrow_back),
             ),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(1.0),
+              child: Container(
+                color: Colors.grey[300],
+                height: 1.0,
+              ),
+            ),
           ),
           body: ListView.builder(
             padding: EdgeInsets.symmetric(
-                vertical: getWidgetHeight(height: 10),
-                horizontal: getWidgetWidth(width: 10)),
+              vertical: getWidgetHeight(height: 10),
+              horizontal: getWidgetWidth(width: 10),
+            ),
             itemCount: controller.subcategories.length,
             shrinkWrap: true,
             itemBuilder: (context, index) {
-              final isExpanded = expandedIndex == index;
-
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    expandedIndex = isExpanded ? -1 : index;
-                  });
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        offset: const Offset(0, 4),
-                        blurRadius: 10,
-                      ),
-                    ],
+              SubCategoryModel subCategory = controller.subcategories[index];
+              String? subname = subCategory.id;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    toBeginningOfSentenceCase(subname) ?? "",
+                    style: GoogleFonts.poppins(
+                      color: linearColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: getWidgetHeight(height: 6),
-                          horizontal: getWidgetWidth(width: 10),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                SizedBox(width: getWidgetWidth(width: 10)),
-                                Text(
-                                  controller.subcategories[index].sentence.text,
-                                  style: TextStyle(
-                                    fontFamily: Keys.fontFamily,
-                                    letterSpacing: 0,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: getWidgetWidth(width: 10),
-                                  child: IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.save_alt, size: 20),
-                                  ),
-                                ),
-                                SizedBox(width: getWidgetWidth(width: 10)),
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.check, size: 20),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: subCategory.sentence.length,
+                    itemBuilder: (context, subIndex) {
+                      final sentence = subCategory.sentence[subIndex];
+                      final isExpanded =
+                          expandedIndex == index * 1000 + subIndex;
 
-                      // Expandable Section
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.fastOutSlowIn,
-                        height: isExpanded ? getWidgetHeight(height: 80) : 0,
-                        // width: MediaQuery.of(context).size.width * 0.6,
-                        padding: EdgeInsets.symmetric(
-                          // vertical: getWidgetHeight(height: 10),
-                          horizontal: getWidgetWidth(width: 15),
-                        ),
-                        child: isExpanded
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (isExpanded)
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: getWidgetWidth(width: 10),
-                                      ),
-                                      child: const Divider(
-                                        color:
-                                            Color.fromARGB(255, 107, 107, 107),
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            expandedIndex =
+                                isExpanded ? -1 : index * 1000 + subIndex;
+                          });
+                        },
+                        child: Container(
+                          margin: EdgeInsets.symmetric(
+                              vertical: getWidgetHeight(height: 6)),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                offset: const Offset(0, 4),
+                                blurRadius: 10,
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  top: getWidgetHeight(height: 2),
+                                  bottom: getWidgetHeight(height: 2),
+                                  left: getWidgetWidth(width: 10),
+                                  // right: getWidgetWidth(width: 15)
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        sentence.text,
+                                        style: TextStyle(
+                                          fontFamily: Keys.fontFamily,
+                                          letterSpacing: 0,
+                                        ),
                                       ),
                                     ),
-                                  SizedBox(
-                                    height: getWidgetHeight(height: 16),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      InkWell(
-                                        onTap: () async {
-                                          controller.handlePlayPause(index);
-                                        },
-                                        child: Row(
-                                          children: [
-                                            // SPW(35),
-                                            Icon(
-                                              controller.currentlyPlayingIndex ==
-                                                      index
-                                                  ? Icons.pause_circle_outline
-                                                  : Icons.play_circle_outline,
-                                              color: Colors.black,
-                                            ),
-                                            // SPW(5),
-                                            SizedBox(
-                                              width: getWidgetWidth(width: 5),
-                                            ),
-                                            Text(
-                                              "Native Speaker",
-                                              style: TextStyle(fontSize: 13),
-                                            ),
-                                          ],
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: getWidgetWidth(width: 10),
+                                          child: IconButton(
+                                            onPressed: () {},
+                                            icon: const Icon(Icons.save_alt,
+                                                size: 20),
+                                          ),
                                         ),
-                                      ),
-                                      InkWell(
-                                        onTap: () async {
-                                          controller.kShowDialog(
-                                              controller.subcategories[index]
-                                                  .sentence.text,
-                                              false,
-                                              context);
-                                        },
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.mic,
-                                            ),
-                                            // SPW(5),
-                                            SizedBox(
-                                              width: getWidgetWidth(width: 5),
-                                            ),
-                                            Text(
-                                              "Practice",
-                                              style: TextStyle(fontSize: 13),
-                                            ),
-                                            // SPW(35),
-                                          ],
+                                        SizedBox(
+                                            width: getWidgetWidth(width: 10)),
+                                        IconButton(
+                                          onPressed: () {},
+                                          icon:
+                                              const Icon(Icons.check, size: 20),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                    ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.fastOutSlowIn,
+                                height: isExpanded
+                                    ? getWidgetHeight(height: 80)
+                                    : 0,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: getWidgetWidth(width: 15),
+                                ),
+                                child: isExpanded
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Divider(
+                                            color: Color.fromARGB(
+                                                255, 107, 107, 107),
+                                          ),
+                                          SizedBox(
+                                              height:
+                                                  getWidgetHeight(height: 16)),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              InkWell(
+                                                onTap: () async {
+                                                  controller.handlePlayPause(
+                                                      index, subIndex);
+                                                },
+                                                child: Row(
+                                                  children: [
+                                                    Icon(
+                                                      controller.currentlyPlayingIndex ==
+                                                              subIndex
+                                                          ? Icons
+                                                              .pause_circle_outline
+                                                          : Icons
+                                                              .play_circle_outline,
+                                                      color: Colors.black,
+                                                    ),
+                                                    SizedBox(
+                                                        width: getWidgetWidth(
+                                                            width: 5)),
+                                                    const Text("Native Speaker",
+                                                        style: TextStyle(
+                                                            fontSize: 13)),
+                                                  ],
+                                                ),
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  // Add dialog or recording functionality
+                                                },
+                                                child: Row(
+                                                  children: [
+                                                    const Icon(Icons.mic),
+                                                    SizedBox(
+                                                        width: getWidgetWidth(
+                                                            width: 5)),
+                                                    const Text("Practice",
+                                                        style: TextStyle(
+                                                            fontSize: 13)),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ),
+                  controller.subcategories.length - 1 != index
+                      ? Divider(
+                          color: Colors.grey[300],
+                          thickness: 1,
+                          height: getWidgetHeight(height: 20),
+                        )
+                      : SizedBox(
+                          height: getWidgetHeight(height: 20),
+                        ),
+                ],
               );
             },
           ),

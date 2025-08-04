@@ -109,13 +109,11 @@ class _SentenceLabState extends State<SentenceLab> {
                                                   index]['bgColor'] ??
                                               Colors.white,
                                           shape: BoxShape.circle),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(8.0),
                                         child: ImageIcon(
                                           AssetImage(
-                                            controller.sentenceConstructionLabList[
-                                                    index]['image'] ??
-                                                AllAssets.plDays,
+                                            AllAssets.slQl,
                                           ),
                                           color: Colors.white,
                                         ),

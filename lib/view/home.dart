@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_launcher_icons/xml_templates.dart';
 // import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'package:flutter_svg/svg.dart';
@@ -24,6 +25,7 @@ import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/interactive_simulations.dart';
 import 'package:hotelmanagementapp/view/language_lab.dart';
 import 'package:hotelmanagementapp/view/login.dart';
+import 'package:hotelmanagementapp/view/profile_screen.dart';
 import 'package:hotelmanagementapp/view/university_lab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -135,69 +137,239 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    Widget _tile(
+        {required Widget icon, required String menu, Function()? onTap}) {
+      return ListTile(
+        onTap: onTap,
+        leading: icon,
+        //  ImageIcon(
+        //   icon,
+        // color: Colors.grey.shade400,
+        // size: 20,
+        // ),
+        title: Text(menu,
+            style: TextStyle(
+              fontFamily: Keys.fontFamily,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade400,
+              fontSize: 15,
+            )),
+        // onTap: _logout,
+      );
+    }
+
     return PopScope(
       onPopInvoked: (didPop) => exitPop(),
       child: Scaffold(
         key: _scaffoldKey,
-        endDrawer: Drawer(
-          child: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Menu items scrollable
-                Expanded(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      SizedBox(height: getWidgetHeight(height: 60)),
-                      ListTile(
-                        leading: Icon(Icons.home),
-                        title: Text('Home'),
-                        onTap: () => Navigator.pop(context),
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.settings),
-                        title: Text('Settings'),
-                        onTap: () => Navigator.pop(context),
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.logout),
-                        title: Text('Logout'),
+        endDrawer: SafeArea(
+          child: GetBuilder<HomeController>(builder: (controller) {
+            return Drawer(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Menu items scrollable
+                  Expanded(
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        SizedBox(height: getWidgetHeight(height: 10)),
+                        ListTile(
+                          title: Text("Welcome",
+                              style: TextStyle(
+                                fontFamily: Keys.fontFamily,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey,
+                                fontSize: 12,
+                              )),
+                          subtitle: Text(controller.userName,
+                              style: TextStyle(
+                                fontFamily: Keys.fontFamily,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                                fontSize: 30,
+                              )),
+                        ),
+                        _tile(
+                            icon: Icon(
+                              Icons.person,
+                              color: Colors.grey.shade400,
+                              size: 20,
+                            ),
+                            menu: "Profile",
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ProfileScreen()));
+                            }),
+                        _tile(
+                            icon: Image.asset(
+                              "assets/images/presentation_icon.png",
+                              color: Colors.grey.shade400,
+                              height: 18,
+                              width: 20,
+                            ) /* Icon(
+                          Icons.account_box_outlined,
+                          color: Colors.grey.shade400,
+                          size: 20,
+                        )*/
+                            ,
+                            menu: "About Profluent AR",
+                            onTap: () {
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => InAppWebViewPage(
+                              //               url: aboutLiteLearningLink,
+                              //             )));
+                            }),
+                        _tile(
+                            icon: Image.asset(
+                              "assets/images/feedback.png",
+                              color: Colors.grey.shade400,
+                              height: 18,
+                              width: 20,
+                            ),
+                            /* icon: Icon(
+                          Icons.home,
+                          color: Colors.grey.shade400,
+                          size: 20,
+                        ),*/
+                            menu: "Share your feedback with us",
+                            onTap: () {
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => InAppWebViewPage(
+                              //               url: helpLink,
+                              //             )));
+                            }),
+                        _tile(
+                            icon: Icon(
+                              Icons.star,
+                              color: Colors.grey.shade400,
+                              size: 20,
+                            ),
+                            menu: "Rate this app",
+                            onTap: () {
+                              // if (Platform.isAndroid || Platform.isIOS) {
+                              //   final appId = Platform.isAndroid
+                              //       ? 'org.mahajob.litelearninglab'
+                              //       : 'org.mahajob.litelearninglab';
+                              //   final url = Uri.parse(
+                              //     Platform.isAndroid
+                              //         ? "market://details?id=$appId"
+                              //         : "https://apps.apple.com/app/id$appId",
+                              //   );
+                              //   launchUrl(
+                              //     url,
+                              //     mode: LaunchMode.externalApplication,
+                              //   );
+                              // }
+                            }),
+                        /*_tile(
+                        icon: SvgPicture.asset(
+                          'assets/images/about.svg',
+                          colorFilter: ColorFilter.mode(
+                            Colors.grey.shade400,
+                            BlendMode.srcIn,
+                          ),
+                          height: 20,
+                        ),
+                        menu: "Help",
                         onTap: () {
-                          Navigator.pop(context);
-                          Future.delayed(Duration(milliseconds: 250),
-                              () => logout(context));
-                        },
-                      ),
-                    ],
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => InAppWebViewPage(
+                                        url: helpLink,
+                                      )));
+                        }),*/
+                        _tile(
+                            icon: Image.asset(
+                              "assets/images/user_guide_icon.png",
+                              color: Colors.grey.shade400,
+                              height: 18,
+                              width: 20,
+                            ),
+                            /*SvgPicture.asset(
+                          'assets/images/dashboard.svg',
+                          colorFilter: ColorFilter.mode(
+                            Colors.grey.shade400,
+                            BlendMode.srcIn,
+                          ),
+                          height: 20,
+                        ),*/
+                            menu: "User Guide",
+                            onTap: () {
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => InAppWebViewPage(
+                              //               url: overViewLink,
+                              //             )));
+                            }),
+                        _tile(
+                            icon: Icon(
+                              Icons.copyright_rounded,
+                              color: Colors.grey.shade400,
+                              size: 20,
+                            ),
+                            menu: "Copyright",
+                            onTap: () {
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => InAppWebViewPage(
+                              //               url: copyRightLink,
+                              //             )));
+                            }),
+                        // Spacer(),
+                        _tile(
+                            icon: Icon(
+                              Icons.power_settings_new,
+                              color: Colors.grey.shade400,
+                              size: 20,
+                            ),
+                            menu: "Logout",
+                            onTap: () {
+                              controller.exitPopup(context);
+                            }
+                            /* onTap: () async {
+                          await user.signOut();
+                        }*/
+                            ),
+                      ],
+                    ),
                   ),
-                ),
 
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextButton(
-                    onPressed: () async {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => InAppWebViewPage(
-                                    url: ApiRoutes.privacyPolicy,
-                                  )));
-                    },
-                    child: Text(
-                      "Privacy & Policy",
-                      style: GoogleFonts.inter(
-                        height: 0.5,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 12,
-                        color: lightWhite,
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextButton(
+                      onPressed: () async {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => InAppWebViewPage(
+                                      url: ApiRoutes.privacyPolicy,
+                                    )));
+                      },
+                      child: Text(
+                        "Privacy & Policy",
+                        style: GoogleFonts.inter(
+                          height: 0.5,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          color: lightWhite,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
+                ],
+              ),
+            );
+          }),
         ),
         extendBody: true,
         bottomNavigationBar: CustomeBottomNavigation(),
@@ -542,8 +714,100 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       },
                     );
                   }),
-                  Center(child: Text("Recent History")),
-                  Center(child: Text("To Do")),
+                  Expanded(
+                      child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        vertical: getWidgetHeight(height: 8),
+                        horizontal: getWidgetWidth(width: 12)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: getWidgetWidth(width: 12),
+                          ),
+                          child: Text(
+                            "collectionName",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: kText.scale(9),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: getWidgetHeight(height: 6)),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: getWidgetWidth(width: 12),
+                          ),
+                          child: Text(
+                            "category",
+                            style: TextStyle(
+                              fontSize: kText.scale(13),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: getWidgetHeight(height: 6)),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: getWidgetWidth(width: 12),
+                            vertical: getWidgetHeight(height: 6),
+                          ),
+                          child: InkWell(
+                            onTap: () async {},
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "keyword",
+                                        style: TextStyle(
+                                          fontSize: kText.scale(12),
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                      SizedBox(height: 2),
+                                      // Text.rich(
+                                      //   TextSpan(
+                                      //     children:
+                                      //         highlightOccurrences(
+                                      //       match['matched'] ?? '',
+                                      //       searchTerm,
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios_outlined,
+                                  size: 16,
+                                  color: Colors.black,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const Divider(
+                            color: Color.fromARGB(255, 248, 248, 248)),
+                      ],
+                    ),
+                  )),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Learning assignments coming soon!"),
+                      SizedBox(
+                        height: getWidgetHeight(height: 75),
+                      )
+                    ],
+                  ),
                 ],
               ),
             ),

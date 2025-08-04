@@ -6,11 +6,13 @@ import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/university_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/view/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends GetxController {
   List<dynamic> categories = [];
   late UniversityModel universityModel;
+  late String userName;
 
   List<String> cardNames = [
     "Front Office Management",
@@ -63,6 +65,7 @@ class HomeController extends GetxController {
   Future<void> fetchCollegeSyllabus() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString("userId") ?? "";
+    userName = prefs.getString("userName") ?? "";
 
     if (userId.isEmpty) {
       print(
@@ -116,5 +119,89 @@ class HomeController extends GetxController {
     }
 
     update();
+  }
+
+  void exitPopup(BuildContext context) {
+    kHeight = MediaQuery.of(context).size.height;
+    kWidth = MediaQuery.of(context).size.width;
+    kText = MediaQuery.of(context).textScaler;
+
+    showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          insetPadding:
+              EdgeInsets.only(left: kWidth / 32.35, right: kWidth / 32.75),
+          actionsPadding: EdgeInsets.only(
+              right: kWidth / 26.2,
+              left: kWidth / 26.2,
+              bottom: kHeight / 28.4),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          title: Text(
+            'Log out',
+            textAlign: TextAlign.center,
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.copyWith(fontWeight: FontWeight.w600, color: Colors.black87),
+          ),
+          content: Text(
+            'Are you sure want to log out?',
+            textAlign: TextAlign.center,
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.copyWith(color: Colors.black87, fontWeight: FontWeight.w500),
+          ),
+          actions: [
+            SizedBox(
+              width: kWidth / 2.5,
+              child: TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                        fontSize: kText.scale(15)),
+                  )),
+            ),
+            SizedBox(
+              width: kWidth / 2.5,
+              child: TextButton(
+                  onPressed: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.clear();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => LoginPage()), // Your home page
+                      (Route<dynamic> route) =>
+                          false, // Remove all previous routes
+                    );
+
+                    // Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavigation()));
+                  },
+                  style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+                      backgroundColor:
+                          const MaterialStatePropertyAll(Colors.white),
+                      side: MaterialStatePropertyAll(
+                          BorderSide(width: 1, color: Colors.green))),
+                  child: Text('Log out',
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                          fontSize: kText.scale(15)))),
+            ),
+          ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          backgroundColor: Colors.white,
+        );
+      },
+    );
   }
 }

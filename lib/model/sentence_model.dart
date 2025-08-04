@@ -20,7 +20,7 @@ class SentenceModel {
 
 class SubCategoryModel {
   final String id;
-  final SentenceModel sentence;
+  final List<SentenceModel> sentence;
 
   SubCategoryModel({required this.id, required this.sentence});
 }

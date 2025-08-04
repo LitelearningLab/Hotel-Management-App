@@ -22,20 +22,20 @@ class SentenceLabSubCatController extends GetxController {
     super.onInit();
   }
 
-  void handlePlayPause(int index) async {
-    loadingIndex = index;
+  void handlePlayPause(int index, int subIndex) async {
+    loadingIndex = subIndex;
     isPlaying = true;
     update();
 
     try {
-      if (currentlyPlayingIndex == index) {
+      if (currentlyPlayingIndex == subIndex) {
         await audioPlayer.pause();
         currentlyPlayingIndex = null;
       } else {
         await audioPlayer.stop();
-        currentlyPlayingIndex = index;
+        currentlyPlayingIndex = subIndex;
         update();
-        await audioPlayer.setUrl(subcategories[index].sentence.file);
+        await audioPlayer.setUrl(subcategories[index].sentence[subIndex].file);
 
         await audioPlayer.play();
         currentlyPlayingIndex = null;
@@ -44,7 +44,7 @@ class SentenceLabSubCatController extends GetxController {
     } catch (e) {
       print("Audio load error: $e");
       currentlyPlayingIndex = null;
-      errorPlaying = index;
+      errorPlaying = subIndex;
       update();
     } finally {
       loadingIndex = null;

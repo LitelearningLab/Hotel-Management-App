@@ -66,37 +66,37 @@ class SentenceLabController extends GetxController {
 
   List<SentenceLabModel> parseSentenceLabCollection(Map<String, dynamic> json) {
     return json.entries.map((sectionEntry) {
-      String sectionName = sectionEntry.key;
-      Map<String, dynamic> categoriesMap =
-          Map<String, dynamic>.from(sectionEntry.value as Map);
+      final sectionName = sectionEntry.key;
+      final categoryMap = Map<String, dynamic>.from(sectionEntry.value as Map);
 
-      List<CategoryModel> categoryList =
-          categoriesMap.entries.map((categoryEntry) {
-        String categoryName = categoryEntry.key;
-        Map<String, dynamic> sentencesMap =
+      final categories = categoryMap.entries.map((categoryEntry) {
+        final categoryName = categoryEntry.key;
+        final subCategoryMap =
             Map<String, dynamic>.from(categoryEntry.value as Map);
 
-        List<SubCategoryModel> subCategoryList =
-            sentencesMap.entries.map((sentenceEntry) {
-          String sentenceId = sentenceEntry.key;
-          Map<String, dynamic> sentenceJson =
-              Map<String, dynamic>.from(sentenceEntry.value as Map);
+        final subCategories = subCategoryMap.entries.map((subCategoryEntry) {
+          final subCategoryId = subCategoryEntry.key;
+          final rawList = subCategoryEntry.value as List<dynamic>;
+
+          final sentenceModels = rawList.map((e) {
+            return SentenceModel.fromJson(Map<String, dynamic>.from(e as Map));
+          }).toList();
 
           return SubCategoryModel(
-            id: sentenceId,
-            sentence: SentenceModel.fromJson(sentenceJson),
+            id: subCategoryId,
+            sentence: sentenceModels,
           );
         }).toList();
 
         return CategoryModel(
           categoryName: categoryName,
-          subCategories: subCategoryList,
+          subCategories: subCategories,
         );
       }).toList();
 
       return SentenceLabModel(
         sectionName: sectionName,
-        categories: categoryList,
+        categories: categories,
       );
     }).toList();
   }
