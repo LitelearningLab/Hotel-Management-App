@@ -721,7 +721,8 @@ class _HomeState extends State<Home>
                                 itemCount:
                                     homeController.homeRecentHistory.length,
                                 itemBuilder: (context, index) {
-                                  final item = recentHistory[index];
+                                  final item =
+                                      homeController.homeRecentHistory[index];
 
                                   return Padding(
                                     padding: EdgeInsets.symmetric(
