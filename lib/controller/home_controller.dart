@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,6 +14,8 @@ class HomeController extends GetxController {
   List<dynamic> categories = [];
   late UniversityModel universityModel;
   late String userName;
+  List<Map<String, dynamic>> homeRecentHistory = [];
+  bool recentHistoryLoaded = true;
 
   List<String> cardNames = [
     "Front Office Management",
@@ -47,6 +50,27 @@ class HomeController extends GetxController {
     super.onReady();
   }
 
+  Future<void> loadRecentHistory() async {
+    log("message: loadRecentHistory called");
+    recentHistoryLoaded = true;
+    homeRecentHistory = [];
+    update();
+
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString('recentHistory');
+
+    if (jsonString != null) {
+      final List<dynamic> decoded = jsonDecode(jsonString);
+      recentHistory = decoded
+          .map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e))
+          .toList();
+      homeRecentHistory = recentHistory;
+    }
+
+    recentHistoryLoaded = false;
+    update();
+  }
+
   void showPopupAtTap(Offset tapPosition) {
     final overlay = Get.overlayContext!;
     late OverlayEntry entry;
@@ -63,6 +87,7 @@ class HomeController extends GetxController {
   }
 
   Future<void> fetchCollegeSyllabus() async {
+    await loadRecentHistory();
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString("userId") ?? "";
     userName = prefs.getString("userName") ?? "";

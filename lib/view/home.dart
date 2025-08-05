@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +13,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
+import 'package:hotelmanagementapp/model/category_model.dart';
+import 'package:hotelmanagementapp/model/grammer_lab_model.dart';
+import 'package:hotelmanagementapp/model/sentence_model.dart';
+import 'package:hotelmanagementapp/model/sound_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
@@ -22,6 +27,7 @@ import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
+import 'package:hotelmanagementapp/view/grammer_lab_sub.dart';
 import 'package:hotelmanagementapp/view/interactive_simulations.dart';
 import 'package:hotelmanagementapp/view/language_lab.dart';
 import 'package:hotelmanagementapp/view/login.dart';
@@ -39,61 +45,31 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+class _HomeState extends State<Home>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabController;
+  HomeController historyController = Get.put(HomeController());
 
   @override
   void initState() {
-    _tabController = TabController(length: 3, vsync: this);
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
-  Future<void> logout(BuildContext context) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white, // White background
-        title: Text(
-          'Logout',
-          style: TextStyle(color: Colors.black), // Black title text
-        ),
-        content: Text(
-          'Are you sure you want to logout?',
-          style: TextStyle(color: Colors.black), // Black content text
-        ),
-        actions: [
-          TextButton(
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.black), // Black button text
-            ),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-            child: Text(
-              'Logout',
-              style: TextStyle(color: Colors.black), // Black button text
-            ),
-            onPressed: () async {
-              Navigator.pop(context); // Close dialog
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _tabController.dispose();
+    super.dispose();
+  }
 
-              // Firebase SignOut
-              await FirebaseAuth.instance.signOut();
-
-              // Clear SharedPreferences
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.clear();
-
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-              );
-            },
-          ),
-        ],
-      ),
-    );
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // if (state == AppLifecycleState.resumed) {
+    // This is like onResume
+    historyController.loadRecentHistory();
+    // }
   }
 
   exitPop() async {
@@ -159,7 +135,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     }
 
     return PopScope(
-      onPopInvoked: (didPop) => exitPop(),
+      onPopInvoked: (didPop) async {
+        await exitPop();
+      },
       child: Scaffold(
         key: _scaffoldKey,
         endDrawer: SafeArea(
@@ -215,7 +193,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           size: 20,
                         )*/
                             ,
-                            menu: "About Profluent AR",
+                            menu: "About Profluent Hotelier",
                             onTap: () {
                               // Navigator.push(
                               //     context,
@@ -253,20 +231,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             ),
                             menu: "Rate this app",
                             onTap: () {
-                              // if (Platform.isAndroid || Platform.isIOS) {
-                              //   final appId = Platform.isAndroid
-                              //       ? 'org.mahajob.litelearninglab'
-                              //       : 'org.mahajob.litelearninglab';
-                              //   final url = Uri.parse(
-                              //     Platform.isAndroid
-                              //         ? "market://details?id=$appId"
-                              //         : "https://apps.apple.com/app/id$appId",
-                              //   );
-                              //   launchUrl(
-                              //     url,
-                              //     mode: LaunchMode.externalApplication,
-                              //   );
-                              // }
+                              if (Platform.isAndroid || Platform.isIOS) {
+                                const appId = "com.profluent.hotelier.app";
+                                final url =
+                                    Uri.parse("market://details?id=$appId");
+                                launchUrl(
+                                  url,
+                                  mode: LaunchMode.externalApplication,
+                                );
+                              }
                             }),
                         /*_tile(
                         icon: SvgPicture.asset(
@@ -575,241 +548,370 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               ),
             ),
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                physics: const BouncingScrollPhysics(),
-                children: [
-                  GetBuilder<HomeController>(builder: (controller) {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: 3,
-                      padding: EdgeInsets.only(
-                          top: getWidgetHeight(height: 10),
-                          bottom: getWidgetHeight(height: 100)),
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: getWidgetWidth(width: 20),
-                            vertical: getWidgetHeight(height: 6),
-                          ),
-                          child: GestureDetector(
-                            onTapDown: (TapDownDetails details) {
-                              // timestampIndex = index;
-                              final tapPosition = details.globalPosition;
-                              index == 0
-                                  ? Get.toNamed(AppRoutes.simulation)
-                                  : index == 1
-                                      ? Get.toNamed(AppRoutes.languageLab)
-                                      : index == 2
-                                          ? Get.toNamed(
-                                              AppRoutes.contentLibrary)
-                                          : controller
-                                              .showPopupAtTap(tapPosition);
-                              controller.showPopupAtTap(tapPosition);
-                              // for playstore
-                              // index == 0
-                              //     ? Get.toNamed(AppRoutes.simulation)
-                              //     : controller.showPopupAtTap(tapPosition);
-                            },
-                            child: Container(
-                              height: getWidgetHeight(height: 75),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    offset: const Offset(0, 4),
-                                    blurRadius: 10,
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  SizedBox(width: getWidgetWidth(width: 4)),
-                                  Container(
-                                    width: getWidgetWidth(width: 55),
-                                    height: getWidgetHeight(height: 68),
-                                    decoration: BoxDecoration(
-                                      color: linearColor,
-                                      borderRadius: BorderRadius.circular(12),
+              child: GetBuilder<HomeController>(builder: (homeController) {
+                return TabBarView(
+                  controller: _tabController,
+                  physics: const BouncingScrollPhysics(),
+                  children: [
+                    GetBuilder<HomeController>(builder: (controller) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: 3,
+                        padding: EdgeInsets.only(
+                            top: getWidgetHeight(height: 10),
+                            bottom: getWidgetHeight(height: 100)),
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: getWidgetWidth(width: 20),
+                              vertical: getWidgetHeight(height: 6),
+                            ),
+                            child: GestureDetector(
+                              onTapDown: (TapDownDetails details) {
+                                // timestampIndex = index;
+                                final tapPosition = details.globalPosition;
+                                index == 0
+                                    ? Get.toNamed(AppRoutes.simulation)
+                                    : index == 1
+                                        ? Get.toNamed(AppRoutes.languageLab)
+                                        :
+                                        // index == 2
+                                        //     ? Get.toNamed(
+                                        //         AppRoutes.contentLibrary)
+                                        //     :
+                                        controller.showPopupAtTap(tapPosition);
+                                // controller.showPopupAtTap(tapPosition);
+                                // for playstore
+                                // index == 0
+                                //     ? Get.toNamed(AppRoutes.simulation)
+                                //     : controller.showPopupAtTap(tapPosition);
+                              },
+                              child: Container(
+                                height: getWidgetHeight(height: 75),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      offset: const Offset(0, 4),
+                                      blurRadius: 10,
                                     ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Stack(
-                                        fit: StackFit.expand,
-                                        children: [
-                                          SvgPicture.asset(
-                                            "assets/Square Vector.svg",
-                                            fit: BoxFit.cover,
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: index == 1
-                                                  ? 0
-                                                  : getWidgetHeight(height: 22),
-                                              horizontal: index == 1
-                                                  ? 0
-                                                  : getWidgetWidth(width: 16),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: getWidgetWidth(width: 4)),
+                                    Container(
+                                      width: getWidgetWidth(width: 55),
+                                      height: getWidgetHeight(height: 68),
+                                      decoration: BoxDecoration(
+                                        color: linearColor,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Stack(
+                                          fit: StackFit.expand,
+                                          children: [
+                                            SvgPicture.asset(
+                                              "assets/Square Vector.svg",
+                                              fit: BoxFit.cover,
                                             ),
-                                            child: index == 0
-                                                ? Image.asset(
-                                                    AllAssets
-                                                        .interactiveSimulations,
-                                                    color: Colors.white,
-                                                  )
-                                                : index == 1
-                                                    ? const Icon(
-                                                        Icons.mic,
-                                                        color: Colors.white,
-                                                        size: 28,
-                                                      )
-                                                    : Image.asset(
-                                                        "assets/language_lab.png"),
-                                          ),
-                                        ],
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                vertical: index == 1
+                                                    ? 0
+                                                    : getWidgetHeight(
+                                                        height: 22),
+                                                horizontal: index == 1
+                                                    ? 0
+                                                    : getWidgetWidth(width: 16),
+                                              ),
+                                              child: index == 0
+                                                  ? Image.asset(
+                                                      AllAssets
+                                                          .interactiveSimulations,
+                                                      color: Colors.white,
+                                                    )
+                                                  : index == 1
+                                                      ? const Icon(
+                                                          Icons.mic,
+                                                          color: Colors.white,
+                                                          size: 28,
+                                                        )
+                                                      : Image.asset(
+                                                          "assets/language_lab.png"),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(width: getWidgetWidth(width: 12)),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        controller.smartShorts[index],
-                                        textAlign: TextAlign.start,
-                                        style: GoogleFonts.inter(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: getWidgetWidth(width: 240),
-                                        child: Text(
-                                          maxLines: 2,
-                                          index == 0
-                                              ? "150+ Simulations - Experiential learning for handling challenging situations & interviews."
-                                              : index == 1
-                                                  ? "English & French Pronunciation, Sentence Lab, Grammar, and Phonetic Sounds. "
-                                                  : "Excellent collection of content for casual and enjoyable micro-learning",
-                                          style: TextStyle(
-                                            overflow: TextOverflow.ellipsis,
-                                            color: lightWhite,
-                                            fontSize: kText.scale(10),
+                                    SizedBox(width: getWidgetWidth(width: 12)),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          controller.smartShorts[index],
+                                          textAlign: TextAlign.start,
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                  SvgPicture.asset("assets/threedots.svg"),
-                                  SizedBox(width: getWidgetWidth(width: 16)),
-                                ],
+                                        SizedBox(
+                                          width: getWidgetWidth(width: 240),
+                                          child: Text(
+                                            maxLines: 2,
+                                            index == 0
+                                                ? "150+ Simulations - Experiential learning for handling challenging situations & interviews."
+                                                : index == 1
+                                                    ? "English & French Pronunciation, Sentence Lab, Grammar, and Phonetic Sounds. "
+                                                    : "Excellent collection of content for casual and enjoyable micro-learning",
+                                            style: TextStyle(
+                                              overflow: TextOverflow.ellipsis,
+                                              color: lightWhite,
+                                              fontSize: kText.scale(10),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    SvgPicture.asset("assets/threedots.svg"),
+                                    SizedBox(width: getWidgetWidth(width: 16)),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  }),
-                  Expanded(
-                      child: Padding(
-                    padding: EdgeInsets.symmetric(
-                        vertical: getWidgetHeight(height: 8),
-                        horizontal: getWidgetWidth(width: 12)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: getWidgetWidth(width: 12),
-                          ),
-                          child: Text(
-                            "collectionName",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: kText.scale(9),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: getWidgetHeight(height: 6)),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: getWidgetWidth(width: 12),
-                          ),
-                          child: Text(
-                            "category",
-                            style: TextStyle(
-                              fontSize: kText.scale(13),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: getWidgetHeight(height: 6)),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: getWidgetWidth(width: 12),
-                            vertical: getWidgetHeight(height: 6),
-                          ),
-                          child: InkWell(
-                            onTap: () async {},
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "keyword",
-                                        style: TextStyle(
-                                          fontSize: kText.scale(12),
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.grey[700],
+                          );
+                        },
+                      );
+                    }),
+                    homeController.recentHistoryLoaded
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(
+                                color: linearColor,
+                              ),
+                              SizedBox(
+                                height: getWidgetHeight(height: 75),
+                              )
+                            ],
+                          )
+                        : homeController.homeRecentHistory.isEmpty
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("No recent history found!"),
+                                  SizedBox(
+                                    height: getWidgetHeight(height: 75),
+                                  )
+                                ],
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                padding: EdgeInsets.only(
+                                    top: getWidgetHeight(height: 10),
+                                    bottom: getWidgetHeight(height: 100)),
+                                itemCount:
+                                    homeController.homeRecentHistory.length,
+                                itemBuilder: (context, index) {
+                                  final item = recentHistory[index];
+
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      // vertical: getWidgetHeight(height: 8),
+                                      horizontal: getWidgetWidth(width: 12),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // collectionName
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal:
+                                                getWidgetWidth(width: 12),
+                                          ),
+                                          child: Text(
+                                            item['path'] ?? '',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: kText.scale(9),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(height: 2),
-                                      // Text.rich(
-                                      //   TextSpan(
-                                      //     children:
-                                      //         highlightOccurrences(
-                                      //       match['matched'] ?? '',
-                                      //       searchTerm,
-                                      //     ),
-                                      //   ),
-                                      // ),
-                                    ],
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios_outlined,
-                                  size: 16,
-                                  color: Colors.black,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const Divider(
-                            color: Color.fromARGB(255, 248, 248, 248)),
+
+                                        SizedBox(
+                                            height: getWidgetHeight(height: 6)),
+
+                                        // category
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal:
+                                                getWidgetWidth(width: 12),
+                                          ),
+                                          child: Text(
+                                            item['category'] ?? '',
+                                            style: TextStyle(
+                                              fontSize: kText.scale(13),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+
+                                        SizedBox(
+                                            height: getWidgetHeight(height: 6)),
+
+                                        // keyword (or path or any identifier)
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal:
+                                                getWidgetWidth(width: 12),
+                                            vertical:
+                                                getWidgetHeight(height: 6),
+                                          ),
+                                          child: InkWell(
+                                            onTap: () async {
+                                              if (item['section'] ==
+                                                  'Sound Lab') {
+                                                SoundSubcategory?
+                                                    soundSubcategory =
+                                                    SoundSubcategory.fromJson(
+                                                        Map<String,
+                                                                dynamic>.from(
+                                                            item['soundSub']));
+
+                                                Get.toNamed(AppRoutes.soundPage,
+                                                    arguments: {
+                                                      "title": item['category'],
+                                                      "soundModel":
+                                                          soundSubcategory
+                                                    });
+                                              } else if (item['section'] ==
+                                                  'Grammer Lab') {
+                                                GrammarDoc? grammerDocs =
+                                                    GrammarDoc.fromJson(Map<
+                                                            String,
+                                                            dynamic>.from(
+                                                        item['grammarDocs']));
+
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            GrammerLabSub(
+                                                              title: item[
+                                                                  'category'],
+                                                              doc: grammerDocs,
+                                                            )));
+                                              } else if (item['section'] ==
+                                                  'Sentence Lab') {
+                                                final subCategories = (item[
+                                                            'subCategories']
+                                                        as List)
+                                                    .map((e) => SubCategoryModel
+                                                        .fromJson(Map<String,
+                                                            dynamic>.from(e)))
+                                                    .toList();
+                                                Get.toNamed(
+                                                  AppRoutes.sentenceLabSub,
+                                                  arguments: {
+                                                    "title": item['category'],
+                                                    "CategoryModel":
+                                                        subCategories,
+                                                  },
+                                                );
+                                              } else if (item['section'] ==
+                                                  'proLab') {
+                                                log("proLab tapped");
+                                                Get.toNamed(
+                                                    AppRoutes
+                                                        .pronunciationLabSub,
+                                                    arguments: {
+                                                      'title': item['category'],
+                                                      'subcategories':
+                                                          <SubcategoryPro>[],
+                                                    });
+                                              } else {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        InAppWebViewPage(
+                                                      isSimulation:
+                                                          item['section'] ==
+                                                                  'simulation'
+                                                              ? true
+                                                              : false,
+                                                      url: item['link'],
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Flexible(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        item['section'] ?? '',
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              kText.scale(12),
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color:
+                                                              Colors.grey[700],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Icon(
+                                                  Icons
+                                                      .arrow_forward_ios_outlined,
+                                                  size: 16,
+                                                  color: Colors.black,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
+                                        const Divider(
+                                            color: Color.fromARGB(
+                                                255, 248, 248, 248)),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Learning assignments coming soon!"),
+                        SizedBox(
+                          height: getWidgetHeight(height: 75),
+                        )
                       ],
                     ),
-                  )),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Learning assignments coming soon!"),
-                      SizedBox(
-                        height: getWidgetHeight(height: 75),
-                      )
-                    ],
-                  ),
-                ],
-              ),
+                  ],
+                );
+              }),
             ),
           ],
         ),

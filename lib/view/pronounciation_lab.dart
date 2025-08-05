@@ -61,6 +61,13 @@ class _PronounciationLabState extends State<PronounciationLab> {
                           onTap: () {
                             subCategoryTitle =
                                 controller.categories[index].category;
+                            addToRecentHistory(
+                                path:
+                                    "Language Lab > ${controller.title.value} > ${controller.categories[index].category}",
+                                category: controller.categories[index].category,
+                                section: "proLab",
+                                link: "",
+                                proLabTitle: "");
                             Get.toNamed(
                               AppRoutes.pronunciationLabSub,
                               arguments: {

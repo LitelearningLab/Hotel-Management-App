@@ -59,6 +59,15 @@ class _GrammerLabState extends State<GrammerLab> {
                           onTap: () {
                             subCategoryTitle =
                                 controller.grammarDocs[index].category;
+                            addToRecentHistory(
+                                path:
+                                    "Language Lab > ${controller.title.value}",
+                                category:
+                                    controller.grammarDocs[index].category,
+                                section: "Grammer Lab",
+                                link: "",
+                                proLabTitle: "",
+                                grammarDocs: controller.grammarDocs[index]);
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(

@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get/instance_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hotelmanagementapp/controller/home_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_sub_controller.dart';
 import 'package:hotelmanagementapp/model/simulation_model.dart';
@@ -25,11 +26,13 @@ class SimulationSub extends StatefulWidget {
 class _SimulationSubState extends State<SimulationSub> {
   late List<bool> isExpanded;
   int expandedIndex = -1;
+  HomeController homeController = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvoked: (didpop) {
         sessionName = "";
+        homeController.loadRecentHistory();
       },
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -97,6 +100,15 @@ class _SimulationSubState extends State<SimulationSub> {
                                 subCategoryTitle = controller
                                     .simulation.subcategory[index].title;
                                 activityName = 'simulation';
+                                addToRecentHistory(
+                                    path:
+                                        "Interactive  Simulation > $subCategoryTitle",
+                                    category: controller
+                                        .simulation.subcategory[index].title,
+                                    section: activityName,
+                                    link: controller
+                                        .simulation.subcategory[index].links[0],
+                                    proLabTitle: "");
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

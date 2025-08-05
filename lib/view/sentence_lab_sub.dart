@@ -67,6 +67,13 @@ class _SentenceLabSubState extends State<SentenceLabSub> {
               onTap: () {
                 sessionName = widget.subcategories[index].categoryName;
                 log(sessionName);
+                addToRecentHistory(
+                    path: "Language Lab > Sentence Lab > ${widget.title}",
+                    category: widget.subcategories[index].categoryName,
+                    section: "Sentence Lab",
+                    link: "",
+                    proLabTitle: "",
+                    subCategories: widget.subcategories[index].subCategories);
                 Get.toNamed(AppRoutes.sentenceLabSub, arguments: {
                   "title": widget.subcategories[index].categoryName,
                   "CategoryModel": widget.subcategories[index].subCategories

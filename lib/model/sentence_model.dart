@@ -16,6 +16,12 @@ class SentenceModel {
       text: json['text'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'file': file,
+        'isPriority': isPriority,
+        'text': text,
+      };
 }
 
 class SubCategoryModel {
@@ -23,6 +29,20 @@ class SubCategoryModel {
   final List<SentenceModel> sentence;
 
   SubCategoryModel({required this.id, required this.sentence});
+
+  factory SubCategoryModel.fromJson(Map<String, dynamic> json) {
+    return SubCategoryModel(
+      id: json['id'] ?? '',
+      sentence: (json['sentence'] as List<dynamic>)
+          .map((e) => SentenceModel.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'sentence': sentence.map((s) => s.toJson()).toList(),
+      };
 }
 
 class CategoryModel {

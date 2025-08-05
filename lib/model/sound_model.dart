@@ -14,9 +14,17 @@ class SoundModel {
       category: json['category'] ?? '',
       order: json['order'] ?? 0,
       subcategories: (json['subcategories'] as List? ?? [])
-          .map((e) => SoundSubcategory.fromJson(e))
+          .map((e) => SoundSubcategory.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'category': category,
+      'order': order,
+      'subcategories': subcategories.map((e) => e.toJson()).toList(),
+    };
   }
 }
 
@@ -43,13 +51,25 @@ class SoundSubcategory {
       links: linksValue is Map
           ? Links.fromJson(Map<String, dynamic>.from(linksValue))
           : Links.empty(),
-      words: json['words'] != null ? Word.fromJson(json['words']) : null,
+      words: json['words'] != null
+          ? Word.fromJson(Map<String, dynamic>.from(json['words']))
+          : null,
       soundsPractice: json['soundsPractice'] != null
           ? (json['soundsPractice'] as List)
-              .map((e) => SoundPractice.fromJson(e))
+              .map((e) => SoundPractice.fromJson(Map<String, dynamic>.from(e)))
               .toList()
           : null,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'ULR': ULR,
+      'links': links.toJson(),
+      'words': words?.toJson(),
+      'soundsPractice': soundsPractice?.map((e) => e.toJson()).toList(),
+    };
   }
 }
 
@@ -77,6 +97,16 @@ class Links {
       );
 
   factory Links.empty() => Links(v1: '', v2: '', v3: '', v4: '', v5: '');
+
+  Map<String, dynamic> toJson() {
+    return {
+      'v1': v1,
+      'v2': v2,
+      'v3': v3,
+      'v4': v4,
+      'v5': v5,
+    };
+  }
 }
 
 class Word {
@@ -98,6 +128,15 @@ class Word {
         syllables: json['syllables'] ?? '',
         text: json['text'] ?? '',
       );
+
+  Map<String, dynamic> toJson() {
+    return {
+      'file': file,
+      'pronun': pronun,
+      'syllables': syllables,
+      'text': text,
+    };
+  }
 }
 
 class SoundPractice {
@@ -119,4 +158,13 @@ class SoundPractice {
         syllables: json['syllables'] ?? '',
         text: json['text'] ?? '',
       );
+
+  Map<String, dynamic> toJson() {
+    return {
+      'file': file,
+      'pronun': pronun,
+      'syllables': syllables,
+      'text': text,
+    };
+  }
 }

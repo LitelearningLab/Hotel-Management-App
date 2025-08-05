@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hotelmanagementapp/model/grammer_lab_model.dart';
+import 'package:hotelmanagementapp/model/sentence_model.dart';
+import 'package:hotelmanagementapp/model/sound_model.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -358,4 +362,46 @@ List<TextSpan> buildTextSpans(String text) {
   }
 
   return spans;
+}
+
+List<Map<String, dynamic>> recentHistory = [];
+
+void addToRecentHistory({
+  required String path,
+  required String category,
+  required String section,
+  required String link,
+  required String proLabTitle,
+  List<SubCategoryModel>? subCategories,
+  GrammarDoc? grammarDocs,
+  SoundSubcategory? soundSubcategory,
+}) async {
+  final newEntry = {
+    'path': path,
+    'category': category,
+    'section': section,
+    'link': link,
+    'proLabTitle': proLabTitle,
+    'subCategories': subCategories?.map((e) => e.toJson()).toList() ?? [],
+    'grammarDocs': grammarDocs != null ? grammarDocs.toJson() : {},
+    'soundSub': soundSubcategory != null ? soundSubcategory.toJson() : {},
+  };
+
+  // Safe remove
+  recentHistory.removeWhere((entry) =>
+      entry['path'] == path &&
+      entry['category'] == category &&
+      entry['section'] == section &&
+      entry['link'] == link &&
+      entry['proLabTitle'] == proLabTitle);
+
+  // ✅ Ensure list is not null
+  recentHistory.insert(0, newEntry);
+
+  if (recentHistory.length > 3) {
+    recentHistory = recentHistory.sublist(0, 3);
+  }
+
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString('recentHistory', jsonEncode(recentHistory));
 }

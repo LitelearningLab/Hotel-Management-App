@@ -114,7 +114,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               final item = controller.finalResults[index];
                               final collectionName = item['fromCollection'] ==
                                       'InteractiveSimulationCollection'
-                                  ? 'Core Department > InteractiveSimulationCollection > ${item["simulationSub"]}'
+                                  ? 'InteractiveSimulationCollection > ${item["simulationSub"]}'
                                   : item['fromCollection'] ==
                                           "FoodAndBevarageCollection"
                                       ? "Core Department > Food and Beverage Service Management"
