@@ -331,7 +331,9 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                               getWidgetHeight(
                                                                   height: 6),
                                                         ),
-                                                        FittedBox(
+                                                        SizedBox(
+                                                          width: getWidgetWidth(
+                                                              width: 180),
                                                           child: Text(
                                                             controller
                                                                         .subcategories[
@@ -347,6 +349,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                                     .replaceAll(
                                                                         "/",
                                                                         ""),
+                                                            maxLines: 2,
                                                             style: TextStyle(
                                                               color:
                                                                   Colors.black,

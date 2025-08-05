@@ -575,7 +575,7 @@ class _HomeState extends State<Home>
                                     : index == 1
                                         ? Get.toNamed(AppRoutes.languageLab)
                                         :
-                                        // index == 2
+                                        //  index == 2
                                         //     ? Get.toNamed(
                                         //         AppRoutes.contentLibrary)
                                         //     :
