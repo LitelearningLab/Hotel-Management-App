@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
@@ -35,6 +37,7 @@ class SentenceLabSubCatController extends GetxController {
         await audioPlayer.stop();
         currentlyPlayingIndex = subIndex;
         update();
+        log("message: Playing audio for index: ${subcategories[index].sentence[subIndex].file}");
         await audioPlayer.setUrl(subcategories[index].sentence[subIndex].file);
 
         await audioPlayer.play();

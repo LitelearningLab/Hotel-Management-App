@@ -3,6 +3,7 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/sentence_lab_sub_cat_controller.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
+import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
@@ -112,8 +113,8 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                             children: [
                               Padding(
                                 padding: EdgeInsets.only(
-                                  top: getWidgetHeight(height: 2),
-                                  bottom: getWidgetHeight(height: 2),
+                                  top: getWidgetHeight(height: 8),
+                                  bottom: getWidgetHeight(height: 8),
                                   left: getWidgetWidth(width: 10),
                                   // right: getWidgetWidth(width: 15)
                                 ),
@@ -130,25 +131,20 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                         ),
                                       ),
                                     ),
-                                    Row(
-                                      children: [
-                                        SizedBox(
-                                          width: getWidgetWidth(width: 10),
-                                          child: IconButton(
-                                            onPressed: () {},
-                                            icon: const Icon(Icons.save_alt,
-                                                size: 20),
-                                          ),
+                                    IconButton(
+                                      onPressed: () {},
+                                      icon: SizedBox(
+                                        // width: displayWidth(context) / 18.75,
+                                        // height: displayHeight(context) / 40.6,
+                                        height: 19,
+                                        width: 19,
+                                        child: Image.asset(
+                                          AllAssets.save,
+                                          width: 18,
+                                          color: Colors.black,
                                         ),
-                                        SizedBox(
-                                            width: getWidgetWidth(width: 10)),
-                                        IconButton(
-                                          onPressed: () {},
-                                          icon:
-                                              const Icon(Icons.check, size: 20),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    )
                                   ],
                                 ),
                               ),
@@ -156,7 +152,7 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                 duration: const Duration(milliseconds: 300),
                                 curve: Curves.fastOutSlowIn,
                                 height: isExpanded
-                                    ? getWidgetHeight(height: 80)
+                                    ? getWidgetHeight(height: 65)
                                     : 0,
                                 padding: EdgeInsets.symmetric(
                                   horizontal: getWidgetWidth(width: 15),
@@ -172,7 +168,7 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                           ),
                                           SizedBox(
                                               height:
-                                                  getWidgetHeight(height: 16)),
+                                                  getWidgetHeight(height: 6)),
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceAround,
@@ -204,6 +200,10 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                               ),
                                               InkWell(
                                                 onTap: () {
+                                                  controller.kShowDialog(
+                                                      sentence.text,
+                                                      false,
+                                                      context);
                                                   // Add dialog or recording functionality
                                                 },
                                                 child: Row(

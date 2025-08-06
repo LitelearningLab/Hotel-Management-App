@@ -31,6 +31,7 @@ import 'package:hotelmanagementapp/view/grammer_lab_sub.dart';
 import 'package:hotelmanagementapp/view/interactive_simulations.dart';
 import 'package:hotelmanagementapp/view/language_lab.dart';
 import 'package:hotelmanagementapp/view/login.dart';
+import 'package:hotelmanagementapp/view/pdf.dart';
 import 'package:hotelmanagementapp/view/profile_screen.dart';
 import 'package:hotelmanagementapp/view/university_lab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -574,12 +575,17 @@ class _HomeState extends State<Home>
                                     ? Get.toNamed(AppRoutes.simulation)
                                     : index == 1
                                         ? Get.toNamed(AppRoutes.languageLab)
-                                        :
-                                        //  index == 2
-                                        //     ? Get.toNamed(
-                                        //         AppRoutes.contentLibrary)
-                                        //     :
-                                        controller.showPopupAtTap(tapPosition);
+                                        : index == 2
+                                            ?
+                                            //  Navigator.push(
+                                            //     context,
+                                            //     MaterialPageRoute(
+                                            //         builder: (context) =>
+                                            //             PDFPreviewWithFirstPage()))
+                                            Get.toNamed(
+                                                AppRoutes.contentLibrary)
+                                            : controller
+                                                .showPopupAtTap(tapPosition);
                                 // controller.showPopupAtTap(tapPosition);
                                 // for playstore
                                 // index == 0
