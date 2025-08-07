@@ -694,47 +694,51 @@ class _ContentLabState extends State<ContentLab> {
                               ],
                             ),
                             SizedBox(height: getWidgetHeight(height: 4)),
-                            RichText(
-                              text: TextSpan(
-                                style: TextStyle(
-                                    fontSize: kText.scale(12),
-                                    color: Colors.black),
-                                children: [
-                                  TextSpan(
-                                    text: isExpanded || !isLongDesc
-                                        ? description
-                                        : _truncateText(description,
-                                            100), // Adjust char count as needed
+                            description.isEmpty
+                                ? const SizedBox.shrink()
+                                : RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                          fontSize: kText.scale(12),
+                                          color: Colors.black),
+                                      children: [
+                                        TextSpan(
+                                          text: isExpanded || !isLongDesc
+                                              ? description
+                                              : _truncateText(description,
+                                                  100), // Adjust char count as needed
+                                        ),
+                                        if (!isExpanded && isLongDesc)
+                                          TextSpan(
+                                            text: " See more",
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: kText.scale(11)),
+                                            recognizer: TapGestureRecognizer()
+                                              ..onTap = () {
+                                                setState(() {
+                                                  expandedDescriptions[index] =
+                                                      true;
+                                                });
+                                              },
+                                          ),
+                                        if (isExpanded && isLongDesc)
+                                          TextSpan(
+                                            text: " See less",
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: kText.scale(11)),
+                                            recognizer: TapGestureRecognizer()
+                                              ..onTap = () {
+                                                setState(() {
+                                                  expandedDescriptions[index] =
+                                                      false;
+                                                });
+                                              },
+                                          ),
+                                      ],
+                                    ),
                                   ),
-                                  if (!isExpanded && isLongDesc)
-                                    TextSpan(
-                                      text: " See more",
-                                      style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: kText.scale(11)),
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          setState(() {
-                                            expandedDescriptions[index] = true;
-                                          });
-                                        },
-                                    ),
-                                  if (isExpanded && isLongDesc)
-                                    TextSpan(
-                                      text: " See less",
-                                      style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: kText.scale(11)),
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          setState(() {
-                                            expandedDescriptions[index] = false;
-                                          });
-                                        },
-                                    ),
-                                ],
-                              ),
-                            ),
                             SizedBox(height: getWidgetHeight(height: 6)),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
