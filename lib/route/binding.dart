@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:hotelmanagementapp/controller/content_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/front_office_controller.dart';
 import 'package:hotelmanagementapp/controller/grammer_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
@@ -108,6 +109,6 @@ class SearchScreenBinding with Bindings {
 class ContentLabBinding with Bindings {
   @override
   void dependencies() {
-    // Add any dependencies needed for the content library here
+    Get.put(ContentLabController());
   }
 }
