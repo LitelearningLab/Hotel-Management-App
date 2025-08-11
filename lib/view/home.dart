@@ -480,7 +480,9 @@ class _HomeState extends State<Home>
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "Hotel Management",
+                                              index == 4
+                                                  ? ""
+                                                  : "Hotel Management",
                                               style: TextStyle(
                                                   color: lightWhite,
                                                   fontSize: 10),

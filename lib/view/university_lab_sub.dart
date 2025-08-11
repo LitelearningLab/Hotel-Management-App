@@ -41,16 +41,16 @@ class _UniversityLabSubState extends State<UniversityLabSub> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PdfViewerPage(
-                            title: widget.category.subcategory[index].text,
-                            url:
-                                "https://www.pearsonhighered.com/assets/samplechapter/0/1/3/4/0134151909.pdf",
-                          ),
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => PdfViewerPage(
+                      //       title: widget.category.subcategory[index].text,
+                      //       url:
+                      //           "https://www.pearsonhighered.com/assets/samplechapter/0/1/3/4/0134151909.pdf",
+                      //     ),
+                      //   ),
+                      // );
                     },
                     child: Container(
                       width: getWidgetWidth(width: 375),

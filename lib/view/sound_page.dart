@@ -49,6 +49,7 @@ class _SoundPageState extends State<SoundPage> {
               controller.title, maxLines: 2,
               // textAlign: TextAlign.start,
               style: const TextStyle(
+                fontFamily: Keys.lucidaFontFamily,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),

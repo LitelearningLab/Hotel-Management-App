@@ -13,4 +13,6 @@ class AppRoutes {
   static const sentenceLabSub = '/sentence_lab_sub';
   static const searchScreen = '/search_screen';
   static const contentLibrary = '/content_library';
+  static const splashScreen = '/splash_screen';
+  static const noInternet = '/no_internet';
 }

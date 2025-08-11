@@ -8,6 +8,7 @@ import 'package:hotelmanagementapp/view/content_lab.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/home.dart';
 import 'package:hotelmanagementapp/view/language_lab.dart';
+import 'package:hotelmanagementapp/view/no_internet_page.dart';
 import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
 import 'package:hotelmanagementapp/view/pronounciation_lab.dart';
 import 'package:hotelmanagementapp/view/search_screen.dart';
@@ -17,6 +18,7 @@ import 'package:hotelmanagementapp/view/sentence_lab_sub_cat.dart';
 import 'package:hotelmanagementapp/view/simulation_sub.dart';
 import 'package:hotelmanagementapp/view/sound_lab.dart';
 import 'package:hotelmanagementapp/view/sound_page.dart';
+import 'package:hotelmanagementapp/view/splash.dart';
 
 import '../view/grammer_lab.dart';
 
@@ -88,5 +90,15 @@ class RouteService {
       page: () => ContentLab(),
       binding: ContentLabBinding(),
     ),
+    GetPage(
+      name: AppRoutes.splashScreen,
+      page: () => SplashScreen(),
+      binding: SplashScreenBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.noInternet,
+      page: () => NoInternetPage(),
+      binding: NoInternetBinding(),
+    )
   ];
 }

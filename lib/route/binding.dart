@@ -13,6 +13,7 @@ import 'package:hotelmanagementapp/controller/simulation_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_sub_controller.dart';
 import 'package:hotelmanagementapp/controller/sound_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/sound_page_controller.dart';
+import 'package:hotelmanagementapp/controller/splash_controller.dart';
 
 class InitialBinding with Bindings {
   @override
@@ -111,4 +112,16 @@ class ContentLabBinding with Bindings {
   void dependencies() {
     Get.put(ContentLabController());
   }
+}
+
+class SplashScreenBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(SplashController());
+  }
+}
+
+class NoInternetBinding with Bindings {
+  @override
+  void dependencies() {}
 }

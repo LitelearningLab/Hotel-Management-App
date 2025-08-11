@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -28,7 +29,7 @@ class _ContentLabState extends State<ContentLab> {
   Widget build(BuildContext context) {
     return GetBuilder<ContentLabController>(builder: (controller) {
       return Scaffold(
-        bottomNavigationBar: CustomeBottomNavigation(),
+        // bottomNavigationBar: CustomeBottomNavigation(),
         backgroundColor: Colors.white,
         // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         // floatingActionButton: Align(
@@ -62,7 +63,7 @@ class _ContentLabState extends State<ContentLab> {
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: getWidgetWidth(width: 15),
-                vertical: getWidgetHeight(height: 6),
+                vertical: getWidgetHeight(height: 10),
               ),
               child: Row(
                 children: controller.isSearching
@@ -104,13 +105,7 @@ class _ContentLabState extends State<ContentLab> {
                                       icon: const Icon(Icons.close,
                                           color: Colors.black),
                                       onPressed: () {
-                                        controller.isSearching = false;
-                                        controller.searchController.clear();
-                                        controller.clearAllFilters();
-                                        controller.selectedSort =
-                                            "Relevance (Default)";
-                                        controller.sortPosts();
-                                        controller.update();
+                                        controller.clearAll();
                                       }),
                                 ],
                               ),
@@ -257,39 +252,55 @@ class _ContentLabState extends State<ContentLab> {
                         ),
                       )
                     : Expanded(
-                        child: ListView.builder(
-                          itemCount: controller.showPosts.length,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                          itemBuilder: (context, index) {
-                            final post = controller.showPosts[index];
-                            final ctr = controller.controllers[index];
-                            final isExpanded =
-                                controller.expandedDescriptions[index];
-                            final description = post["description"] as String;
-                            final isLongDesc =
-                                description.trim().split('\n').length > 2 ||
-                                    description.length > 100;
-                            String externalSource =
-                                post["externalSource"] ?? "";
+                        child: RefreshIndicator(
+                          color: linearColor,
+                          backgroundColor: Colors.white,
+                          onRefresh: controller.refreshPosts,
+                          child: ListView.builder(
+                            // controller: controller.scrollController,
+                            itemCount: controller.showPosts.length,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
+                            itemBuilder: (context, index) {
+                              final post = controller.showPosts[index];
 
-                            return Padding(
-                              padding: EdgeInsets.only(
-                                  bottom: getWidgetHeight(height: 10)),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: SizedBox(
-                                      height: getWidgetHeight(height: 200),
-                                      child: WebViewWidget(controller: ctr),
+                              if (controller.controllers[index] == null) {
+                                final embedUrl = controller
+                                    .convertToEmbedUrl(post["videoUrl"]);
+                                final webViewCtrl = WebViewController()
+                                  ..setJavaScriptMode(
+                                      JavaScriptMode.unrestricted)
+                                  ..loadHtmlString(
+                                      controller.buildHtmlForUrl(embedUrl));
+                                controller.controllers[index] = webViewCtrl;
+                              }
+                              final ctr = controller.controllers[index];
+                              final isExpanded =
+                                  controller.expandedDescriptions[index];
+                              final description = post["description"] as String;
+                              final isLongDesc =
+                                  description.trim().split('\n').length > 2 ||
+                                      description.length > 100;
+                              String externalSource =
+                                  post["externalSource"] ?? "";
+                              String title = post['title'];
+
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                    bottom: getWidgetHeight(height: 10)),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: SizedBox(
+                                        height: getWidgetHeight(height: 200),
+                                        child: WebViewWidget(controller: ctr!),
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: getWidgetHeight(height: 4),
-                                  ),
-                                  if (externalSource.isNotEmpty)
+                                    SizedBox(
+                                      height: getWidgetHeight(height: 6),
+                                    ),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
@@ -306,28 +317,27 @@ class _ContentLabState extends State<ContentLab> {
                                               ),
                                               children: [
                                                 TextSpan(
-                                                  text: "External Source",
+                                                  text: "Video Title",
                                                   style: TextStyle(
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: kText.scale(12),
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: kText.scale(13),
                                                     color: Colors.grey[700],
                                                   ),
                                                 ),
                                                 TextSpan(
                                                   text: " : ",
                                                   style: TextStyle(
-                                                    fontSize: kText.scale(10),
+                                                    fontSize: kText.scale(13),
                                                     color: Colors.black,
+                                                    fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
                                                 TextSpan(
-                                                  text:
-                                                      post["externalSource"] ??
-                                                          '',
+                                                  text: title,
                                                   style: TextStyle(
-                                                    fontWeight: FontWeight.w500,
+                                                    fontWeight: FontWeight.w600,
                                                     color: Colors.black,
-                                                    fontSize: kText.scale(12),
+                                                    fontSize: kText.scale(13),
                                                   ),
                                                 ),
                                               ],
@@ -336,145 +346,211 @@ class _ContentLabState extends State<ContentLab> {
                                         ),
                                       ],
                                     ),
-                                  SizedBox(
-                                    height: getWidgetHeight(height: 4),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
+                                    SizedBox(
+                                      height: getWidgetHeight(height: 2),
+                                    ),
+                                    if (externalSource.isNotEmpty)
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: [
-                                          RichText(
-                                            text: TextSpan(
-                                              style: TextStyle(
-                                                fontSize: kText.scale(10),
-                                                color: Colors.grey,
-                                              ),
-                                              children: [
-                                                TextSpan(
-                                                    text: post["category"] ??
-                                                        "Content Title"),
-                                                TextSpan(
-                                                    text: " | ",
-                                                    style: TextStyle(
-                                                        fontSize:
-                                                            kText.scale(10),
-                                                        color: Colors.black)),
-                                                TextSpan(
-                                                  text: post["subcategory"] ??
-                                                      "Content Title",
-                                                  style: TextStyle(
-                                                    fontSize: kText.scale(10),
-                                                  ),
+                                          Expanded(
+                                            child: RichText(
+                                              softWrap: true,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              text: TextSpan(
+                                                style: TextStyle(
+                                                  fontSize: kText.scale(10),
+                                                  color: Colors.grey,
                                                 ),
-                                              ],
+                                                children: [
+                                                  TextSpan(
+                                                    text: "External Source",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: kText.scale(12),
+                                                      color: Colors.grey[700],
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: " : ",
+                                                    style: TextStyle(
+                                                      fontSize: kText.scale(10),
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: post[
+                                                            "externalSource"] ??
+                                                        '',
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Colors.black,
+                                                      fontSize: kText.scale(12),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                  SizedBox(height: getWidgetHeight(height: 4)),
-                                  description.isEmpty
-                                      ? const SizedBox.shrink()
-                                      : RichText(
-                                          text: TextSpan(
-                                            style: TextStyle(
-                                                fontSize: kText.scale(12),
-                                                color: Colors.black),
-                                            children: [
-                                              TextSpan(
-                                                text: isExpanded || !isLongDesc
-                                                    ? description
-                                                    : controller.truncateText(
-                                                        description,
-                                                        100), // Adjust char count as needed
-                                              ),
-                                              if (!isExpanded && isLongDesc)
-                                                TextSpan(
-                                                  text: " See more",
-                                                  style: TextStyle(
-                                                      color: Colors.grey,
-                                                      fontSize:
-                                                          kText.scale(11)),
-                                                  recognizer:
-                                                      TapGestureRecognizer()
-                                                        ..onTap = () {
-                                                          controller
-                                                                  .expandedDescriptions[
-                                                              index] = true;
-                                                          controller.update();
-                                                        },
-                                                ),
-                                              if (isExpanded && isLongDesc)
-                                                TextSpan(
-                                                  text: " See less",
-                                                  style: TextStyle(
-                                                      color: Colors.grey,
-                                                      fontSize:
-                                                          kText.scale(11)),
-                                                  recognizer:
-                                                      TapGestureRecognizer()
-                                                        ..onTap = () {
-                                                          controller
-                                                                  .expandedDescriptions[
-                                                              index] = false;
-                                                          controller.update();
-                                                        },
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                  SizedBox(height: getWidgetHeight(height: 6)),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                          controller.toggleLike(post);
-                                        },
-                                        child: Row(
+                                    SizedBox(
+                                      height: getWidgetHeight(height: 8),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Row(
                                           children: [
-                                            Icon(Icons.thumb_up,
-                                                size: 16,
-                                                color: post['isLike']
-                                                    ? linearColor
-                                                    : Colors.grey),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              "${post["likes"]}",
-                                              style: TextStyle(
-                                                  color: post['isLike']
-                                                      ? linearColor
-                                                      : Colors.grey),
+                                            RichText(
+                                              text: TextSpan(
+                                                style: TextStyle(
+                                                  fontSize: kText.scale(10),
+                                                  color: Colors.grey,
+                                                ),
+                                                children: [
+                                                  TextSpan(
+                                                      text: post["category"] ??
+                                                          "Content Title"),
+                                                  TextSpan(
+                                                      text: " | ",
+                                                      style: TextStyle(
+                                                          fontSize:
+                                                              kText.scale(10),
+                                                          color: Colors.black)),
+                                                  TextSpan(
+                                                    text: post["subcategory"] ??
+                                                        "Content Title",
+                                                    style: TextStyle(
+                                                      fontSize: kText.scale(10),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            controller.formatTimeAgo(
-                                                post["uploadDate"]),
-                                            style: const TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                        height: getWidgetHeight(height: 4)),
+                                    description.isEmpty
+                                        ? const SizedBox.shrink()
+                                        : RichText(
+                                            text: TextSpan(
+                                              style: TextStyle(
+                                                  fontSize: kText.scale(12),
+                                                  color: Colors.black),
+                                              children: [
+                                                TextSpan(
+                                                  text: isExpanded ||
+                                                          !isLongDesc
+                                                      ? description
+                                                      : controller.truncateText(
+                                                          description,
+                                                          100), // Adjust char count as needed
+                                                ),
+                                                if (!isExpanded && isLongDesc)
+                                                  TextSpan(
+                                                    text: " See more",
+                                                    style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize:
+                                                            kText.scale(11)),
+                                                    recognizer:
+                                                        TapGestureRecognizer()
+                                                          ..onTap = () {
+                                                            controller
+                                                                    .expandedDescriptions[
+                                                                index] = true;
+                                                            controller.update();
+                                                          },
+                                                  ),
+                                                if (isExpanded && isLongDesc)
+                                                  TextSpan(
+                                                    text: " See less",
+                                                    style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize:
+                                                            kText.scale(11)),
+                                                    recognizer:
+                                                        TapGestureRecognizer()
+                                                          ..onTap = () {
+                                                            controller
+                                                                    .expandedDescriptions[
+                                                                index] = false;
+                                                            controller.update();
+                                                          },
+                                                  ),
+                                              ],
+                                            ),
                                           ),
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                  Divider(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    // height: 20,
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
+                                    SizedBox(
+                                        height: getWidgetHeight(height: 6)),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            controller.toggleLike(post);
+                                          },
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.thumb_up,
+                                                  size: 16,
+                                                  color: post['isLike']
+                                                      ? linearColor
+                                                      : Colors.grey),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                "${post["likes"]}",
+                                                style: TextStyle(
+                                                    color: post['isLike']
+                                                        ? linearColor
+                                                        : Colors.grey),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              controller.formatTimeAgo(
+                                                  post["uploadDate"]),
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                    Divider(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      // height: 20,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
+            if (controller.fetchMore)
+              const Padding(
+                padding: EdgeInsets.all(12),
+                child: Center(
+                  child: CupertinoActivityIndicator(
+                    radius: 12.0,
+                  ),
+                ),
+              )
           ],
         ),
       );

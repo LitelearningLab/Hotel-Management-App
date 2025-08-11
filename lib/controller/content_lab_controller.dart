@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
@@ -8,7 +11,8 @@ import '../public/common_function.dart';
 
 class ContentLabController extends GetxController {
   String selectedSort = "Relevance (Default)";
-  List<WebViewController> controllers = [];
+  late DataSnapshot snapshot;
+  List<WebViewController?> controllers = [];
   List<bool> expandedDescriptions = [];
   bool isloading = true;
   bool controllerInitialized = false;
@@ -22,114 +26,111 @@ class ContentLabController extends GetxController {
   TextEditingController searchController = TextEditingController();
   bool filterApplied = false;
   Set<String> likedVideoUrls = {};
-  final List<Map<String, dynamic>> posts = [
-    {
-      "category": "Food and Beverage",
-      "subcategory": "Communication Skills",
-      "videoUrl": "https://youtu.be/Ly7p88cL45U?si=n2Aw7ccxmezvdlBC",
-      "description":
-          "In this video, you’ll learn professional communication skills that every hotel front office staff must know.\n\n"
-              "From handling guest queries to body language tips, this guide ensures you deliver a seamless customer experience.",
-      "likes": 152,
-      "views": 2100,
-      "uploadDate": DateTime.now().subtract(const Duration(hours: 2)),
-      'externalSource': "Nisbets (Youtube Channel)",
-      'isLike': false
-    },
-    {
-      "category": "Food Production",
-      "subcategory": "Telephone Etiquette",
-      "videoUrl": "https://youtu.be/gSZiXRRs65c?si=qHMSuKjSUReGXSFp",
-      "description":
-          "A quick guide to telephone handling in hospitality. Learn the do's and don'ts, tone control, and the correct way to take and transfer calls.",
-      "likes": 98,
-      "views": 1800,
-      "uploadDate": DateTime.now().subtract(const Duration(hours: 4)),
-      'isLike': false
-    },
-    {
-      "category": "Food Production",
-      "subcategory": "Handling Complaints",
-      "videoUrl": "https://youtu.be/ewnqShNBUpY?si=muPLFsfmcjUEfmSQ",
-      "description": "",
-      "likes": 143,
-      "views": 2300,
-      "uploadDate": DateTime.now().subtract(const Duration(hours: 6)),
-      "externalSource": "WebstaurantStore (Youtube Channel)",
-      'isLike': false
-    },
-    {
-      "category": "Housekeeping",
-      "subcategory": "Reservation Process",
-      "videoUrl": "https://www.youtube.com/watch?v=b85tkcqHmgk",
-      "description": "This is an in-depth tutorial on managing reservations.\n\n"
-          "From walk-in to advance bookings, confirmations, and cancellations, the video covers complete front office reservation procedures.",
-      "likes": 167,
-      "views": 2750,
-      "uploadDate": DateTime.now().subtract(const Duration(days: 1)),
-      "externalSource": "Institut Escoffier lle Maurice (Youtube Channel)",
-      'isLike': false
-    },
-    {
-      "category": "Front Office",
-      "subcategory": "Mindfulness & Stress Relief",
-      "videoUrl": "https://youtu.be/cULNEk6Px5E?si=Hfnac5DjDdgKNr13",
-      "description": "Guided meditation for peace, mindfulness, and calmness.\n\n"
-          "Includes breathing exercises to relax your mind and body. Perfect for hotel staff managing high-pressure environments.",
-      "likes": 302,
-      "views": 3471,
-      "uploadDate": DateTime.now().subtract(const Duration(days: 2)),
-      'isLike': false
-    },
-    {
-      "category": "Front Office",
-      "subcategory": "Health & Energy",
-      "videoUrl": "https://youtu.be/3pYbdj-rp_Q?si=vo84bwkVQ0biY9F5",
-      "description": "",
-      "likes": 89,
-      "views": 1321,
-      "uploadDate": DateTime.now().subtract(const Duration(hours: 5)),
-      "externalSource": "Reception Academy (Youtube Channel)",
-      'isLike': false
-    },
-    {
-      "category": "Front Office",
-      "subcategory": "Focus & Productivity",
-      "videoUrl": "https://youtu.be/IVXRmxc36Vw?si=yUlwd64mY0WtstKw",
-      "description":
-          "Techniques to stay focused while studying or working long shifts.\n\n"
-              "Practical tools, time-blocking strategies, and examples tailored for hospitality professionals.",
-      "likes": 120,
-      "views": 2400,
-      "uploadDate": DateTime.now().subtract(const Duration(hours: 1)),
-      "externalSource": "Reception Academy (Youtube Channel)",
-      'isLike': false
-    },
-  ];
+  List<Map<String, dynamic>> posts = [];
+  bool fetchMore = false;
+  final database = FirebaseDatabase.instance;
+  int _batchSize = 2;
+  int _currentIndex = 0;
+  bool isFetchingMore = false;
+  bool hasMorePosts = true;
+  String? _lastFetchedKey;
+  bool _hasMoreData = true;
+
+  ScrollController scrollController = ScrollController();
+  Future<void> fetchPostsFromFirebase() async {
+    isloading = true;
+    _lastFetchedKey = null;
+    hasMorePosts = false; // Since we're loading everything at once
+    showPosts.clear();
+    posts.clear();
+    expandedDescriptions.clear();
+    controllers.clear();
+    update();
+
+    try {
+      final ref = database.ref('ContentLibraryCollection');
+
+      // 🔄 No pagination - get all data
+      final snapshot = await ref.orderByKey().get();
+
+      if (snapshot.exists) {
+        final data = snapshot.value as Map<dynamic, dynamic>;
+        final entries = data.entries.toList();
+
+        final List<Map<String, dynamic>> loadedPosts = [];
+
+        for (final entry in entries) {
+          final postMap = Map<String, dynamic>.from(entry.value);
+          postMap['id'] = entry.key;
+
+          DateTime uploadDate;
+          try {
+            final rawDate = postMap['uploadDate'];
+            if (rawDate is String) {
+              uploadDate = DateTime.parse(rawDate);
+            } else if (rawDate is DateTime) {
+              uploadDate = rawDate;
+            } else {
+              uploadDate = DateTime.now();
+            }
+          } catch (_) {
+            uploadDate = DateTime.now();
+          }
+
+          loadedPosts.add({
+            ...postMap,
+            'uploadDate': uploadDate,
+            'isLike': false,
+            'likes': postMap['likes'] ?? 0,
+            'views': postMap['views'] ?? 0,
+            'description': postMap['description'] ?? '',
+            'category': postMap['category'] ?? '',
+            'subcategory': postMap['subcategory'] ?? '',
+          });
+        }
+
+        showPosts.addAll(loadedPosts);
+        posts.addAll(loadedPosts);
+        expandedDescriptions
+            .addAll(List<bool>.filled(loadedPosts.length, false));
+        controllers.addAll(List.filled(loadedPosts.length, null));
+
+        await loadLikedPosts();
+      }
+    } catch (e) {
+      debugPrint("Error fetching all emergency posts: $e");
+    }
+
+    isloading = false;
+    update();
+  }
+
   Future<void> loadLikedPosts() async {
     final prefs = await SharedPreferences.getInstance();
     likedVideoUrls = prefs.getStringList('likedPosts')?.toSet() ?? {};
-
-    // Mark liked status in posts
     for (var post in showPosts) {
       post['isLike'] = likedVideoUrls.contains(post['videoUrl']);
-      if (post['isLike']) {
-        post['likes'] += 1;
-      }
     }
 
-    showPosts = [...posts]; // initialize display list
+    showPosts = [...posts];
     update();
   }
 
   @override
   void onReady() {
     super.onReady();
+    fetchPostsFromFirebase();
+    // showPosts = posts;
+    // sortPosts();
+    // loadLikedPosts();
+    // expandedDescriptions = List.filled(showPosts.length, false);
+    // scrollController.addListener(() {
+    //   if (scrollController.position.pixels >=
+    //       scrollController.position.maxScrollExtent - 100) {
+    //     // fetchPostsFromFirebase(loadMore: true);
+    //   }
+    // });
 
-    showPosts = posts;
-    sortPosts();
-    loadLikedPosts();
-    expandedDescriptions = List.filled(showPosts.length, false);
     update();
   }
 
@@ -141,12 +142,13 @@ class ContentLabController extends GetxController {
           selectedCategory, selectedSubcategories.toList());
     }
 
-    final lowerQuery = query.toLowerCase();
+    final lowerQuery = query.toLowerCase().trim();
     return showPosts.where((post) {
       final category = post['category']?.toLowerCase() ?? '';
       final subcategory = post['subcategory']?.toLowerCase() ?? '';
       final description = post['description']?.toLowerCase() ?? '';
-      final title = subcategory;
+      final title = post['title'] ?? "";
+      // final title = subcategory;
       return category.contains(lowerQuery) ||
           subcategory.contains(lowerQuery) ||
           title.contains(lowerQuery) ||
@@ -157,16 +159,41 @@ class ContentLabController extends GetxController {
   Future<void> toggleLike(Map<String, dynamic> post) async {
     final prefs = await SharedPreferences.getInstance();
     final videoUrl = post['videoUrl'];
+
+    // Toggle local like status
     if (likedVideoUrls.contains(videoUrl)) {
       likedVideoUrls.remove(videoUrl);
       post['isLike'] = false;
-      post['likes'] -= 1;
+      post['likes'] = (post['likes'] ?? 1) - 1;
     } else {
       likedVideoUrls.add(videoUrl);
       post['isLike'] = true;
-      post['likes'] += 1;
+      post['likes'] = (post['likes'] ?? 0) + 1;
     }
+
     await prefs.setStringList('likedPosts', likedVideoUrls.toList());
+    try {
+      final data = snapshot.value;
+      if (data is List) {
+        for (int i = 0; i < data.length; i++) {
+          final item = data[i];
+          if (item == null || item is! Map) continue;
+
+          if (item['videoUrl'] == videoUrl) {
+            final postRef = database.ref('ContentLibraryCollection/$i');
+            await postRef.update({
+              'likes': post['likes'],
+            });
+            break;
+          }
+        }
+      } else {
+        debugPrint("Snapshot is not a List. Cannot update post.");
+      }
+    } catch (e) {
+      debugPrint("Error updating Firebase: $e");
+    }
+
     update();
   }
 
@@ -187,22 +214,25 @@ class ContentLabController extends GetxController {
     controllers = [];
     controllerInitialized = false;
     expandedDescriptions = List.generate(showPosts.length, (_) => false);
+    controllers = List.filled(showPosts.length, null);
 
-    // Delay WebViewController creation
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controllers = showPosts.map((post) {
-        final embedUrl = convertToEmbedUrl(post["videoUrl"]);
-        debugPrint("Loading WebView for $embedUrl");
-        final controller = WebViewController()
-          ..setJavaScriptMode(JavaScriptMode.unrestricted)
-          ..loadHtmlString(_buildHtmlForUrl(embedUrl));
-        return controller;
-      }).toList();
-      // Future.delayed(const Duration(seconds: 2), () {});
-      controllerInitialized = true;
-      isloading = false;
-      update();
-    });
+    // // Delay WebViewController creation
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   controllers = showPosts.map((post) {
+    //     final embedUrl = convertToEmbedUrl(post["videoUrl"]);
+    //     debugPrint("Loading WebView for $embedUrl");
+    //     final controller = WebViewController()
+    //       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    //       ..loadHtmlString(_buildHtmlForUrl(embedUrl));
+    //     return controller;
+    //   }).toList();
+    //   // Future.delayed(const Duration(seconds: 2), () {});
+    //   controllerInitialized = true;
+    //   isloading = false;
+    //   update();
+    // });
+    isloading = false;
+    update();
   }
 
   void openSortBottomSheet(BuildContext context) {
@@ -269,7 +299,16 @@ class ContentLabController extends GetxController {
     );
   }
 
+  Future<void> refreshPosts() async {
+    clearAll();
+
+    // await fetchPostsFromFirebase();
+    update();
+  }
+
   clearAllFilters() {
+    isloading = true;
+    update();
     if (filterApplied) {
       filterApplied = false;
 
@@ -282,18 +321,34 @@ class ContentLabController extends GetxController {
 
       sortPosts();
 
-      controllers = showPosts.map((post) {
-        final embedUrl = convertToEmbedUrl(post["videoUrl"]);
-        debugPrint("Loading WebView for $embedUrl");
+      // controllers = showPosts.map((post) {
+      //   final embedUrl = convertToEmbedUrl(post["videoUrl"]);
+      //   debugPrint("Loading WebView for $embedUrl");
 
-        final controller = WebViewController()
-          ..setJavaScriptMode(JavaScriptMode.unrestricted)
-          ..loadHtmlString(_buildHtmlForUrl(embedUrl));
-        return controller;
-      }).toList();
+      //   final controller = WebViewController()
+      //     ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      //     ..loadHtmlString(_buildHtmlForUrl(embedUrl));
+      //   return controller;
+      // }).toList();
 
       update();
     }
+    isloading = false;
+    update();
+  }
+
+  clearAll() async {
+    isloading = true;
+    update();
+
+    isSearching = false;
+    searchController.clear();
+    clearAllFilters();
+    selectedSort = "Relevance (Default)";
+    sortPosts();
+    await Future.delayed(Duration(seconds: 2));
+    isloading = false;
+    update();
   }
 
   void openFilterBottomSheet(BuildContext context) {
@@ -530,14 +585,14 @@ class ContentLabController extends GetxController {
     }
 
     showPosts = filtered;
-    controllers = filtered.map((post) {
-      final embedUrl = convertToEmbedUrl(post["videoUrl"]);
-      final controller = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..loadHtmlString(_buildHtmlForUrl(embedUrl));
-      return controller;
-    }).toList();
-
+    // controllers = filtered.map((post) {
+    //   final embedUrl = convertToEmbedUrl(post["videoUrl"]);
+    //   final controller = WebViewController()
+    //     ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    //     ..loadHtmlString(_buildHtmlForUrl(embedUrl));
+    //   return controller;
+    // }).toList();
+    controllers = List.filled(showPosts.length, null);
     // Optionally, reset or update expandedDescriptions too
     expandedDescriptions = List.generate(showPosts.length, (_) => false);
     update();
@@ -559,7 +614,7 @@ class ContentLabController extends GetxController {
     return url; // fallback
   }
 
-  String _buildHtmlForUrl(String url) {
+  String buildHtmlForUrl(String url) {
     return '''
       <!DOCTYPE html>
       <html>
@@ -595,12 +650,33 @@ class ContentLabController extends GetxController {
     final now = DateTime.now();
     final diff = now.difference(dateTime);
 
-    if (diff.inSeconds < 60) return '${diff.inSeconds}seconds ago';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}minutes ago';
-    if (diff.inHours < 24) return '${diff.inHours}hours ago';
-    if (diff.inDays < 30) return '${diff.inDays}days ago';
-    if (diff.inDays < 365) return '${(diff.inDays / 30).floor()}months ago';
-    return '${(diff.inDays / 365).floor()}years ago';
+    if (diff.inSeconds < 60) {
+      final seconds = diff.inSeconds;
+      return '$seconds${seconds == 1 ? 'second' : 'seconds'} ago';
+    }
+
+    if (diff.inMinutes < 60) {
+      final minutes = diff.inMinutes;
+      return '$minutes${minutes == 1 ? 'minute' : 'minutes'} ago';
+    }
+
+    if (diff.inHours < 24) {
+      final hours = diff.inHours;
+      return '$hours${hours == 1 ? 'hour' : 'hours'} ago';
+    }
+
+    if (diff.inDays < 30) {
+      final days = diff.inDays;
+      return '$days${days == 1 ? 'day' : 'days'} ago';
+    }
+
+    if (diff.inDays < 365) {
+      final months = (diff.inDays / 30).floor();
+      return '$months${months == 1 ? 'month' : 'months'} ago';
+    }
+
+    final years = (diff.inDays / 365).floor();
+    return '$years${years == 1 ? 'year' : 'years'} ago';
   }
 
   String truncateText(String text, int maxChars) {

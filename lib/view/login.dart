@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:android_id/android_id.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -99,25 +100,28 @@ class _LoginPageState extends State<LoginPage> {
       final doc = snapshot.docs.first;
       final userData = doc.data();
       final userId = doc.id;
-      final deviceId = await const AndroidId().getId();
-      final deviceName = await DeviceScreenInfo.getModelName();
       final prefs = await SharedPreferences.getInstance();
 
-      if (userData.containsKey('imei')) {
-        if (userData['imei'] != deviceId) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Login denied: Device not recognized.")),
-          );
-          _isLoading = false;
-          setState(() {});
-          return;
+      if (!kIsWeb) {
+        final deviceId = await const AndroidId().getId();
+        final deviceName = await DeviceScreenInfo.getModelName();
+
+        if (userData.containsKey('imei')) {
+          if (userData['imei'] != deviceId) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Login denied: Device not recognized.")),
+            );
+            _isLoading = false;
+            setState(() {});
+            return;
+          }
+        } else {
+          await doc.reference.update({
+            'imei': deviceId,
+            'model': deviceName,
+            'firstTImeLogin': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          });
         }
-      } else {
-        await doc.reference.update({
-          'imei': deviceId,
-          'model': deviceName,
-          'firstTImeLogin': DateFormat('yyyy-MM-dd').format(DateTime.now()),
-        });
       }
 
       await prefs.setString('email', email);
