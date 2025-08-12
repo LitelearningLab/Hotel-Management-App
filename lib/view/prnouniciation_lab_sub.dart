@@ -188,13 +188,31 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                                     .handlePlayPause(
                                                                         index);
                                                               },
-                                                              child: ImageIcon(
-                                                                const AssetImage(
-                                                                    AllAssets
-                                                                        .roundPlay),
-                                                                color:
-                                                                    linearColor,
-                                                              ),
+                                                              child: controller
+                                                                          .playingIs ==
+                                                                      index
+                                                                  ? SizedBox(
+                                                                      height: getWidgetHeight(
+                                                                          height:
+                                                                              20),
+                                                                      width: getWidgetWidth(
+                                                                          width:
+                                                                              22),
+                                                                      child:
+                                                                          CircularProgressIndicator(
+                                                                        strokeWidth:
+                                                                            2.0,
+                                                                        color:
+                                                                            linearColor,
+                                                                      ),
+                                                                    )
+                                                                  : ImageIcon(
+                                                                      const AssetImage(
+                                                                          AllAssets
+                                                                              .roundPlay),
+                                                                      color:
+                                                                          linearColor,
+                                                                    ),
                                                             ),
                                                   SizedBox(
                                                     width: getWidgetWidth(
@@ -242,15 +260,24 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                       // height: displayHeight(context) / 40.6,
                                                       height: 19,
                                                       width: 19,
-                                                      child: Image.asset(
-                                                        AllAssets.save,
-                                                        width: 18,
-                                                        color: controller
-                                                                    .isPriorityList[
-                                                                index]
-                                                            ? linearColor
-                                                            : Colors.black,
-                                                      ),
+                                                      child: controller
+                                                                  .isSaving ==
+                                                              index
+                                                          ? CircularProgressIndicator(
+                                                              strokeWidth: 2.0,
+                                                              color:
+                                                                  linearColor,
+                                                            )
+                                                          : Image.asset(
+                                                              AllAssets.save,
+                                                              width: 18,
+                                                              color: controller
+                                                                          .isPriorityList[
+                                                                      index]
+                                                                  ? linearColor
+                                                                  : Colors
+                                                                      .black,
+                                                            ),
                                                     ),
                                                   )
                                                 ],

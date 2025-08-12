@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -13,6 +14,11 @@ import 'package:hotelmanagementapp/public/db_helper.dart';
 import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 
 import 'package:just_audio/just_audio.dart';
+import 'dart:typed_data';
+import 'package:encrypt/encrypt.dart' as encrypt;
+
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 class PronunciationLabSubController extends GetxController {
   late String title;
@@ -30,6 +36,8 @@ class PronunciationLabSubController extends GetxController {
   List<bool> isPriorityList = [];
   int errorPlaying = -1;
   bool isPlaying = false;
+  int playingIs = -1;
+  int isSaving = -1;
 
   @override
   void onInit() {
@@ -54,10 +62,10 @@ class PronunciationLabSubController extends GetxController {
     });
     id = Get.arguments['id'] ?? "";
     if (id == "") {
-      // elseCase();
-      isPriorityList =
-          subcategories.map((e) => e.downloadStatus == true).toList();
-      isLoading = false;
+      elseCase();
+      // isPriorityList =
+      //     subcategories.map((e) => e.downloadStatus == true).toList();
+      // isLoading = false;
     } else {
       fetchPronunById(id);
     }
@@ -100,26 +108,59 @@ class PronunciationLabSubController extends GetxController {
   }
 
   void saveUpdate(int index) async {
-    {
-      try {
-        // final DatabaseReference dbRef = FirebaseDatabase.instance.ref();
-        await DBHelper.toggleDownloadStatus(subcategories[index].file,
-            title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase());
-        bool newValue = !isPriorityList[index];
-        isPriorityList[index] = newValue;
-        update();
-        print("✅ isPriority updated to $newValue at index $index");
-      } catch (e) {
-        print("❌ Failed to update isPriority at index $index: $e");
+    isSaving = index;
+    try {
+      String tableName = title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
+      String fileKey = subcategories[index].file; // Use exact file key
+      String fileName = subcategories[index].text.replaceAll(' ', '_');
+      String url = subcategories[index].file;
+
+      // Toggle current UI state first
+      bool newValue = !isPriorityList[index];
+      isPriorityList[index] = newValue;
+      update();
+
+      if (newValue) {
+        log("⬇️ Downloading and encrypting for $fileName...");
+        final encryptedPath =
+            await AudioCryptoHelper.downloadAndEncryptAudio(url, fileName);
+
+        // Update DB with local path and downloadStatus = true
+        await DBHelper.updateLocalPath(fileKey, tableName, encryptedPath);
+        await DBHelper.setDownloadStatus(fileKey, tableName, 1);
+
+        subcategories[index] =
+            subcategories[index].copyWith(localPath: encryptedPath);
+        log("✅ Downloaded & saved local path: $encryptedPath");
+      } else {
+        final localPath = subcategories[index].localPath;
+        if (localPath.isNotEmpty && await File(localPath).exists()) {
+          await File(localPath).delete();
+          log("🗑 Deleted local file: $localPath");
+        }
+
+        // Update DB with empty localPath and downloadStatus = false
+        await DBHelper.updateLocalPath(fileKey, tableName, "");
+        await DBHelper.setDownloadStatus(fileKey, tableName, 0);
+
+        subcategories[index] = subcategories[index].copyWith(localPath: "");
       }
+
+      log("✅ isPriority updated to $newValue at index $index");
+      update();
+    } catch (e) {
+      log("❌ Failed to update isPriority at index $index: $e");
     }
+    isSaving = -1;
+    update();
   }
 
   void handlePlayPause(int index) async {
     log("${subcategories[index].file}");
     loadingIndex = index;
     isPlaying = true;
-
+    errorPlaying = -1;
+    playingIs = index;
     update();
 
     try {
@@ -129,34 +170,33 @@ class PronunciationLabSubController extends GetxController {
       } else {
         await audioPlayer.stop();
         currentlyPlayingIndex = index;
-        update();
-        final url = subcategories[index].file;
-        log("Playing audio from URL: $url");
 
-        // final decryptedPath = await AudioCryptoHelper.decryptFile(
-        //   subcategories[index].file,
-        //   subcategories[index].text.replaceAll(' ', '_'), // sanitized name
-        // );
-        log("Decrypted path: $url");
-        await audioPlayer.setUrl(url);
+        String? playPath;
+        if (subcategories[index].localPath.isNotEmpty &&
+            await File(subcategories[index].localPath).exists()) {
+          log("🔐 Decrypting local file before playing...");
+          playPath = await AudioCryptoHelper.decryptFile(
+            subcategories[index].localPath,
+            subcategories[index].text.replaceAll(' ', '_'),
+          );
+          log("Decrypted to temp file: $playPath");
+        } else {
+          playPath = subcategories[index].file; // URL
+          log("Playing from URL: $playPath");
+        }
+
+        await audioPlayer.setUrl(playPath);
+        playingIs = -1;
+        update();
         await audioPlayer.play();
       }
-      errorPlaying = -1; // Reset error state
+      errorPlaying = -1;
     } on PlayerException catch (e) {
       print("❌ Audio player error: ${e.message}");
-      if (e.code == 'MEDIA_UNAVAILABLE') {
-        errorPlaying = index;
-        currentlyPlayingIndex = null;
-      } else {
-        // Handle other player exceptions
-        print("❌ Other audio player error: ${e.code}");
-      }
-    } on Exception catch (e) {
-      print("❌ General audio error: $e");
       errorPlaying = index;
       currentlyPlayingIndex = null;
-    } catch (e) {
-      print("❌ Audio load error: $e");
+    } on Exception catch (e) {
+      print("❌ General audio error: $e");
       errorPlaying = index;
       currentlyPlayingIndex = null;
     } finally {
@@ -167,44 +207,24 @@ class PronunciationLabSubController extends GetxController {
   }
 
   Future<void> elseCase() async {
-    final formattedTitle =
-        title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
-    final localData = await DBHelper.getAllSubcategories(formattedTitle);
+    final tableName = title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
+    await DBHelper.ensureTableExists(tableName);
 
-    if (localData.isNotEmpty) {
-      // Normalize sentenceSamples after fetching from DB
-      subcategories = localData.map((item) {
-        if (item.sentenceSamples is! List<String>) {
-          if (item.sentenceSamples is String) {
-            try {
-              item.sentenceSamples =
-                  List<String>.from(jsonDecode(item.sentenceSamples as String));
-            } catch (_) {
-              item.sentenceSamples = <String>[];
-            }
-          } else {
-            item.sentenceSamples = <String>[];
-          }
-        }
-        return item;
-      }).toList();
+    final localData = await DBHelper.getAllSubcategories(tableName);
 
-      isPriorityList =
-          subcategories.map((e) => e.downloadStatus == true).toList();
-      print('Loaded from local database (no ID case) for $title');
-    } else {
+    if (localData.isEmpty) {
+      log("No local data found, inserting passed subcategories...");
       for (var item in subcategories) {
-        await DBHelper.insertSubcategory(
-          item.copyWith(
-            sentenceSamples: List<String>.from(item.sentenceSamples),
-          ),
-          formattedTitle,
-        );
+        await DBHelper.insertSubcategory(item, tableName);
       }
-      isPriorityList =
-          subcategories.map((e) => e.downloadStatus == true).toList();
-      print('No local DB. Stored passed subcategories for $title');
+    } else {
+      log("Local data exists, skipping insert.");
     }
+
+    // Reload from DB to keep localPath, downloadStatus intact
+    subcategories = await DBHelper.getAllSubcategories(tableName);
+    isPriorityList =
+        subcategories.map((e) => e.downloadStatus == true).toList();
 
     isLoading = false;
     update();

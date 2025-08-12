@@ -1,79 +1,61 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart';
+import 'dart:typed_data';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:path_provider/path_provider.dart';
+import "package:path/path.dart" as p;
+// ignore: depend_on_referenced_packages
+import 'package:http/http.dart' as http;
 
 class AudioCryptoHelper {
-  static final _key = encrypt.Key.fromUtf8('my32lengthsupersecretnooneknows1');
-  static final _iv = encrypt.IV.fromLength(16);
-  static final _encrypter = encrypt.Encrypter(encrypt.AES(_key));
-
-  /// Download from [url], encrypt and save to local storage.
-  static Future<String> downloadAndEncryptFile(
-      String url, String fileName) async {
-    try {
-      if (!url.startsWith('http')) throw Exception('❌ Invalid URL: $url');
-
-      final response = await http.get(Uri.parse(url));
-
-      {
-        if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
-          final dir = await getApplicationDocumentsDirectory();
-          final filePath = join(dir.path, '$fileName.enc');
-          final file = File(filePath);
-
-          final encrypted =
-              _encrypter.encryptBytes(response.bodyBytes, iv: _iv);
-          await file.writeAsBytes(encrypted.bytes, flush: true);
-
-          print('✅ Encrypted and saved: $filePath');
-          return filePath;
-        } else {
-          throw Exception('❌ Failed to download or empty content: $url');
-        }
-      }
-    } catch (e) {
-      print('❌ Error in downloadAndEncryptFile: $e');
-      return '';
-    }
-  }
+  static final key =
+      encrypt.Key.fromUtf8('1234567890123456'); // must match encryption key
+  static final iv = encrypt.IV.fromLength(16);
+  static final encrypter = encrypt.Encrypter(encrypt.AES(key));
 
   static Future<String> decryptFile(
-      String encryptedPath, String fileName) async {
-    try {
-      final file = File(encryptedPath);
-
-      if (!await file.exists()) {
-        print("❌ File doesn't exist: $encryptedPath");
-        return '';
-      }
-
-      final encryptedBytes = await file.readAsBytes();
-      print("🔐 Encrypted bytes length: ${encryptedBytes.length}");
-
-      if (encryptedBytes.isEmpty) {
-        print("❌ Encrypted file is empty: $encryptedPath");
-        return '';
-      }
-
-      final decryptedBytes = _encrypter.decryptBytes(
-        encrypt.Encrypted(encryptedBytes),
-        iv: _iv,
-      );
-
-      final tempDir = await getTemporaryDirectory();
-      final decryptedPath = join(tempDir.path, '$fileName.mp3');
-
-      final decryptedFile = File(decryptedPath);
-      await decryptedFile.writeAsBytes(decryptedBytes, flush: true);
-
-      print("✅ Decrypted path: $decryptedPath");
-      return decryptedPath;
-    } catch (e) {
-      print('❌ Decryption failed for $encryptedPath: $e');
-      return '';
+      String encryptedPath, String outputFileName) async {
+    final encryptedFile = File(encryptedPath);
+    if (!await encryptedFile.exists()) {
+      throw Exception("Encrypted file not found: $encryptedPath");
     }
+
+    // Read encrypted bytes
+    final encryptedBytes = await encryptedFile.readAsBytes();
+
+    // Decrypt
+    final decryptedBytes = encrypter.decryptBytes(
+      encrypt.Encrypted(encryptedBytes),
+      iv: iv,
+    );
+
+    // Save to temporary file
+    final tempDir = await getTemporaryDirectory();
+    final outputPath = p.join(tempDir.path, "$outputFileName.mp3");
+    await File(outputPath).writeAsBytes(decryptedBytes);
+
+    return outputPath; // Return path for playback
+  }
+
+  static Future<String> downloadAndEncryptAudio(
+      String url, String fileName) async {
+    // Step 1: Download audio
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode != 200) throw Exception("Failed to download audio");
+
+    // Step 2: Prepare encryption
+    // final key = encrypt.Key.fromUtf8('1234567890123456'); // 16 chars
+    // final iv = encrypt.IV.fromLength(16);
+    // final encrypter = encrypt.Encrypter(encrypt.AES(key));
+
+    // Step 3: Encrypt data
+    final encrypted = encrypter.encryptBytes(response.bodyBytes, iv: iv);
+
+    // Step 4: Save encrypted file
+    final dir = await getApplicationDocumentsDirectory();
+    final filePath = p.join(dir.path, "$fileName.enc");
+    final file = File(filePath);
+    await file.writeAsBytes(encrypted.bytes);
+
+    return filePath; // Return path to store in DB
   }
 }

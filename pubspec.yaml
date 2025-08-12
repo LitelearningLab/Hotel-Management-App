@@ -2,7 +2,7 @@ name: hotelmanagementapp
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.18+26
+version: 1.0.19+27
 
 environment:
   sdk: '>=3.3.0 <3.4.0'  # Stay within Dart 3.3.x since you can't use 3.4.0+

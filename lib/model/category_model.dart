@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Category {
   final String category;
   final List<SubcategoryPro> subcategories;
@@ -24,28 +26,33 @@ class SubcategoryPro {
   final String text;
   final String pronun;
   bool downloadStatus;
+  String localPath;
   List<String> sentenceSamples;
 
-  SubcategoryPro(
-      {required this.file,
-      required this.isPriority,
-      required this.syllables,
-      required this.text,
-      required this.pronun,
-      this.downloadStatus = false,
-      required this.sentenceSamples});
+  SubcategoryPro({
+    required this.file,
+    required this.isPriority,
+    required this.syllables,
+    required this.text,
+    required this.pronun,
+    this.downloadStatus = false,
+    this.localPath = "",
+    required this.sentenceSamples,
+  });
+
   factory SubcategoryPro.fromJson(Map<String, dynamic> json) {
     return SubcategoryPro(
       file: json['file'] ?? '',
-      isPriority: json['isPriority']?.toString() ?? "false",
-      syllables: json['syllables'] ?? '',
-      text: json['text'] ?? '',
-      pronun: json['pronun'] ?? '',
-      downloadStatus: json['downloadStatus'] ?? false,
-      sentenceSamples: (json['sentenceSamples'] as List?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
+      isPriority: json['isPriority']?.toString() ?? '',
+      syllables: json['syllables']?.toString() ?? '',
+      text: json['text']?.toString() ?? '',
+      pronun: json['pronun']?.toString() ?? '',
+      downloadStatus:
+          json['downloadStatus'] == 1 || json['downloadStatus'] == true,
+      sentenceSamples: (json['sentenceSamples'] is String)
+          ? List<String>.from(jsonDecode(json['sentenceSamples']))
+          : (json['sentenceSamples'] ?? []).cast<String>(),
+      localPath: json['localPath'] ?? '',
     );
   }
 
@@ -56,13 +63,15 @@ class SubcategoryPro {
       syllables: map['syllables'] ?? '',
       text: map['text'] ?? '',
       pronun: map['pronun'] ?? '',
-      downloadStatus: map['downloadStatus'] == 1 ? true : false,
+      downloadStatus: map['downloadStatus'] == 1,
+      localPath: map['localPath'] ?? "",
       sentenceSamples: (map['sentenceSamples'] as List?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
     );
   }
+
   Map<String, dynamic> toMap() {
     return {
       'file': file,
@@ -71,19 +80,24 @@ class SubcategoryPro {
       'text': text,
       'pronun': pronun,
       'downloadStatus': downloadStatus ? 1 : 0,
-      'sentenceSamples': sentenceSamples ?? []
+      'localPath': localPath,
+      'sentenceSamples': sentenceSamples
     };
   }
 
-  SubcategoryPro copyWith({required List<String> sentenceSamples}) {
+  SubcategoryPro copyWith({
+    List<String>? sentenceSamples,
+    String? localPath,
+  }) {
     return SubcategoryPro(
-      file: this.file,
-      isPriority: this.isPriority,
-      syllables: this.syllables,
-      text: this.text,
-      pronun: this.pronun,
-      downloadStatus: this.downloadStatus,
-      sentenceSamples: sentenceSamples,
+      file: file,
+      isPriority: isPriority,
+      syllables: syllables,
+      text: text,
+      pronun: pronun,
+      downloadStatus: downloadStatus,
+      localPath: localPath ?? this.localPath,
+      sentenceSamples: sentenceSamples ?? this.sentenceSamples,
     );
   }
 }
