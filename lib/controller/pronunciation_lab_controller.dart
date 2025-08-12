@@ -109,21 +109,39 @@ class PronunciationLabController extends GetxController {
       DatabaseEvent event = await databaseRef.once();
       final data = event.snapshot.value;
 
+      log("📥 Raw snapshot: $data");
+
       if (data != null && data is List) {
-        // Directly cast each entry as a Map and convert to Category
         categories = data.map((item) {
           final categoryMap = Map<String, dynamic>.from(item as Map);
+
+          // Ensure subcategories are a List<Map<String, dynamic>>
           if (categoryMap['subcategories'] is List) {
             categoryMap['subcategories'] =
-                (categoryMap['subcategories'] as List)
-                    .map((item) => Map<String, dynamic>.from(item))
-                    .toList();
+                (categoryMap['subcategories'] as List).map((subcat) {
+              final subcatMap = Map<String, dynamic>.from(subcat);
+
+              // 🔹 Normalize sentenceSamples to List<String>
+              if (subcatMap['sentenceSamples'] is List) {
+                subcatMap['sentenceSamples'] =
+                    (subcatMap['sentenceSamples'] as List)
+                        .map((e) => e.toString())
+                        .toList();
+              } else {
+                subcatMap['sentenceSamples'] = <String>[];
+              }
+
+              return subcatMap;
+            }).toList();
           }
+
           return Category.fromJson(categoryMap);
         }).toList();
 
         log("✅ Data loaded: ${categories.length} categories");
-        log(categories[0].subcategories[0].pronun);
+        if (categories.isNotEmpty && categories[0].subcategories.isNotEmpty) {
+          log("📜 First subcategory sentenceSamples: ${categories[0].subcategories[0].sentenceSamples}");
+        }
       } else {
         errorMessage.value = "No data found or invalid format.";
         log("⚠️ No data found or invalid format.");

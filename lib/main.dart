@@ -17,6 +17,7 @@ import 'package:hotelmanagementapp/view/login.dart';
 import 'package:hotelmanagementapp/view/splash.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+bool isOnNoInternetPage = false;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -36,7 +37,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final Connectivity _connectivity = Connectivity();
   String? lastRoute;
-  bool isOnNoInternetPage = false;
 
   @override
   void initState() {
@@ -49,6 +49,7 @@ class _MyAppState extends State<MyApp> {
 
       if (!isConnected) {
         lastRoute = Get.currentRoute;
+        if (lastRoute == AppRoutes.inAppWebView) return;
         if (lastRoute == AppRoutes.noInternet) return;
 
         isOnNoInternetPage = true;

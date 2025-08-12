@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/instance_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +11,7 @@ import 'package:hotelmanagementapp/controller/search_screen_controller.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -223,17 +225,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                                           'simulationLink'],
                                                       proLabTitle: "");
 
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          InAppWebViewPage(
-                                                        isSimulation: true,
-                                                        url: item[
+                                                  Get.toNamed(
+                                                      AppRoutes.inAppWebView,
+                                                      arguments: {
+                                                        "isSimulation": true,
+                                                        "url": item[
                                                             'simulationLink'],
-                                                      ),
-                                                    ),
-                                                  );
+                                                      });
                                                 } else {
                                                   final querySnapshot =
                                                       await FirebaseFirestore
@@ -292,16 +290,14 @@ class _SearchScreenState extends State<SearchScreen> {
                                                           section: match['key'],
                                                           link: link,
                                                           proLabTitle: "");
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              InAppWebViewPage(
-                                                            isSimulation: false,
-                                                            url: link,
-                                                          ),
-                                                        ),
-                                                      );
+                                                      Get.toNamed(
+                                                          AppRoutes
+                                                              .inAppWebView,
+                                                          arguments: {
+                                                            "isSimulation":
+                                                                false,
+                                                            "url": link,
+                                                          });
                                                     } else {
                                                       openDialog(context);
                                                       print(

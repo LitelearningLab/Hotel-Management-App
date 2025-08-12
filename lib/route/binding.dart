@@ -1,8 +1,10 @@
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/controller/content_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/front_office_controller.dart';
 import 'package:hotelmanagementapp/controller/grammer_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
+import 'package:hotelmanagementapp/controller/in_app_web_view_controller.dart';
 import 'package:hotelmanagementapp/controller/language_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/pronunciation_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/pronunciation_lab_sub_controller.dart';
@@ -124,4 +126,11 @@ class SplashScreenBinding with Bindings {
 class NoInternetBinding with Bindings {
   @override
   void dependencies() {}
+}
+
+class InAppWebViewBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(InAppWebViewGetController());
+  }
 }

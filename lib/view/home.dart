@@ -322,12 +322,9 @@ class _HomeState extends State<Home>
                     padding: const EdgeInsets.all(16.0),
                     child: TextButton(
                       onPressed: () async {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => InAppWebViewPage(
-                                      url: ApiRoutes.privacyPolicy,
-                                    )));
+                        Get.toNamed(AppRoutes.inAppWebView, arguments: {
+                          "url": ApiRoutes.privacyPolicy,
+                        });
                       },
                       child: Text(
                         "Privacy & Policy",
@@ -849,20 +846,16 @@ class _HomeState extends State<Home>
                                                           <SubcategoryPro>[],
                                                     });
                                               } else {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        InAppWebViewPage(
-                                                      isSimulation:
+                                                Get.toNamed(
+                                                    AppRoutes.inAppWebView,
+                                                    arguments: {
+                                                      "isSimulation":
                                                           item['section'] ==
                                                                   'simulation'
                                                               ? true
                                                               : false,
-                                                      url: item['link'],
-                                                    ),
-                                                  ),
-                                                );
+                                                      "url": item['link'],
+                                                    });
                                               }
                                             },
                                             child: Row(

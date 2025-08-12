@@ -332,12 +332,9 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.all(16.0),
                       child: TextButton(
                         onPressed: () async {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => InAppWebViewPage(
-                                        url: ApiRoutes.privacyPolicy,
-                                      )));
+                          Get.toNamed(AppRoutes.inAppWebView, arguments: {
+                            "url": ApiRoutes.privacyPolicy,
+                          });
                         },
                         child: Text(
                           "Privacy & Policy",

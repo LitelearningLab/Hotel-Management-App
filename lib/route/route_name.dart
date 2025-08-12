@@ -15,4 +15,5 @@ class AppRoutes {
   static const contentLibrary = '/content_library';
   static const splashScreen = '/splash_screen';
   static const noInternet = '/no_internet';
+  static const inAppWebView = '/in_app_web_view';
 }

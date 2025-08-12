@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,7 +35,13 @@ class PronunciationLabSubController extends GetxController {
   void onInit() {
     audioPlayer = AudioPlayer();
     title = Get.arguments['title'];
-    subcategories = Get.arguments['subcategories'] as List<SubcategoryPro>;
+    final argList = Get.arguments['subcategories'] as List;
+    subcategories = argList
+        .map((item) => item is SubcategoryPro
+            ? item
+            : SubcategoryPro.fromMap(Map<String, dynamic>.from(item)))
+        .toList();
+
     collectionName = Get.arguments['pronunCollectionName'] ?? '';
     audioPlayer.playerStateStream.listen((state) {
       if (state.playing && state.processingState == ProcessingState.ready) {
@@ -47,7 +54,10 @@ class PronunciationLabSubController extends GetxController {
     });
     id = Get.arguments['id'] ?? "";
     if (id == "") {
-      elseCase();
+      // elseCase();
+      isPriorityList =
+          subcategories.map((e) => e.downloadStatus == true).toList();
+      isLoading = false;
     } else {
       fetchPronunById(id);
     }
@@ -162,14 +172,34 @@ class PronunciationLabSubController extends GetxController {
     final localData = await DBHelper.getAllSubcategories(formattedTitle);
 
     if (localData.isNotEmpty) {
-      subcategories = localData;
+      // Normalize sentenceSamples after fetching from DB
+      subcategories = localData.map((item) {
+        if (item.sentenceSamples is! List<String>) {
+          if (item.sentenceSamples is String) {
+            try {
+              item.sentenceSamples =
+                  List<String>.from(jsonDecode(item.sentenceSamples as String));
+            } catch (_) {
+              item.sentenceSamples = <String>[];
+            }
+          } else {
+            item.sentenceSamples = <String>[];
+          }
+        }
+        return item;
+      }).toList();
+
       isPriorityList =
           subcategories.map((e) => e.downloadStatus == true).toList();
       print('Loaded from local database (no ID case) for $title');
     } else {
-      // Store the passed subcategories locally
       for (var item in subcategories) {
-        await DBHelper.insertSubcategory(item, formattedTitle);
+        await DBHelper.insertSubcategory(
+          item.copyWith(
+            sentenceSamples: List<String>.from(item.sentenceSamples),
+          ),
+          formattedTitle,
+        );
       }
       isPriorityList =
           subcategories.map((e) => e.downloadStatus == true).toList();
@@ -214,11 +244,13 @@ class PronunciationLabSubController extends GetxController {
         List<SubcategoryPro> tempList = [];
 
         for (var item in category.subcategories) {
-          // final encryptedPath = await AudioCryptoHelper.downloadAndEncryptFile(
-          //     item.file, item.text);
-          // log("Encrypted path: $encryptedPath && time.file: ${item.file}");
+          // 4️⃣ Print each subcategory to inspect sentenceSamples
+          log("🔍 Subcategory: ${item.text}");
+          log("    ➡ sentenceSamples raw: ${item.sentenceSamples}");
+          log("    ➡ sentenceSamples length: ${item.sentenceSamples.length}");
 
           final newItem = SubcategoryPro(
+            sentenceSamples: item.sentenceSamples,
             file: item.file,
             isPriority: item.isPriority,
             syllables: item.syllables,
@@ -228,15 +260,18 @@ class PronunciationLabSubController extends GetxController {
           );
 
           await DBHelper.insertSubcategory(
-              newItem, title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase());
+            newItem,
+            title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase(),
+          );
           tempList.add(newItem);
         }
 
         subcategories = tempList;
         isPriorityList =
             subcategories.map((e) => e.downloadStatus == true).toList();
-        print(
-            'Fetched from Firebase and saved locally for $title ${subcategories.length} items');
+
+        log('🎯 Fetched from Firebase and saved locally for $title '
+            '${subcategories.length} items');
       } else {
         print('No Firebase data found for ID: $title');
       }

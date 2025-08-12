@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get/instance_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,6 +12,7 @@ import 'package:hotelmanagementapp/controller/simulation_sub_controller.dart';
 import 'package:hotelmanagementapp/model/simulation_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 
@@ -109,16 +111,11 @@ class _SimulationSubState extends State<SimulationSub> {
                                     link: controller
                                         .simulation.subcategory[index].links[0],
                                     proLabTitle: "");
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => InAppWebViewPage(
-                                      isSimulation: true,
-                                      url: controller.simulation
-                                          .subcategory[index].links[0],
-                                    ),
-                                  ),
-                                );
+                                Get.toNamed(AppRoutes.inAppWebView, arguments: {
+                                  "isSimulation": true,
+                                  "url": controller
+                                      .simulation.subcategory[index].links[0],
+                                });
                                 setState(() {});
                                 // controller.update();
                               },

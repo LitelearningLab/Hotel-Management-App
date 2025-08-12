@@ -1,8 +1,10 @@
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/default_route.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:hotelmanagementapp/route/binding.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
+import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/content_lab.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
@@ -99,6 +101,11 @@ class RouteService {
       name: AppRoutes.noInternet,
       page: () => NoInternetPage(),
       binding: NoInternetBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.inAppWebView,
+      page: () => InAppWebViewPage(),
+      binding: InAppWebViewBinding(),
     )
   ];
 }

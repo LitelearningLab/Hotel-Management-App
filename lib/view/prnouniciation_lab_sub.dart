@@ -432,6 +432,41 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                     ),
                                                   ],
                                                 ),
+                                                if (controller
+                                                    .subcategories[index]
+                                                    .sentenceSamples
+                                                    .isNotEmpty)
+                                                  SizedBox(
+                                                    height: getWidgetHeight(
+                                                        height: 12),
+                                                  ),
+
+                                                if (controller
+                                                    .subcategories[index]
+                                                    .sentenceSamples
+                                                    .isNotEmpty) ...[
+                                                  for (var sentence
+                                                      in controller
+                                                          .subcategories[index]
+                                                          .sentenceSamples)
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        highlightWord(
+                                                            sentence,
+                                                            controller
+                                                                .subcategories[
+                                                                    index]
+                                                                .text),
+                                                        Divider(
+                                                          thickness: 0.2,
+                                                          color: Colors.black,
+                                                        )
+                                                      ],
+                                                    )
+                                                ],
                                                 if (controller.selectedWord
                                                         .toLowerCase() ==
                                                     controller
@@ -491,5 +526,25 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
         ),
       );
     });
+  }
+
+  Widget highlightWord(String sentence, String targetWord) {
+    final words = sentence.split(' ');
+    return RichText(
+      text: TextSpan(
+        children: words.map((word) {
+          bool isMatch = word.toLowerCase().replaceAll(RegExp(r'[^\w]'), '') ==
+              targetWord.toLowerCase();
+          return TextSpan(
+            text: "$word ",
+            style: TextStyle(
+              fontWeight: isMatch ? FontWeight.bold : FontWeight.normal,
+              color: linearColor,
+              fontSize: kText.scale(14),
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 }

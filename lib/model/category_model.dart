@@ -24,27 +24,45 @@ class SubcategoryPro {
   final String text;
   final String pronun;
   bool downloadStatus;
+  List<String> sentenceSamples;
 
-  SubcategoryPro({
-    required this.file,
-    required this.isPriority,
-    required this.syllables,
-    required this.text,
-    required this.pronun,
-    this.downloadStatus = false,
-  });
-
+  SubcategoryPro(
+      {required this.file,
+      required this.isPriority,
+      required this.syllables,
+      required this.text,
+      required this.pronun,
+      this.downloadStatus = false,
+      required this.sentenceSamples});
   factory SubcategoryPro.fromJson(Map<String, dynamic> json) {
     return SubcategoryPro(
       file: json['file'] ?? '',
-      isPriority: json['isPriority'].toString() ?? "false",
+      isPriority: json['isPriority']?.toString() ?? "false",
       syllables: json['syllables'] ?? '',
       text: json['text'] ?? '',
       pronun: json['pronun'] ?? '',
       downloadStatus: json['downloadStatus'] ?? false,
+      sentenceSamples: (json['sentenceSamples'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
     );
   }
 
+  factory SubcategoryPro.fromMap(Map<String, dynamic> map) {
+    return SubcategoryPro(
+      file: map['file'] ?? '',
+      isPriority: map['isPriority']?.toString() ?? "false",
+      syllables: map['syllables'] ?? '',
+      text: map['text'] ?? '',
+      pronun: map['pronun'] ?? '',
+      downloadStatus: map['downloadStatus'] == 1 ? true : false,
+      sentenceSamples: (map['sentenceSamples'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+    );
+  }
   Map<String, dynamic> toMap() {
     return {
       'file': file,
@@ -52,18 +70,20 @@ class SubcategoryPro {
       'syllables': syllables,
       'text': text,
       'pronun': pronun,
-      'downloadStatus': downloadStatus ? 1 : 0, // Convert bool to int
+      'downloadStatus': downloadStatus ? 1 : 0,
+      'sentenceSamples': sentenceSamples ?? []
     };
   }
 
-  factory SubcategoryPro.fromMap(Map<String, dynamic> map) {
+  SubcategoryPro copyWith({required List<String> sentenceSamples}) {
     return SubcategoryPro(
-      file: map['file'] ?? '',
-      isPriority: map['isPriority'].toString() ?? "false",
-      syllables: map['syllables'] ?? '',
-      text: map['text'] ?? '',
-      pronun: map['pronun'] ?? '',
-      downloadStatus: map['downloadStatus'] == 1 ? true : false,
+      file: this.file,
+      isPriority: this.isPriority,
+      syllables: this.syllables,
+      text: this.text,
+      pronun: this.pronun,
+      downloadStatus: this.downloadStatus,
+      sentenceSamples: sentenceSamples,
     );
   }
 }

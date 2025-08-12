@@ -270,12 +270,15 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                           .link,
                                                                       proLabTitle:
                                                                           "");
-                                                                  Navigator.push(
-                                                                      context,
-                                                                      MaterialPageRoute(
-                                                                          builder: (context) => InAppWebViewPage(
-                                                                                url: controller.frontOfficeData[index].subcategory[0].link,
-                                                                              )));
+                                                                  Get.toNamed(
+                                                                      AppRoutes
+                                                                          .inAppWebView,
+                                                                      arguments: {
+                                                                        "url": controller
+                                                                            .frontOfficeData[index]
+                                                                            .subcategory[0]
+                                                                            .link
+                                                                      });
                                                                 }
                                                               : null,
                                                           child: Image.asset(
@@ -316,12 +319,15 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                           .link,
                                                                       proLabTitle:
                                                                           "");
-                                                                  Navigator.push(
-                                                                      context,
-                                                                      MaterialPageRoute(
-                                                                          builder: (context) => InAppWebViewPage(
-                                                                                url: controller.frontOfficeData[index].subcategory[1].link,
-                                                                              )));
+                                                                  Get.toNamed(
+                                                                      AppRoutes
+                                                                          .inAppWebView,
+                                                                      arguments: {
+                                                                        "url": controller
+                                                                            .frontOfficeData[index]
+                                                                            .subcategory[1]
+                                                                            .link
+                                                                      });
                                                                 }
                                                               : null,
                                                           child: Image.asset(
@@ -365,12 +371,15 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                           .link,
                                                                       proLabTitle:
                                                                           "");
-                                                                  Navigator.push(
-                                                                      context,
-                                                                      MaterialPageRoute(
-                                                                          builder: (context) => InAppWebViewPage(
-                                                                                url: controller.frontOfficeData[index].subcategory[2].link,
-                                                                              )));
+                                                                  Get.toNamed(
+                                                                      AppRoutes
+                                                                          .inAppWebView,
+                                                                      arguments: {
+                                                                        "url": controller
+                                                                            .frontOfficeData[index]
+                                                                            .subcategory[2]
+                                                                            .link
+                                                                      });
                                                                 }
                                                               : null,
                                                           child: Image.asset(
