@@ -1,27 +1,45 @@
 class SentenceModel {
+  final int? id;
   final String file;
   final bool isPriority;
   final String text;
+  bool isDownloaded;
+  String localPath;
 
   SentenceModel({
+    this.id,
     required this.file,
     required this.isPriority,
     required this.text,
+    this.isDownloaded = false,
+    this.localPath = '',
   });
 
   factory SentenceModel.fromJson(Map<String, dynamic> json) {
     return SentenceModel(
-      file: json['file'] ?? '',
-      isPriority: json['isPriority'].toString().toLowerCase() == 'true',
-      text: json['text'] ?? '',
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id']?.toString() ?? ''),
+      file: json['file']?.toString() ?? '',
+      isPriority: json['isPriority'] == true ||
+          json['isPriority']?.toString().toLowerCase() == 'true',
+      text: json['text']?.toString() ?? '',
+      isDownloaded: json['isDownloaded'] == true ||
+          json['isDownloaded']?.toString().toLowerCase() == 'true',
+      localPath: json['localPath']?.toString() ?? '',
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'file': file,
-        'isPriority': isPriority,
-        'text': text,
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'file': file,
+      'isPriority': isPriority,
+      'text': text,
+      'isDownloaded': isDownloaded,
+      'localPath': localPath,
+    };
+  }
 }
 
 class SubCategoryModel {
@@ -31,18 +49,23 @@ class SubCategoryModel {
   SubCategoryModel({required this.id, required this.sentence});
 
   factory SubCategoryModel.fromJson(Map<String, dynamic> json) {
+    final sentenceList = json['sentence'];
     return SubCategoryModel(
-      id: json['id'] ?? '',
-      sentence: (json['sentence'] as List<dynamic>)
-          .map((e) => SentenceModel.fromJson(e))
-          .toList(),
+      id: json['id']?.toString() ?? '',
+      sentence: sentenceList is List
+          ? sentenceList
+              .map((e) => SentenceModel.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : [],
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'sentence': sentence.map((s) => s.toJson()).toList(),
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'sentence': sentence.map((s) => s.toJson()).toList(),
+    };
+  }
 }
 
 class CategoryModel {
@@ -53,6 +76,25 @@ class CategoryModel {
     required this.categoryName,
     required this.subCategories,
   });
+
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    final subCatList = json['subCategories'];
+    return CategoryModel(
+      categoryName: json['categoryName']?.toString() ?? '',
+      subCategories: subCatList is List
+          ? subCatList
+              .map((e) => SubCategoryModel.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : [],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'categoryName': categoryName,
+      'subCategories': subCategories.map((sc) => sc.toJson()).toList(),
+    };
+  }
 }
 
 class SentenceLabModel {
@@ -63,4 +105,23 @@ class SentenceLabModel {
     required this.sectionName,
     required this.categories,
   });
+
+  factory SentenceLabModel.fromJson(Map<String, dynamic> json) {
+    final categoryList = json['categories'];
+    return SentenceLabModel(
+      sectionName: json['sectionName']?.toString() ?? '',
+      categories: categoryList is List
+          ? categoryList
+              .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : [],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sectionName': sectionName,
+      'categories': categories.map((c) => c.toJson()).toList(),
+    };
+  }
 }

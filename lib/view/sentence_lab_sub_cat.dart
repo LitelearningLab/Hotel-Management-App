@@ -58,191 +58,218 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
               ),
             ),
           ),
-          body: ListView.builder(
-            padding: EdgeInsets.symmetric(
-              vertical: getWidgetHeight(height: 10),
-              horizontal: getWidgetWidth(width: 10),
-            ),
-            itemCount: controller.subcategories.length,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              SubCategoryModel subCategory = controller.subcategories[index];
-              String? subname = subCategory.id;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    toBeginningOfSentenceCase(subname) ?? "",
-                    style: GoogleFonts.poppins(
-                      color: linearColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+          body: controller.isLoading
+              ? CircularProgressIndicator()
+              : ListView.builder(
+                  padding: EdgeInsets.symmetric(
+                    vertical: getWidgetHeight(height: 10),
+                    horizontal: getWidgetWidth(width: 10),
                   ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: subCategory.sentence.length,
-                    itemBuilder: (context, subIndex) {
-                      final sentence = subCategory.sentence[subIndex];
-                      final isExpanded =
-                          expandedIndex == index * 1000 + subIndex;
-
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            expandedIndex =
-                                isExpanded ? -1 : index * 1000 + subIndex;
-                          });
-                        },
-                        child: Container(
-                          margin: EdgeInsets.symmetric(
-                              vertical: getWidgetHeight(height: 6)),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                offset: const Offset(0, 4),
-                                blurRadius: 10,
-                              ),
-                            ],
+                  itemCount: controller.subcategories.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    SubCategoryModel subCategory =
+                        controller.subcategories[index];
+                    String? subname = subCategory.id;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          toBeginningOfSentenceCase(subname) ?? "",
+                          style: GoogleFonts.poppins(
+                            color: linearColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  top: getWidgetHeight(height: 8),
-                                  bottom: getWidgetHeight(height: 8),
-                                  left: getWidgetWidth(width: 10),
-                                  // right: getWidgetWidth(width: 15)
+                        ),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: subCategory.sentence.length,
+                          itemBuilder: (context, subIndex) {
+                            final sentence = subCategory.sentence[subIndex];
+                            final isExpanded =
+                                expandedIndex == index * 1000 + subIndex;
+
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  expandedIndex =
+                                      isExpanded ? -1 : index * 1000 + subIndex;
+                                });
+                              },
+                              child: Container(
+                                margin: EdgeInsets.symmetric(
+                                    vertical: getWidgetHeight(height: 6)),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      offset: const Offset(0, 4),
+                                      blurRadius: 10,
+                                    ),
+                                  ],
                                 ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                child: Column(
                                   children: [
-                                    Expanded(
-                                      child: Text(
-                                        sentence.text,
-                                        style: TextStyle(
-                                          fontFamily: Keys.fontFamily,
-                                          letterSpacing: 0,
-                                        ),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        top: getWidgetHeight(height: 8),
+                                        bottom: getWidgetHeight(height: 8),
+                                        left: getWidgetWidth(width: 10),
+                                        // right: getWidgetWidth(width: 15)
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              sentence.text,
+                                              style: TextStyle(
+                                                fontFamily: Keys.fontFamily,
+                                                letterSpacing: 0,
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              controller.saveUpdate(
+                                                  index, subIndex);
+                                            },
+                                            icon: SizedBox(
+                                              // width: displayWidth(context) / 18.75,
+                                              // height: displayHeight(context) / 40.6,
+                                              height: 19,
+                                              width: 19,
+                                              child: controller.isLoadingMap[
+                                                          "$index-$subIndex"] ==
+                                                      true
+                                                  ? CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color: linearColor,
+                                                    )
+                                                  : Image.asset(
+                                                      AllAssets.save,
+                                                      width: 18,
+                                                      color:
+                                                          sentence.isDownloaded
+                                                              ? linearColor
+                                                              : Colors.black,
+                                                    ),
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                    IconButton(
-                                      onPressed: () {},
-                                      icon: SizedBox(
-                                        // width: displayWidth(context) / 18.75,
-                                        // height: displayHeight(context) / 40.6,
-                                        height: 19,
-                                        width: 19,
-                                        child: Image.asset(
-                                          AllAssets.save,
-                                          width: 18,
-                                          color: Colors.black,
-                                        ),
+                                    AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      curve: Curves.fastOutSlowIn,
+                                      height: isExpanded
+                                          ? getWidgetHeight(height: 65)
+                                          : 0,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: getWidgetWidth(width: 15),
                                       ),
-                                    )
+                                      child: isExpanded
+                                          ? Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Divider(
+                                                  color: Color.fromARGB(
+                                                      255, 107, 107, 107),
+                                                ),
+                                                SizedBox(
+                                                    height: getWidgetHeight(
+                                                        height: 6)),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  children: [
+                                                    InkWell(
+                                                      onTap: () async {
+                                                        controller
+                                                            .handlePlayPause(
+                                                                index,
+                                                                subIndex);
+                                                      },
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            controller.currentlyPlayingIndex ==
+                                                                    subIndex
+                                                                ? Icons
+                                                                    .pause_circle_outline
+                                                                : Icons
+                                                                    .play_circle_outline,
+                                                            color: Colors.black,
+                                                          ),
+                                                          SizedBox(
+                                                              width:
+                                                                  getWidgetWidth(
+                                                                      width:
+                                                                          5)),
+                                                          const Text(
+                                                              "Native Speaker",
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      13)),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    InkWell(
+                                                      onTap: () {
+                                                        controller.kShowDialog(
+                                                            sentence.text,
+                                                            false,
+                                                            context);
+                                                        // Add dialog or recording functionality
+                                                      },
+                                                      child: Row(
+                                                        children: [
+                                                          const Icon(Icons.mic),
+                                                          SizedBox(
+                                                              width:
+                                                                  getWidgetWidth(
+                                                                      width:
+                                                                          5)),
+                                                          const Text("Practice",
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      13)),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            )
+                                          : const SizedBox.shrink(),
+                                    ),
                                   ],
                                 ),
                               ),
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.fastOutSlowIn,
-                                height: isExpanded
-                                    ? getWidgetHeight(height: 65)
-                                    : 0,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: getWidgetWidth(width: 15),
-                                ),
-                                child: isExpanded
-                                    ? Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Divider(
-                                            color: Color.fromARGB(
-                                                255, 107, 107, 107),
-                                          ),
-                                          SizedBox(
-                                              height:
-                                                  getWidgetHeight(height: 6)),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              InkWell(
-                                                onTap: () async {
-                                                  controller.handlePlayPause(
-                                                      index, subIndex);
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    Icon(
-                                                      controller.currentlyPlayingIndex ==
-                                                              subIndex
-                                                          ? Icons
-                                                              .pause_circle_outline
-                                                          : Icons
-                                                              .play_circle_outline,
-                                                      color: Colors.black,
-                                                    ),
-                                                    SizedBox(
-                                                        width: getWidgetWidth(
-                                                            width: 5)),
-                                                    const Text("Native Speaker",
-                                                        style: TextStyle(
-                                                            fontSize: 13)),
-                                                  ],
-                                                ),
-                                              ),
-                                              InkWell(
-                                                onTap: () {
-                                                  controller.kShowDialog(
-                                                      sentence.text,
-                                                      false,
-                                                      context);
-                                                  // Add dialog or recording functionality
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    const Icon(Icons.mic),
-                                                    SizedBox(
-                                                        width: getWidgetWidth(
-                                                            width: 5)),
-                                                    const Text("Practice",
-                                                        style: TextStyle(
-                                                            fontSize: 13)),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      )
-                                    : const SizedBox.shrink(),
+                            );
+                          },
+                        ),
+                        controller.subcategories.length - 1 != index
+                            ? Divider(
+                                color: Colors.grey[300],
+                                thickness: 1,
+                                height: getWidgetHeight(height: 20),
+                              )
+                            : SizedBox(
+                                height: getWidgetHeight(height: 20),
                               ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  controller.subcategories.length - 1 != index
-                      ? Divider(
-                          color: Colors.grey[300],
-                          thickness: 1,
-                          height: getWidgetHeight(height: 20),
-                        )
-                      : SizedBox(
-                          height: getWidgetHeight(height: 20),
-                        ),
-                ],
-              );
-            },
-          ),
+                      ],
+                    );
+                  },
+                ),
         ),
       );
     });
