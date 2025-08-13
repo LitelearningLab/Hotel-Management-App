@@ -105,42 +105,41 @@ class HomeController extends GetxController {
       final userData = userSnapshot.data() ?? {};
       final String collegeId = userData['collegeId'] ?? '';
       log("College ID: $collegeId");
-
       if (collegeId.isNotEmpty) {
-        DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
             .collection('UniversityCollection')
-            .doc(collegeId)
+            .where('collegeId', isEqualTo: collegeId)
+            .limit(1) // assuming only one document matches
             .get();
 
-        if (snapshot.exists) {
-          final data = snapshot.data() as Map<String, dynamic>;
+        if (querySnapshot.docs.isNotEmpty) {
+          final data = querySnapshot.docs.first.data() as Map<String, dynamic>;
 
-          // ✅ Parse using your model
           universityModel = UniversityModel.fromMap(data);
           cardNames.insert(4, universityModel.collegeName);
           update();
 
-          print('📘 College Name: ${universityModel.collegeName}');
-          print('🏷️ College ID: ${universityModel.collegeId}');
+          log('📘 College Name: ${universityModel.collegeName}');
+          log('🏷️ College ID: ${universityModel.collegeId}');
 
           for (var category in universityModel.category) {
-            print('\n📚 Category: ${category.name}');
-            print('   ID: ${category.id}');
-            print('   Order: ${category.order}');
+            log('\n📚 Category: ${category.name}');
+            log('   ID: ${category.id}');
+            log('   Order: ${category.order}');
 
             for (var subject in category.subcategory) {
-              print('   ➤ ${subject.text}');
+              log('   ➤ ${subject.text}');
             }
-            print('-----------------------------');
+            log('-----------------------------');
           }
         } else {
-          print('⚠️ No college data found for this collegeId.');
+          log('⚠️ No college data found for this collegeId.');
         }
       } else {
-        print('⚠️ No collegeId found for user.');
+        log('⚠️ No collegeId found for user.');
       }
     } catch (e) {
-      print('❌ Error fetching data: $e');
+      log('❌ Error fetching data: $e');
     }
 
     update();
