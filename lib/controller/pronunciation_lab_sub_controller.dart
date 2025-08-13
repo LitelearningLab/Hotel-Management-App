@@ -6,6 +6,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hotelmanagementapp/public/constant.dart';
+
 import 'package:get/get.dart';
 
 import 'package:hotelmanagementapp/model/category_model.dart';
@@ -109,15 +112,15 @@ class PronunciationLabSubController extends GetxController {
 
   void saveUpdate(int index) async {
     isSaving = index;
-    try {
-      String tableName = title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
-      String fileKey = subcategories[index].file; // Use exact file key
-      String fileName = subcategories[index].text.replaceAll(' ', '_');
-      String url = subcategories[index].file;
+    String tableName = title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
+    String fileKey = subcategories[index].file; // Use exact file key
+    String fileName = subcategories[index].text.replaceAll(' ', '_');
+    String url = subcategories[index].file;
 
-      // Toggle current UI state first
-      bool newValue = !isPriorityList[index];
-      isPriorityList[index] = newValue;
+    // Toggle current UI state first
+    bool newValue = !isPriorityList[index];
+    isPriorityList[index] = newValue;
+    try {
       update();
 
       if (newValue) {
@@ -152,6 +155,16 @@ class PronunciationLabSubController extends GetxController {
       log("❌ Failed to update isPriority at index $index: $e");
     }
     isSaving = -1;
+    Fluttertoast.showToast(
+        msg: newValue
+            ? "Added to your priority list"
+            : "Removed from your priority list",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: linearColor,
+        textColor: Colors.white,
+        fontSize: 12.0);
     update();
   }
 

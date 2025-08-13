@@ -11,6 +11,7 @@ class SentenceLabController extends GetxController {
   RxString title = "Sentence Lab".obs;
   late List<SentenceLabModel> sentenceLabList;
   final RxBool isLoading = true.obs;
+
   List<Map<String, dynamic>> sentenceConstructionLabList = [
     {
       'image': AllAssets.slPcp,
@@ -157,7 +158,6 @@ class SentenceLabController extends GetxController {
       'bgColor': Color(0xFF0190FE),
     },
   ];
-
   @override
   void onInit() {
     log('[onInit] Starting onInit');
@@ -174,30 +174,24 @@ class SentenceLabController extends GetxController {
     sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
     log('[onFirst] Loaded ${sentenceLabList.length} items from local DB');
 
-    if (sentenceLabList.isNotEmpty) {
-      log('[onFirst] Using local DB data, skipping Firebase fetch');
-      isLoading.value = false;
-      update();
-      return;
-    }
-
     try {
-      log('[onFirst] No local data found, fetching from Firebase...');
-      sentenceLabList = await fetchSentenceLabData();
-      log('[onFirst] Fetched ${sentenceLabList.length} items from Firebase');
+      log('[onFirst] Fetching latest data from Firebase...');
+      final firebaseData = await fetchSentenceLabData();
+      log('[onFirst] Fetched ${firebaseData.length} sections from Firebase');
 
-      log('[onFirst] Saving fetched data locally...');
-      await saveDataLocally(sentenceLabList);
-      log('[onFirst] Data saved locally');
+      log('[onFirst] Saving/Updating local data...');
+      await saveDataLocallyIncremental(firebaseData);
+      log('[onFirst] Incremental save completed');
 
-      isLoading.value = false;
-      update();
+      // Reload local after merge
+      sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
     } catch (e, stacktrace) {
-      isLoading.value = false;
-      update();
-      log('[onFirst] Error fetching data: $e');
+      log('[onFirst] Error syncing data: $e');
       log("$stacktrace");
     }
+
+    isLoading.value = false;
+    update();
   }
 
   Future<List<SentenceLabModel>> fetchSentenceLabData() async {
@@ -222,25 +216,19 @@ class SentenceLabController extends GetxController {
     log('[parseSentenceLabCollection] Parsing JSON...');
     final sections = json.entries.map((sectionEntry) {
       final sectionName = sectionEntry.key;
-      log('[parseSentenceLabCollection] Parsing section: $sectionName');
       final categoryMap = Map<String, dynamic>.from(sectionEntry.value as Map);
 
       final categories = categoryMap.entries.map((categoryEntry) {
         final categoryName = categoryEntry.key;
-        log('  [parseSentenceLabCollection] Parsing category: $categoryName');
         final subCategoryMap =
             Map<String, dynamic>.from(categoryEntry.value as Map);
 
         final subCategories = subCategoryMap.entries.map((subCategoryEntry) {
           final subCategoryId = subCategoryEntry.key;
-          log('    [parseSentenceLabCollection] Parsing subCategory: $subCategoryId');
           final rawList = subCategoryEntry.value as List<dynamic>;
 
           final sentenceModels = rawList.map((e) {
-            final sentence =
-                SentenceModel.fromJson(Map<String, dynamic>.from(e as Map));
-            log('      [parseSentenceLabCollection] Parsed sentence: ${sentence.text}');
-            return sentence;
+            return SentenceModel.fromJson(Map<String, dynamic>.from(e as Map));
           }).toList();
 
           return SubCategoryModel(
@@ -265,34 +253,56 @@ class SentenceLabController extends GetxController {
     return sections;
   }
 
-  Future<void> saveDataLocally(List<SentenceLabModel> data) async {
-    log('[saveDataLocally] Starting saving data locally...');
+  Future<void> saveDataLocallyIncremental(List<SentenceLabModel> data) async {
     final dbHelper = SentenceDBHelper();
 
-    log('[saveDataLocally] Clearing old data...');
-    await dbHelper.clearAllData();
-
     for (var section in data) {
-      log('[saveDataLocally] Inserting section: ${section.sectionName}');
-      int sectionId = await dbHelper.insertSection(section.sectionName);
+      // Section
+      int? sectionId = await dbHelper.getSectionIdByName(section.sectionName);
+      if (sectionId == null) {
+        sectionId = await dbHelper.insertSection(section.sectionName);
+      }
 
       for (var category in section.categories) {
-        log('  [saveDataLocally] Inserting category: ${category.categoryName}');
-        int categoryId =
-            await dbHelper.insertCategory(sectionId, category.categoryName);
+        // Category
+        int? categoryId =
+            await dbHelper.getCategoryId(sectionId!, category.categoryName);
+        if (categoryId == null) {
+          categoryId =
+              await dbHelper.insertCategory(sectionId, category.categoryName);
+        }
 
         for (var subCategory in category.subCategories) {
-          log('    [saveDataLocally] Inserting subCategory: ${subCategory.id}');
-          int subCategoryDbId =
-              await dbHelper.insertSubCategory(categoryId, subCategory.id);
+          // SubCategory
+          int? subCategoryDbId =
+              await dbHelper.getSubCategoryDbId(categoryId!, subCategory.id);
+          if (subCategoryDbId == null) {
+            subCategoryDbId =
+                await dbHelper.insertSubCategory(categoryId, subCategory.id);
+          }
 
           for (var sentence in subCategory.sentence) {
-            log('      [saveDataLocally] Inserting sentence: ${sentence.text}');
-            await dbHelper.insertSentence(subCategoryDbId, sentence);
+            // Sentence
+            final exists = await _sentenceExists(
+                subCategoryDbId!, sentence.text, dbHelper);
+            if (!exists) {
+              await dbHelper.insertSentence(subCategoryDbId, sentence);
+            }
           }
         }
       }
     }
-    print('[saveDataLocally] Finished saving data locally');
+  }
+
+  Future<bool> _sentenceExists(
+      int subCategoryDbId, String text, SentenceDBHelper dbHelper) async {
+    final db = await dbHelper.database;
+    final res = await db.query(
+      'sentences',
+      where: 'subCategoryId = ? AND text = ?',
+      whereArgs: [subCategoryDbId, text],
+      limit: 1,
+    );
+    return res.isNotEmpty;
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/pronunciation_lab_sub_controller.dart';
@@ -10,7 +11,13 @@ import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/public/spacing.dart';
+import 'package:hotelmanagementapp/utility/boom_menu.dart';
+
+import 'package:hotelmanagementapp/utility/boom_menu_item.dart' as bm;
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
+
+import '../utility/boom_menu_item.dart';
+import '../utility/boom_menu_item.dart';
 
 class PronunciationLabSub extends StatefulWidget {
   const PronunciationLabSub({super.key});
@@ -35,12 +42,13 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
           stopTimerMainCategory();
         },
         child: Scaffold(
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
-          floatingActionButton: Align(
-            alignment: Alignment.bottomCenter,
-            child: CustomeBottomNavigation(),
-          ),
+          bottomNavigationBar: CustomeBottomNavigation(),
+          // floatingActionButtonLocation:
+          //     FloatingActionButtonLocation.centerDocked,
+          // floatingActionButton: Align(
+          //   alignment: Alignment.bottomCenter,
+          //   child: buildBoomMenu(),
+          // ),
           appBar: AppBar(
             forceMaterialTransparency: true,
             surfaceTintColor: Colors.white,
@@ -50,8 +58,8 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
             title: Padding(
               padding: EdgeInsets.only(right: getWidgetWidth(width: 12)),
               child: Text(
-                controller.title, maxLines: 2,
-                // textAlign: TextAlign.start,
+                controller.title,
+                maxLines: 2,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -64,6 +72,39 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
               },
               icon: const Icon(Icons.arrow_back),
             ),
+
+            // 🔹 Three-dot menu at the end
+            actions: [
+              PopupMenuButton<String>(
+                color: Colors.white,
+                onSelected: (value) {
+                  if (value == 'priority') {
+                    // Handle filter priority
+                    print("Filter Priority Clicked");
+                  } else if (value == 'all_priority') {
+                    // Handle filter all priority
+                    print("Filter All Priority Clicked");
+                  } else if (value == 'search') {
+                    // Handle search
+                    print("Search Clicked");
+                  }
+                },
+                itemBuilder: (BuildContext context) => [
+                  const PopupMenuItem<String>(
+                    value: 'priority',
+                    child: Text('Filter Priority'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'all_priority',
+                    child: Text('Filter All Priority'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'search',
+                    child: Text('Search'),
+                  ),
+                ],
+              ),
+            ],
           ),
           body: controller.isLoading
               ? Center(
@@ -539,14 +580,15 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                           )
                                         : const SizedBox.shrink(),
                                   ),
+                                  if (controller.subcategories.length - 1 ==
+                                      index)
+                                    SizedBox(
+                                      height: getWidgetHeight(height: 40),
+                                    )
                                 ],
                               );
                             },
                           ),
-                        ),
-                        Container(
-                          color: Colors.transparent,
-                          height: getWidgetHeight(height: 80),
                         ),
                       ],
                     ),
@@ -572,6 +614,56 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
           );
         }).toList(),
       ),
+    );
+  }
+
+  buildBoomMenu() {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+          vertical: getWidgetHeight(height: 80),
+          horizontal: getWidgetWidth(width: 10)),
+      child: BoomMenu(
+          animatedIcon: AnimatedIcons.menu_close,
+          animatedIconTheme: IconThemeData(size: 22.0, color: Colors.white),
+          onOpen: () {
+            print('OPENING DIAL');
+          },
+          onClose: () {
+            print('DIAL CLOSED');
+          },
+          backgroundColor: linearColor,
+          overlayColor: Colors.grey[400], //Colors.transparent,
+          overlayOpacity: 0.9,
+          children: [
+            bm.MenuItem(
+              child: Container(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: getWidgetWidth(width: 12),
+                      vertical: getWidgetHeight(height: 12)),
+                  decoration: BoxDecoration(
+                      color: Colors.white, shape: BoxShape.circle),
+                  child: Image.asset("assets/images/filter.png",
+                      color: Colors.grey)),
+              title: "Filter Priority",
+              titleColor: Colors.white,
+              backgroundColor: Colors.transparent,
+              onTap: () {},
+            ),
+            bm.MenuItem(
+              child: Container(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: getWidgetWidth(width: 12),
+                      vertical: getWidgetHeight(height: 12)),
+                  decoration: BoxDecoration(
+                      color: Colors.white, shape: BoxShape.circle),
+                  child: Image.asset("assets/images/filter_all.png",
+                      color: Colors.grey)),
+              title: "Filter All Priority",
+              titleColor: Colors.white,
+              backgroundColor: Colors.transparent,
+              onTap: () {},
+            ),
+          ]),
     );
   }
 }

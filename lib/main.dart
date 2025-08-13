@@ -76,9 +76,27 @@ class _MyAppState extends State<MyApp> {
       initialBinding: InitialBinding(),
       title: 'Hotel Management App',
       theme: ThemeData(
+        useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
         primaryColor: Colors.white,
-        colorScheme: ColorScheme.fromSwatch().copyWith(primary: Colors.white),
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: Colors.white,
+          surface: Colors.white,
+          onSurface: Colors.black,
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+        ),
+        popupMenuTheme: const PopupMenuThemeData(
+          color: Colors.white,
+          surfaceTintColor: Colors.transparent,
+        ),
+        dialogTheme: const DialogTheme(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+        ),
       ),
       initialRoute: AppRoutes.splashScreen,
     );

@@ -2,7 +2,7 @@ name: hotelmanagementapp
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.19+27
+version: 1.0.20+28
 
 environment:
   sdk: '>=3.3.0 <3.4.0'  # Stay within Dart 3.3.x since you can't use 3.4.0+
@@ -47,6 +47,9 @@ dependencies:
   flutter_inappwebview: ^5.7.2+3
   webview_flutter: ^4.4.2
   flutter_html: ^3.0.0-beta.2
+  fluttertoast: ^8.2.8
+  toast: ^0.3.0
+  lib: ^0.0.3
   # pdf_render: ^1.4.12
   # dio: ^5.8.0+1
 

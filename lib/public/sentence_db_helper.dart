@@ -166,6 +166,102 @@ class SentenceDBHelper {
     await db.delete('sentence_lab_sections');
   }
 
+  Future<void> saveDataLocallyIncremental(List<SentenceLabModel> data) async {
+    final dbHelper = SentenceDBHelper();
+
+    for (var section in data) {
+      // 1. Section
+      int? sectionId = await dbHelper.getSectionIdByName(section.sectionName);
+      if (sectionId == null) {
+        sectionId = await dbHelper.insertSection(section.sectionName);
+        if (sectionId == 0) {
+          // If insert ignored (already exists), fetch id
+          sectionId = await dbHelper.getSectionIdByName(section.sectionName);
+        }
+      }
+
+      for (var category in section.categories) {
+        // 2. Category
+        int? categoryId =
+            await dbHelper.getCategoryId(sectionId!, category.categoryName);
+        if (categoryId == null) {
+          categoryId =
+              await dbHelper.insertCategory(sectionId, category.categoryName);
+          if (categoryId == 0) {
+            categoryId =
+                await dbHelper.getCategoryId(sectionId, category.categoryName);
+          }
+        }
+
+        for (var subCategory in category.subCategories) {
+          // 3. Subcategory
+          int? subCategoryDbId =
+              await dbHelper.getSubCategoryDbId(categoryId!, subCategory.id);
+          if (subCategoryDbId == null) {
+            subCategoryDbId =
+                await dbHelper.insertSubCategory(categoryId, subCategory.id);
+            if (subCategoryDbId == 0) {
+              subCategoryDbId =
+                  await dbHelper.getSubCategoryDbId(categoryId, subCategory.id);
+            }
+          }
+
+          for (var sentence in subCategory.sentence) {
+            // 4. Sentence check
+            final exists = await _sentenceExists(
+                subCategoryDbId!, sentence.text, dbHelper);
+            if (!exists) {
+              await dbHelper.insertSentence(subCategoryDbId, sentence);
+            }
+          }
+        }
+      }
+    }
+  }
+
+// Helper: check if sentence already exists by subcategory + text
+  Future<bool> _sentenceExists(
+      int subCategoryDbId, String text, SentenceDBHelper dbHelper) async {
+    final db = await dbHelper.database;
+    final res = await db.query(
+      'sentences',
+      where: 'subCategoryId = ? AND text = ?',
+      whereArgs: [subCategoryDbId, text],
+      limit: 1,
+    );
+    return res.isNotEmpty;
+  }
+
+  Future<void> removeMissingDataFromFirebase(
+      List<String> firebaseSentenceIds) async {
+    final db = await database;
+
+    // Step 1: Get all sentence IDs currently stored in SQLite
+    final localSentences = await db.query('sentences', columns: ['id']);
+    final localIds = localSentences.map((row) => row['id'].toString()).toSet();
+
+    // Step 2: Firebase IDs → set for quick lookup
+    final firebaseIdSet = firebaseSentenceIds.toSet();
+
+    // Step 3: Find IDs that are in SQLite but NOT in Firebase
+    final missingIds = localIds.difference(firebaseIdSet);
+
+    if (missingIds.isEmpty) {
+      log("✅ No missing data to remove.");
+      return;
+    }
+
+    // Step 4: Delete missing sentences from SQLite
+    final placeholders = List.filled(missingIds.length, '?').join(',');
+    await db.delete(
+      'sentences',
+      where: 'id IN ($placeholders)',
+      whereArgs: missingIds.toList(),
+    );
+
+    log("🗑️ Removed ${missingIds.length} missing sentences from SQLite.");
+  }
+
   Future<List<SentenceLabModel>> getAllSentenceLabData() async {
     final db = await database;
 
