@@ -128,9 +128,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: getWidgetWidth(width: 20),
                                 ),
                               ),
-                              SizedBox(width: getWidgetWidth(width: 15)),
+                              SizedBox(width: getWidgetWidth(width: 4)),
                               Text(
-                                " +91 $mobileNumber",
+                                "+91 $mobileNumber",
                                 style: TextStyle(
                                     fontFamily: Keys.fontFamily,
                                     color: Colors.black87,
@@ -176,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: getWidgetWidth(width: 15),
                                 ),
                               ),
-                              SizedBox(width: getWidgetWidth(width: 15)),
+                              SizedBox(width: getWidgetWidth(width: 4)),
                               Text(
                                 email,
                                 style: TextStyle(
@@ -224,7 +224,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: getWidgetWidth(width: 15),
                                 ),
                               ),
-                              SizedBox(width: getWidgetWidth(width: 15)),
+                              SizedBox(
+                                width: getWidgetWidth(width: 4),
+                              ),
                               Text(
                                 collegeName,
                                 style: TextStyle(
@@ -274,7 +276,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: getWidgetWidth(width: 15),
                                 ),
                               ),
-                              SizedBox(width: getWidgetWidth(width: 15)),
+                              SizedBox(
+                                width: getWidgetWidth(width: 4),
+                              ),
                               Text(
                                 "${toBeginningOfSentenceCase(city) ?? ''}, ${toBeginningOfSentenceCase(country) ?? ''}",
                                 style: TextStyle(
@@ -304,36 +308,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   margin: EdgeInsets.symmetric(
                       horizontal: getWidgetWidth(width: 10)),
                   child: Container(
-                      height: getWidgetHeight(height: 50),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(7),
-                              bottomRight: Radius.circular(7))),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 20,
-                              backgroundColor: Color(0XFFf66b5c),
-                              child: Image.asset(
-                                "assets/images/calendar_profile.png",
-                                height: getWidgetHeight(height: 15),
-                                width: getWidgetWidth(width: 15),
-                              ),
-                            ),
-                            SizedBox(width: 15),
-                            Text(
-                              "Active from $joinDate to  ",
-                              style: TextStyle(
-                                  fontFamily: Keys.fontFamily,
-                                  color: Colors.black87,
-                                  fontSize: 15),
-                            ),
-                          ],
+                    height: getWidgetHeight(height: 50),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(7),
+                        bottomRight: Radius.circular(7),
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundColor: const Color(0XFFf66b5c),
+                          child: Image.asset(
+                            "assets/images/calendar_profile.png",
+                            height: getWidgetHeight(height: 15),
+                            width: getWidgetWidth(width: 15),
+                          ),
                         ),
-                      )),
+                        SizedBox(
+                          width: getWidgetWidth(width: 4),
+                        ),
+                        Expanded(
+                          child: Text(
+                            "Active from ${DateFormat('yyyy-MM-dd').format(DateTime.parse(joinDate))} "
+                            "to ${DateFormat('yyyy-MM-dd').format(DateTime.parse(endDate))}",
+                            maxLines: 2,
+                            softWrap: true,
+                            // overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: Keys.fontFamily,
+                              color: Colors.black87,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 SizedBox(height: getWidgetHeight(height: 16)),
                 Container(

@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/auth/email_auth_service.dart';
@@ -90,8 +91,10 @@ class _LoginPageState extends State<LoginPage> {
 
       if (snapshot.docs.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Invalid password.")),
+          SnackBar(
+              backgroundColor: Colors.red, content: Text("Invalid password.")),
         );
+        // showCenterToast("Invalid password.");
         _isLoading = false;
         setState(() {});
         return;
@@ -100,8 +103,76 @@ class _LoginPageState extends State<LoginPage> {
       final doc = snapshot.docs.first;
       final userData = doc.data();
       final userId = doc.id;
-      final prefs = await SharedPreferences.getInstance();
 
+      // 🔹 Step 1: Fetch Company Data
+      final companyId = userData['companyid'];
+      if (companyId == null || companyId.toString().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              backgroundColor: Colors.red,
+              content: Text("Company information missing.")),
+        );
+        _isLoading = false;
+        setState(() {});
+        return;
+      }
+
+      final companySnapshot = await FirebaseFirestore.instance
+          .collection('UserNode')
+          .where('_id', isEqualTo: companyId)
+          .limit(1)
+          .get();
+
+      if (companySnapshot.docs.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              backgroundColor: Colors.red, content: Text("Company not found.")),
+        );
+        _isLoading = false;
+        setState(() {});
+        return;
+      }
+
+      final companyData = companySnapshot.docs.first.data();
+      log("${companyData['status']} make printing the company status here");
+
+      // 🔹 Step 2: Check company status
+      if (companyData['status'] != "1") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              backgroundColor: Colors.red,
+              content: Text("Company status is invalid.")),
+        );
+        _isLoading = false;
+        setState(() {});
+        return;
+      }
+
+      // 🔹 Step 3: Check subscription dates
+      final userSubDate =
+          DateTime.tryParse(userData['subscriptionenddate'] ?? '');
+      final companySubDate =
+          DateTime.tryParse(companyData['subscriptionenddate'] ?? '');
+      final now = DateTime.now();
+      log("user sub date $userSubDate company sub date $companySubDate  now $now");
+
+      bool isUserActive = userSubDate != null && userSubDate.isAfter(now);
+      bool isCompanyActive =
+          companySubDate != null && companySubDate.isAfter(now);
+
+      if (!isUserActive && !isCompanyActive) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              backgroundColor: Colors.red,
+              content: Text("Subscription date has been finished.")),
+        );
+        _isLoading = false;
+        setState(() {});
+        return;
+      }
+
+      // 🔹 Step 4: Device verification (same as before)
+      final prefs = await SharedPreferences.getInstance();
       if (!kIsWeb) {
         final deviceId = await const AndroidId().getId();
         final deviceName = await DeviceScreenInfo.getModelName();
@@ -109,7 +180,9 @@ class _LoginPageState extends State<LoginPage> {
         if (userData.containsKey('imei')) {
           if (userData['imei'] != deviceId) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Login denied: Device not recognized.")),
+              SnackBar(
+                  backgroundColor: Colors.red,
+                  content: Text("Login denied: Device not recognized.")),
             );
             _isLoading = false;
             setState(() {});
@@ -124,6 +197,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
 
+      // 🔹 Step 5: Save prefs
       await prefs.setString('email', email);
       await prefs.setString('password', password);
       await prefs.setBool("loginInfo", true);
@@ -136,14 +210,16 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString("country", userData['country'] ?? '');
       await prefs.setString("mobile", userData['mobile'] ?? '');
       await prefs.setString("joindate", userData['joindate'] ?? '');
-      await prefs.setString("enddate", userData['enddate'] ?? '');
+      await prefs.setString("enddate", userData['subscriptionenddate'] ?? '');
 
       log("User ID saved: $userId");
       Get.offAllNamed(AppRoutes.home);
     } catch (e) {
       log("Login error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login failed. Please try again.")),
+        SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("Login failed. Please try again.")),
       );
     }
 
@@ -187,169 +263,190 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  void showCenterToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 14.0,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: kHeight,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 25),
-            child: Form(
-              key: _formKey,
-              child: Container(
-                padding: EdgeInsets.only(
-                    top:
-                        //  isSplitScreen
-                        //     ? getFullWidgetHeight(height: 30)
-                        //     :
-                        getWidgetHeight(height: 30),
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                width: kWidth,
-                decoration: BoxDecoration(color: Colors.white),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: getWidgetHeight(height: 120),
-                            width: getWidgetWidth(width: 200),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.transparent,
-                              // radius: 25,
-                              child: ClipOval(
-                                child: Image.asset(
-                                  AllAssets.splashLogo,
-                                  fit: BoxFit.contain,
-                                  // width: getWidgetWidth(width: 200),
-                                  height: getWidgetHeight(height: 200),
-                                ),
+      body: SizedBox(
+        height: kHeight,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 25),
+          child: Form(
+            key: _formKey,
+            child: Container(
+              padding: EdgeInsets.only(
+                  top:
+                      //  isSplitScreen
+                      //     ? getFullWidgetHeight(height: 30)
+                      //     :
+                      getWidgetHeight(height: 30),
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              width: kWidth,
+              decoration: BoxDecoration(color: Colors.white),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: getWidgetHeight(height: 25),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: getWidgetHeight(height: 120),
+                          width: getWidgetWidth(width: 200),
+                          child: CircleAvatar(
+                            backgroundColor: Colors.transparent,
+                            // radius: 25,
+                            child: ClipOval(
+                              child: Image.asset(
+                                AllAssets.splashLogo,
+                                fit: BoxFit.contain,
+                                // width: getWidgetWidth(width: 200),
+                                height: getWidgetHeight(height: 200),
                               ),
                             ),
                           ),
-                          // Container(
-                          //     height: 40,
-                          //     width: 40,
-                          //     child: Image.asset(
-                          //         "assets/images/profluent_ar_icon.png"))
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: getWidgetHeight(height: 30)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
-                      ),
-                      child: SizedBox(
-                          height:
-                              //  isSplitScreen
-                              //     ? getFullWidgetHeight(height: 280)
-                              //     :
-                              getWidgetHeight(height: 200),
-                          child: Image.asset(!_isLogin
-                              ? 'assets/images/undraw_Messaging_app_re_aytg.png'
-                              : 'assets/images/SMSOTP.png')),
-                    ),
-                    SizedBox(height: getWidgetHeight(height: 20)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
-                      ),
-                      child: Text(
-                        _isLogin
-                            ? "Enter Your Password"
-                            : "Enter Your Email Address",
-                        style: TextStyle(color: Color(0XFFF8F8F8F)),
-                      ),
-                    ),
-                    SizedBox(height: getWidgetHeight(height: 23)),
-
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
-                      ),
-                      child: SizedBox(
-                        height: getWidgetHeight(height: error ? 75 : 50),
-                        child: TextFormField(
-                          cursorColor: Colors.black,
-                          controller:
-                              _isLogin ? passwordController : emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (val) {
-                            !_isLogin ? validateEmail(val) : null;
-                          },
-                          decoration: InputDecoration(
-                            counterText: "",
-                            hintText: _isLogin ? "Password" : "Email Address",
-                            hintStyle: TextStyle(color: Colors.grey[600]),
-                            fillColor: Color(0XFFE8E8E8),
-                            filled: true,
-                            prefixIcon: Icon(Icons.email,
-                                color: Colors.grey), // Optional
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 15, horizontal: 10),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0XFFE8E8E8)),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0XFFE8E8E8)),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
                         ),
-                      ),
+                        // Container(
+                        //     height: 40,
+                        //     width: 40,
+                        //     child: Image.asset(
+                        //         "assets/images/profluent_ar_icon.png"))
+                      ],
                     ),
+                  ),
+                  SizedBox(height: getWidgetHeight(height: 30)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: getWidgetHeight(height: 25),
+                    ),
+                    child: SizedBox(
+                        height:
+                            //  isSplitScreen
+                            //     ? getFullWidgetHeight(height: 280)
+                            //     :
+                            getWidgetHeight(height: 200),
+                        child: Image.asset(!_isLogin
+                            ? 'assets/images/undraw_Messaging_app_re_aytg.png'
+                            : 'assets/images/SMSOTP.png')),
+                  ),
+                  SizedBox(height: getWidgetHeight(height: 20)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: getWidgetHeight(height: 25),
+                    ),
+                    child: Text(
+                      _isLogin
+                          ? "Enter Your Password"
+                          : "Enter Your Email Address",
+                      style: TextStyle(color: Color(0XFFF8F8F8F)),
+                    ),
+                  ),
+                  SizedBox(height: getWidgetHeight(height: 23)),
 
-                    SizedBox(height: 23),
-                    // if (!_isLoading)
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
-                      ),
-                      child: _isLoading
-                          ? CircularProgressIndicator(
-                              color: linearColor,
-                            )
-                          : CustomButton(
-                              buttonText:
-                                  _isLogin ? "Verify Login" : "Verify & Login",
-                              onPressed: () async {
-                                login();
-                              },
-                            ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: getWidgetHeight(height: 25),
                     ),
-                    Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: TextButton(
-                        onPressed: () async {
-                          Get.toNamed(AppRoutes.inAppWebView, arguments: {
-                            "url": ApiRoutes.privacyPolicy,
-                          });
+                    child: SizedBox(
+                      height: getWidgetHeight(height: error ? 75 : 50),
+                      child: TextFormField(
+                        cursorColor: Colors.black,
+                        controller:
+                            _isLogin ? passwordController : emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (val) {
+                          !_isLogin ? validateEmail(val) : null;
                         },
-                        child: Text(
-                          "Privacy & Policy",
-                          style: GoogleFonts.inter(
-                            height: 0.5,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            color: lightWhite,
+                        decoration: InputDecoration(
+                          counterText: "",
+                          hintText: _isLogin ? "Password" : "Email Address",
+                          hintStyle: TextStyle(color: Colors.grey[600]),
+                          fillColor: Color(0XFFE8E8E8),
+                          filled: true,
+                          prefixIcon:
+                              Icon(Icons.email, color: Colors.grey), // Optional
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 10),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0XFFE8E8E8)),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0XFFE8E8E8)),
+                            borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 30),
-                  ],
-                ),
+                  ),
+
+                  SizedBox(height: 23),
+                  // if (!_isLoading)
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: getWidgetHeight(height: 25),
+                    ),
+                    child: _isLoading
+                        ? CircularProgressIndicator(
+                            color: linearColor,
+                          )
+                        : CustomButton(
+                            buttonText:
+                                _isLogin ? "Verify Login" : "Verify & Login",
+                            onPressed: () async {
+                              login();
+                            },
+                          ),
+                  ),
+                  if (_isLogin)
+                    TextButton(
+                      onPressed: () {
+                        passwordController.clear();
+                        _isLogin = false;
+                        setState(() {});
+                      },
+                      child: const Text(
+                        "<< Back",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextButton(
+                      onPressed: () async {
+                        Get.toNamed(AppRoutes.inAppWebView, arguments: {
+                          "url": ApiRoutes.privacyPolicy,
+                        });
+                      },
+                      child: Text(
+                        "Privacy & Policy",
+                        style: GoogleFonts.inter(
+                          height: 0.5,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          color: lightWhite,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                ],
               ),
             ),
           ),

@@ -55,52 +55,100 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
             shadowColor: Colors.white,
             backgroundColor: Colors.white,
             titleSpacing: 0,
-            title: Padding(
-              padding: EdgeInsets.only(right: getWidgetWidth(width: 12)),
-              child: Text(
-                controller.title,
-                maxLines: 2,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+            title: controller.isSearching
+                ? TextField(
+                    cursorColor: Colors.grey,
+                    controller: controller.searchController,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: 'Search...',
+                      border: InputBorder.none,
+                      hintStyle: TextStyle(color: Colors.grey),
+                    ),
+                    onChanged: (value) {
+                      controller
+                          .searchSubcategories(value); // Your search logic
+                    },
+                  )
+                : Padding(
+                    padding: EdgeInsets.only(right: getWidgetWidth(width: 12)),
+                    child: Text(
+                      controller.title,
+                      maxLines: 2,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
             leading: IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                if (controller.isSearching) {
+                  controller.isSearching = false;
+                  controller.searchController.clear();
+                  controller.clearSearch(); // Clear filter
+                  controller.update();
+                } else {
+                  Navigator.pop(context);
+                }
               },
-              icon: const Icon(Icons.arrow_back),
+              icon:
+                  Icon(controller.isSearching ? Icons.close : Icons.arrow_back),
             ),
-
-            // 🔹 Three-dot menu at the end
             actions: [
               PopupMenuButton<String>(
                 color: Colors.white,
                 onSelected: (value) {
+                  controller.selectedMenuOption = value;
+
                   if (value == 'priority') {
-                    // Handle filter priority
-                    print("Filter Priority Clicked");
+                    controller.applyDownloadedFilter(true);
                   } else if (value == 'all_priority') {
-                    // Handle filter all priority
-                    print("Filter All Priority Clicked");
+                    controller.applyDownloadedFilter(false);
                   } else if (value == 'search') {
-                    // Handle search
-                    print("Search Clicked");
+                    controller.isSearching = true;
                   }
+
+                  controller.update();
                 },
                 itemBuilder: (BuildContext context) => [
-                  const PopupMenuItem<String>(
-                    value: 'priority',
-                    child: Text('Filter Priority'),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'all_priority',
-                    child: Text('Filter All Priority'),
-                  ),
-                  const PopupMenuItem<String>(
+                  PopupMenuItem<String>(
                     value: 'search',
-                    child: Text('Search'),
+                    child: Text(
+                      'Search',
+                      style: TextStyle(
+                        fontWeight: controller.selectedMenuOption == 'search'
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                        color: controller.selectedMenuOption == 'search'
+                            ? Colors.black
+                            : Colors.grey[800],
+                      ),
+                    ),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'priority',
+                    child: Text(
+                      'Filter Priority',
+                      style: TextStyle(
+                        fontWeight: controller.selectedMenuOption == 'priority'
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                        color: controller.selectedMenuOption == 'priority'
+                            ? Colors.black
+                            : Colors.grey[800],
+                      ),
+                    ),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'all_priority',
+                    child: Text(
+                      'Clear Filter',
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        color: Colors.grey[800],
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -112,486 +160,519 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                     color: linearColor,
                   ),
                 )
-              : controller.subcategories.length < 1
-                  ? Center(
-                      child: Text("No Data Found"),
-                    )
-                  : Column(
-                      children: [
-                        Expanded(
-                          child: ListView.builder(
-                            padding: EdgeInsets.symmetric(
-                                vertical: getWidgetHeight(height: 10),
-                                horizontal: getWidgetWidth(width: 10)),
-                            itemCount: controller.subcategories.length,
-                            itemBuilder: (context, index) {
-                              final isExpanded = expandedIndex == index;
+              : Column(
+                  children: [
+                    if (controller.searchController.text.isNotEmpty)
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: getWidgetWidth(width: 12)),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Search Results for: ${controller.searchTerm}",
+                            style: TextStyle(
+                              fontSize: kText.scale(13),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    controller.subcategories.length < 1
+                        ? SizedBox(
+                            height: getWidgetHeight(height: 550),
+                            child: Center(
+                              child: Text(
+                                  controller.searchController.text.isNotEmpty
+                                      ? "No Search Result Found"
+                                      : "No Data Found"),
+                            ),
+                          )
+                        : Expanded(
+                            child: ListView.builder(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: getWidgetHeight(height: 10),
+                                  horizontal: getWidgetWidth(width: 10)),
+                              itemCount: controller.subcategories.length,
+                              itemBuilder: (context, index) {
+                                final isExpanded = expandedIndex == index;
 
-                              return Column(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        expandedIndex = isExpanded ? -1 : index;
-                                      });
-                                    },
-                                    child: Container(
-                                      width: getWidgetWidth(width: 375),
-                                      // height: getWidgetHeight(height: 60),
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 5),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.1),
-                                            offset: const Offset(0, 4),
-                                            blurRadius: 10,
-                                          ),
-                                        ],
-                                      ),
+                                return Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          expandedIndex =
+                                              isExpanded ? -1 : index;
+                                        });
+                                      },
                                       child: Container(
                                         width: getWidgetWidth(width: 375),
-                                        // height: getWidgetHeight(height: 75),
+                                        // height: getWidgetHeight(height: 60),
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 5),
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(12),
-                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              offset: const Offset(0, 4),
+                                              blurRadius: 10,
+                                            ),
+                                          ],
                                         ),
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical:
-                                                  getWidgetHeight(height: 6),
-                                              horizontal:
-                                                  getWidgetWidth(width: 10)),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  // (controller.loadingIndex == index)
-                                                  //     ? SizedBox(
-                                                  //         height: getWidgetHeight(
-                                                  //             height: 25),
-                                                  //         width:
-                                                  //             getWidgetWidth(width: 25),
-                                                  //         child: Padding(
-                                                  //           padding:
-                                                  //               const EdgeInsets.all(
-                                                  //                   3.0),
-                                                  //           child:
-                                                  //               CircularProgressIndicator(
-                                                  //             strokeWidth: 2,
-                                                  //             color: linearColor,
-                                                  //           ),
-                                                  //         ),
-                                                  //       )
-                                                  //     :
-                                                  (controller.currentlyPlayingIndex ==
-                                                          index
-                                                      //      &&
-                                                      // controller.isPlaying
-                                                      )
-                                                      ? InkWell(
-                                                          onTap: () {
-                                                            controller
-                                                                .handlePlayPause(
-                                                                    index);
-                                                          },
-                                                          child: Icon(
-                                                            Icons
-                                                                .pause_circle_outline,
-                                                            color: linearColor,
-                                                            size: 26,
-                                                          ),
+                                        child: Container(
+                                          width: getWidgetWidth(width: 375),
+                                          // height: getWidgetHeight(height: 75),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            color: Colors.white,
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical:
+                                                    getWidgetHeight(height: 6),
+                                                horizontal:
+                                                    getWidgetWidth(width: 10)),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    // (controller.loadingIndex == index)
+                                                    //     ? SizedBox(
+                                                    //         height: getWidgetHeight(
+                                                    //             height: 25),
+                                                    //         width:
+                                                    //             getWidgetWidth(width: 25),
+                                                    //         child: Padding(
+                                                    //           padding:
+                                                    //               const EdgeInsets.all(
+                                                    //                   3.0),
+                                                    //           child:
+                                                    //               CircularProgressIndicator(
+                                                    //             strokeWidth: 2,
+                                                    //             color: linearColor,
+                                                    //           ),
+                                                    //         ),
+                                                    //       )
+                                                    //     :
+                                                    (controller.currentlyPlayingIndex ==
+                                                            index
+                                                        //      &&
+                                                        // controller.isPlaying
                                                         )
-                                                      : controller.errorPlaying ==
-                                                              index
-                                                          ? GestureDetector(
-                                                              onTap: () {
-                                                                controller
-                                                                    .handlePlayPause(
-                                                                        index);
-                                                              },
-                                                              child: Icon(
-                                                                Icons
-                                                                    .info_outline,
-                                                                color:
-                                                                    Colors.red,
-                                                                size: 25,
-                                                              ),
-                                                            )
-                                                          : GestureDetector(
-                                                              onTap: () {
-                                                                controller
-                                                                    .handlePlayPause(
-                                                                        index);
-                                                              },
-                                                              child: controller
-                                                                          .playingIs ==
-                                                                      index
-                                                                  ? SizedBox(
-                                                                      height: getWidgetHeight(
-                                                                          height:
-                                                                              20),
-                                                                      width: getWidgetWidth(
-                                                                          width:
-                                                                              22),
-                                                                      child:
-                                                                          CircularProgressIndicator(
-                                                                        strokeWidth:
-                                                                            2.0,
+                                                        ? InkWell(
+                                                            onTap: () {
+                                                              controller
+                                                                  .handlePlayPause(
+                                                                      index);
+                                                            },
+                                                            child: Icon(
+                                                              Icons
+                                                                  .pause_circle_outline,
+                                                              color:
+                                                                  linearColor,
+                                                              size: 26,
+                                                            ),
+                                                          )
+                                                        : controller.errorPlaying ==
+                                                                index
+                                                            ? GestureDetector(
+                                                                onTap: () {
+                                                                  controller
+                                                                      .handlePlayPause(
+                                                                          index);
+                                                                },
+                                                                child: Icon(
+                                                                  Icons
+                                                                      .info_outline,
+                                                                  color: Colors
+                                                                      .red,
+                                                                  size: 25,
+                                                                ),
+                                                              )
+                                                            : GestureDetector(
+                                                                onTap: () {
+                                                                  controller
+                                                                      .handlePlayPause(
+                                                                          index);
+                                                                },
+                                                                child: controller
+                                                                            .playingIs ==
+                                                                        index
+                                                                    ? SizedBox(
+                                                                        height: getWidgetHeight(
+                                                                            height:
+                                                                                20),
+                                                                        width: getWidgetWidth(
+                                                                            width:
+                                                                                22),
+                                                                        child:
+                                                                            CircularProgressIndicator(
+                                                                          strokeWidth:
+                                                                              2.0,
+                                                                          color:
+                                                                              linearColor,
+                                                                        ),
+                                                                      )
+                                                                    : ImageIcon(
+                                                                        const AssetImage(
+                                                                            AllAssets.roundPlay),
                                                                         color:
                                                                             linearColor,
                                                                       ),
-                                                                    )
-                                                                  : ImageIcon(
-                                                                      const AssetImage(
-                                                                          AllAssets
-                                                                              .roundPlay),
-                                                                      color:
-                                                                          linearColor,
-                                                                    ),
-                                                            ),
-                                                  SizedBox(
-                                                    width: getWidgetWidth(
-                                                        width: 10),
-                                                  ),
-                                                  Text(
-                                                      controller
-                                                          .subcategories[index]
-                                                          .text,
-                                                      style: TextStyle(
-                                                        fontFamily:
-                                                            Keys.fontFamily,
-                                                        letterSpacing: 0,
-                                                      )),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  // GestureDetector(
-                                                  //   onTap: () {
-                                                  //     controller.saveUpdate(index);
-                                                  //   },
-                                                  //   child: SizedBox(
-                                                  //     // width: displayWidth(context) / 18.75,
-                                                  //     // height: displayHeight(context) / 40.6,
-                                                  //     height: 19,
-                                                  //     width: 19,
-                                                  //     child: ImageIcon(
-                                                  //       AssetImage(AllAssets.download),
-                                                  //       color: controller
-                                                  //               .isPriorityList[index]
-                                                  //           ? linearColor
-                                                  //           : Colors.black,
-                                                  //       // size: size.height * 0.03,
-                                                  //     ),
-                                                  //   ),
-                                                  // ),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      controller
-                                                          .saveUpdate(index);
-                                                    },
-                                                    icon: SizedBox(
-                                                      // width: displayWidth(context) / 18.75,
-                                                      // height: displayHeight(context) / 40.6,
-                                                      height: 19,
-                                                      width: 19,
-                                                      child: controller
-                                                                  .isSaving ==
-                                                              index
-                                                          ? CircularProgressIndicator(
-                                                              strokeWidth: 2.0,
-                                                              color:
-                                                                  linearColor,
-                                                            )
-                                                          : Image.asset(
-                                                              AllAssets.save,
-                                                              width: 18,
-                                                              color: controller
-                                                                          .isPriorityList[
-                                                                      index]
-                                                                  ? linearColor
-                                                                  : Colors
-                                                                      .black,
-                                                            ),
+                                                              ),
+                                                    SizedBox(
+                                                      width: getWidgetWidth(
+                                                          width: 10),
                                                     ),
-                                                  )
-                                                ],
-                                              ),
-                                            ],
+                                                    Text(
+                                                        controller
+                                                            .subcategories[
+                                                                index]
+                                                            .text,
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              Keys.fontFamily,
+                                                          letterSpacing: 0,
+                                                        )),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    // GestureDetector(
+                                                    //   onTap: () {
+                                                    //     controller.saveUpdate(index);
+                                                    //   },
+                                                    //   child: SizedBox(
+                                                    //     // width: displayWidth(context) / 18.75,
+                                                    //     // height: displayHeight(context) / 40.6,
+                                                    //     height: 19,
+                                                    //     width: 19,
+                                                    //     child: ImageIcon(
+                                                    //       AssetImage(AllAssets.download),
+                                                    //       color: controller
+                                                    //               .isPriorityList[index]
+                                                    //           ? linearColor
+                                                    //           : Colors.black,
+                                                    //       // size: size.height * 0.03,
+                                                    //     ),
+                                                    //   ),
+                                                    // ),
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        controller
+                                                            .saveUpdate(index);
+                                                      },
+                                                      icon: SizedBox(
+                                                        // width: displayWidth(context) / 18.75,
+                                                        // height: displayHeight(context) / 40.6,
+                                                        height: 19,
+                                                        width: 19,
+                                                        child: controller
+                                                                    .isSaving ==
+                                                                index
+                                                            ? CircularProgressIndicator(
+                                                                strokeWidth:
+                                                                    2.0,
+                                                                color:
+                                                                    linearColor,
+                                                              )
+                                                            : Image.asset(
+                                                                AllAssets.save,
+                                                                width: 18,
+                                                                color: controller
+                                                                            .isPriorityList[
+                                                                        index]
+                                                                    ? linearColor
+                                                                    : Colors
+                                                                        .black,
+                                                              ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
 
-                                  // Expandable Section
-                                  AnimatedContainer(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.fastOutSlowIn,
-                                    width: double.infinity,
-                                    child: isExpanded
-                                        ? Padding(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal:
-                                                  getWidgetWidth(width: 15),
-                                              vertical:
-                                                  getWidgetHeight(height: 10),
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "IPA",
-                                                  style: GoogleFonts.inter(
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      fontSize: 12,
-                                                      color: lightWhite),
-                                                ),
-                                                SizedBox(
-                                                  height: getWidgetHeight(
-                                                      height: 6),
-                                                ),
-                                                RichText(
-                                                  textAlign: TextAlign.justify,
-                                                  text: TextSpan(
-                                                    children: buildTextSpans(
-                                                        controller
-                                                            .subcategories[
-                                                                index]
-                                                            .syllables),
+                                    // Expandable Section
+                                    AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      curve: Curves.fastOutSlowIn,
+                                      width: double.infinity,
+                                      child: isExpanded
+                                          ? Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal:
+                                                    getWidgetWidth(width: 15),
+                                                vertical:
+                                                    getWidgetHeight(height: 10),
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "IPA",
+                                                    style: GoogleFonts.inter(
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 12,
+                                                        color: lightWhite),
                                                   ),
-                                                ),
-                                                SizedBox(
-                                                  height: getWidgetHeight(
-                                                      height: 20),
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          "PRONUNCIATION",
-                                                          style:
-                                                              GoogleFonts.inter(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  fontSize: 12,
-                                                                  color:
-                                                                      lightWhite),
-                                                        ),
-                                                        SizedBox(
+                                                  SizedBox(
+                                                    height: getWidgetHeight(
+                                                        height: 6),
+                                                  ),
+                                                  RichText(
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    text: TextSpan(
+                                                      children: buildTextSpans(
+                                                          controller
+                                                              .subcategories[
+                                                                  index]
+                                                              .syllables),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: getWidgetHeight(
+                                                        height: 20),
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            "PRONUNCIATION",
+                                                            style: GoogleFonts.inter(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                fontSize: 12,
+                                                                color:
+                                                                    lightWhite),
+                                                          ),
+                                                          SizedBox(
+                                                            height:
+                                                                getWidgetHeight(
+                                                                    height: 6),
+                                                          ),
+                                                          SizedBox(
+                                                            width:
+                                                                getWidgetWidth(
+                                                                    width: 180),
+                                                            child: Text(
+                                                              controller
+                                                                          .subcategories[
+                                                                              index]
+                                                                          .pronun
+                                                                          .trim() ==
+                                                                      ""
+                                                                  ? "no data"
+                                                                  : controller
+                                                                      .subcategories[
+                                                                          index]
+                                                                      .pronun
+                                                                      .replaceAll(
+                                                                          "/",
+                                                                          ""),
+                                                              maxLines: 2,
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 20,
+                                                                fontFamily: Keys
+                                                                    .fontFamily,
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          controller.kShowDialog(
+                                                              controller
+                                                                  .subcategories[
+                                                                      index]
+                                                                  .text,
+                                                              false,
+                                                              context);
+                                                        },
+                                                        child: Container(
+                                                          width: getWidgetWidth(
+                                                              width: 130),
                                                           height:
                                                               getWidgetHeight(
-                                                                  height: 6),
-                                                        ),
-                                                        SizedBox(
-                                                          width: getWidgetWidth(
-                                                              width: 180),
-                                                          child: Text(
-                                                            controller
-                                                                        .subcategories[
-                                                                            index]
-                                                                        .pronun
-                                                                        .trim() ==
-                                                                    ""
-                                                                ? "no data"
-                                                                : controller
-                                                                    .subcategories[
-                                                                        index]
-                                                                    .pronun
-                                                                    .replaceAll(
-                                                                        "/",
-                                                                        ""),
-                                                            maxLines: 2,
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize: 20,
-                                                              fontFamily: Keys
-                                                                  .fontFamily,
-                                                            ),
+                                                                  height: 45),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                            color: Colors.white,
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                        0.1),
+                                                                offset:
+                                                                    const Offset(
+                                                                        0, 4),
+                                                                blurRadius: 10,
+                                                              ),
+                                                            ],
                                                           ),
-                                                        )
-                                                      ],
-                                                    ),
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        controller.kShowDialog(
-                                                            controller
-                                                                .subcategories[
-                                                                    index]
-                                                                .text,
-                                                            false,
-                                                            context);
-                                                      },
-                                                      child: Container(
-                                                        width: getWidgetWidth(
-                                                            width: 130),
-                                                        height: getWidgetHeight(
-                                                            height: 45),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(8),
-                                                          color: Colors.white,
-                                                          boxShadow: [
-                                                            BoxShadow(
-                                                              color: Colors
-                                                                  .black
-                                                                  .withOpacity(
-                                                                      0.1),
-                                                              offset:
-                                                                  const Offset(
-                                                                      0, 4),
-                                                              blurRadius: 10,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceAround,
-                                                          children: [
-                                                            const Icon(
-                                                              Icons.mic,
-                                                              color: Color
-                                                                  .fromARGB(
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceAround,
+                                                            children: [
+                                                              const Icon(
+                                                                Icons.mic,
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        112,
+                                                                        112,
+                                                                        112),
+                                                              ),
+                                                              Text(
+                                                                "Practice",
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .inter(
+                                                                  color: const Color
+                                                                      .fromARGB(
                                                                       255,
                                                                       112,
                                                                       112,
                                                                       112),
-                                                            ),
-                                                            Text(
-                                                              "Practice",
-                                                              style: GoogleFonts
-                                                                  .inter(
-                                                                color: const Color
-                                                                    .fromARGB(
-                                                                    255,
-                                                                    112,
-                                                                    112,
-                                                                    112),
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize: 16,
+                                                                ),
                                                               ),
-                                                            ),
-                                                            const SizedBox()
-                                                          ],
+                                                              const SizedBox()
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                if (controller
-                                                    .subcategories[index]
-                                                    .sentenceSamples
-                                                    .isNotEmpty)
-                                                  SizedBox(
-                                                    height: getWidgetHeight(
-                                                        height: 12),
+                                                    ],
                                                   ),
-
-                                                if (controller
-                                                    .subcategories[index]
-                                                    .sentenceSamples
-                                                    .isNotEmpty) ...[
-                                                  for (var sentence
-                                                      in controller
-                                                          .subcategories[index]
-                                                          .sentenceSamples)
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        highlightWord(
-                                                            sentence,
-                                                            controller
-                                                                .subcategories[
-                                                                    index]
-                                                                .text),
-                                                        Divider(
-                                                          thickness: 0.2,
-                                                          color: Colors.black,
-                                                        )
-                                                      ],
-                                                    )
-                                                ],
-                                                if (controller.selectedWord
-                                                        .toLowerCase() ==
-                                                    controller
-                                                        .subcategories[index]
-                                                        .text
-                                                        .toLowerCase())
-                                                  ListTile(
-                                                    contentPadding:
-                                                        EdgeInsets.zero,
-                                                    title: Text(
-                                                      "Pronunciation Analysis Result",
-                                                      style: TextStyle(
-                                                          color: linearColor,
-                                                          fontSize: 13,
-                                                          fontFamily:
-                                                              Keys.fontFamily),
-                                                    ),
-                                                    subtitle: Text(
-                                                      "Note: This result only indicates intelligibility and does not confirm the accuracy of pronunciation.",
-                                                      style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize:
-                                                              kText.scale(12),
-                                                          fontFamily:
-                                                              Keys.fontFamily,
-                                                          fontWeight:
-                                                              FontWeight.w500),
-                                                    ),
-                                                    trailing: Container(
+                                                  if (controller
+                                                      .subcategories[index]
+                                                      .sentenceSamples
+                                                      .isNotEmpty)
+                                                    SizedBox(
                                                       height: getWidgetHeight(
-                                                          height: 40),
-                                                      width: getWidgetWidth(
-                                                          width: 40),
-                                                      child: Image.asset(controller
-                                                              .isCorrect
-                                                          ? "assets/images/right.png"
-                                                          : "assets/images/wrong.png"),
+                                                          height: 12),
                                                     ),
-                                                  ),
-                                                // SPH(10)
-                                              ],
-                                            ),
-                                          )
-                                        : const SizedBox.shrink(),
-                                  ),
-                                  if (controller.subcategories.length - 1 ==
-                                      index)
-                                    SizedBox(
-                                      height: getWidgetHeight(height: 40),
-                                    )
-                                ],
-                              );
-                            },
+
+                                                  if (controller
+                                                      .subcategories[index]
+                                                      .sentenceSamples
+                                                      .isNotEmpty) ...[
+                                                    for (var sentence
+                                                        in controller
+                                                            .subcategories[
+                                                                index]
+                                                            .sentenceSamples)
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          highlightWord(
+                                                              sentence,
+                                                              controller
+                                                                  .subcategories[
+                                                                      index]
+                                                                  .text),
+                                                          Divider(
+                                                            thickness: 0.2,
+                                                            color: Colors.black,
+                                                          )
+                                                        ],
+                                                      )
+                                                  ],
+                                                  if (controller.selectedWord
+                                                          .toLowerCase() ==
+                                                      controller
+                                                          .subcategories[index]
+                                                          .text
+                                                          .toLowerCase())
+                                                    ListTile(
+                                                      contentPadding:
+                                                          EdgeInsets.zero,
+                                                      title: Text(
+                                                        "Pronunciation Analysis Result",
+                                                        style: TextStyle(
+                                                            color: linearColor,
+                                                            fontSize: 13,
+                                                            fontFamily: Keys
+                                                                .fontFamily),
+                                                      ),
+                                                      subtitle: Text(
+                                                        "Note: This result only indicates intelligibility and does not confirm the accuracy of pronunciation.",
+                                                        style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize:
+                                                                kText.scale(12),
+                                                            fontFamily:
+                                                                Keys.fontFamily,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      ),
+                                                      trailing: Container(
+                                                        height: getWidgetHeight(
+                                                            height: 40),
+                                                        width: getWidgetWidth(
+                                                            width: 40),
+                                                        child: Image.asset(controller
+                                                                .isCorrect
+                                                            ? "assets/images/right.png"
+                                                            : "assets/images/wrong.png"),
+                                                      ),
+                                                    ),
+                                                  // SPH(10)
+                                                ],
+                                              ),
+                                            )
+                                          : const SizedBox.shrink(),
+                                    ),
+                                    if (controller.subcategories.length - 1 ==
+                                        index)
+                                      SizedBox(
+                                        height: getWidgetHeight(height: 40),
+                                      )
+                                  ],
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                  ],
+                ),
         ),
       );
     });

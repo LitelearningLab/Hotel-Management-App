@@ -3,10 +3,12 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/university_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/update_checker.dart';
 import 'package:hotelmanagementapp/view/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -47,6 +49,8 @@ class HomeController extends GetxController {
   void onReady() {
     // TODO: implement onReady
     fetchCollegeSyllabus();
+    checkSubscriptionValidity();
+
     super.onReady();
   }
 
@@ -69,6 +73,65 @@ class HomeController extends GetxController {
 
     recentHistoryLoaded = false;
     update();
+  }
+
+  Future checkSubscriptionValidity() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String userId = prefs.getString("userId") ?? "";
+      log("$userId user id printing for checkin");
+      final userSnapshot = await FirebaseFirestore.instance
+          .collection('UserNode')
+          .doc(userId)
+          .get();
+
+      if (!userSnapshot.exists) return false;
+
+      final userData = userSnapshot.data()!;
+      final companyId = userData['companyid'];
+
+      if (companyId == null || companyId.toString().isEmpty) return false;
+
+      final companySnapshot = await FirebaseFirestore.instance
+          .collection('UserNode')
+          .where('_id', isEqualTo: companyId)
+          .limit(1)
+          .get();
+
+      if (companySnapshot.docs.isEmpty) return false;
+
+      final companyData = companySnapshot.docs.first.data();
+
+      // Company status check
+      if (companyData['status'] != "1") return false;
+
+      // Subscription dates check
+      final userSubDate =
+          DateTime.tryParse(userData['subscriptionenddate'] ?? '');
+      final companySubDate =
+          DateTime.tryParse(companyData['subscriptionenddate'] ?? '');
+      final now = DateTime.now();
+
+      bool isUserActive = userSubDate != null && userSubDate.isAfter(now);
+      bool isCompanyActive =
+          companySubDate != null && companySubDate.isAfter(now);
+      log("$isUserActive this is user active $isCompanyActive is company active");
+      if (!isUserActive || !isCompanyActive) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+        Fluttertoast.showToast(
+            msg: "Subscription date has been finished.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 12.0);
+        Get.offAll(() => LoginPage());
+      }
+    } catch (e) {
+      log("Error checking subscription: $e");
+    }
   }
 
   void showPopupAtTap(Offset tapPosition) {
@@ -103,13 +166,13 @@ class HomeController extends GetxController {
           FirebaseFirestore.instance.collection('UserNode').doc(userId);
       final userSnapshot = await userRef.get();
       final userData = userSnapshot.data() ?? {};
-      final String collegeId = userData['collegeId'] ?? '';
+      final String collegeId = userData['companyid'] ?? '';
       log("College ID: $collegeId");
       if (collegeId.isNotEmpty) {
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
             .collection('UniversityCollection')
             .where('collegeId', isEqualTo: collegeId)
-            .limit(1) // assuming only one document matches
+            .limit(1)
             .get();
 
         if (querySnapshot.docs.isNotEmpty) {
@@ -198,13 +261,7 @@ class HomeController extends GetxController {
                   onPressed: () async {
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.clear();
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => LoginPage()), // Your home page
-                      (Route<dynamic> route) =>
-                          false, // Remove all previous routes
-                    );
+                    Get.offAll(() => LoginPage());
 
                     // Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavigation()));
                   },

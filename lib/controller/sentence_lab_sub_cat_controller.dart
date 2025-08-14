@@ -23,6 +23,13 @@ class SentenceLabSubCatController extends GetxController {
   List<bool> isSaved = [];
   int isSaving = -1;
   Map<String, bool> isLoadingMap = {};
+  bool isSearching = false;
+  TextEditingController searchController = TextEditingController();
+  String searchTerm = "";
+  String selectedMenuOption = '';
+  List<SubCategoryModel> allSubcategories = [];
+  String searchQuery = "";
+  String selectedFilter = "";
 
   @override
   void onInit() {
@@ -38,11 +45,82 @@ class SentenceLabSubCatController extends GetxController {
   }
 
   Future<void> reloadFromDB(String categoryName) async {
-    subcategories =
+    allSubcategories =
         await SentenceDBHelper().getSubCategoriesByCategoryName(categoryName);
+    subcategories = List.from(allSubcategories);
     isLoading = false;
-
     update();
+  }
+
+  void applySearchAndFilter() {
+    List<SubCategoryModel> baseList = List.from(allSubcategories);
+
+    // Start from filtered data if filter is active
+    if (selectedFilter.isNotEmpty) {
+      bool onlyDownloaded = selectedFilter == "downloaded";
+      baseList = baseList
+          .map((subCat) {
+            final filteredSentences = subCat.sentence
+                .where((sentence) => sentence.isDownloaded == onlyDownloaded)
+                .toList();
+
+            if (filteredSentences.isNotEmpty) {
+              return SubCategoryModel(
+                id: subCat.id,
+                sentence: filteredSentences,
+              );
+            }
+            return null;
+          })
+          .whereType<SubCategoryModel>()
+          .toList();
+    }
+
+    // Apply search if searchTerm is not empty
+    if (searchTerm.isNotEmpty) {
+      final term = searchTerm.toLowerCase();
+      baseList = baseList
+          .map((subCat) {
+            final matchingSentences = subCat.sentence
+                .where((sentence) =>
+                    sentence.text.toLowerCase().contains(term) ||
+                    subCat.id.toLowerCase().contains(term))
+                .toList();
+
+            if (matchingSentences.isNotEmpty) {
+              return SubCategoryModel(
+                  id: subCat.id, sentence: matchingSentences);
+            }
+            return null;
+          })
+          .whereType<SubCategoryModel>()
+          .toList();
+    }
+
+    subcategories = baseList;
+    update();
+  }
+
+  void searchSentences(String query) {
+    searchTerm = query.trim();
+    applySearchAndFilter();
+  }
+
+  void filterByDownloadStatus(String filterType) {
+    selectedFilter = filterType;
+    applySearchAndFilter();
+  }
+
+  void clearSearch() {
+    searchTerm = "";
+    searchController.clear();
+    isSearching = false;
+    applySearchAndFilter();
+  }
+
+  void clearFilter() {
+    selectedFilter = "";
+    applySearchAndFilter(); // still applies search if active
   }
 
   saveUpdate(int index, int subIndex) async {

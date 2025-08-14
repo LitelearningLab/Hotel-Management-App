@@ -3,9 +3,11 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/model/front_office_model.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/response/front_office_responce.dart';
 
 class FrontOfficeController extends GetxController {
@@ -15,37 +17,18 @@ class FrontOfficeController extends GetxController {
   final int itemCount = 10;
   late List<bool> isExpanded;
   int expandedIndex = -1;
-  List<List<String>> allLinks = [];
+
   FrontOfficeResponse frontOfficeResponse = FrontOfficeResponse();
   List<FrontOfficeDocument> frontOfficeData = [];
   bool loading = false;
   String collectionName = "";
   int index = 0;
-
+  List<FrontOfficeDocument> originalData = [];
   String pronunCollectionName = "";
+  bool isSearching = false;
+  TextEditingController searchController = TextEditingController();
+  String searchTerm = "";
 
-  final List<String> hospitalityTopics = [
-    "INTRODUCTION - TOURISM AND ITS IMPORTANCE",
-    "INTRODUCTION - HOSPITALITY AND ITS ORIGIN",
-    "INTRODUCTION - HOTELS, THEIR EVOLUTION AND GROWTH",
-    "INTRODUCTION - CORE AREAS FRONT OFFICE",
-    "INTRODUCTION - TRAVEL AND HOTEL INDUSTRY AND THEIR INTER-RELATIONSHIP",
-    "INTRODUCTION - INTERDEPENDENCY OF TOURISM, TRAVEL, AND HOSPITALITY INDUSTRY",
-    "INTRODUCTION - CLASSIFICATION OF HOTELS",
-    "STAFFING AND ORGANIZATIONAL STRUCTURE OF HOTEL",
-    "FRONT OFFICE ORGANIZATION",
-    "UPDATED FRONT OFFICE LAYOUT AND EQUIPMENT",
-    "JOB DESCRIPTION OF FRONT OFFICE PERSONNEL",
-    "ATTRIBUTES OF FRONT OFFICE STAFF",
-    "GRE AND LOBBY MANAGER",
-    "GUEST CYCLE",
-    "TYPES OF HOTEL GUESTS",
-    "RESERVATION",
-    "GROUP RESERVATION AND CANCELLATIONS",
-    "REGISTRATION",
-    "FRONT OFFICE COMMUNICATION",
-    "SECURITY DEPARTMENT",
-  ];
   @override
   void onInit() {
     super.onInit();
@@ -85,6 +68,7 @@ class FrontOfficeController extends GetxController {
     log(collectionName);
     frontOfficeData =
         await frontOfficeResponse.getFrontOfficeCollection(collectionName);
+    originalData = List.from(frontOfficeData);
     loading = false;
     update();
   }
@@ -107,25 +91,61 @@ class FrontOfficeController extends GetxController {
 
     Overlay.of(overlay).insert(entry);
   }
-}
 
-Future<List<List<String>>> fetchAllLinks() async {
-  List<List<String>> allLinks = [];
+  void searchByCategory(String query) {
+    searchTerm = query;
+    update();
 
-  try {
-    QuerySnapshot snapshot =
-        await FirebaseFirestore.instance.collection('FrontOffice').get();
-
-    for (var doc in snapshot.docs) {
-      var data = doc.data() as Map<String, dynamic>;
-      if (data['links'] != null && data['links'] is List) {
-        List<String> links = List<String>.from(data['links']);
-        allLinks.add(links);
-      }
+    if (query.isEmpty) {
+      clearSearch();
+      return;
     }
-  } catch (e) {
-    print('Error fetching links: $e');
+
+    frontOfficeData = originalData
+        .where(
+            (item) => item.category.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+
+    update();
   }
 
-  return allLinks;
+  void clearSearch() {
+    searchController.clear();
+    isSearching = false;
+    searchTerm = "";
+    frontOfficeData = List.from(originalData);
+    update();
+  }
+
+  List<TextSpan> highlightOccurrences(String text, String query) {
+    if (query.isEmpty) {
+      return [TextSpan(text: text)];
+    }
+    var matches = text.toLowerCase().split(query.toLowerCase());
+    List<TextSpan> spans = [];
+    int start = 0;
+
+    for (int i = 0; i < matches.length; i++) {
+      String matchText = matches[i];
+      // Add normal text
+      spans.add(TextSpan(
+        text: matchText,
+        style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 15),
+      ));
+      start += matchText.length;
+      // Add bold text (if not at the end)
+      if (i < matches.length - 1) {
+        spans.add(TextSpan(
+          text: text.substring(start, start + query.length),
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            color: linearColor,
+            fontSize: 15,
+          ),
+        ));
+        start += query.length;
+      }
+    }
+    return spans;
+  }
 }

@@ -22,6 +22,7 @@ import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/public/update_checker.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
@@ -54,6 +55,7 @@ class _HomeState extends State<Home>
   @override
   void initState() {
     super.initState();
+    UpdateChecker.checkForUpdate(context);
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 3, vsync: this);
   }

@@ -53,10 +53,8 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                         icon: Stack(
                           alignment: Alignment.center,
                           children: [
-                            // Blur circle background
                             Container(
-                              width: getWidgetWidth(
-                                  width: 36), // Slightly larger than the icon
+                              width: getWidgetWidth(width: 36),
                               height: getWidgetHeight(height: 36),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
@@ -85,32 +83,94 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                           ],
                         ),
                         iconSize: 30,
-                        splashColor: Colors.transparent, // Remove splash effect
-                        highlightColor:
-                            Colors.transparent, // Remove highlight effect
-                        padding: EdgeInsets.zero, // Remove default padding
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        padding: EdgeInsets.zero,
                       )),
                 ],
               ),
               SizedBox(
                 height: getWidgetHeight(height: 10),
               ),
-              Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: getWidgetWidth(width: 20)),
-                child: Text(
-                  controller.title,
-                  textAlign: TextAlign.left,
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: getWidgetHeight(height: 15),
-              ),
+              controller.isSearching
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: getWidgetWidth(width: 20),
+                      ),
+                      child: TextField(
+                        cursorColor: Colors.grey,
+                        controller: controller.searchController,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          hintText: 'Search...',
+                          hintStyle: TextStyle(color: Colors.grey),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.clear, color: Colors.grey),
+                            onPressed: () {
+                              controller.clearSearch();
+                            },
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide:
+                                BorderSide(color: Colors.grey, width: 0.2),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          controller.searchByCategory(value);
+                        },
+                      ),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: getWidgetWidth(width: 20),
+                            ),
+                            child: Text(
+                              controller.title,
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w600,
+                                fontSize: kText.scale(20),
+                                color: Colors.black,
+                              ),
+                              overflow:
+                                  TextOverflow.ellipsis, // Prevent overflow
+                              maxLines: 2,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: getWidgetWidth(width: 10),
+                            top: getWidgetHeight(height: 4),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              controller.isSearching = true;
+                              controller.update();
+                            },
+                            icon: Icon(
+                              Icons.search,
+                              color: Colors.black.withOpacity(0.9),
+                              size: 26,
+                              weight: 800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+              // SizedBox(
+              //   height: getWidgetHeight(height: 6),
+              // ),
               Expanded(
                 child: controller.loading
                     ? Center(
@@ -125,7 +185,9 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                     : controller.frontOfficeData.isEmpty
                         ? Center(
                             child: Text(
-                            "No data",
+                            controller.searchController.text.isNotEmpty
+                                ? "No Search Result Found"
+                                : "No data",
                             textAlign: TextAlign.left,
                             style: GoogleFonts.inter(
                               fontWeight: FontWeight.w600,
@@ -207,14 +269,21 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                     horizontal: getWidgetWidth(
                                                         width: 20),
                                                   ),
-                                                  child: Text(
-                                                    controller
-                                                        .frontOfficeData[index]
-                                                        .category,
-                                                    style: GoogleFonts.inter(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontSize: 15,
+                                                  child: RichText(
+                                                    text: TextSpan(
+                                                      children: controller
+                                                          .highlightOccurrences(
+                                                              controller
+                                                                  .frontOfficeData[
+                                                                      index]
+                                                                  .category,
+                                                              controller
+                                                                  .searchTerm),
+                                                      style: GoogleFonts.inter(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontSize: 15),
                                                     ),
                                                   ),
                                                 ),

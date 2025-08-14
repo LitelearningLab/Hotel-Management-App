@@ -25,7 +25,11 @@ import 'package:path/path.dart' as p;
 
 class PronunciationLabSubController extends GetxController {
   late String title;
-  late List<SubcategoryPro> subcategories = [];
+  List<SubcategoryPro> subcategories = [];
+  List<SubcategoryPro> ogSubCategories = [];
+  List<SubcategoryPro> beforesearchResults = [];
+  List<SubcategoryPro> currentList = [];
+
   late CategoryModel category;
   bool isLoading = true;
   String collectionName = '';
@@ -41,13 +45,17 @@ class PronunciationLabSubController extends GetxController {
   bool isPlaying = false;
   int playingIs = -1;
   int isSaving = -1;
+  bool isSearching = false;
+  TextEditingController searchController = TextEditingController();
+  String searchTerm = "";
+  String selectedMenuOption = '';
 
   @override
   void onInit() {
     audioPlayer = AudioPlayer();
     title = Get.arguments['title'];
     final argList = Get.arguments['subcategories'] as List;
-    subcategories = argList
+    ogSubCategories = argList
         .map((item) => item is SubcategoryPro
             ? item
             : SubcategoryPro.fromMap(Map<String, dynamic>.from(item)))
@@ -120,6 +128,8 @@ class PronunciationLabSubController extends GetxController {
     // Toggle current UI state first
     bool newValue = !isPriorityList[index];
     isPriorityList[index] = newValue;
+    ogSubCategories[index].downloadStatus =
+        !ogSubCategories[index].downloadStatus;
     try {
       update();
 
@@ -219,6 +229,33 @@ class PronunciationLabSubController extends GetxController {
     }
   }
 
+  void clearSearch() {
+    searchController.clear();
+    subcategories = List.from(currentList);
+    isPriorityList =
+        subcategories.map((e) => e.downloadStatus == true).toList();
+    isSearching = false;
+    update();
+  }
+
+  void searchSubcategories(String query) {
+    query = query.trim().toLowerCase();
+    searchTerm = query;
+    update();
+
+    if (query.isEmpty) {
+      subcategories = List.from(currentList); // restore filtered list
+    } else {
+      subcategories = currentList
+          .where((item) => item.text.toLowerCase().contains(query))
+          .toList();
+    }
+
+    isPriorityList =
+        subcategories.map((e) => e.downloadStatus == true).toList();
+    update();
+  }
+
   Future<void> elseCase() async {
     final tableName = title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
     await DBHelper.ensureTableExists(tableName);
@@ -227,7 +264,7 @@ class PronunciationLabSubController extends GetxController {
 
     if (localData.isEmpty) {
       log("No local data found, inserting passed subcategories...");
-      for (var item in subcategories) {
+      for (var item in ogSubCategories) {
         await DBHelper.insertSubcategory(item, tableName);
       }
     } else {
@@ -235,7 +272,28 @@ class PronunciationLabSubController extends GetxController {
     }
 
     // Reload from DB to keep localPath, downloadStatus intact
+
     subcategories = await DBHelper.getAllSubcategories(tableName);
+    ogSubCategories = await DBHelper.getAllSubcategories(tableName);
+    isPriorityList =
+        ogSubCategories.map((e) => e.downloadStatus == true).toList();
+
+    isLoading = false;
+    update();
+  }
+
+  void applyDownloadedFilter(bool onlyDownloaded) {
+    isLoading = true;
+    update();
+
+    if (onlyDownloaded) {
+      currentList =
+          ogSubCategories.where((item) => item.downloadStatus == true).toList();
+    } else {
+      currentList = List.from(ogSubCategories);
+    }
+
+    subcategories = List.from(currentList);
     isPriorityList =
         subcategories.map((e) => e.downloadStatus == true).toList();
 
@@ -249,8 +307,9 @@ class PronunciationLabSubController extends GetxController {
 
     if (localData.isNotEmpty) {
       subcategories = localData;
+      ogSubCategories = localData;
       isPriorityList =
-          subcategories.map((e) => e.downloadStatus == true).toList();
+          ogSubCategories.map((e) => e.downloadStatus == true).toList();
       print('Loaded from local database for $id');
     } else {
       final ref = FirebaseDatabase.instance.ref('$collectionName/$id');
@@ -300,8 +359,9 @@ class PronunciationLabSubController extends GetxController {
         }
 
         subcategories = tempList;
+        ogSubCategories = tempList;
         isPriorityList =
-            subcategories.map((e) => e.downloadStatus == true).toList();
+            ogSubCategories.map((e) => e.downloadStatus == true).toList();
 
         log('🎯 Fetched from Firebase and saved locally for $title '
             '${subcategories.length} items');
