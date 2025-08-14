@@ -29,6 +29,12 @@ class PronunciationLabSubController extends GetxController {
   List<SubcategoryPro> ogSubCategories = [];
   List<SubcategoryPro> beforesearchResults = [];
   List<SubcategoryPro> currentList = [];
+  List<SubcategoryPro> masterList = []; // Always full original list
+  List<SubcategoryPro> filterBaseList = []; // Base list after applying filter
+  List<SubcategoryPro> searchBaseList = []; // Base list after applying search
+
+  bool isFiltering = false;
+  bool isSearching = false;
 
   late CategoryModel category;
   bool isLoading = true;
@@ -45,7 +51,7 @@ class PronunciationLabSubController extends GetxController {
   bool isPlaying = false;
   int playingIs = -1;
   int isSaving = -1;
-  bool isSearching = false;
+  // bool isSearching = false;
   TextEditingController searchController = TextEditingController();
   String searchTerm = "";
   String selectedMenuOption = '';
@@ -85,6 +91,21 @@ class PronunciationLabSubController extends GetxController {
     update();
   }
 
+  void applyDownloadedFilter(bool onlyDownloaded) {
+    isFiltering = onlyDownloaded;
+
+    List<SubcategoryPro> base = isSearching ? searchBaseList : masterList;
+
+    filterBaseList = onlyDownloaded
+        ? base.where((item) => item.downloadStatus == true).toList()
+        : List.from(base);
+
+    subcategories = List.from(filterBaseList);
+    isPriorityList =
+        subcategories.map((e) => e.downloadStatus == true).toList();
+    update();
+  }
+
   void kShowDialog(String word, bool notCatch, BuildContext context) async {
     // log("message");
     Get.dialog(
@@ -116,6 +137,26 @@ class PronunciationLabSubController extends GetxController {
     }).onError((error, stackTrace) {
       // log(error.toString());
     });
+  }
+
+  void searchSubcategories(String query) {
+    isSearching = query.trim().isNotEmpty;
+
+    List<SubcategoryPro> base = isFiltering ? filterBaseList : masterList;
+
+    if (isSearching) {
+      searchBaseList = base
+          .where(
+              (item) => item.text.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+      subcategories = List.from(searchBaseList);
+    } else {
+      subcategories = List.from(base);
+    }
+
+    isPriorityList =
+        subcategories.map((e) => e.downloadStatus == true).toList();
+    update();
   }
 
   void saveUpdate(int index) async {
@@ -229,28 +270,11 @@ class PronunciationLabSubController extends GetxController {
     }
   }
 
-  void clearSearch() {
-    searchController.clear();
-    subcategories = List.from(currentList);
-    isPriorityList =
-        subcategories.map((e) => e.downloadStatus == true).toList();
-    isSearching = false;
-    update();
-  }
+  void clearFilter() {
+    isFiltering = false;
 
-  void searchSubcategories(String query) {
-    query = query.trim().toLowerCase();
-    searchTerm = query;
-    update();
-
-    if (query.isEmpty) {
-      subcategories = List.from(currentList); // restore filtered list
-    } else {
-      subcategories = currentList
-          .where((item) => item.text.toLowerCase().contains(query))
-          .toList();
-    }
-
+    subcategories =
+        isSearching ? List.from(searchBaseList) : List.from(masterList);
     isPriorityList =
         subcategories.map((e) => e.downloadStatus == true).toList();
     update();
@@ -267,33 +291,19 @@ class PronunciationLabSubController extends GetxController {
       for (var item in ogSubCategories) {
         await DBHelper.insertSubcategory(item, tableName);
       }
+      subcategories = List.from(ogSubCategories);
     } else {
-      log("Local data exists, skipping insert.");
+      log("Local data exists, loading...");
+      subcategories = localData;
     }
 
-    // Reload from DB to keep localPath, downloadStatus intact
+    // Always set ogSubCategories and master list
+    ogSubCategories = List.from(subcategories);
+    masterList =
+        List.from(ogSubCategories); // ✅ Master list for search/filter reset
+    filterBaseList = List.from(masterList);
+    searchBaseList = List.from(masterList);
 
-    subcategories = await DBHelper.getAllSubcategories(tableName);
-    ogSubCategories = await DBHelper.getAllSubcategories(tableName);
-    isPriorityList =
-        ogSubCategories.map((e) => e.downloadStatus == true).toList();
-
-    isLoading = false;
-    update();
-  }
-
-  void applyDownloadedFilter(bool onlyDownloaded) {
-    isLoading = true;
-    update();
-
-    if (onlyDownloaded) {
-      currentList =
-          ogSubCategories.where((item) => item.downloadStatus == true).toList();
-    } else {
-      currentList = List.from(ogSubCategories);
-    }
-
-    subcategories = List.from(currentList);
     isPriorityList =
         subcategories.map((e) => e.downloadStatus == true).toList();
 
@@ -302,22 +312,19 @@ class PronunciationLabSubController extends GetxController {
   }
 
   Future<void> fetchPronunById(String id) async {
-    final localData = await DBHelper.getAllSubcategories(
-        title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase());
+    final tableName = title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
+    final localData = await DBHelper.getAllSubcategories(tableName);
 
     if (localData.isNotEmpty) {
+      log('Loaded from local database for $id');
       subcategories = localData;
-      ogSubCategories = localData;
-      isPriorityList =
-          ogSubCategories.map((e) => e.downloadStatus == true).toList();
-      print('Loaded from local database for $id');
+      ogSubCategories = List.from(localData);
     } else {
       final ref = FirebaseDatabase.instance.ref('$collectionName/$id');
       final snapshot = await ref.get();
 
       if (snapshot.exists) {
         final data = snapshot.value as Map<Object?, Object?>;
-
         final parsed = data.map((key, value) {
           if (value is Map) {
             return MapEntry(key.toString(), Map<String, dynamic>.from(value));
@@ -332,15 +339,9 @@ class PronunciationLabSubController extends GetxController {
         });
 
         category = CategoryModel.fromMap(parsed);
-
         List<SubcategoryPro> tempList = [];
 
         for (var item in category.subcategories) {
-          // 4️⃣ Print each subcategory to inspect sentenceSamples
-          log("🔍 Subcategory: ${item.text}");
-          log("    ➡ sentenceSamples raw: ${item.sentenceSamples}");
-          log("    ➡ sentenceSamples length: ${item.sentenceSamples.length}");
-
           final newItem = SubcategoryPro(
             sentenceSamples: item.sentenceSamples,
             file: item.file,
@@ -351,27 +352,39 @@ class PronunciationLabSubController extends GetxController {
             downloadStatus: false,
           );
 
-          await DBHelper.insertSubcategory(
-            newItem,
-            title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase(),
-          );
+          await DBHelper.insertSubcategory(newItem, tableName);
           tempList.add(newItem);
         }
 
         subcategories = tempList;
-        ogSubCategories = tempList;
-        isPriorityList =
-            ogSubCategories.map((e) => e.downloadStatus == true).toList();
-
-        log('🎯 Fetched from Firebase and saved locally for $title '
-            '${subcategories.length} items');
+        ogSubCategories = List.from(tempList);
       } else {
-        print('No Firebase data found for ID: $title');
+        log('No Firebase data found for ID: $title');
+        subcategories = [];
+        ogSubCategories = [];
       }
-      update();
     }
 
+    // ✅ Always refresh master and base lists after data load
+    masterList = List.from(ogSubCategories);
+    filterBaseList = List.from(masterList);
+    searchBaseList = List.from(masterList);
+
+    isPriorityList =
+        subcategories.map((e) => e.downloadStatus == true).toList();
+
     isLoading = false;
+    update();
+  }
+
+  void clearSearch() {
+    isSearching = false;
+    searchController.clear();
+
+    subcategories =
+        isFiltering ? List.from(filterBaseList) : List.from(masterList);
+    isPriorityList =
+        subcategories.map((e) => e.downloadStatus == true).toList();
     update();
   }
 }
