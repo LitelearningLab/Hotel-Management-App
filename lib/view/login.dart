@@ -33,11 +33,12 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final emailAuth = EmailAuthService();
-  final googleAuth = GoogleAuthService();
+  // final googleAuth = GoogleAuthService();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   bool _isLogin = false;
   bool error = false;
+  bool isLoading = true;
   String? validateEmail(String? val) {
     if (val == null || val.isEmpty) {
       setState(() {
@@ -96,6 +97,7 @@ class _LoginPageState extends State<LoginPage> {
         );
         // showCenterToast("Invalid password.");
         _isLoading = false;
+        isLoading = true;
         setState(() {});
         return;
       }
@@ -113,6 +115,7 @@ class _LoginPageState extends State<LoginPage> {
               content: Text("Company information missing.")),
         );
         _isLoading = false;
+        isLoading = true;
         setState(() {});
         return;
       }
@@ -129,6 +132,7 @@ class _LoginPageState extends State<LoginPage> {
               backgroundColor: Colors.red, content: Text("Company not found.")),
         );
         _isLoading = false;
+        isLoading = true;
         setState(() {});
         return;
       }
@@ -144,6 +148,7 @@ class _LoginPageState extends State<LoginPage> {
               content: Text("Company status is invalid.")),
         );
         _isLoading = false;
+        isLoading = true;
         setState(() {});
         return;
       }
@@ -167,6 +172,7 @@ class _LoginPageState extends State<LoginPage> {
               content: Text("Subscription date has been finished.")),
         );
         _isLoading = false;
+        isLoading = true;
         setState(() {});
         return;
       }
@@ -185,6 +191,7 @@ class _LoginPageState extends State<LoginPage> {
                   content: Text("Login denied: Device not recognized.")),
             );
             _isLoading = false;
+            isLoading = true;
             setState(() {});
             return;
           }
@@ -216,6 +223,8 @@ class _LoginPageState extends State<LoginPage> {
       Get.offAllNamed(AppRoutes.home);
     } catch (e) {
       log("Login error: $e");
+      isLoading = true;
+      setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             backgroundColor: Colors.red,
@@ -291,7 +300,7 @@ class _LoginPageState extends State<LoginPage> {
                       //  isSplitScreen
                       //     ? getFullWidgetHeight(height: 30)
                       //     :
-                      getWidgetHeight(height: 30),
+                      getWidgetHeight(height: 20),
                   bottom: MediaQuery.of(context).viewInsets.bottom),
               width: kWidth,
               decoration: BoxDecoration(color: Colors.white),
@@ -306,7 +315,7 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
-                          height: getWidgetHeight(height: 120),
+                          height: getWidgetHeight(height: 140),
                           width: getWidgetWidth(width: 200),
                           child: CircleAvatar(
                             backgroundColor: Colors.transparent,
@@ -409,11 +418,15 @@ class _LoginPageState extends State<LoginPage> {
                             buttonText:
                                 _isLogin ? "Verify Login" : "Verify & Login",
                             onPressed: () async {
+                              if (_isLogin) {
+                                isLoading = false;
+                                setState(() {});
+                              }
                               login();
                             },
                           ),
                   ),
-                  if (_isLogin)
+                  if (_isLogin && isLoading)
                     TextButton(
                       onPressed: () {
                         passwordController.clear();

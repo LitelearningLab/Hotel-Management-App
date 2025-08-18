@@ -358,15 +358,15 @@ class _HomeState extends State<Home>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    height: getWidgetHeight(height: 75),
-                    width: getWidgetWidth(width: 140),
+                    height: getWidgetHeight(height: 81),
+                    width: getWidgetWidth(width: 130),
                     child: CircleAvatar(
                       backgroundColor: Colors.transparent,
                       // radius: 25,
                       child: ClipOval(
                         child: Image.asset(
                           AllAssets.splashLogo,
-                          fit: BoxFit.contain,
+                          fit: BoxFit.fitWidth,
                           // width: getWidgetWidth(width: 200),
                           height: getWidgetHeight(height: 300),
                         ),
@@ -907,7 +907,7 @@ class _HomeState extends State<Home>
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Learning assignments coming soon!"),
+                        Text("Learning Assignments Coming Soon!"),
                         SizedBox(
                           height: getWidgetHeight(height: 75),
                         )

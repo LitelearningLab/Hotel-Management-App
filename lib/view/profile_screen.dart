@@ -334,8 +334,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         Expanded(
                           child: Text(
-                            "Active from ${DateFormat('yyyy-MM-dd').format(DateTime.parse(joinDate))} "
-                            "to ${DateFormat('yyyy-MM-dd').format(DateTime.parse(endDate))}",
+                            "Active from ${DateFormat('dd-MM-yyyy').format(DateTime.parse(joinDate))} "
+                            "to ${DateFormat('dd-MM-yyyy').format(DateTime.parse(endDate))}",
                             maxLines: 2,
                             softWrap: true,
                             // overflow: TextOverflow.ellipsis,

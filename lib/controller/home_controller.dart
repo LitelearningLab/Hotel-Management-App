@@ -84,6 +84,7 @@ class HomeController extends GetxController {
           .collection('UserNode')
           .doc(userId)
           .get();
+      log("$userId printining the userId");
 
       if (!userSnapshot.exists) return false;
 
@@ -113,16 +114,17 @@ class HomeController extends GetxController {
       final now = DateTime.now();
 
       bool isUserActive = userSubDate != null && userSubDate.isAfter(now);
+      log("${userSubDate} left is showing the usersub date and right is showing current time $now");
       bool isCompanyActive =
           companySubDate != null && companySubDate.isAfter(now);
       log("$isUserActive this is user active $isCompanyActive is company active");
-      if (!isUserActive || !isCompanyActive) {
+      if (!isUserActive) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.clear();
         Fluttertoast.showToast(
             msg: "Subscription date has been finished.",
             toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
+            gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
             backgroundColor: Colors.red,
             textColor: Colors.white,

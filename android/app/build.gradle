@@ -27,14 +27,14 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.profluent.hotelier.app"
-    compileSdk 34  // ✅ Required by Play Store
+    compileSdk 36  
 
     ndkVersion flutter.ndkVersion
 
     defaultConfig {
         applicationId "com.profluent.hotelier.app"
-        minSdkVersion 23
-        targetSdkVersion 34  // ✅ Target API 35 to comply
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion 36  // ✅ Target API 35 to comply
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

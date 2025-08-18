@@ -116,8 +116,10 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
                       padding:
                           EdgeInsets.only(top: getWidgetHeight(height: 50)),
                       child: InAppWebView(
-                        initialUrlRequest:
-                            URLRequest(url: Uri.parse(controller.url)),
+                        initialUrlRequest: URLRequest(
+                          url: WebUri(controller
+                              .url), // ✅ Wrap your string URL in WebUri
+                        ),
                         initialOptions: InAppWebViewGroupOptions(
                           crossPlatform: InAppWebViewOptions(
                             mediaPlaybackRequiresUserGesture: false,

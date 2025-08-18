@@ -93,7 +93,7 @@ class _MyAppState extends State<MyApp> {
           color: Colors.white,
           surfaceTintColor: Colors.transparent,
         ),
-        dialogTheme: const DialogTheme(
+        dialogTheme: const DialogThemeData(
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
         ),
