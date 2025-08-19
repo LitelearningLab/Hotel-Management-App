@@ -30,7 +30,7 @@ class HomeController extends GetxController {
     AllAssets.foodAndBevarage,
     AllAssets.foodProduction,
     AllAssets.houseKeeping,
-    AllAssets.frontOffice,
+    // AllAssets.frontOffice,
     // AllAssets.interview
   ];
   List<String> smartShorts = [
@@ -182,6 +182,8 @@ class HomeController extends GetxController {
 
           universityModel = UniversityModel.fromMap(data);
           cardNames.insert(4, universityModel.collegeName);
+          cardImages.insert(4, universityModel.photo);
+          log("${universityModel.photo} here im printing which im fetching from firebase");
           update();
 
           log('📘 College Name: ${universityModel.collegeName}');

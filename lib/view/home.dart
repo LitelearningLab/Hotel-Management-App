@@ -466,8 +466,14 @@ class _HomeState extends State<Home>
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      SvgPicture.asset(
-                                          controller.cardImages[index]),
+                                      index == 4
+                                          ? SvgPicture.network(
+                                              controller.cardImages[index],
+                                              placeholderBuilder: (context) =>
+                                                  const CircularProgressIndicator(),
+                                            )
+                                          : SvgPicture.asset(
+                                              controller.cardImages[index]),
                                       SizedBox(
                                           height: getWidgetHeight(height: 8)),
                                       Padding(

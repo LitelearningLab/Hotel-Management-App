@@ -41,42 +41,42 @@ class SentenceDBHelper {
 
   Future<void> _createTables(Database db) async {
     await db.execute('''
-      CREATE TABLE sentence_lab_sections(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        sectionName TEXT UNIQUE
-      )
-    ''');
+        CREATE TABLE sentence_lab_sections(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          sectionName TEXT UNIQUE
+        )
+      ''');
 
     await db.execute('''
-      CREATE TABLE categories(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        sectionId INTEGER,
-        categoryName TEXT,
-        FOREIGN KEY(sectionId) REFERENCES sentence_lab_sections(id)
-      )
-    ''');
+        CREATE TABLE categories(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          sectionId INTEGER,
+          categoryName TEXT,
+          FOREIGN KEY(sectionId) REFERENCES sentence_lab_sections(id)
+        )
+      ''');
 
     await db.execute('''
-      CREATE TABLE sub_categories(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        categoryId INTEGER,
-        subCategoryId TEXT,
-        FOREIGN KEY(categoryId) REFERENCES categories(id)
-      )
-    ''');
+        CREATE TABLE sub_categories(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          categoryId INTEGER,
+          subCategoryId TEXT,
+          FOREIGN KEY(categoryId) REFERENCES categories(id)
+        )
+      ''');
 
     await db.execute('''
-      CREATE TABLE sentences(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        subCategoryId INTEGER,
-        file TEXT,
-        isPriority INTEGER,
-        text TEXT,
-        isDownloaded INTEGER DEFAULT 0,
-        localPath TEXT DEFAULT "",
-        FOREIGN KEY(subCategoryId) REFERENCES sub_categories(id)
-      )
-    ''');
+        CREATE TABLE sentences(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          subCategoryId INTEGER,
+          file TEXT,
+          isPriority INTEGER,
+          text TEXT,
+          isDownloaded INTEGER DEFAULT 0,
+          localPath TEXT DEFAULT "",
+          FOREIGN KEY(subCategoryId) REFERENCES sub_categories(id)
+        )
+      ''');
   }
 
   Future<int> insertSection(String sectionName) async {
@@ -219,7 +219,7 @@ class SentenceDBHelper {
     }
   }
 
-// Helper: check if sentence already exists by subcategory + text
+  // Helper: check if sentence already exists by subcategory + text
   Future<bool> _sentenceExists(
       int subCategoryDbId, String text, SentenceDBHelper dbHelper) async {
     final db = await dbHelper.database;
@@ -448,11 +448,11 @@ class SentenceDBHelper {
 
     // First get all sub_categories for the categoryName
     final subCategoryRows = await db.rawQuery('''
-    SELECT s.id, s.subCategoryId
-    FROM sub_categories s
-    JOIN categories c ON s.categoryId = c.id
-    WHERE c.categoryName = ?
-  ''', [categoryName]);
+      SELECT s.id, s.subCategoryId
+      FROM sub_categories s
+      JOIN categories c ON s.categoryId = c.id
+      WHERE c.categoryName = ?
+    ''', [categoryName]);
 
     List<SubCategoryModel> subCategories = [];
 

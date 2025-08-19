@@ -2,11 +2,13 @@ class UniversityModel {
   final String collegeName;
   final String collegeId;
   final List<UniversityCategory> category;
+  final String photo;
 
   UniversityModel({
     required this.collegeName,
     required this.collegeId,
     required this.category,
+    required this.photo,
   });
 
   factory UniversityModel.fromMap(Map<String, dynamic> map) {
@@ -17,6 +19,7 @@ class UniversityModel {
               ?.map((item) => UniversityCategory.fromMap(item))
               .toList() ??
           [],
+      photo: map['photo'],
     );
   }
 }

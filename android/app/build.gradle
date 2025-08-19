@@ -5,7 +5,7 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    id 'com.google.gms.google-services' // Firebase
+    id 'com.google.gms.google-services' 
 }
 
 def localProperties = new Properties()
@@ -34,7 +34,7 @@ android {
     defaultConfig {
         applicationId "com.profluent.hotelier.app"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 36 // ✅ Target API 35 to comply
+        targetSdkVersion 36 
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
