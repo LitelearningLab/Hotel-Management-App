@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
@@ -73,13 +74,11 @@ class _SplashScreenState extends State<SplashScreen>
                 child: CircleAvatar(
                   backgroundColor: Colors.transparent,
                   // radius: 25,
-                  child: ClipOval(
-                    child: Image.asset(
-                      AllAssets.splashLogo,
-                      fit: BoxFit.contain,
-                      // width: getWidgetWidth(width: 200),
-                      height: getWidgetHeight(height: 300),
-                    ),
+                  child: Image.asset(
+                    AllAssets.splashLogo,
+                    fit: BoxFit.contain,
+                    // width: getWidgetWidth(width: 200),
+                    height: getWidgetHeight(height: 300),
                   ),
                 ),
               ),
@@ -93,10 +92,11 @@ class _SplashScreenState extends State<SplashScreen>
               //   ),
               // ),
               // SizedBox(height: 10),
-              Text(
-                "Loading...",
-                style: TextStyle(color: Colors.grey),
-              ),
+              if (!kIsWeb)
+                Text(
+                  "Loading...",
+                  style: TextStyle(color: Colors.grey),
+                ),
               SizedBox(height: getWidgetHeight(height: 60)),
             ],
           ),

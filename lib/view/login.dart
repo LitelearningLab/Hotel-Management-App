@@ -317,17 +317,11 @@ class _LoginPageState extends State<LoginPage> {
                         SizedBox(
                           height: getWidgetHeight(height: 140),
                           width: getWidgetWidth(width: 200),
-                          child: CircleAvatar(
-                            backgroundColor: Colors.transparent,
-                            // radius: 25,
-                            child: ClipOval(
-                              child: Image.asset(
-                                AllAssets.splashLogo,
-                                fit: BoxFit.contain,
-                                // width: getWidgetWidth(width: 200),
-                                height: getWidgetHeight(height: 200),
-                              ),
-                            ),
+                          child: Image.asset(
+                            AllAssets.splashLogo,
+                            fit: BoxFit.contain,
+                            // width: getWidgetWidth(width: 200),
+                            height: getWidgetHeight(height: 200),
                           ),
                         ),
                         // Container(
@@ -344,11 +338,7 @@ class _LoginPageState extends State<LoginPage> {
                       horizontal: getWidgetHeight(height: 25),
                     ),
                     child: SizedBox(
-                        height:
-                            //  isSplitScreen
-                            //     ? getFullWidgetHeight(height: 280)
-                            //     :
-                            getWidgetHeight(height: 200),
+                        height: getWidgetHeight(height: 200),
                         child: Image.asset(!_isLogin
                             ? 'assets/images/undraw_Messaging_app_re_aytg.png'
                             : 'assets/images/SMSOTP.png')),
@@ -372,6 +362,7 @@ class _LoginPageState extends State<LoginPage> {
                       horizontal: getWidgetHeight(height: 25),
                     ),
                     child: SizedBox(
+                      width: getWidgetWidth(width: kWidth > 500 ? 200 : 375),
                       height: getWidgetHeight(height: error ? 75 : 50),
                       child: TextFormField(
                         cursorColor: Colors.black,
@@ -414,16 +405,25 @@ class _LoginPageState extends State<LoginPage> {
                         ? CircularProgressIndicator(
                             color: linearColor,
                           )
-                        : CustomButton(
-                            buttonText:
-                                _isLogin ? "Verify Login" : "Verify & Login",
-                            onPressed: () async {
-                              if (_isLogin) {
-                                isLoading = false;
-                                setState(() {});
-                              }
-                              login();
-                            },
+                        : SizedBox(
+                            height:
+                                getWidgetHeight(height: kWidth > 400 ? 40 : 50),
+                            width:
+                                getWidgetWidth(width: kWidth > 400 ? 200 : 375),
+                            child: Expanded(
+                              child: CustomButton(
+                                buttonText: _isLogin
+                                    ? "Verify Login"
+                                    : "Verify & Login",
+                                onPressed: () async {
+                                  if (_isLogin) {
+                                    isLoading = false;
+                                    setState(() {});
+                                  }
+                                  login();
+                                },
+                              ),
+                            ),
                           ),
                   ),
                   if (_isLogin && isLoading)

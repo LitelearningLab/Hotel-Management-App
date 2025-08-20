@@ -22,7 +22,7 @@
     #splash {
       position: fixed;
       top: 0; left: 0;
-      width: 100%;  100%;
+      width: 100%; height: 100%;
       background: white;
       display: flex;
       flex-direction: column;
@@ -35,7 +35,7 @@
     /* Match Flutter splash size (≈300x300 responsive) */
     #splash-logo {
       width: min(40vw, 300px);
-       min(40vw, 300px);
+      height: min(40vw, 300px);
       border-radius: 50%;
       overflow: hidden;
       display: flex;
@@ -46,13 +46,13 @@
 
     #splash-logo img {
       width: 100%;
-       100%;
+      height: 100%;
       object-fit: contain;
     }
 
     #progress-container {
       width: 250px;
-       10px;
+      height: 10px;
       background: #eee;
       border-radius: 5px;
       margin-top: 20px;
@@ -60,7 +60,7 @@
     }
 
     #progress-bar {
-       100%;
+      height: 100%;
       width: 0%;
       background: #61B3CA; /* Your Flutter theme color */
       transition: width 0.2s ease;

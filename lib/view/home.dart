@@ -414,121 +414,131 @@ class _HomeState extends State<Home>
                                 left: getWidgetWidth(width: 20),
                                 bottom: getWidgetHeight(height: 20),
                                 top: getWidgetHeight(height: 10)),
-                            child: InkWell(
-                              onTap: () {
-                                timestampIndex = index;
-                                mianCategoryTitile =
-                                    controller.cardNames[index];
-                                if (index != 4) {
-                                  Get.toNamed(AppRoutes.frontOffice,
-                                      arguments: {
-                                        'title': controller.cardNames[index] ==
-                                                "Front Office\nManagement"
-                                            ? "Front Office Management"
-                                            : controller.cardNames[index] ==
-                                                    "Food & Beverage Service\nManagement"
-                                                ? "Food & Beverage Service Management"
-                                                : controller.cardNames[index] ==
-                                                        "Accommodation\nManagement - Housekeeping"
-                                                    ? "Accommodation Management - Housekeeping"
-                                                    : controller
-                                                        .cardNames[index],
-                                        'image': controller.cardImages[index],
-                                        'index': index,
-                                      });
-                                } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => UniversityLab(
-                                        universityModel:
-                                            controller.universityModel,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      offset: const Offset(0, 4),
-                                      blurRadius: 10,
-                                    ),
-                                  ],
-                                ),
-                                child:
-                                    GetBuilder<HomeController>(builder: (ctr) {
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      index == 4
-                                          ? SvgPicture.network(
-                                              controller.cardImages[index],
-                                              placeholderBuilder: (context) =>
-                                                  const CircularProgressIndicator(),
-                                            )
-                                          : SvgPicture.asset(
-                                              controller.cardImages[index]),
-                                      SizedBox(
-                                          height: getWidgetHeight(height: 8)),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal:
-                                                getWidgetWidth(width: 10)),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              index == 4
-                                                  ? ""
-                                                  : "Hotel Management",
-                                              style: TextStyle(
-                                                  color: lightWhite,
-                                                  fontSize: 10),
-                                            ),
-                                            SizedBox(
-                                                height:
-                                                    getWidgetHeight(height: 8)),
-                                            SizedBox(
-                                              height:
-                                                  getWidgetHeight(height: 60),
-                                              child: Text(
-                                                controller.cardNames[index],
-                                                textAlign: TextAlign.start,
-                                                overflow: TextOverflow.fade,
-                                                style: GoogleFonts.inter(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                                height: getWidgetHeight(
-                                                    height: 15)),
-                                            Text(
-                                              "View Details",
-                                              textAlign: TextAlign.start,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: linearColor,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                                height:
-                                                    getWidgetHeight(height: 10))
-                                          ],
+                            child: SizedBox(
+                              height: getWidgetHeight(height: 340),
+                              width: getWidgetWidth(width: 260),
+                              child: InkWell(
+                                onTap: () {
+                                  timestampIndex = index;
+                                  mianCategoryTitile =
+                                      controller.cardNames[index];
+                                  if (index != 4) {
+                                    Get.toNamed(AppRoutes.frontOffice,
+                                        arguments: {
+                                          'title': controller
+                                                      .cardNames[index] ==
+                                                  "Front Office\nManagement"
+                                              ? "Front Office Management"
+                                              : controller.cardNames[index] ==
+                                                      "Food & Beverage Service\nManagement"
+                                                  ? "Food & Beverage Service Management"
+                                                  : controller.cardNames[
+                                                              index] ==
+                                                          "Accommodation\nManagement - Housekeeping"
+                                                      ? "Accommodation Management - Housekeeping"
+                                                      : controller
+                                                          .cardNames[index],
+                                          'image': controller.cardImages[index],
+                                          'index': index,
+                                        });
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => UniversityLab(
+                                          universityModel:
+                                              controller.universityModel,
                                         ),
                                       ),
+                                    );
+                                  }
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        offset: const Offset(0, 4),
+                                        blurRadius: 10,
+                                      ),
                                     ],
-                                  );
-                                }),
+                                  ),
+                                  child: GetBuilder<HomeController>(
+                                      builder: (ctr) {
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          width: getWidgetWidth(width: 260),
+                                          height: getWidgetHeight(height: 200),
+                                          child: index == 4
+                                              ? SvgPicture.network(
+                                                  controller.cardImages[index],
+                                                  placeholderBuilder: (context) =>
+                                                      const CircularProgressIndicator(),
+                                                )
+                                              : SvgPicture.asset(
+                                                  controller.cardImages[index]),
+                                        ),
+                                        SizedBox(
+                                            height: getWidgetHeight(height: 8)),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal:
+                                                  getWidgetWidth(width: 10)),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                index == 4
+                                                    ? ""
+                                                    : "Hotel Management",
+                                                style: TextStyle(
+                                                    color: lightWhite,
+                                                    fontSize: 10),
+                                              ),
+                                              SizedBox(
+                                                  height: getWidgetHeight(
+                                                      height: 8)),
+                                              SizedBox(
+                                                height:
+                                                    getWidgetHeight(height: 60),
+                                                child: Text(
+                                                  controller.cardNames[index],
+                                                  textAlign: TextAlign.start,
+                                                  overflow: TextOverflow.fade,
+                                                  style: GoogleFonts.inter(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  height: getWidgetHeight(
+                                                      height: 15)),
+                                              Text(
+                                                "View Details",
+                                                textAlign: TextAlign.start,
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: linearColor,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  height: getWidgetHeight(
+                                                      height: 10))
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }),
+                                ),
                               ),
                             ),
                           );
