@@ -41,14 +41,6 @@ class PronunciationLabController extends GetxController {
       'bgColor': Color(0xFF0190FE),
     },
     {
-      'title': 'Common American Names',
-      'load': 'ProcessWords',
-      'menuText': 'Common American Names',
-      'backgroundImage': AllAssets.back1,
-      'image': AllAssets.plCommon,
-      'bgColor': Color(0xFFFF6548),
-    },
-    {
       'title': 'Most Commonly Used Words',
       'load': 'CommonWords',
       'menuText': 'Most Commonly Used Words',
@@ -57,12 +49,12 @@ class PronunciationLabController extends GetxController {
       'bgColor': Color(0xFF8540C8),
     },
     {
-      'title': 'US Healthcare - Revenue Cycle Management',
-      'load': 'US Healthcare',
-      'menuText': 'US Healthcare - Revenue Cycle Management',
+      'title': 'Common American Names',
+      'load': 'ProcessWords',
+      'menuText': 'Common American Names',
       'backgroundImage': AllAssets.back1,
-      'image': AllAssets.plUSState,
-      'bgColor': Color(0xFFFDA500),
+      'image': AllAssets.plCommon,
+      'bgColor': Color(0xFFFF6548),
     },
     {
       'title': 'Restaurant, Hotel & Travel',

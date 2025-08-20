@@ -1,55 +1,130 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
-
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
 
-  <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="hotelmanagementapp">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
-
   <title>hotelmanagementapp</title>
   <link rel="manifest" href="manifest.json">
 
-  <script>
-    // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = null;
-  </script>
-  <!-- This script adds the flutter initialization JS code -->
+  <script>const serviceWorkerVersion = null;</script>
   <script src="flutter.js" defer></script>
+
+  <style>
+    /* Full-screen splash */
+    #splash {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;  100%;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Match Flutter splash size (≈300x300 responsive) */
+    #splash-logo {
+      width: min(40vw, 300px);
+       min(40vw, 300px);
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadein 1.5s ease-in-out infinite alternate;
+    }
+
+    #splash-logo img {
+      width: 100%;
+       100%;
+      object-fit: contain;
+    }
+
+    #progress-container {
+      width: 250px;
+       10px;
+      background: #eee;
+      border-radius: 5px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+
+    #progress-bar {
+       100%;
+      width: 0%;
+      background: #61B3CA; /* Your Flutter theme color */
+      transition: width 0.2s ease;
+    }
+
+    #progress-text {
+      margin-top: 10px;
+      color: grey;
+      font-size: 16px;
+    }
+
+    @keyframes fadein {
+      from { opacity: 0.5; }
+      to   { opacity: 1; }
+    }
+  </style>
 </head>
 <body>
+  <div id="splash">
+    <div id="splash-logo">
+      <img src="assets/ph-logo-transperant-bg-01.png" alt="Logo" />
+    </div>
+
+    <div id="progress-container">
+      <div id="progress-bar"></div>
+    </div>
+    <div id="progress-text">Loading... 0%</div>
+  </div>
+
   <script>
+    let progress = 0;
+    const progressBar = document.getElementById("progress-bar");
+    const progressText = document.getElementById("progress-text");
+
+    // Fake progress until Flutter is ready
+    const interval = setInterval(() => {
+      if (progress < 90) { // stop at 90% until Flutter loads
+        progress += 1;
+        progressBar.style.width = progress + "%";
+        progressText.innerText = "Loading... " + progress + "%";
+      }
+    }, 80); // adjust speed
+
+    // Load Flutter app
     window.addEventListener('load', function(ev) {
-      // Download main.dart.js
       _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
+        serviceWorker: { serviceWorkerVersion: serviceWorkerVersion },
         onEntrypointLoaded: function(engineInitializer) {
           engineInitializer.initializeEngine().then(function(appRunner) {
             appRunner.runApp();
+
+            // When Flutter paints first frame → complete progress
+            window.addEventListener('flutter-first-frame', function () {
+              clearInterval(interval);
+              progress = 100;
+              progressBar.style.width = "100%";
+              progressText.innerText = "Loading... 100%";
+
+              // Fade out splash
+              const splash = document.getElementById('splash');
+              splash.style.transition = "opacity 0.5s ease";
+              splash.style.opacity = "0";
+              setTimeout(() => splash.remove(), 600);
+            });
           });
         }
       });
