@@ -1,3 +1,7 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/svg.dart';
@@ -12,6 +16,7 @@ import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
+import 'package:hotelmanagementapp/utility/web_view_page.dart';
 
 class FrontOfficeHotelReception extends StatefulWidget {
   const FrontOfficeHotelReception({super.key});
@@ -25,6 +30,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
   HomeController homeController = Get.put<HomeController>(HomeController());
   @override
   Widget build(BuildContext context) {
+    double isKwidth = MediaQuery.of(context).size.width;
     return PopScope(
       onPopInvoked: ((didPop) => homeController.loadRecentHistory()),
       child: Scaffold(body: SafeArea(
@@ -37,25 +43,33 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                   ClipPath(
                     // clipper: CustomShape(),
                     child: SizedBox(
-                      width: getWidgetWidth(width: 3750),
-                      height: getWidgetHeight(height: 270),
+                      width: getWidgetWidth(width: 375),
+                      height:
+                          getWidgetHeight(height: isKwidth > 700 ? 400 : 270),
                       child: SvgPicture.asset(
                         controller.image,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
                   Positioned(
                       top: getWidgetHeight(height: 15),
-                      left: getWidgetWidth(width: 5),
+                      left: getWidgetWidth(width: isKwidth > 700 ? 0 : 5),
                       child: IconButton(
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        splashColor: Colors.transparent,
+                        color: Colors.transparent,
                         onPressed: () => Navigator.pop(context),
                         icon: Stack(
                           alignment: Alignment.center,
                           children: [
                             Container(
-                              width: getWidgetWidth(width: 36),
-                              height: getWidgetHeight(height: 36),
+                              width: getWidgetWidth(
+                                  width: isKwidth > 700 ? 56 : 36),
+                              height: getWidgetHeight(
+                                  height: isKwidth > 700 ? 56 : 36),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.black.withOpacity(0.3),
@@ -82,9 +96,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                             ),
                           ],
                         ),
-                        iconSize: 30,
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
+                        iconSize: isKwidth > 700 ? 50 : 30,
                         padding: EdgeInsets.zero,
                       )),
                 ],
@@ -139,7 +151,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                               controller.title,
                               style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w600,
-                                fontSize: kText.scale(20),
+                                fontSize: kText.scale(isKwidth > 700 ? 25 : 20),
                                 color: Colors.black,
                               ),
                               overflow:
@@ -150,7 +162,8 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                         ),
                         Padding(
                           padding: EdgeInsets.only(
-                            right: getWidgetWidth(width: 10),
+                            right:
+                                getWidgetWidth(width: isKwidth > 700 ? 20 : 10),
                             top: getWidgetHeight(height: 4),
                           ),
                           child: IconButton(
@@ -161,7 +174,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                             icon: Icon(
                               Icons.search,
                               color: Colors.black.withOpacity(0.9),
-                              size: 26,
+                              size: isKwidth > 700 ? 36 : 26,
                               weight: 800,
                             ),
                           ),
@@ -175,9 +188,12 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                 child: controller.loading
                     ? Center(
                         child: SizedBox(
-                          width: getWidgetWidth(width: 40),
-                          height: getWidgetHeight(height: 40),
+                          width:
+                              getWidgetWidth(width: isKwidth > 700 ? 20 : 40),
+                          height:
+                              getWidgetHeight(height: isKwidth > 700 ? 80 : 40),
                           child: CircularProgressIndicator(
+                            strokeWidth: isKwidth > 700 ? 10 : 4,
                             color: linearColor,
                           ),
                         ),
@@ -191,7 +207,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                             textAlign: TextAlign.left,
                             style: GoogleFonts.inter(
                               fontWeight: FontWeight.w600,
-                              fontSize: 16,
+                              fontSize: kText.scale(16),
                               color: Colors.black,
                             ),
                           ))
@@ -265,9 +281,13 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                 Padding(
                                                   padding: EdgeInsets.symmetric(
                                                     vertical: getWidgetHeight(
-                                                        height: 12),
+                                                        height: isKwidth > 700
+                                                            ? 22
+                                                            : 12),
                                                     horizontal: getWidgetWidth(
-                                                        width: 20),
+                                                        width: isKwidth > 700
+                                                            ? 5
+                                                            : 20),
                                                   ),
                                                   child: RichText(
                                                     text: TextSpan(
@@ -283,7 +303,10 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                           color: Colors.black,
                                                           fontWeight:
                                                               FontWeight.w500,
-                                                          fontSize: 15),
+                                                          fontSize: kText.scale(
+                                                              isKwidth > 700
+                                                                  ? 16
+                                                                  : 14)),
                                                     ),
                                                   ),
                                                 ),
@@ -339,15 +362,24 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                           .link,
                                                                       proLabTitle:
                                                                           "");
-                                                                  Get.toNamed(
-                                                                      AppRoutes
-                                                                          .inAppWebView,
-                                                                      arguments: {
-                                                                        "url": controller
-                                                                            .frontOfficeData[index]
-                                                                            .subcategory[0]
-                                                                            .link
-                                                                      });
+                                                                  log("$kIsWeb printing im clicking the correct");
+                                                                  if (kIsWeb) {
+                                                                    Navigator.push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                            builder: (context) =>
+                                                                                WebContentPage(title: controller.frontOfficeData[index].category, url: controller.frontOfficeData[index].subcategory[0].link)));
+                                                                  } else {
+                                                                    Get.toNamed(
+                                                                        AppRoutes
+                                                                            .inAppWebView,
+                                                                        arguments: {
+                                                                          "url": controller
+                                                                              .frontOfficeData[index]
+                                                                              .subcategory[0]
+                                                                              .link
+                                                                        });
+                                                                  }
                                                                 }
                                                               : null,
                                                           child: Image.asset(
@@ -388,15 +420,23 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                           .link,
                                                                       proLabTitle:
                                                                           "");
-                                                                  Get.toNamed(
-                                                                      AppRoutes
-                                                                          .inAppWebView,
-                                                                      arguments: {
-                                                                        "url": controller
-                                                                            .frontOfficeData[index]
-                                                                            .subcategory[1]
-                                                                            .link
-                                                                      });
+                                                                  if (kIsWeb) {
+                                                                    Navigator.push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                            builder: (context) =>
+                                                                                WebContentPage(title: controller.frontOfficeData[index].category, url: controller.frontOfficeData[index].subcategory[1].link)));
+                                                                  } else {
+                                                                    Get.toNamed(
+                                                                        AppRoutes
+                                                                            .inAppWebView,
+                                                                        arguments: {
+                                                                          "url": controller
+                                                                              .frontOfficeData[index]
+                                                                              .subcategory[1]
+                                                                              .link
+                                                                        });
+                                                                  }
                                                                 }
                                                               : null,
                                                           child: Image.asset(
@@ -440,15 +480,23 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                           .link,
                                                                       proLabTitle:
                                                                           "");
-                                                                  Get.toNamed(
-                                                                      AppRoutes
-                                                                          .inAppWebView,
-                                                                      arguments: {
-                                                                        "url": controller
-                                                                            .frontOfficeData[index]
-                                                                            .subcategory[2]
-                                                                            .link
-                                                                      });
+                                                                  if (kIsWeb) {
+                                                                    Navigator.push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                            builder: (context) =>
+                                                                                WebContentPage(title: controller.frontOfficeData[index].category, url: controller.frontOfficeData[index].subcategory[2].link)));
+                                                                  } else {
+                                                                    Get.toNamed(
+                                                                        AppRoutes
+                                                                            .inAppWebView,
+                                                                        arguments: {
+                                                                          "url": controller
+                                                                              .frontOfficeData[index]
+                                                                              .subcategory[2]
+                                                                              .link
+                                                                        });
+                                                                  }
                                                                 }
                                                               : null,
                                                           child: Image.asset(

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -19,6 +20,7 @@ import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 import 'package:just_audio/just_audio.dart';
 import 'dart:typed_data';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:firebase_core/firebase_core.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -342,13 +344,26 @@ class PronunciationLabSubController extends GetxController {
         List<SubcategoryPro> tempList = [];
 
         for (var item in category.subcategories) {
+          String url = item.file;
+          log("$url printing the url for to show how the thing is start with http or not");
+          if (!url.startsWith("http")) {
+            try {
+              url = await FirebaseStorage.instance
+                  .ref(item.file)
+                  .getDownloadURL();
+            } catch (e) {
+              log("❌ Could not fetch URL for ${item.file}: $e");
+            }
+          }
+
           final newItem = SubcategoryPro(
             sentenceSamples: item.sentenceSamples,
-            file: item.file,
+            file: url,
             isPriority: item.isPriority,
             syllables: item.syllables,
             text: item.text,
             pronun: item.pronun,
+            localPath: '',
             downloadStatus: false,
           );
 

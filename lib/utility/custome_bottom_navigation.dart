@@ -16,7 +16,10 @@ class CustomeBottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      padding: EdgeInsets.only(
+          left: getWidgetWidth(width: 20),
+          right: getWidgetWidth(width: 20),
+          bottom: getWidgetHeight(height: 20)),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,

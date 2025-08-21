@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_launcher_icons/xml_templates.dart';
@@ -26,6 +27,7 @@ import 'package:hotelmanagementapp/public/update_checker.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
+import 'package:hotelmanagementapp/utility/web_view_page.dart';
 import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/grammer_lab_sub.dart';
@@ -116,6 +118,8 @@ class _HomeState extends State<Home>
 
   @override
   Widget build(BuildContext context) {
+    double isKwidth = MediaQuery.of(context).size.width;
+    print("width is printing  ${isKwidth}");
     Widget _tile(
         {required Widget icon, required String menu, Function()? onTap}) {
       return ListTile(
@@ -350,29 +354,28 @@ class _HomeState extends State<Home>
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: getWidgetHeight(height: 50)),
+            SizedBox(height: getWidgetHeight(height: isKwidth > 700 ? 20 : 50)),
             Padding(
               padding:
                   EdgeInsets.symmetric(horizontal: getWidgetWidth(width: 20)),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
                     height: getWidgetHeight(height: 81),
-                    width: getWidgetWidth(width: 130),
+                    width: getWidgetWidth(width: isKwidth > 700 ? 40 : 130),
                     child: CircleAvatar(
                       backgroundColor: Colors.transparent,
                       // radius: 25,
-                      child: ClipOval(
-                        child: Image.asset(
-                          AllAssets.splashLogo,
-                          fit: BoxFit.fitWidth,
-                          // width: getWidgetWidth(width: 200),
-                          height: getWidgetHeight(height: 300),
-                        ),
+                      child: Image.asset(
+                        AllAssets.splashLogo,
+                        fit: BoxFit.fitWidth,
+                        // width: getWidgetWidth(width: 200),
+                        height: getWidgetHeight(height: 200),
                       ),
                     ),
                   ),
+                  Spacer(),
                   Builder(builder: (context) {
                     return InkWell(
                       onTap: () {
@@ -397,26 +400,32 @@ class _HomeState extends State<Home>
                 ],
               ),
             ),
-            // SizedBox(height: getWidgetHeight(height: 10)),
+            if (kIsWeb) SizedBox(height: getWidgetHeight(height: 20)),
             GetBuilder<HomeController>(
                 init: HomeController(),
                 builder: (controller) {
                   return SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Padding(
-                      padding:
-                          EdgeInsets.only(right: getWidgetWidth(width: 20)),
+                      padding: EdgeInsets.only(
+                          right: getWidgetWidth(width: 20),
+                          left: getWidgetWidth(width: isKwidth > 700 ? 18 : 0)),
                       child: Row(
                         children:
                             List.generate(controller.cardNames.length, (index) {
                           return Padding(
                             padding: EdgeInsets.only(
-                                left: getWidgetWidth(width: 20),
+                                left: getWidgetWidth(
+                                    width: isKwidth > 700 ? 5 : 20),
                                 bottom: getWidgetHeight(height: 20),
                                 top: getWidgetHeight(height: 10)),
-                            child: SizedBox(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                               height: getWidgetHeight(height: 340),
-                              width: getWidgetWidth(width: 260),
+                              width: getWidgetWidth(
+                                  width: isKwidth > 700 ? 80 : 260),
                               child: InkWell(
                                 onTap: () {
                                   timestampIndex = index;
@@ -487,8 +496,9 @@ class _HomeState extends State<Home>
                                             height: getWidgetHeight(height: 8)),
                                         Padding(
                                           padding: EdgeInsets.symmetric(
-                                              horizontal:
-                                                  getWidgetWidth(width: 10)),
+                                              horizontal: getWidgetWidth(
+                                                  width:
+                                                      isKwidth > 700 ? 3 : 10)),
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -499,7 +509,10 @@ class _HomeState extends State<Home>
                                                     : "Hotel Management",
                                                 style: TextStyle(
                                                     color: lightWhite,
-                                                    fontSize: 10),
+                                                    fontSize: kText.scale(
+                                                        isKwidth > 700
+                                                            ? 12
+                                                            : 10)),
                                               ),
                                               SizedBox(
                                                   height: getWidgetHeight(
@@ -513,7 +526,10 @@ class _HomeState extends State<Home>
                                                   overflow: TextOverflow.fade,
                                                   style: GoogleFonts.inter(
                                                     fontWeight: FontWeight.w600,
-                                                    fontSize: 16,
+                                                    fontSize: kText.scale(
+                                                        isKwidth > 700
+                                                            ? 18
+                                                            : 16),
                                                   ),
                                                 ),
                                               ),
@@ -524,7 +540,7 @@ class _HomeState extends State<Home>
                                                 "View Details",
                                                 textAlign: TextAlign.start,
                                                 style: TextStyle(
-                                                  fontSize: 12,
+                                                  fontSize: kText.scale(12),
                                                   color: linearColor,
                                                   fontWeight: FontWeight.w600,
                                                 ),
@@ -610,7 +626,8 @@ class _HomeState extends State<Home>
                                 //     : controller.showPopupAtTap(tapPosition);
                               },
                               child: Container(
-                                height: getWidgetHeight(height: 75),
+                                height: getWidgetHeight(
+                                    height: isKwidth > 700 ? 100 : 75),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(16),
@@ -626,8 +643,10 @@ class _HomeState extends State<Home>
                                   children: [
                                     SizedBox(width: getWidgetWidth(width: 4)),
                                     Container(
-                                      width: getWidgetWidth(width: 55),
-                                      height: getWidgetHeight(height: 68),
+                                      width: getWidgetWidth(
+                                          width: isKwidth > 700 ? 25 : 55),
+                                      height: getWidgetHeight(
+                                          height: isKwidth > 700 ? 80 : 68),
                                       decoration: BoxDecoration(
                                         color: linearColor,
                                         borderRadius: BorderRadius.circular(12),
@@ -646,10 +665,15 @@ class _HomeState extends State<Home>
                                                 vertical: index == 1
                                                     ? 0
                                                     : getWidgetHeight(
-                                                        height: 22),
+                                                        height: isKwidth > 700
+                                                            ? 15
+                                                            : 22),
                                                 horizontal: index == 1
                                                     ? 0
-                                                    : getWidgetWidth(width: 16),
+                                                    : getWidgetWidth(
+                                                        width: isKwidth > 700
+                                                            ? 8
+                                                            : 16),
                                               ),
                                               child: index == 0
                                                   ? Image.asset(
@@ -658,10 +682,12 @@ class _HomeState extends State<Home>
                                                       color: Colors.white,
                                                     )
                                                   : index == 1
-                                                      ? const Icon(
+                                                      ? Icon(
                                                           Icons.mic,
                                                           color: Colors.white,
-                                                          size: 28,
+                                                          size: isKwidth > 700
+                                                              ? 45
+                                                              : 28,
                                                         )
                                                       : Image.asset(
                                                           "assets/language_lab.png"),
@@ -767,7 +793,7 @@ class _HomeState extends State<Home>
                                             style: TextStyle(
                                               color: Colors.black,
                                               fontSize: kText.scale(9),
-                                              fontWeight: FontWeight.w500,
+                                              fontWeight: FontWeight.w600,
                                             ),
                                           ),
                                         ),
@@ -785,7 +811,7 @@ class _HomeState extends State<Home>
                                             item['category'] ?? '',
                                             style: TextStyle(
                                               fontSize: kText.scale(13),
-                                              fontWeight: FontWeight.w500,
+                                              fontWeight: FontWeight.w600,
                                             ),
                                           ),
                                         ),
@@ -864,16 +890,30 @@ class _HomeState extends State<Home>
                                                           <SubcategoryPro>[],
                                                     });
                                               } else {
-                                                Get.toNamed(
-                                                    AppRoutes.inAppWebView,
-                                                    arguments: {
-                                                      "isSimulation":
-                                                          item['section'] ==
-                                                                  'simulation'
-                                                              ? true
-                                                              : false,
-                                                      "url": item['link'],
-                                                    });
+                                                if (kIsWeb) {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          WebContentPage(
+                                                              title: item[
+                                                                  'category'],
+                                                              url:
+                                                                  item['link']),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  Get.toNamed(
+                                                      AppRoutes.inAppWebView,
+                                                      arguments: {
+                                                        "isSimulation":
+                                                            item['section'] ==
+                                                                    'simulation'
+                                                                ? true
+                                                                : false,
+                                                        "url": item['link'],
+                                                      });
+                                                }
                                               }
                                             },
                                             child: Row(

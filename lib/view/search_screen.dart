@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,7 @@ import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
+import 'package:hotelmanagementapp/utility/web_view_page.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -224,14 +226,27 @@ class _SearchScreenState extends State<SearchScreen> {
                                                       link: item[
                                                           'simulationLink'],
                                                       proLabTitle: "");
-
-                                                  Get.toNamed(
-                                                      AppRoutes.inAppWebView,
-                                                      arguments: {
-                                                        "isSimulation": true,
-                                                        "url": item[
-                                                            'simulationLink'],
-                                                      });
+                                                  if (kIsWeb) {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            WebContentPage(
+                                                                title: item[
+                                                                    'category'],
+                                                                url: item[
+                                                                    'simulationLink']),
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    Get.toNamed(
+                                                        AppRoutes.inAppWebView,
+                                                        arguments: {
+                                                          "isSimulation": true,
+                                                          "url": item[
+                                                              'simulationLink'],
+                                                        });
+                                                  }
                                                 } else {
                                                   final querySnapshot =
                                                       await FirebaseFirestore
@@ -290,14 +305,27 @@ class _SearchScreenState extends State<SearchScreen> {
                                                           section: match['key'],
                                                           link: link,
                                                           proLabTitle: "");
-                                                      Get.toNamed(
-                                                          AppRoutes
-                                                              .inAppWebView,
-                                                          arguments: {
-                                                            "isSimulation":
-                                                                false,
-                                                            "url": link,
-                                                          });
+                                                      if (kIsWeb) {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                WebContentPage(
+                                                                    title: item[
+                                                                        'category'],
+                                                                    url: link),
+                                                          ),
+                                                        );
+                                                      } else {
+                                                        Get.toNamed(
+                                                            AppRoutes
+                                                                .inAppWebView,
+                                                            arguments: {
+                                                              "isSimulation":
+                                                                  false,
+                                                              "url": link,
+                                                            });
+                                                      }
                                                     } else {
                                                       openDialog(context);
                                                       print(
