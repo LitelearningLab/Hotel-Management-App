@@ -258,7 +258,7 @@ class PronunciationLabSubController extends GetxController {
       }
       errorPlaying = -1;
     } on PlayerException catch (e) {
-      print("❌ Audio player error: ${e.message}");
+      print("❌ Audio player error: ${e.message} ${subcategories[index].file}");
       errorPlaying = index;
       currentlyPlayingIndex = null;
     } on Exception catch (e) {
@@ -315,13 +315,9 @@ class PronunciationLabSubController extends GetxController {
 
   Future<void> fetchPronunById(String id) async {
     final tableName = title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
-    final localData = await DBHelper.getAllSubcategories(tableName);
 
-    if (localData.isNotEmpty) {
-      log('Loaded from local database for $id');
-      subcategories = localData;
-      ogSubCategories = List.from(localData);
-    } else {
+    if (kIsWeb) {
+      // ✅ Web: Fetch directly from Firebase (no local DB)
       final ref = FirebaseDatabase.instance.ref('$collectionName/$id');
       final snapshot = await ref.get();
 
@@ -345,7 +341,8 @@ class PronunciationLabSubController extends GetxController {
 
         for (var item in category.subcategories) {
           String url = item.file;
-          log("$url printing the url for to show how the thing is start with http or not");
+          log("WEB mode → checking URL: $url");
+
           if (!url.startsWith("http")) {
             try {
               url = await FirebaseStorage.instance
@@ -363,11 +360,10 @@ class PronunciationLabSubController extends GetxController {
             syllables: item.syllables,
             text: item.text,
             pronun: item.pronun,
-            localPath: '',
-            downloadStatus: false,
+            localPath: '', // Not needed in web
+            downloadStatus: false, // Not used in web
           );
 
-          await DBHelper.insertSubcategory(newItem, tableName);
           tempList.add(newItem);
         }
 
@@ -378,9 +374,77 @@ class PronunciationLabSubController extends GetxController {
         subcategories = [];
         ogSubCategories = [];
       }
+    } else {
+      // ✅ Mobile: Keep local DB logic
+      final localData = await DBHelper.getAllSubcategories(tableName);
+
+      if (localData.isNotEmpty) {
+        log('Loaded from local database for $id');
+        subcategories = localData;
+        ogSubCategories = List.from(localData);
+      } else {
+        final ref = FirebaseDatabase.instance.ref('$collectionName/$id');
+        final snapshot = await ref.get();
+
+        if (snapshot.exists) {
+          final data = snapshot.value as Map<Object?, Object?>;
+          final parsed = data.map((key, value) {
+            if (value is Map) {
+              return MapEntry(key.toString(), Map<String, dynamic>.from(value));
+            } else if (value is List) {
+              return MapEntry(
+                key.toString(),
+                value.map((e) => Map<String, dynamic>.from(e)).toList(),
+              );
+            } else {
+              return MapEntry(key.toString(), value);
+            }
+          });
+
+          category = CategoryModel.fromMap(parsed);
+          List<SubcategoryPro> tempList = [];
+
+          for (var item in category.subcategories) {
+            String url = item.file;
+            print(
+                "$url printing the url for to show how the thing is start with http or not");
+
+            if (!url.startsWith("http")) {
+              try {
+                url = await FirebaseStorage.instance
+                    .ref(item.file)
+                    .getDownloadURL();
+              } catch (e) {
+                print("❌ Could not fetch URL for ${item.file}: $e");
+              }
+            }
+
+            final newItem = SubcategoryPro(
+              sentenceSamples: item.sentenceSamples,
+              file: url,
+              isPriority: item.isPriority,
+              syllables: item.syllables,
+              text: item.text,
+              pronun: item.pronun,
+              localPath: '',
+              downloadStatus: false,
+            );
+
+            await DBHelper.insertSubcategory(newItem, tableName);
+            tempList.add(newItem);
+          }
+
+          subcategories = tempList;
+          ogSubCategories = List.from(tempList);
+        } else {
+          log('No Firebase data found for ID: $title');
+          subcategories = [];
+          ogSubCategories = [];
+        }
+      }
     }
 
-    // ✅ Always refresh master and base lists after data load
+    // ✅ Always refresh lists
     masterList = List.from(ogSubCategories);
     filterBaseList = List.from(masterList);
     searchBaseList = List.from(masterList);

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "233565329277",
+    "firebase_url": "https://hotel-management-app-d25d5-default-rtdb.firebaseio.com",
     "project_id": "hotel-management-app-d25d5",
     "storage_bucket": "hotel-management-app-d25d5.firebasestorage.app"
   },
@@ -12,7 +13,28 @@
           "package_name": "com.profluent.hotelier.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "233565329277-4s467rv2osvgmotp3meijo46hct9brhv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.profluent.hotelier.app",
+            "certificate_hash": "2f3ffd18e2d5044574f90e47ea46af1f6766dee8"
+          }
+        },
+        {
+          "client_id": "233565329277-4ti9hethb64p4406gqruhv0fugni8g7v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.profluent.hotelier.app",
+            "certificate_hash": "9ec7ea9276fbc718122016e5a7355abae35d87c9"
+          }
+        },
+        {
+          "client_id": "233565329277-7rjrh33k6ue5fgn6ca5j9v8gqsg5jgdl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBZ04znTLuHChNJgP99sIFVRoe9CJoS5Ao"
@@ -20,7 +42,63 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "233565329277-7rjrh33k6ue5fgn6ca5j9v8gqsg5jgdl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "233565329277-m1q2d9nmdebs36vv99gv1i0sl4qgt3j4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.profluent.hotelier.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:233565329277:android:2ff536557bfb569e005e14",
+        "android_client_info": {
+          "package_name": "com.profluent.hotelier.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "233565329277-lttnunmhf8tnu2huougrl2f4e6g4039g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.profluent.hotelier.app",
+            "certificate_hash": "9ec7ea9276fbc718122016e5a7355abae35d87c9"
+          }
+        },
+        {
+          "client_id": "233565329277-7rjrh33k6ue5fgn6ca5j9v8gqsg5jgdl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZ04znTLuHChNJgP99sIFVRoe9CJoS5Ao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "233565329277-7rjrh33k6ue5fgn6ca5j9v8gqsg5jgdl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "233565329277-m1q2d9nmdebs36vv99gv1i0sl4qgt3j4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.profluent.hotelier.app"
+              }
+            }
+          ]
         }
       }
     }

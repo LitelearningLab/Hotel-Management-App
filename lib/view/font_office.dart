@@ -189,11 +189,11 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                     ? Center(
                         child: SizedBox(
                           width:
-                              getWidgetWidth(width: isKwidth > 700 ? 20 : 40),
+                              getWidgetWidth(width: isKwidth > 700 ? 10 : 40),
                           height:
-                              getWidgetHeight(height: isKwidth > 700 ? 80 : 40),
+                              getWidgetHeight(height: isKwidth > 700 ? 40 : 40),
                           child: CircularProgressIndicator(
-                            strokeWidth: isKwidth > 700 ? 10 : 4,
+                            strokeWidth: isKwidth > 700 ? 6 : 4,
                             color: linearColor,
                           ),
                         ),

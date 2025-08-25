@@ -138,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       final companyData = companySnapshot.docs.first.data();
-      log("${companyData['status']} make printing the company status here");
+      log("${companyData['status']} make printing the company status here and here im printing the imei ${userData["imei"]}");
 
       // 🔹 Step 2: Check company status
       if (companyData['status'] != "1") {
@@ -196,6 +196,7 @@ class _LoginPageState extends State<LoginPage> {
             return;
           }
         } else {
+          log("checking whether is going now");
           await doc.reference.update({
             'imei': deviceId,
             'model': deviceName,
@@ -209,7 +210,9 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString('password', password);
       await prefs.setBool("loginInfo", true);
       await prefs.setString("userId", userId);
-      await prefs.setString("collegeId", userData['collegeId'] ?? '');
+      await prefs.setString("collegeId", userData['companyid'] ?? '');
+      print(
+          "Here im printing the user data company id ${userData['companyid']}");
       await prefs.setString("batchName", userData['batchName'] ?? '');
       await prefs.setString("userName", userData['username'] ?? '');
       await prefs.setString("collegeName", userData['college'] ?? '');
@@ -410,19 +413,16 @@ class _LoginPageState extends State<LoginPage> {
                                 getWidgetHeight(height: kWidth > 400 ? 40 : 50),
                             width:
                                 getWidgetWidth(width: kWidth > 400 ? 200 : 375),
-                            child: Expanded(
-                              child: CustomButton(
-                                buttonText: _isLogin
-                                    ? "Verify Login"
-                                    : "Verify & Login",
-                                onPressed: () async {
-                                  if (_isLogin) {
-                                    isLoading = false;
-                                    setState(() {});
-                                  }
-                                  login();
-                                },
-                              ),
+                            child: CustomButton(
+                              buttonText:
+                                  _isLogin ? "Verify Login" : "Verify & Login",
+                              onPressed: () async {
+                                if (_isLogin) {
+                                  isLoading = false;
+                                  setState(() {});
+                                }
+                                login();
+                              },
                             ),
                           ),
                   ),

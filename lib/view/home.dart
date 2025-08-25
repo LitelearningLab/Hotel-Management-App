@@ -389,7 +389,7 @@ class _HomeState extends State<Home>
                             vertical: getWidgetHeight(height: 10)),
                         decoration: BoxDecoration(
                             color: const Color(0xFFF7F8F8),
-                            borderRadius: BorderRadius.circular(8)),
+                            borderRadius: BorderRadius.circular(16)),
                         child: Image.asset(
                           AllAssets.drawerIcon,
                           color: Colors.black,
@@ -425,7 +425,7 @@ class _HomeState extends State<Home>
                               ),
                               height: getWidgetHeight(height: 340),
                               width: getWidgetWidth(
-                                  width: isKwidth > 700 ? 80 : 260),
+                                  width: isKwidth > 700 ? 80 : 270),
                               child: InkWell(
                                 onTap: () {
                                   timestampIndex = index;

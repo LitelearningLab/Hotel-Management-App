@@ -295,6 +295,7 @@ class Languagelab extends StatelessWidget {
                                             onTap: () {
                                               mianCategoryTitile =
                                                   "Important Sounds";
+                                              activityName = 'Sound Lab';
                                               subCategoryTitle = controller
                                                   .importantSound!
                                                   .subcategories[index]
@@ -566,8 +567,11 @@ class Languagelab extends StatelessWidget {
                                                                           15)),
                                                           child: InkWell(
                                                             onTap: () {
+                                                              activityName =
+                                                                  "Sound Lab";
                                                               sessionName =
                                                                   sub.name;
+                                                              log("${sessionName} session name is printing here");
                                                               addToRecentHistory(
                                                                 path:
                                                                     "Language Lab > $mianCategoryTitile > $subCategoryTitle",

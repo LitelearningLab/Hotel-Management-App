@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -36,6 +37,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
 
   @override
   Widget build(BuildContext context) {
+    double isKwidth = MediaQuery.of(context).size.width;
     return GetBuilder<PronunciationLabSubController>(builder: (controller) {
       return PopScope(
         onPopInvoked: (didPop) {
@@ -75,8 +77,8 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                     child: Text(
                       controller.title,
                       maxLines: 2,
-                      style: const TextStyle(
-                        fontSize: 18,
+                      style: TextStyle(
+                        fontSize: kText.scale(isKwidth > 700 ? 20 : 18),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -126,30 +128,33 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                       ),
                     ),
                   ),
-                  PopupMenuItem<String>(
-                    value: 'priority',
-                    child: Text(
-                      'Filter Priority',
-                      style: TextStyle(
-                        fontWeight: controller.selectedMenuOption == 'priority'
-                            ? FontWeight.w600
-                            : FontWeight.normal,
-                        color: controller.selectedMenuOption == 'priority'
-                            ? Colors.black
-                            : Colors.grey[800],
+                  if (!kIsWeb)
+                    PopupMenuItem<String>(
+                      value: 'priority',
+                      child: Text(
+                        'Filter Priority',
+                        style: TextStyle(
+                          fontWeight:
+                              controller.selectedMenuOption == 'priority'
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                          color: controller.selectedMenuOption == 'priority'
+                              ? Colors.black
+                              : Colors.grey[800],
+                        ),
                       ),
                     ),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'all_priority',
-                    child: Text(
-                      'Clear Filter',
-                      style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: Colors.grey[800],
+                  if (!kIsWeb)
+                    PopupMenuItem<String>(
+                      value: 'all_priority',
+                      child: Text(
+                        'Clear Filter',
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: Colors.grey[800],
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ],
@@ -232,10 +237,14 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                           ),
                                           child: Padding(
                                             padding: EdgeInsets.symmetric(
-                                                vertical:
-                                                    getWidgetHeight(height: 6),
-                                                horizontal:
-                                                    getWidgetWidth(width: 10)),
+                                                vertical: getWidgetHeight(
+                                                    height: isKwidth > 700
+                                                        ? 10
+                                                        : 4),
+                                                horizontal: getWidgetWidth(
+                                                    width: isKwidth > 700
+                                                        ? 5
+                                                        : 10)),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
@@ -329,7 +338,9 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                               ),
                                                     SizedBox(
                                                       width: getWidgetWidth(
-                                                          width: 10),
+                                                          width: isKwidth > 700
+                                                              ? 5
+                                                              : 10),
                                                     ),
                                                     Text(
                                                         controller
@@ -337,6 +348,10 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                                 index]
                                                             .text,
                                                         style: TextStyle(
+                                                          fontSize: kText.scale(
+                                                              isKwidth > 700
+                                                                  ? 16
+                                                                  : 13),
                                                           fontFamily:
                                                               Keys.fontFamily,
                                                           letterSpacing: 0,
@@ -364,37 +379,53 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                     //     ),
                                                     //   ),
                                                     // ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        controller
-                                                            .saveUpdate(index);
-                                                      },
-                                                      icon: SizedBox(
-                                                        // width: displayWidth(context) / 18.75,
-                                                        // height: displayHeight(context) / 40.6,
-                                                        height: 19,
-                                                        width: 19,
-                                                        child: controller
-                                                                    .isSaving ==
-                                                                index
-                                                            ? CircularProgressIndicator(
-                                                                strokeWidth:
-                                                                    2.0,
-                                                                color:
-                                                                    linearColor,
-                                                              )
-                                                            : Image.asset(
-                                                                AllAssets.save,
-                                                                width: 18,
-                                                                color: controller
-                                                                            .isPriorityList[
-                                                                        index]
-                                                                    ? linearColor
-                                                                    : Colors
-                                                                        .black,
-                                                              ),
-                                                      ),
-                                                    )
+                                                    kIsWeb
+                                                        ? SizedBox(
+                                                            height:
+                                                                getWidgetHeight(
+                                                                    height: 20),
+                                                            width:
+                                                                getWidgetWidth(
+                                                                    width: 19),
+                                                          )
+                                                        : IconButton(
+                                                            onPressed: () {
+                                                              controller
+                                                                  .saveUpdate(
+                                                                      index);
+                                                            },
+                                                            icon: SizedBox(
+                                                              // width: displayWidth(context) / 18.75,
+                                                              // height: displayHeight(context) / 40.6,
+                                                              height:
+                                                                  getWidgetHeight(
+                                                                      height:
+                                                                          19),
+                                                              width:
+                                                                  getWidgetWidth(
+                                                                      width:
+                                                                          19),
+                                                              child: controller
+                                                                          .isSaving ==
+                                                                      index
+                                                                  ? CircularProgressIndicator(
+                                                                      strokeWidth:
+                                                                          2.0,
+                                                                      color:
+                                                                          linearColor,
+                                                                    )
+                                                                  : Image.asset(
+                                                                      AllAssets
+                                                                          .save,
+                                                                      width: 18,
+                                                                      color: controller.isPriorityList[
+                                                                              index]
+                                                                          ? linearColor
+                                                                          : Colors
+                                                                              .black,
+                                                                    ),
+                                                            ),
+                                                          )
                                                   ],
                                                 ),
                                               ],
@@ -505,78 +536,83 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                           )
                                                         ],
                                                       ),
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          controller.kShowDialog(
-                                                              controller
-                                                                  .subcategories[
-                                                                      index]
-                                                                  .text,
-                                                              false,
-                                                              context);
-                                                        },
-                                                        child: Container(
-                                                          width: getWidgetWidth(
-                                                              width: 130),
-                                                          height:
-                                                              getWidgetHeight(
-                                                                  height: 45),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                            color: Colors.white,
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                color: Colors
-                                                                    .black
-                                                                    .withOpacity(
-                                                                        0.1),
-                                                                offset:
-                                                                    const Offset(
-                                                                        0, 4),
-                                                                blurRadius: 10,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceAround,
-                                                            children: [
-                                                              const Icon(
-                                                                Icons.mic,
-                                                                color: Color
-                                                                    .fromARGB(
+                                                      if (!kIsWeb)
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            controller.kShowDialog(
+                                                                controller
+                                                                    .subcategories[
+                                                                        index]
+                                                                    .text,
+                                                                false,
+                                                                context);
+                                                          },
+                                                          child: Container(
+                                                            width:
+                                                                getWidgetWidth(
+                                                                    width: 130),
+                                                            height:
+                                                                getWidgetHeight(
+                                                                    height: 45),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8),
+                                                              color:
+                                                                  Colors.white,
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                  color: Colors
+                                                                      .black
+                                                                      .withOpacity(
+                                                                          0.1),
+                                                                  offset:
+                                                                      const Offset(
+                                                                          0, 4),
+                                                                  blurRadius:
+                                                                      10,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceAround,
+                                                              children: [
+                                                                const Icon(
+                                                                  Icons.mic,
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          112,
+                                                                          112,
+                                                                          112),
+                                                                ),
+                                                                Text(
+                                                                  "Practice",
+                                                                  style:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    color: const Color
+                                                                        .fromARGB(
                                                                         255,
                                                                         112,
                                                                         112,
                                                                         112),
-                                                              ),
-                                                              Text(
-                                                                "Practice",
-                                                                style:
-                                                                    GoogleFonts
-                                                                        .inter(
-                                                                  color: const Color
-                                                                      .fromARGB(
-                                                                      255,
-                                                                      112,
-                                                                      112,
-                                                                      112),
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  fontSize: 16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    fontSize:
+                                                                        16,
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                              const SizedBox()
-                                                            ],
+                                                                const SizedBox()
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
                                                     ],
                                                   ),
                                                   if (controller

@@ -100,7 +100,7 @@ void startTimerMainCategory(String name) {
   }
 }
 
-stopTimerMainCategory() async {
+Future<void> stopTimerMainCategory() async {
   if (isTimerActive) {
     // if (count == 1) {
     // endTimings = DateTime.now();
@@ -168,11 +168,22 @@ Future<void> startPracticeTime({
 
     // 3. Prepare Firestore instance
     final firestore = FirebaseFirestore.instance;
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString("userId") ?? "";
 
     // 4. Attempt to find existing session document
+    if (mainCategory == "English Pronunciation" ||
+        mainCategory == "French Pronunciation" ||
+        mainCategory == "Sentence Lab") {
+      activityName = "Pronunciation Lab";
+      type = "null";
+    } else if (mianCategoryTitile == "Grammer Lab") {
+      activityName = "Grammer Lab";
+      type = "null";
+    }
     final querySnapshot = await firestore
         .collection(collectionName)
-        .where('userId', isEqualTo: "userId")
+        .where('userId', isEqualTo: userId)
         .where('category', isEqualTo: mainCategory)
         .where('subCategory', isEqualTo: subCategory)
         .where('type', isEqualTo: type)

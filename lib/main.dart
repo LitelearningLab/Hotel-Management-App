@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -20,10 +21,22 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 bool isOnNoInternetPage = false;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: FirebaseOptions(
+        apiKey: "AIzaSyBWDZkn03gGxw7jnJYSQI0PZQbSTY8LC1Q",
+        appId: "1:233565329277:web:4df00d8ac94bf7ff005e14",
+        messagingSenderId: "233565329277",
+        projectId: "hotel-management-app-d25d5",
+        authDomain: "hotel-management-app-d25d5.firebaseapp.com",
+        storageBucket: "hotel-management-app-d25d5.firebasestorage.app",
+        databaseURL:
+            "https://hotel-management-app-d25d5-default-rtdb.firebaseio.com/",
+      ),
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
   runApp(const MyApp());
 }
 
