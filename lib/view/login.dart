@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:android_id/android_id.dart';
@@ -39,6 +40,8 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLogin = false;
   bool error = false;
   bool isLoading = true;
+  bool _obscurePassword = true;
+  Timer? _hideTimer;
   String? validateEmail(String? val) {
     if (val == null || val.isEmpty) {
       setState(() {
@@ -371,9 +374,15 @@ class _LoginPageState extends State<LoginPage> {
                         cursorColor: Colors.black,
                         controller:
                             _isLogin ? passwordController : emailController,
-                        keyboardType: TextInputType.emailAddress,
+                        keyboardType: _isLogin
+                            ? TextInputType.text
+                            : TextInputType.emailAddress,
+                        obscureText: _isLogin ? _obscurePassword : false,
                         validator: (val) {
-                          !_isLogin ? validateEmail(val) : null;
+                          if (!_isLogin) {
+                            return validateEmail(val);
+                          }
+                          return null;
                         },
                         decoration: InputDecoration(
                           counterText: "",
@@ -381,10 +390,42 @@ class _LoginPageState extends State<LoginPage> {
                           hintStyle: TextStyle(color: Colors.grey[600]),
                           fillColor: Color(0XFFE8E8E8),
                           filled: true,
-                          prefixIcon:
-                              Icon(Icons.email, color: Colors.grey), // Optional
+                          prefixIcon: Icon(
+                            _isLogin ? Icons.lock : Icons.email,
+                            color: Colors.grey,
+                          ),
+                          suffixIcon: _isLogin
+                              ? IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+
+                                    if (!_obscurePassword) {
+                                      _hideTimer?.cancel();
+
+                                      _hideTimer =
+                                          Timer(Duration(seconds: 1), () {
+                                        if (mounted) {
+                                          setState(() {
+                                            _obscurePassword = true;
+                                          });
+                                        }
+                                      });
+                                    }
+                                  },
+                                )
+                              : null,
                           contentPadding: EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 10),
+                            vertical: 15,
+                            horizontal: 10,
+                          ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Color(0XFFE8E8E8)),
                             borderRadius: BorderRadius.circular(10.0),
