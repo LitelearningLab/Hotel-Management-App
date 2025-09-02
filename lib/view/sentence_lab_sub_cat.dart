@@ -351,6 +351,7 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                                                 InkWell(
                                                                   onTap: () {
                                                                     controller.kShowDialog(
+                                                                        subname,
                                                                         sentence
                                                                             .text,
                                                                         false,

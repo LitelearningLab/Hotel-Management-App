@@ -714,7 +714,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
       print("until go back>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
       CloseValue closeValue = CloseValue();
-
+      closeValue.correctWords = correctWords;
       closeValue.formatedWords = formatedWords;
       closeValue.wordPer = correctPer;
       closeValue.heard = heard.join(' ');

@@ -4,6 +4,7 @@ class CloseValue {
   String? heard;
   double? wordPer;
   List? formatedWords;
+  List? correctWords;
 
   CloseValue({
     this.isCorrect,
@@ -11,6 +12,7 @@ class CloseValue {
     this.word,
     this.wordPer,
     this.formatedWords,
+    this.correctWords,
   });
 
   CloseValue.map(dynamic obj) {
@@ -20,6 +22,7 @@ class CloseValue {
 
     this.wordPer = obj['wordPer'];
     this.formatedWords = obj['formatedWords'];
+    this.correctWords = obj['correctWords'];
   }
 
   Map<String, dynamic> toMap() {
@@ -32,6 +35,7 @@ class CloseValue {
 
     map['wordPer'] = wordPer;
     map['formatedWords'] = formatedWords;
+    map['correctWords'] = correctWords;
 
     return map;
   }
@@ -43,5 +47,6 @@ class CloseValue {
     this.wordPer = map['wordPer'];
     this.heard = map['heard'];
     this.formatedWords = map['formatedWords'];
+    this.correctWords = map['correctWords'];
   }
 }

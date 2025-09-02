@@ -2,12 +2,14 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hotelmanagementapp/model/sentence_attempt.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/public/audio_helper.dart';
-import 'package:hotelmanagementapp/public/sentence_db_helper.dart';
+import 'package:hotelmanagementapp/dbHelper/sentence_db_helper.dart';
 import 'package:hotelmanagementapp/utility/result_dialog.dart';
 import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SentenceLabSubCatController extends GetxController {
   late String title;
@@ -30,6 +32,9 @@ class SentenceLabSubCatController extends GetxController {
   List<SubCategoryModel> allSubcategories = [];
   String searchQuery = "";
   String selectedFilter = "";
+  String userId = "";
+  String collegeId = "";
+  String batchName = "";
 
   @override
   void onInit() {
@@ -48,6 +53,10 @@ class SentenceLabSubCatController extends GetxController {
     allSubcategories =
         await SentenceDBHelper().getSubCategoriesByCategoryName(categoryName);
     subcategories = List.from(allSubcategories);
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString("userId") ?? "";
+    collegeId = prefs.getString("collegeId") ?? "";
+    batchName = prefs.getString("batchName") ?? "";
     isLoading = false;
     update();
   }
@@ -202,6 +211,26 @@ class SentenceLabSubCatController extends GetxController {
         await audioPlayer.play();
 
         currentlyPlayingIndex = null;
+        final attempt = SentenceAttempt(
+          batch: "Your-Batch",
+          companyId: collegeId,
+          correct: 0,
+          dateTime: DateTime.now().toString(),
+          focusWord: [],
+          lastAttempt: DateTime.now().toString(),
+          lastScore: 0,
+          listAtt: 1,
+          load: "",
+          main: title,
+          pracAtt: 0,
+          score: 0,
+          sentence: sentence.text,
+          time: 1,
+          timeCal: DateTime.now().millisecondsSinceEpoch,
+          title: title,
+          userId: userId,
+        );
+        await SentenceAttempt.saveAttempt(attempt);
       }
     } catch (e) {
       log("❌ Audio load error: $e");
@@ -214,7 +243,8 @@ class SentenceLabSubCatController extends GetxController {
     }
   }
 
-  void kShowDialog(String word, bool notCatch, BuildContext context) async {
+  void kShowDialog(
+      String main, String word, bool notCatch, BuildContext context) async {
     Get.dialog(
       Dialog(
         shape:
@@ -228,9 +258,33 @@ class SentenceLabSubCatController extends GetxController {
           main: "main",
         ),
       ),
-    ).then((value) {
+    ).then((value) async {
       if (value != null &&
           (value.isCorrect == "true" || value.isCorrect == "false")) {
+        final attempt = SentenceAttempt(
+          batch: "Your-Batch",
+          companyId: collegeId,
+          correct: value.isCorrect == "true" ? 1 : 0,
+          dateTime: DateTime.now().toString(),
+          focusWord: [
+            {
+              DateTime.now().toIso8601String(): value.correctWords ?? [],
+            }
+          ],
+          lastAttempt: DateTime.now().toString(),
+          lastScore: value.wordPer,
+          listAtt: 0,
+          load: main,
+          main: title,
+          pracAtt: 1,
+          score: value.wordPer,
+          sentence: word,
+          time: 1,
+          timeCal: DateTime.now().millisecondsSinceEpoch,
+          title: title,
+          userId: userId,
+        );
+
         showDialog(
           context: context,
           builder: (BuildContext buildContext) {
@@ -247,10 +301,12 @@ class SentenceLabSubCatController extends GetxController {
             );
           },
         );
+
+        await SentenceAttempt.saveAttempt(attempt);
       } else if (value != null && value.isCorrect == "notCatch") {
-        kShowDialog(word, true, context);
+        kShowDialog(main, word, true, context);
       } else if (value != null && value.isCorrect == "openDialog") {
-        kShowDialog(word, false, context);
+        kShowDialog(main, word, false, context);
       }
     });
   }

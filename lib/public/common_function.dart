@@ -32,6 +32,7 @@ String subCategoryTitle = "";
 String activityName = "";
 int timestampIndex = 0;
 late TextScaler kText;
+String accessLinks = "";
 // double fullScreenHeight = 805.33;
 
 Size displaySize(BuildContext context) {

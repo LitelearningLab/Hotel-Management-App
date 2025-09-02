@@ -74,7 +74,11 @@ class ARCallSimulation extends StatelessWidget {
         homeController.loadRecentHistory();
       },
       child: Scaffold(
-        bottomNavigationBar: CustomeBottomNavigation(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Align(
+          alignment: Alignment.bottomCenter,
+          child: CustomeBottomNavigation(),
+        ),
         appBar: AppBar(
           forceMaterialTransparency: true,
           backgroundColor: Colors.white,
@@ -427,6 +431,9 @@ class ARCallSimulation extends StatelessWidget {
                                 ),
                               ],
                             ),
+                          ),
+                          SizedBox(
+                            height: getWidgetHeight(height: 90),
                           ),
                         ],
                       ),

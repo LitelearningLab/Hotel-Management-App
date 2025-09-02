@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hotelmanagementapp/dbHelper/progress_bar_db_helper.dart';
 import 'package:hotelmanagementapp/model/front_office_model.dart';
+import 'package:hotelmanagementapp/model/progress_model.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
@@ -28,6 +30,9 @@ class FrontOfficeController extends GetxController {
   bool isSearching = false;
   TextEditingController searchController = TextEditingController();
   String searchTerm = "";
+  int totalPercentage = 0;
+  double particularPercentage = 0;
+  Map<String, ProgressModel> progressData = {};
 
   @override
   void onInit() {
@@ -69,8 +74,37 @@ class FrontOfficeController extends GetxController {
     frontOfficeData =
         await frontOfficeResponse.getFrontOfficeCollection(collectionName);
     originalData = List.from(frontOfficeData);
+    totalPercentage = originalData.length * 3;
+    await _loadProgress();
+    particularPercentage = await _getTotalProgress();
+    log("here im printing the total percentage $totalPercentage and here im printing the particular percentage $particularPercentage");
     loading = false;
     update();
+  }
+
+  Future<void> _loadProgress() async {
+    for (var h in originalData) {
+      final p = await ProgressBarDbHelper.getProgress(h.category);
+      if (p == null) {
+        ProgressModel fresh = ProgressModel(
+          id: h.category,
+          option1Time: 0,
+          option1Done: false,
+          option2Time: 0,
+          option2Done: false,
+          percentageEarned: 0,
+        );
+        await ProgressBarDbHelper.saveProgress(fresh);
+        progressData[h.category] = fresh;
+      } else {
+        progressData[h.category] = p;
+      }
+    }
+    update();
+  }
+
+  Future<double> _getTotalProgress() async {
+    return await ProgressBarDbHelper.getTotalProgress();
   }
 
   void showPopupAtTap(Offset tapPosition) {

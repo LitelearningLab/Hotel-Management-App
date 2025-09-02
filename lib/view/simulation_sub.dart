@@ -101,7 +101,7 @@ class _SimulationSubState extends State<SimulationSub> {
                               onTap: () {
                                 subCategoryTitle = controller
                                     .simulation.subcategory[index].title;
-                                activityName = 'simulation';
+                                activityName = 'Interactive Simulation';
                                 addToRecentHistory(
                                     path:
                                         "Interactive  Simulation > $subCategoryTitle",

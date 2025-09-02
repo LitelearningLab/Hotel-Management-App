@@ -8,13 +8,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hotelmanagementapp/model/word_attempt.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 
 import 'package:get/get.dart';
 
 import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:hotelmanagementapp/public/audio_helper.dart';
-import 'package:hotelmanagementapp/public/db_helper.dart';
+import 'package:hotelmanagementapp/dbHelper/db_helper.dart';
 import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 
 import 'package:just_audio/just_audio.dart';
@@ -24,6 +25,7 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PronunciationLabSubController extends GetxController {
   late String title;
@@ -57,9 +59,18 @@ class PronunciationLabSubController extends GetxController {
   TextEditingController searchController = TextEditingController();
   String searchTerm = "";
   String selectedMenuOption = '';
+  String userId = "";
+  String collegeId = "";
+  String batchName = "";
 
   @override
   void onInit() {
+    readyFirs();
+    super.onInit();
+    update();
+  }
+
+  void readyFirs() async {
     audioPlayer = AudioPlayer();
     title = Get.arguments['title'];
     final argList = Get.arguments['subcategories'] as List;
@@ -88,9 +99,10 @@ class PronunciationLabSubController extends GetxController {
     } else {
       fetchPronunById(id);
     }
-
-    super.onInit();
-    update();
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString("userId") ?? "";
+    collegeId = prefs.getString("collegeId") ?? "";
+    batchName = prefs.getString("batchName") ?? "";
   }
 
   void applyDownloadedFilter(bool onlyDownloaded) {
@@ -109,7 +121,6 @@ class PronunciationLabSubController extends GetxController {
   }
 
   void kShowDialog(String word, bool notCatch, BuildContext context) async {
-    // log("message");
     Get.dialog(
       Container(
         child: Dialog(
@@ -119,17 +130,36 @@ class PronunciationLabSubController extends GetxController {
             true,
             isShowDidNotCatch: notCatch,
             word: word,
-            title: "widget.title",
-            load: "widget.load",
+            title: "widget.title", // replace with actual title
+            load: "widget.load", // replace with actual load
           ),
         ),
       ),
-    ).then((value) {
-      if (value != null && value.isCorrect == "true" ||
-          value.isCorrect == "false") {
+    ).then((value) async {
+      if (value != null &&
+          (value.isCorrect == "true" || value.isCorrect == "false")) {
         selectedWord = word;
-        isCorrect = value.isCorrect == "true" ? true : false;
-        log("is correct or not ${isCorrect}");
+        isCorrect = value.isCorrect == "true";
+        log("is correct or not $isCorrect");
+
+        final attempt = WordAttempt(
+          batch: "yourBatch",
+          companyId: collegeId,
+          correct: isCorrect ? 1 : 0,
+          date: "",
+          lastAttempt: "",
+          listAtt: 0,
+          load: "widget.load",
+          pracAtt: 1,
+          time: 0,
+          timeCal: 0,
+          title: title,
+          userId: userId,
+          word: word,
+        );
+
+        await WordAttempt.saveAttempt(attempt);
+
         update();
       } else if (value != null && value.isCorrect == "notCatch") {
         kShowDialog(word, true, context);
@@ -137,7 +167,7 @@ class PronunciationLabSubController extends GetxController {
         kShowDialog(word, false, context);
       }
     }).onError((error, stackTrace) {
-      // log(error.toString());
+      log("Dialog error: $error");
     });
   }
 
@@ -253,8 +283,27 @@ class PronunciationLabSubController extends GetxController {
 
         await audioPlayer.setUrl(playPath);
         playingIs = -1;
+
         update();
         await audioPlayer.play();
+
+        final attempt = WordAttempt(
+          batch: "yourBatch",
+          companyId: collegeId,
+          correct: 0,
+          date: "",
+          lastAttempt: "",
+          listAtt: 1,
+          load: "widget.load",
+          pracAtt: 0,
+          time: 0,
+          timeCal: 0,
+          title: title,
+          userId: userId,
+          word: subcategories[index].text,
+        );
+
+        await WordAttempt.saveAttempt(attempt);
       }
       errorPlaying = -1;
     } on PlayerException catch (e) {

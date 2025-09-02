@@ -105,6 +105,9 @@ class HomeController extends GetxController {
 
       // Company status check
       if (companyData['status'] != "1") return false;
+      // accessLinks = companyData['accessLinks'] ?? "";
+      accessLinks = "E-Learning , Knowledge Check , Glossary , Simulation";
+      log(" here printing the access links how coming $accessLinks");
 
       // Subscription dates check
       final userSubDate =
@@ -189,16 +192,16 @@ class HomeController extends GetxController {
           log('📘 College Name: ${universityModel.collegeName}');
           log('🏷️ College ID: ${universityModel.collegeId}');
 
-          for (var category in universityModel.category) {
-            log('\n📚 Category: ${category.name}');
-            log('   ID: ${category.id}');
-            log('   Order: ${category.order}');
+          // for (var category in universityModel.category) {
+          //   log('\n📚 Category: ${category.name}');
+          //   log('   ID: ${category.id}');
+          //   log('   Order: ${category.order}');
 
-            for (var subject in category.subcategory) {
-              log('   ➤ ${subject.text}');
-            }
-            log('-----------------------------');
-          }
+          //   for (var subject in category.subcategory) {
+          //     log('   ➤ ${subject.text}');
+          //   }
+          //   log('-----------------------------');
+          // }
         } else {
           log('⚠️ No college data found for this collegeId.');
         }

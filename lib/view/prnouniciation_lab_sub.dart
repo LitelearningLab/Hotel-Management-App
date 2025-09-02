@@ -44,13 +44,13 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
           stopTimerMainCategory();
         },
         child: Scaffold(
-          bottomNavigationBar: CustomeBottomNavigation(),
-          // floatingActionButtonLocation:
-          //     FloatingActionButtonLocation.centerDocked,
-          // floatingActionButton: Align(
-          //   alignment: Alignment.bottomCenter,
-          //   child: buildBoomMenu(),
-          // ),
+          // bottomNavigationBar: CustomeBottomNavigation(),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          floatingActionButton: Align(
+            alignment: Alignment.bottomCenter,
+            child: CustomeBottomNavigation(),
+          ),
           appBar: AppBar(
             forceMaterialTransparency: true,
             surfaceTintColor: Colors.white,
@@ -700,7 +700,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                     if (controller.subcategories.length - 1 ==
                                         index)
                                       SizedBox(
-                                        height: getWidgetHeight(height: 40),
+                                        height: getWidgetHeight(height: 80),
                                       )
                                   ],
                                 );

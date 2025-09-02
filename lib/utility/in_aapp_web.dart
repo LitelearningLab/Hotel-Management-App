@@ -8,7 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/controller/in_app_web_view_controller.dart';
+import 'package:hotelmanagementapp/dbHelper/progress_bar_db_helper.dart';
 import 'package:hotelmanagementapp/main.dart';
+import 'package:hotelmanagementapp/model/progress_model.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
@@ -28,7 +30,8 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
   bool onLoad = true;
   bool isLandscape = false;
   bool isMeetingEtiquite = false;
-
+  Map<String, ProgressModel> progressData = {};
+  Timer? _timer;
   Future<bool> _checkInternetAndHandleBack() async {
     var results = await Connectivity().checkConnectivity();
 
@@ -46,6 +49,7 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
 
   @override
   void initState() {
+    _startTimer(subCategoryTitle, 1);
     super.initState();
   }
 
@@ -54,6 +58,54 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
     WidgetsBinding.instance.removeObserver(this);
     resetOrientationIfNeeded();
     super.dispose();
+  }
+
+  void _startTimer(String id, int option) {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      ProgressModel? p = await ProgressBarDbHelper.getProgress(id);
+      if (p == null) return;
+
+      int o1Time = p.option1Time;
+      int o2Time = p.option2Time;
+      bool o1Done = p.option1Done;
+      bool o2Done = p.option2Done;
+      double percentage = p.percentageEarned;
+
+      if (option == 1 && !o1Done) {
+        o1Time++;
+        if (o1Time >= 10) {
+          // change 10 -> 300 for 5 min
+          o1Done = true;
+          percentage += 3;
+        }
+      } else if (option == 2 && !o2Done) {
+        o2Time++;
+        if (o2Time >= 10) {
+          o2Done = true;
+          percentage += 1;
+        }
+      }
+
+      ProgressModel updated = ProgressModel(
+        id: id,
+        option1Time: o1Time,
+        option1Done: o1Done,
+        option2Time: o2Time,
+        option2Done: o2Done,
+        percentageEarned: percentage,
+      );
+
+      await ProgressBarDbHelper.saveProgress(updated);
+
+      setState(() {
+        progressData[id] = updated;
+      });
+
+      if ((option == 1 && o1Done) || (option == 2 && o2Done)) {
+        _timer?.cancel();
+      }
+    });
   }
 
   void resetOrientationIfNeeded() {

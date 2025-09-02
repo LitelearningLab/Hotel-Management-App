@@ -5,7 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
-import 'package:hotelmanagementapp/public/sentence_db_helper.dart';
+import 'package:hotelmanagementapp/dbHelper/sentence_db_helper.dart';
 
 class SentenceLabController extends GetxController {
   RxString title = "Sentence Lab".obs;

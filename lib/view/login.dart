@@ -313,6 +313,9 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  SizedBox(
+                    height: getWidgetHeight(height: 35),
+                  ),
                   Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: getWidgetHeight(height: 25),
@@ -321,13 +324,13 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
-                          height: getWidgetHeight(height: 140),
+                          // height: getWidgetHeight(height: 140),
                           width: getWidgetWidth(width: 200),
                           child: Image.asset(
                             AllAssets.splashLogo,
                             fit: BoxFit.contain,
                             // width: getWidgetWidth(width: 200),
-                            height: getWidgetHeight(height: 200),
+                            // height: getWidgetHeight(height: 200),
                           ),
                         ),
                         // Container(

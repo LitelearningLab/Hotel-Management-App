@@ -7,9 +7,8 @@ import "package:path/path.dart" as p;
 import 'package:http/http.dart' as http;
 
 class AudioCryptoHelper {
-  static final key =
-      encrypt.Key.fromUtf8('1234567890123456'); // must match encryption key
-  static final iv = encrypt.IV.fromLength(16);
+  static final key = encrypt.Key.fromUtf8('1234567890123456');
+  static final iv = encrypt.IV.fromUtf8('1234567890123456');
   static final encrypter = encrypt.Encrypter(encrypt.AES(key));
 
   static Future<String> decryptFile(

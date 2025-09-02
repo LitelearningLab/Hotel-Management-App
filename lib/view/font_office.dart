@@ -219,30 +219,38 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                             itemBuilder: (context, index) {
                               final isExpanded =
                                   controller.expandedIndex == index;
-                              final linkAvailable = (controller
-                                      .frontOfficeData[index]
-                                      .subcategory[0]
-                                      .link
-                                      .isNotEmpty ||
-                                  controller.frontOfficeData[index]
-                                          .subcategory[0].link !=
-                                      "");
-                              final linkAvailable1 = (controller
-                                      .frontOfficeData[index]
-                                      .subcategory[1]
-                                      .link
-                                      .isNotEmpty ||
-                                  controller.frontOfficeData[index]
-                                          .subcategory[1].link !=
-                                      "");
-                              final linkAvailable2 = (controller
-                                      .frontOfficeData[index]
-                                      .subcategory[2]
-                                      .link
-                                      .isNotEmpty ||
-                                  controller.frontOfficeData[index]
-                                          .subcategory[2].link !=
-                                      "");
+                              final linkAvailable = ((controller
+                                          .frontOfficeData[index]
+                                          .subcategory[0]
+                                          .link
+                                          .isNotEmpty ||
+                                      controller.frontOfficeData[index]
+                                              .subcategory[0].link !=
+                                          "") &&
+                                  accessLinks
+                                      .toLowerCase()
+                                      .contains("e-learning".toLowerCase()));
+                              final linkAvailable1 = ((controller
+                                          .frontOfficeData[index]
+                                          .subcategory[1]
+                                          .link
+                                          .isNotEmpty ||
+                                      controller.frontOfficeData[index]
+                                              .subcategory[1].link !=
+                                          "") &&
+                                  accessLinks
+                                      .toLowerCase()
+                                      .contains("glossary".toLowerCase()));
+                              final linkAvailable2 = ((controller
+                                          .frontOfficeData[index]
+                                          .subcategory[2]
+                                          .link
+                                          .isNotEmpty ||
+                                      controller.frontOfficeData[index]
+                                              .subcategory[2].link !=
+                                          "") &&
+                                  accessLinks.toLowerCase().contains(
+                                      "knowledge check".toLowerCase()));
 
                               return Column(
                                 children: [
@@ -400,7 +408,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                           onTap: linkAvailable1
                                                               ? () {
                                                                   activityName =
-                                                                      'Glossary';
+                                                                      'Knowledge Check';
                                                                   subCategoryTitle = controller
                                                                       .frontOfficeData[
                                                                           index]
@@ -459,7 +467,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                           onTap: linkAvailable2
                                                               ? () {
                                                                   activityName =
-                                                                      "Knowledge check";
+                                                                      "Glossary";
 
                                                                   subCategoryTitle = controller
                                                                       .frontOfficeData[

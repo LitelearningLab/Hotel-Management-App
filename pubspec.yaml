@@ -2,7 +2,7 @@ name: hotelmanagementapp
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.29+37
+version: 1.0.36+44
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -55,6 +55,7 @@ dependencies:
   lib: ^0.2.1
   firebase_storage: ^13.0.0
   webview_flutter_web: ^0.2.3+4
+  percent_indicator: ^4.2.5
 
 dev_dependencies:
   flutter_test:

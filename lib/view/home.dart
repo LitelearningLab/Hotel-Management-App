@@ -37,6 +37,7 @@ import 'package:hotelmanagementapp/view/login.dart';
 import 'package:hotelmanagementapp/view/pdf.dart';
 import 'package:hotelmanagementapp/view/profile_screen.dart';
 import 'package:hotelmanagementapp/view/university_lab.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -349,12 +350,16 @@ class _HomeState extends State<Home>
           }),
         ),
         extendBody: true,
-        bottomNavigationBar: CustomeBottomNavigation(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Align(
+          alignment: Alignment.bottomCenter,
+          child: CustomeBottomNavigation(),
+        ),
         backgroundColor: Colors.white,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: getWidgetHeight(height: isKwidth > 700 ? 20 : 50)),
+            SizedBox(height: getWidgetHeight(height: isKwidth > 700 ? 20 : 60)),
             Padding(
               padding:
                   EdgeInsets.symmetric(horizontal: getWidgetWidth(width: 20)),
@@ -362,7 +367,7 @@ class _HomeState extends State<Home>
                 // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    height: getWidgetHeight(height: 81),
+                    // height: getWidgetHeight(height: 81),
                     width: getWidgetWidth(width: isKwidth > 700 ? 40 : 130),
                     child: CircleAvatar(
                       backgroundColor: Colors.transparent,
@@ -371,7 +376,7 @@ class _HomeState extends State<Home>
                         AllAssets.splashLogo,
                         fit: BoxFit.fitWidth,
                         // width: getWidgetWidth(width: 200),
-                        height: getWidgetHeight(height: 200),
+                        // height: getWidgetHeight(height: 200),
                       ),
                     ),
                   ),
@@ -400,6 +405,7 @@ class _HomeState extends State<Home>
                 ],
               ),
             ),
+            SizedBox(height: getWidgetHeight(height: 5)),
             if (kIsWeb) SizedBox(height: getWidgetHeight(height: 20)),
             GetBuilder<HomeController>(
                 init: HomeController(),
@@ -423,9 +429,9 @@ class _HomeState extends State<Home>
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              height: getWidgetHeight(height: 340),
+                              height: getWidgetHeight(height: 315),
                               width: getWidgetWidth(
-                                  width: isKwidth > 700 ? 80 : 270),
+                                  width: isKwidth > 700 ? 80 : 218),
                               child: InkWell(
                                 onTap: () {
                                   timestampIndex = index;
@@ -481,8 +487,8 @@ class _HomeState extends State<Home>
                                           CrossAxisAlignment.start,
                                       children: [
                                         SizedBox(
-                                          width: getWidgetWidth(width: 260),
-                                          height: getWidgetHeight(height: 200),
+                                          width: getWidgetWidth(width: 235),
+                                          height: getWidgetHeight(height: 160),
                                           child: index == 4
                                               ? SvgPicture.network(
                                                   controller.cardImages[index],
@@ -519,7 +525,7 @@ class _HomeState extends State<Home>
                                                       height: 8)),
                                               SizedBox(
                                                 height:
-                                                    getWidgetHeight(height: 60),
+                                                    getWidgetHeight(height: 78),
                                                 child: Text(
                                                   controller.cardNames[index],
                                                   textAlign: TextAlign.start,
@@ -536,13 +542,50 @@ class _HomeState extends State<Home>
                                               SizedBox(
                                                   height: getWidgetHeight(
                                                       height: 15)),
-                                              Text(
-                                                "View Details",
-                                                textAlign: TextAlign.start,
-                                                style: TextStyle(
-                                                  fontSize: kText.scale(12),
-                                                  color: linearColor,
-                                                  fontWeight: FontWeight.w600,
+                                              SizedBox(
+                                                height:
+                                                    getWidgetHeight(height: 20),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      "View Details",
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                      style: TextStyle(
+                                                        fontSize:
+                                                            kText.scale(12),
+                                                        color: linearColor,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    // LinearPercentIndicator(
+                                                    //   center: Text(
+                                                    //     "20%",
+                                                    //     style: TextStyle(
+                                                    //         color: Colors.white,
+                                                    //         fontSize: kText
+                                                    //             .scale(10)),
+                                                    //   ),
+                                                    //   barRadius:
+                                                    //       Radius.circular(6),
+                                                    //   width: getWidgetWidth(
+                                                    //       width: 150),
+                                                    //   lineHeight:
+                                                    //       getWidgetHeight(
+                                                    //           height: 14),
+                                                    //   percent: 0.2,
+                                                    //   backgroundColor:
+                                                    //       Colors.grey,
+                                                    //   progressColor:
+                                                    //       linearColor,
+                                                    // ),
+                                                  ],
                                                 ),
                                               ),
                                               SizedBox(
@@ -605,7 +648,10 @@ class _HomeState extends State<Home>
                                 // timestampIndex = index;
                                 final tapPosition = details.globalPosition;
                                 index == 0
-                                    ? Get.toNamed(AppRoutes.simulation)
+                                    ? accessLinks.toLowerCase().contains(
+                                            "simulation".toLowerCase())
+                                        ? Get.toNamed(AppRoutes.simulation)
+                                        : controller.showPopupAtTap(tapPosition)
                                     : index == 1
                                         ? Get.toNamed(AppRoutes.languageLab)
                                         : index == 2
@@ -716,7 +762,7 @@ class _HomeState extends State<Home>
                                           child: Text(
                                             maxLines: 2,
                                             index == 0
-                                                ? "150+ Simulations - Experiential learning for handling challenging situations & interviews."
+                                                ? "250+ Simulations - Experiential learning for handling challenging situations & interviews."
                                                 : index == 1
                                                     ? "English & French Pronunciation, Sentence Lab, Grammar, and Phonetic Sounds. "
                                                     : "Excellent collection of content for casual and enjoyable micro-learning",
