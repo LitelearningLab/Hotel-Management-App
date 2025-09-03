@@ -617,11 +617,83 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                   ),
                                                   if (controller
                                                       .subcategories[index]
+                                                      .meaningSamples
+                                                      .isNotEmpty)
+                                                    Column(
+                                                      children: [
+                                                        SizedBox(
+                                                          height:
+                                                              getWidgetHeight(
+                                                                  height: 12),
+                                                        ),
+                                                        SizedBox(
+                                                          height:
+                                                              getWidgetHeight(
+                                                                  height: 24),
+                                                          child: Text(
+                                                            "ENGLISH MEANING",
+                                                            style: GoogleFonts.inter(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                fontSize: 10,
+                                                                color:
+                                                                    lightWhite),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+
+                                                  if (controller
+                                                      .subcategories[index]
+                                                      .meaningSamples
+                                                      .isNotEmpty) ...[
+                                                    for (var sentence
+                                                        in controller
+                                                            .subcategories[
+                                                                index]
+                                                            .meaningSamples)
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(sentence),
+                                                          Divider(
+                                                            thickness: 0.2,
+                                                            color: Colors.black,
+                                                          )
+                                                        ],
+                                                      )
+                                                  ],
+
+                                                  if (controller
+                                                      .subcategories[index]
                                                       .sentenceSamples
                                                       .isNotEmpty)
-                                                    SizedBox(
-                                                      height: getWidgetHeight(
-                                                          height: 12),
+                                                    Column(
+                                                      children: [
+                                                        SizedBox(
+                                                          height:
+                                                              getWidgetHeight(
+                                                                  height: 12),
+                                                        ),
+                                                        SizedBox(
+                                                          height:
+                                                              getWidgetHeight(
+                                                                  height: 24),
+                                                          child: Text(
+                                                            "SAMPLE SENTENCES",
+                                                            style: GoogleFonts.inter(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                fontSize: 10,
+                                                                color:
+                                                                    lightWhite),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
 
                                                   if (controller

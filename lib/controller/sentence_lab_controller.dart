@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:ui';
 
@@ -6,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/dbHelper/sentence_db_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SentenceLabController extends GetxController {
   RxString title = "Sentence Lab".obs;
@@ -169,24 +171,80 @@ class SentenceLabController extends GetxController {
     log('[onFirst] Called');
     final args = Get.arguments as Map<String, dynamic>?;
     title.value = args?['title'] ?? "Sentence Lab";
-    log('[onFirst] title set to: ${title.value}');
 
+    final prefs = await SharedPreferences.getInstance();
+    final hasInitialized = prefs.getBool("sentenceLabInitialized") ?? false;
+
+    if (!hasInitialized) {
+      // 🚨 First-time run → clear everything
+      log('[onFirst] First-time run detected → clearing local DB...');
+      await SentenceDBHelper().clearAllData();
+
+      try {
+        log('[onFirst] Fetching latest data from Firebase (first run)...');
+        final firebaseData = await fetchSentenceLabData();
+        log('[onFirst] Fetched ${firebaseData.length} sections from Firebase');
+
+        log('[onFirst] Saving fresh data locally...');
+        await SentenceDBHelper().saveDataLocally(firebaseData);
+        log('[onFirst] Initial save completed');
+
+        // Reload local after save
+        sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
+      } catch (e, stacktrace) {
+        log('[onFirst] Error during first-time fetch: $e');
+        log("$stacktrace");
+      }
+
+      // ✅ Mark initialization as done
+      await prefs.setBool("sentenceLabInitialized", true);
+      isLoading.value = false;
+      update();
+      return;
+    }
+
+    // 🔄 Normal logic after initialization
     sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
     log('[onFirst] Loaded ${sentenceLabList.length} items from local DB');
 
+    if (sentenceLabList.isNotEmpty) {
+      // ✅ Already have local data → use it directly
+      isLoading.value = false;
+      update();
+
+      // 🔄 Background refresh from Firebase
+      unawaited(() async {
+        try {
+          log('[onFirst] Background sync started...');
+          final firebaseData = await fetchSentenceLabData();
+          await SentenceDBHelper().syncData(firebaseData);
+
+          // Reload after sync
+          sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
+          log('[onFirst] Sync completed → ${sentenceLabList.length} items');
+          update();
+        } catch (e, st) {
+          log('[onFirst] Sync failed: $e');
+          log("$st");
+        }
+      }());
+      return;
+    }
+
+    // 2. If no local data → fetch from Firebase once
     try {
       log('[onFirst] Fetching latest data from Firebase...');
       final firebaseData = await fetchSentenceLabData();
       log('[onFirst] Fetched ${firebaseData.length} sections from Firebase');
 
-      log('[onFirst] Saving/Updating local data...');
-      await saveDataLocallyIncremental(firebaseData);
-      log('[onFirst] Incremental save completed');
+      log('[onFirst] Saving data locally...');
+      await SentenceDBHelper().saveDataLocally(firebaseData);
+      log('[onFirst] Initial save completed');
 
-      // Reload local after merge
+      // Reload local after save
       sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
     } catch (e, stacktrace) {
-      log('[onFirst] Error syncing data: $e');
+      log('[onFirst] Error fetching data: $e');
       log("$stacktrace");
     }
 

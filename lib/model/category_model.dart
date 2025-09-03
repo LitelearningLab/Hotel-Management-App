@@ -28,6 +28,7 @@ class SubcategoryPro {
   bool downloadStatus;
   String localPath;
   List<String> sentenceSamples;
+  List<String> meaningSamples;
 
   SubcategoryPro({
     required this.file,
@@ -38,6 +39,7 @@ class SubcategoryPro {
     this.downloadStatus = false,
     this.localPath = "",
     required this.sentenceSamples,
+    required this.meaningSamples,
   });
 
   factory SubcategoryPro.fromJson(Map<String, dynamic> json) {
@@ -53,6 +55,9 @@ class SubcategoryPro {
           ? List<String>.from(jsonDecode(json['sentenceSamples']))
           : (json['sentenceSamples'] ?? []).cast<String>(),
       localPath: json['localPath'] ?? '',
+      meaningSamples: (json['meaningSamples'] is String)
+          ? List<String>.from(jsonDecode(json['meaningSamples']))
+          : (json['meaningSamples'] ?? []).cast<String>(),
     );
   }
 
@@ -65,10 +70,12 @@ class SubcategoryPro {
       pronun: map['pronun'] ?? '',
       downloadStatus: map['downloadStatus'] == 1,
       localPath: map['localPath'] ?? "",
-      sentenceSamples: (map['sentenceSamples'] as List?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
+      sentenceSamples: (map['sentenceSamples'] != null)
+          ? List<String>.from(jsonDecode(map['sentenceSamples']))
+          : [],
+      meaningSamples: (map['meaningSamples'] != null)
+          ? List<String>.from(jsonDecode(map['meaningSamples']))
+          : [],
     );
   }
 
@@ -81,13 +88,15 @@ class SubcategoryPro {
       'pronun': pronun,
       'downloadStatus': downloadStatus ? 1 : 0,
       'localPath': localPath,
-      'sentenceSamples': sentenceSamples
+      'sentenceSamples': jsonEncode(sentenceSamples),
+      'meaningSamples': jsonEncode(meaningSamples),
     };
   }
 
   SubcategoryPro copyWith({
     List<String>? sentenceSamples,
     String? localPath,
+    List<String>? meaningSamples,
   }) {
     return SubcategoryPro(
       file: file,
@@ -98,6 +107,7 @@ class SubcategoryPro {
       downloadStatus: downloadStatus,
       localPath: localPath ?? this.localPath,
       sentenceSamples: sentenceSamples ?? this.sentenceSamples,
+      meaningSamples: meaningSamples ?? this.meaningSamples,
     );
   }
 }

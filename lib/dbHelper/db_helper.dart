@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -38,7 +37,9 @@ class DBHelper {
       text TEXT,
       pronun TEXT,
       downloadStatus INTEGER,
-      localPath TEXT
+      localPath TEXT,
+      sentenceSamples TEXT,
+      meaningSamples TEXT
     )
   ''');
   }
@@ -74,6 +75,8 @@ class DBHelper {
         'pronun': item.pronun,
         'downloadStatus': downloadStatus,
         'localPath': localPath,
+        'sentenceSamples': jsonEncode(item.sentenceSamples),
+        'meaningSamples': jsonEncode(item.meaningSamples), // ✅ new field
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -118,7 +121,7 @@ class DBHelper {
   Future<void> toggleDownloadStatus(String id, String file, bool status) async {
     final db = await database;
     await db.update(
-      '"$id"', // ✅ Safe table name
+      '"$id"',
       {'downloadStatus': status ? 1 : 0},
       where: 'file = ?',
       whereArgs: [file],
@@ -141,7 +144,7 @@ class DBHelper {
   Future<bool> isDownloaded(String id, String file) async {
     final db = await database;
     final result = await db.query(
-      '"$id"', // ✅ Safe table name
+      '"$id"',
       where: 'file = ?',
       whereArgs: [file],
     );

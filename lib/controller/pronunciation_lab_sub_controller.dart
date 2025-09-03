@@ -411,6 +411,7 @@ class PronunciationLabSubController extends GetxController {
             pronun: item.pronun,
             localPath: '', // Not needed in web
             downloadStatus: false, // Not used in web
+            meaningSamples: item.meaningSamples,
           );
 
           tempList.add(newItem);
@@ -477,6 +478,7 @@ class PronunciationLabSubController extends GetxController {
               pronun: item.pronun,
               localPath: '',
               downloadStatus: false,
+              meaningSamples: item.meaningSamples,
             );
 
             await DBHelper.insertSubcategory(newItem, tableName);
