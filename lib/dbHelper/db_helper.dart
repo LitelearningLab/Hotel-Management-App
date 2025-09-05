@@ -153,4 +153,26 @@ class DBHelper {
     }
     return false;
   }
+
+  static Future<void> clearTable(String tableId) async {
+    final db = await database;
+    await ensureTableExists(tableId);
+    await db.delete('"$tableId"');
+    log("🗑 Cleared all data from table $tableId");
+  }
+
+  /// Clear entire database (remove all tables & data)
+  static Future<void> clearDatabase() async {
+    final db = await database;
+    final tables =
+        await db.rawQuery('SELECT name FROM sqlite_master WHERE type="table"');
+
+    for (var table in tables) {
+      final tableName = table['name'] as String;
+      if (tableName != "sqlite_sequence") {
+        await db.delete('"$tableName"');
+        log("🗑 Cleared table $tableName");
+      }
+    }
+  }
 }

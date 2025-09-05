@@ -348,10 +348,6 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                                 index]
                                                             .text,
                                                         style: TextStyle(
-                                                          fontSize: kText.scale(
-                                                              isKwidth > 700
-                                                                  ? 16
-                                                                  : 13),
                                                           fontFamily:
                                                               Keys.fontFamily,
                                                           letterSpacing: 0,

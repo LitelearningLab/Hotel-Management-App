@@ -10,6 +10,7 @@ import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/update_checker.dart';
 import 'package:hotelmanagementapp/view/login.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends GetxController {
@@ -50,8 +51,21 @@ class HomeController extends GetxController {
     // TODO: implement onReady
     fetchCollegeSyllabus();
     checkSubscriptionValidity();
+    _checkFirstTimeAndRequestMic();
 
     super.onReady();
+  }
+
+  Future<void> _checkFirstTimeAndRequestMic() async {
+    final prefs = await SharedPreferences.getInstance();
+    final alreadyAsked = prefs.getBool('mic_permission_requested') ?? false;
+
+    if (!alreadyAsked) {
+      await _requestMicPermission();
+
+      // Save so we don’t ask again
+      await prefs.setBool('mic_permission_requested', true);
+    }
   }
 
   Future<void> loadRecentHistory() async {
@@ -291,5 +305,38 @@ class HomeController extends GetxController {
         );
       },
     );
+  }
+
+  Future<void> _requestMicPermission() async {
+    var status = await Permission.microphone.status;
+
+    if (status.isDenied) {
+      // First time / previously denied
+      var result = await Permission.microphone.request();
+
+      if (result.isPermanentlyDenied) {
+        // User clicked "Don't ask again"
+        Get.dialog(
+          AlertDialog(
+            title: const Text("Microphone Permission"),
+            content: const Text(
+                "We need microphone access to use this feature. Please enable it in Settings."),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () {
+                  openAppSettings();
+                  Get.back();
+                },
+                child: const Text("Open Settings"),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 }

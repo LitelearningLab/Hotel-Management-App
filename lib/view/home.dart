@@ -429,7 +429,7 @@ class _HomeState extends State<Home>
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              height: getWidgetHeight(height: 315),
+                              height: getWidgetHeight(height: 300),
                               width: getWidgetWidth(
                                   width: isKwidth > 700 ? 80 : 218),
                               child: InkWell(
@@ -541,10 +541,10 @@ class _HomeState extends State<Home>
                                               ),
                                               SizedBox(
                                                   height: getWidgetHeight(
-                                                      height: 15)),
+                                                      height: 5)),
                                               SizedBox(
                                                 height:
-                                                    getWidgetHeight(height: 20),
+                                                    getWidgetHeight(height: 15),
                                                 child: Row(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.center,

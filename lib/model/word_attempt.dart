@@ -4,8 +4,8 @@ class WordAttempt {
   String batch;
   String companyId;
   int correct;
-  String date; 
-  String lastAttempt; 
+  String date;
+  String lastAttempt;
   int listAtt;
   String load;
   int pracAtt;
@@ -67,14 +67,11 @@ class WordAttempt {
     );
   }
 
-  
   static Future<void> saveAttempt(WordAttempt newAttempt) async {
     final now = DateTime.now().toIso8601String();
 
-    final collection =
-        FirebaseFirestore.instance.collection('ProLabReports');
+    final collection = FirebaseFirestore.instance.collection('ProLabReports');
 
-    
     final query = await collection
         .where('userId', isEqualTo: newAttempt.userId)
         .where('companyId', isEqualTo: newAttempt.companyId)
@@ -84,20 +81,29 @@ class WordAttempt {
         .get();
 
     if (query.docs.isNotEmpty) {
-    
       final docId = query.docs.first.id;
       final existing = query.docs.first.data();
 
-      await collection.doc(docId).update({
-        'correct': (existing['correct'] ?? 0) + newAttempt.correct,
-        'pracAtt': (existing['pracAtt'] ?? 0) + newAttempt.pracAtt,
-        'listAtt': (existing['listAtt'] ?? 0) + newAttempt.listAtt,
-        'time': (existing['time'] ?? 0) + newAttempt.time,
-        'timeCal': (existing['timeCal'] ?? 0) + newAttempt.timeCal,
-        'lastAttempt': now,
-      });
+      if (newAttempt.listAtt == 1) {
+        await collection.doc(docId).update({
+          'correct': (existing['correct'] ?? 0) + newAttempt.correct,
+          'pracAtt': (existing['pracAtt'] ?? 0) + newAttempt.pracAtt,
+          'listAtt': (existing['listAtt'] ?? 0) + newAttempt.listAtt,
+          'time': (existing['time'] ?? 0) + newAttempt.time,
+          'timeCal': (existing['timeCal'] ?? 0) + newAttempt.timeCal,
+          // 'lastAttempt': now,
+        });
+      } else {
+        await collection.doc(docId).update({
+          'correct': (existing['correct'] ?? 0) + newAttempt.correct,
+          'pracAtt': (existing['pracAtt'] ?? 0) + newAttempt.pracAtt,
+          'listAtt': (existing['listAtt'] ?? 0) + newAttempt.listAtt,
+          'time': (existing['time'] ?? 0) + newAttempt.time,
+          'timeCal': (existing['timeCal'] ?? 0) + newAttempt.timeCal,
+          'lastAttempt': now,
+        });
+      }
     } else {
-    
       newAttempt.date = now;
       newAttempt.lastAttempt = now;
       await collection.add(newAttempt.toJson());

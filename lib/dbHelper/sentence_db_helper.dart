@@ -303,16 +303,16 @@ class SentenceDBHelper {
 
         List<SubCategoryModel> subCategories = [];
 
-        for (var sub in subCategoryRows) {
-          int subCategoryDbId = sub['id'] as int;
-          String subCategoryId = sub['subCategoryId'] as String;
+        // for (var sub in subCategoryRows) {
+        //   int subCategoryDbId = sub['id'] as int;
+        //   String subCategoryId = sub['subCategoryId'] as String;
 
-          final sentences =
-              await getSentencesBySubCategoryDbId(subCategoryDbId);
+        //   final sentences =
+        //       await getSentencesBySubCategoryDbId(subCategoryDbId);
 
-          subCategories
-              .add(SubCategoryModel(id: subCategoryId, sentence: sentences));
-        }
+        //   subCategories
+        //       .add(SubCategoryModel(id: subCategoryId, sentence: sentences));
+        // }
 
         categories.add(CategoryModel(
             categoryName: categoryName, subCategories: subCategories));

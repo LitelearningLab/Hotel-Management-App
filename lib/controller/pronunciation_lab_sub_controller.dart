@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hotelmanagementapp/model/word_attempt.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 
 import 'package:get/get.dart';
@@ -149,10 +150,10 @@ class PronunciationLabSubController extends GetxController {
           date: "",
           lastAttempt: "",
           listAtt: 0,
-          load: "widget.load",
+          load: mianCategoryTitile,
           pracAtt: 1,
           time: 0,
-          timeCal: 0,
+          timeCal: DateTime.now().millisecondsSinceEpoch,
           title: title,
           userId: userId,
           word: word,
@@ -294,10 +295,10 @@ class PronunciationLabSubController extends GetxController {
           date: "",
           lastAttempt: "",
           listAtt: 1,
-          load: "widget.load",
+          load: mianCategoryTitile,
           pracAtt: 0,
           time: 0,
-          timeCal: 0,
+          timeCal: DateTime.now().millisecondsSinceEpoch,
           title: title,
           userId: userId,
           word: subcategories[index].text,
@@ -335,23 +336,51 @@ class PronunciationLabSubController extends GetxController {
     final tableName = title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
     await DBHelper.ensureTableExists(tableName);
 
+    // Fetch local data
     final localData = await DBHelper.getAllSubcategories(tableName);
+    log("📥 Local has ${localData.length} items, Firebase has ${ogSubCategories.length}");
 
-    if (localData.isEmpty) {
-      log("No local data found, inserting passed subcategories...");
-      for (var item in ogSubCategories) {
-        await DBHelper.insertSubcategory(item, tableName);
-      }
-      subcategories = List.from(ogSubCategories);
-    } else {
-      log("Local data exists, loading...");
-      subcategories = localData;
+    final localFiles = localData.map((e) => e.file).toSet();
+    final incomingFiles = ogSubCategories.map((e) => e.file).toSet();
+
+    // 1. Add missing ones (in Firebase but not in local)
+    final toAdd =
+        ogSubCategories.where((e) => !localFiles.contains(e.file)).toList();
+    for (var item in toAdd) {
+      log("➕ Adding new: ${item.file}");
+      await DBHelper.insertSubcategory(item, tableName);
     }
 
-    // Always set ogSubCategories and master list
+    // 2. Update common ones (exists in both → update instead of duplicate)
+    for (var item in ogSubCategories) {
+      final existing =
+          localData.firstWhere((e) => e.file == item.file, orElse: () => item);
+      await DBHelper.insertSubcategory(
+        item.copyWith(
+          localPath: existing.localPath,
+          meaningSamples: item.meaningSamples,
+          sentenceSamples: item.sentenceSamples,
+        ),
+        tableName,
+      );
+    }
+
+    // 3. Delete missing ones (exist in local but not in Firebase)
+    final toDelete =
+        localData.where((e) => !incomingFiles.contains(e.file)).toList();
+    for (var item in toDelete) {
+      log("🗑️ Removing: ${item.file}");
+      final db = await DBHelper.database;
+      await db
+          .delete('"$tableName"', where: 'file = ?', whereArgs: [item.file]);
+    }
+
+    // Reload final synced data
+    subcategories = await DBHelper.getAllSubcategories(tableName);
+
+    // Reset master + filters
     ogSubCategories = List.from(subcategories);
-    masterList =
-        List.from(ogSubCategories); // ✅ Master list for search/filter reset
+    masterList = List.from(ogSubCategories);
     filterBaseList = List.from(masterList);
     searchBaseList = List.from(masterList);
 

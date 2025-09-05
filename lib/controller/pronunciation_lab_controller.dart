@@ -5,9 +5,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:hotelmanagementapp/dbHelper/db_helper.dart';
 import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/firebase_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PronunciationLabController extends GetxController {
   late DatabaseReference databaseRef;
@@ -131,6 +133,22 @@ class PronunciationLabController extends GetxController {
         }).toList();
 
         log("✅ Data loaded: ${categories.length} categories");
+
+        // 🔹 First-time clear logic
+        final prefs = await SharedPreferences.getInstance();
+        final hasCleared = prefs.getBool("categoriesCleared") ?? false;
+
+        if (!hasCleared) {
+          log("🗑 First-time run → clearing all category tables...");
+          for (var cat in categories) {
+            final tableName =
+                cat.category.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
+            await DBHelper.clearTable(tableName);
+          }
+          await prefs.setBool("categoriesCleared", true);
+          log("✅ All category tables cleared once.");
+        }
+
         if (categories.isNotEmpty && categories[0].subcategories.isNotEmpty) {
           log("📜 First subcategory sentenceSamples: ${categories[0].subcategories[0].sentenceSamples}");
         }

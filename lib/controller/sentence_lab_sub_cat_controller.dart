@@ -6,6 +6,7 @@ import 'package:hotelmanagementapp/model/sentence_attempt.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/public/audio_helper.dart';
 import 'package:hotelmanagementapp/dbHelper/sentence_db_helper.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/utility/result_dialog.dart';
 import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 import 'package:just_audio/just_audio.dart';
@@ -221,7 +222,7 @@ class SentenceLabSubCatController extends GetxController {
           lastScore: 0,
           listAtt: 1,
           load: "",
-          main: title,
+          main: mianCategoryTitile,
           pracAtt: 0,
           score: 0,
           sentence: sentence.text,
@@ -268,14 +269,17 @@ class SentenceLabSubCatController extends GetxController {
           dateTime: DateTime.now().toString(),
           focusWord: [
             {
-              DateTime.now().toIso8601String(): value.correctWords ?? [],
+              DateTime.now().toIso8601String(): [
+                ...(value.correctWords ?? []),
+                value.wordPer,
+              ],
             }
           ],
           lastAttempt: DateTime.now().toString(),
           lastScore: value.wordPer,
           listAtt: 0,
           load: main,
-          main: title,
+          main: mianCategoryTitile,
           pracAtt: 1,
           score: value.wordPer,
           sentence: word,

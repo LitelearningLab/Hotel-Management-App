@@ -41,6 +41,7 @@ class _SoundLabState extends State<SoundLab> {
             controller.soundSubcategory.name, maxLines: 2,
             // textAlign: TextAlign.start,
             style: const TextStyle(
+              fontFamily: Keys.lucidaFontFamily,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
@@ -227,13 +228,13 @@ class _SoundLabState extends State<SoundLab> {
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.fastOutSlowIn,
-                  height: isExpanded
-                      ? getWidgetHeight(
-                          height: (controller.selectedWord.toLowerCase() ==
-                                  soundPractice.text.toLowerCase())
-                              ? 230
-                              : 160)
-                      : 0,
+                  // height: isExpanded
+                  //     ? getWidgetHeight(
+                  //         height: (controller.selectedWord.toLowerCase() ==
+                  //                 soundPractice.text.toLowerCase())
+                  //             ? 230
+                  //             : 160)
+                  // : 0,
                   width: double.infinity,
                   child: isExpanded
                       ? Padding(
@@ -283,23 +284,38 @@ class _SoundLabState extends State<SoundLab> {
                                         height: getWidgetHeight(height: 6),
                                       ),
                                       SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
-                                        child: FittedBox(
-                                          child: Text(
-                                            soundPractice.pronun == ""
-                                                ? "no data"
-                                                : soundPractice.pronun
-                                                    .replaceAll("/", ""),
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 20,
-                                              fontFamily: Keys.fontFamily,
-                                            ),
+                                        width: getWidgetWidth(width: 180),
+                                        child: Text(
+                                          soundPractice.pronun == ""
+                                              ? "no data"
+                                              : soundPractice.pronun
+                                                  .replaceAll("/", ""),
+                                          maxLines: 2,
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 20,
+                                            fontFamily: Keys.fontFamily,
                                           ),
                                         ),
                                       )
+                                      // SizedBox(
+                                      //   width:
+                                      //       MediaQuery.of(context).size.width *
+                                      //           0.45,
+                                      //   child: FittedBox(
+                                      //     child: Text(
+                                      //       soundPractice.pronun == ""
+                                      //           ? "no data"
+                                      //           : soundPractice.pronun
+                                      //               .replaceAll("/", ""),
+                                      //       style: TextStyle(
+                                      //         color: Colors.black,
+                                      //         fontSize: 20,
+                                      //         fontFamily: Keys.fontFamily,
+                                      //       ),
+                                      //     ),
+                                      //   ),
+                                      // )
                                     ],
                                   ),
                                   GestureDetector(
