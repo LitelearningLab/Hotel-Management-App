@@ -308,13 +308,14 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                               controller
                                                                   .searchTerm),
                                                       style: GoogleFonts.inter(
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: kText.scale(
-                                                              isKwidth > 700
-                                                                  ? 16
-                                                                  : 14)),
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        // fontSize: kText.scale(
+                                                        //     isKwidth > 700
+                                                        //         ? 16
+                                                        //         : 14)
+                                                      ),
                                                     ),
                                                   ),
                                                 ),

@@ -82,6 +82,70 @@ class PronunciationLabController extends GetxController {
       'image': AllAssets.plIT,
       'bgColor': Color(0xFF3DBAD3),
     },
+    {
+      'title': 'Days, Dates, Months & Numbers',
+      'load': 'daysdates',
+      'menuText': 'Days, Dates, Months & Numbers',
+      'backgroundImage': AllAssets.back1,
+      'image': AllAssets.plDays,
+      'bgColor': Color(0xFF5370D4),
+    },
+    {
+      'title': 'Letters Of The English Alphabet',
+      'load': 'Latters and NATO',
+      'menuText': 'Letters Of The English Alphabet',
+      'backgroundImage': AllAssets.back2,
+      'image': AllAssets.plLetters,
+      'bgColor': Color(0xFF3DBAD3),
+    },
+    {
+      'title': 'US States & Cities',
+      'load': 'States and Cities',
+      'menuText': 'US States & Cities',
+      'backgroundImage': AllAssets.back1,
+      'image': AllAssets.plUSState,
+      'bgColor': Color(0xFF0190FE),
+    },
+    {
+      'title': 'Most Commonly Used Words',
+      'load': 'CommonWords',
+      'menuText': 'Most Commonly Used Words',
+      'backgroundImage': AllAssets.back1,
+      'image': AllAssets.plMostCommon,
+      'bgColor': Color(0xFF8540C8),
+    },
+    {
+      'title': 'Common American Names',
+      'load': 'ProcessWords',
+      'menuText': 'Common American Names',
+      'backgroundImage': AllAssets.back1,
+      'image': AllAssets.plCommon,
+      'bgColor': Color(0xFFFF6548),
+    },
+    {
+      'title': 'Restaurant, Hotel & Travel',
+      'load': 'Restaurant Hotel Travel',
+      'menuText': 'Restaurant, Hotel & Travel',
+      'backgroundImage': AllAssets.back1,
+      'image': AllAssets.plRestaurant,
+      'bgColor': Color(0xFF5146FF),
+    },
+    {
+      'title': 'Business Words',
+      'load': 'Business Words',
+      'menuText': 'Business Words',
+      'backgroundImage': AllAssets.back1,
+      'image': AllAssets.plBusiness,
+      'bgColor': Color(0xFF5370D4),
+    },
+    {
+      'title': 'Information Technology',
+      'load': 'Information Technology',
+      'menuText': 'Information Technology',
+      'backgroundImage': AllAssets.back1,
+      'image': AllAssets.plIT,
+      'bgColor': Color(0xFF3DBAD3),
+    },
   ];
   @override
   void onInit() {
@@ -102,8 +166,12 @@ class PronunciationLabController extends GetxController {
     try {
       DatabaseEvent event = await databaseRef.once();
       final data = event.snapshot.value;
-
-      log("📥 Raw snapshot: $data");
+      if (data is List) {
+        log("📊 Firebase returned a list of length: ${data.length}");
+      } else {
+        log("⚠️ Firebase data is not a List. Type: ${data.runtimeType}");
+      }
+      // log("📥 Raw snapshot: $data");
 
       if (data != null && data is List) {
         categories = data.map((item) {
@@ -136,7 +204,7 @@ class PronunciationLabController extends GetxController {
 
         // 🔹 First-time clear logic
         final prefs = await SharedPreferences.getInstance();
-        final hasCleared = prefs.getBool("categoriesCleared") ?? false;
+        final hasCleared = prefs.getBool("categoriesCleared1") ?? false;
 
         if (!hasCleared) {
           log("🗑 First-time run → clearing all category tables...");
@@ -145,7 +213,7 @@ class PronunciationLabController extends GetxController {
                 cat.category.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
             await DBHelper.clearTable(tableName);
           }
-          await prefs.setBool("categoriesCleared", true);
+          await prefs.setBool("categoriesCleared1", true);
           log("✅ All category tables cleared once.");
         }
 

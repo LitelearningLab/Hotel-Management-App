@@ -127,11 +127,21 @@ class _GrammerLabState extends State<GrammerLab> {
                                     SizedBox(
                                       width: getWidgetWidth(width: 10),
                                     ),
-                                    Text(
-                                      controller.grammarDocs[index].category,
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
+                                    Expanded(
+                                      child: Text(
+                                        controller.grammarDocs[index].category
+                                                .isNotEmpty
+                                            ? controller.grammarDocs[index]
+                                                    .category[0]
+                                                    .toUpperCase() +
+                                                controller
+                                                    .grammarDocs[index].category
+                                                    .substring(1)
+                                            : '',
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                        ),
                                       ),
                                     ),
                                   ],

@@ -75,6 +75,9 @@ class PronunciationLabSubController extends GetxController {
     audioPlayer = AudioPlayer();
     title = Get.arguments['title'];
     final argList = Get.arguments['subcategories'] as List;
+    audioPlayer.setUrl(
+        "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Hotel%20Management%2FWhatsApp%20Audio%202025-09-09%20at%203.41.09%20PM.mp4?alt=media&token=b99d9096-211b-45cc-b157-4582c7fc3312");
+    audioPlayer.play();
     ogSubCategories = argList
         .map((item) => item is SubcategoryPro
             ? item
@@ -343,40 +346,53 @@ class PronunciationLabSubController extends GetxController {
     final localFiles = localData.map((e) => e.file).toSet();
     final incomingFiles = ogSubCategories.map((e) => e.file).toSet();
 
-    // 1. Add missing ones (in Firebase but not in local)
-    final toAdd =
-        ogSubCategories.where((e) => !localFiles.contains(e.file)).toList();
-    for (var item in toAdd) {
-      log("➕ Adding new: ${item.file}");
-      await DBHelper.insertSubcategory(item, tableName);
-    }
-
-    // 2. Update common ones (exists in both → update instead of duplicate)
+    // 1️⃣ Add or update items (upsert)
     for (var item in ogSubCategories) {
-      final existing =
-          localData.firstWhere((e) => e.file == item.file, orElse: () => item);
+      final existing = localData.firstWhere((e) => e.file == item.file,
+          orElse: () => SubcategoryPro(
+                file: '',
+                isPriority: '',
+                syllables: '',
+                text: '',
+                pronun: '',
+                downloadStatus: false,
+                localPath: '',
+                sentenceSamples: [],
+                meaningSamples: [],
+              ));
+
       await DBHelper.insertSubcategory(
-        item.copyWith(
-          localPath: existing.localPath,
-          meaningSamples: item.meaningSamples,
-          sentenceSamples: item.sentenceSamples,
-        ),
-        tableName,
-      );
+          item.copyWith(
+            localPath: existing.localPath, // Preserve localPath if exists
+          ),
+          tableName);
+
+      log("✅ Upserted: ${item.file}");
     }
 
-    // 3. Delete missing ones (exist in local but not in Firebase)
+    // 2️⃣ Delete items removed from Firebase
     final toDelete =
         localData.where((e) => !incomingFiles.contains(e.file)).toList();
     for (var item in toDelete) {
       log("🗑️ Removing: ${item.file}");
       final db = await DBHelper.database;
-      await db
-          .delete('"$tableName"', where: 'file = ?', whereArgs: [item.file]);
+      await db.delete(
+        '"$tableName"',
+        where: 'file = ?',
+        whereArgs: [item.file],
+      );
     }
 
-    // Reload final synced data
+    // 3️⃣ Remove any duplicates (based on `file`)
+    await DBHelper.removeDuplicates(tableName);
+    log("🔧 Duplicates removed, if any.");
+
+    // 4️⃣ Reload final synced data
     subcategories = await DBHelper.getAllSubcategories(tableName);
+
+    // ✅ Sort alphabetically by `text`
+    // subcategories
+    //     .sort((a, b) => a.text.toLowerCase().compareTo(b.text.toLowerCase()));
 
     // Reset master + filters
     ogSubCategories = List.from(subcategories);
@@ -447,20 +463,17 @@ class PronunciationLabSubController extends GetxController {
         }
 
         subcategories = tempList;
-        ogSubCategories = List.from(tempList);
       } else {
         log('No Firebase data found for ID: $title');
         subcategories = [];
-        ogSubCategories = [];
       }
     } else {
-      // ✅ Mobile: Keep local DB logic
+      // ✅ Mobile: Local DB first, fallback to Firebase
       final localData = await DBHelper.getAllSubcategories(tableName);
 
       if (localData.isNotEmpty) {
         log('Loaded from local database for $id');
         subcategories = localData;
-        ogSubCategories = List.from(localData);
       } else {
         final ref = FirebaseDatabase.instance.ref('$collectionName/$id');
         final snapshot = await ref.get();
@@ -515,16 +528,19 @@ class PronunciationLabSubController extends GetxController {
           }
 
           subcategories = tempList;
-          ogSubCategories = List.from(tempList);
         } else {
           log('No Firebase data found for ID: $title');
           subcategories = [];
-          ogSubCategories = [];
         }
       }
     }
 
+    // ✅ Sort alphabetically by text (case-insensitive)
+    subcategories
+        .sort((a, b) => a.text.toLowerCase().compareTo(b.text.toLowerCase()));
+
     // ✅ Always refresh lists
+    ogSubCategories = List.from(subcategories);
     masterList = List.from(ogSubCategories);
     filterBaseList = List.from(masterList);
     searchBaseList = List.from(masterList);

@@ -46,8 +46,24 @@ class _SentenceLabState extends State<SentenceLab> {
               horizontal: getWidgetWidth(width: 10)),
           child: controller.isLoading.value
               ? Center(
-                  child: CircularProgressIndicator(
-                    color: linearColor,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        color: linearColor,
+                      ),
+                      SizedBox(height: getWidgetHeight(height: 12)),
+                      !controller.hasInitialized
+                          ? Text(
+                              "This may take a couple of minutes \n(only during the first time).",
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 15),
+                              textAlign: TextAlign.center,
+                            )
+                          : SizedBox.shrink(),
+                      SizedBox(height: getWidgetHeight(height: 65)),
+                    ],
                   ),
                 )
               : controller.sentenceLabList.length < 1
@@ -122,12 +138,22 @@ class _SentenceLabState extends State<SentenceLab> {
                                     SizedBox(
                                       width: getWidgetWidth(width: 10),
                                     ),
-                                    Text(
-                                      controller
-                                          .sentenceLabList[index].sectionName,
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
+                                    Expanded(
+                                      child: Text(
+                                        controller.sentenceLabList[index]
+                                                .sectionName.isNotEmpty
+                                            ? controller.sentenceLabList[index]
+                                                    .sectionName[0]
+                                                    .toUpperCase() +
+                                                controller
+                                                    .sentenceLabList[index]
+                                                    .sectionName
+                                                    .substring(1)
+                                            : '',
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                        ),
                                       ),
                                     ),
                                   ],

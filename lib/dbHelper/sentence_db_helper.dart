@@ -28,7 +28,7 @@ class SentenceDBHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async => _createTables(db),
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -36,6 +36,8 @@ class SentenceDBHelper {
               'ALTER TABLE sentences ADD COLUMN isDownloaded INTEGER DEFAULT 0');
           await db.execute(
               'ALTER TABLE sentences ADD COLUMN localPath TEXT DEFAULT ""');
+          await db.execute(
+              'ALTER TABLE categories ADD COLUMN "order" INTEGER DEFAULT 0');
         }
       },
     );
@@ -43,42 +45,43 @@ class SentenceDBHelper {
 
   Future<void> _createTables(Database db) async {
     await db.execute('''
-      CREATE TABLE sentence_lab_sections(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        sectionName TEXT UNIQUE
-      )
-    ''');
+    CREATE TABLE sentence_lab_sections(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sectionName TEXT UNIQUE
+    )
+  ''');
 
     await db.execute('''
-      CREATE TABLE categories(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        sectionId INTEGER,
-        categoryName TEXT,
-        FOREIGN KEY(sectionId) REFERENCES sentence_lab_sections(id)
-      )
-    ''');
+    CREATE TABLE categories(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sectionId INTEGER,
+      categoryName TEXT,
+      categoryOrder INTEGER,
+      FOREIGN KEY(sectionId) REFERENCES sentence_lab_sections(id)
+    )
+  ''');
 
     await db.execute('''
-      CREATE TABLE sub_categories(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        categoryId INTEGER,
-        subCategoryId TEXT,
-        FOREIGN KEY(categoryId) REFERENCES categories(id)
-      )
-    ''');
+    CREATE TABLE sub_categories(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      categoryId INTEGER,
+      subCategoryId TEXT,
+      FOREIGN KEY(categoryId) REFERENCES categories(id)
+    )
+  ''');
 
     await db.execute('''
-      CREATE TABLE sentences(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        subCategoryId INTEGER,
-        file TEXT,
-        isPriority INTEGER,
-        text TEXT,
-        isDownloaded INTEGER DEFAULT 0,
-        localPath TEXT DEFAULT "",
-        FOREIGN KEY(subCategoryId) REFERENCES sub_categories(id)
-      )
-    ''');
+    CREATE TABLE sentences(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      subCategoryId INTEGER,
+      file TEXT,
+      isPriority INTEGER,
+      text TEXT,
+      isDownloaded INTEGER DEFAULT 0,
+      localPath TEXT DEFAULT "",
+      FOREIGN KEY(subCategoryId) REFERENCES sub_categories(id)
+    )
+  ''');
   }
 
   // -----------------------------
@@ -106,11 +109,16 @@ class SentenceDBHelper {
   // -----------------------------
   // Category Methods
   // -----------------------------
-  Future<int> insertCategory(int sectionId, String categoryName) async {
+  Future<int> insertCategory(
+      int sectionId, String categoryName, int categoryOrder) async {
     final db = await database;
     return await db.insert(
       'categories',
-      {'sectionId': sectionId, 'categoryName': categoryName},
+      {
+        'sectionId': sectionId,
+        'categoryName': categoryName,
+        'categoryOrder': categoryOrder,
+      },
       conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
@@ -256,7 +264,8 @@ class SentenceDBHelper {
       for (var category in section.categories) {
         int? categoryId =
             await getCategoryId(sectionId!, category.categoryName);
-        categoryId ??= await insertCategory(sectionId, category.categoryName);
+        categoryId ??= await insertCategory(
+            sectionId, category.categoryName, category.order);
 
         for (var subCategory in category.subCategories) {
           int? subCategoryDbId =
@@ -315,7 +324,9 @@ class SentenceDBHelper {
         // }
 
         categories.add(CategoryModel(
-            categoryName: categoryName, subCategories: subCategories));
+            order: category['categoryOrder'] as int,
+            categoryName: categoryName,
+            subCategories: subCategories));
       }
 
       result.add(
@@ -405,7 +416,8 @@ class SentenceDBHelper {
       for (var category in section.categories) {
         int? categoryId =
             await getCategoryId(sectionId!, category.categoryName);
-        categoryId ??= await insertCategory(sectionId, category.categoryName);
+        categoryId ??= await insertCategory(
+            sectionId, category.categoryName, category.order);
 
         for (var subCategory in category.subCategories) {
           int? subCategoryDbId =
@@ -445,6 +457,12 @@ class SentenceDBHelper {
         }
       }
     }
+  }
+
+  Future<void> deleteDatabaseFile() async {
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'sentence_lab.db');
+    await deleteDatabase(path);
   }
 
   // -----------------------------

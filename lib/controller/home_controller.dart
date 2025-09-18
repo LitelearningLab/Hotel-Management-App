@@ -119,9 +119,14 @@ class HomeController extends GetxController {
 
       // Company status check
       if (companyData['status'] != "1") return false;
-      // accessLinks = companyData['accessLinks'] ?? "";
-      accessLinks = "E-Learning , Knowledge Check , Glossary , Simulation";
-      log(" here printing the access links how coming $accessLinks");
+      if (companyData.containsKey('accessLinks')) {
+        accessLinks = companyData['accessLinks'];
+      } else {
+        accessLinks =
+            "E-Learning , Knowledge Check , Glossary , Simulation , local";
+      }
+
+      log("Here printing the access links: $accessLinks");
 
       // Subscription dates check
       final userSubDate =

@@ -46,7 +46,10 @@ class SubCategoryModel {
   final String id;
   final List<SentenceModel> sentence;
 
-  SubCategoryModel({required this.id, required this.sentence});
+  SubCategoryModel({
+    required this.id,
+    required this.sentence,
+  });
 
   factory SubCategoryModel.fromJson(Map<String, dynamic> json) {
     final sentenceList = json['sentence'];
@@ -71,15 +74,19 @@ class SubCategoryModel {
 class CategoryModel {
   final String categoryName;
   final List<SubCategoryModel> subCategories;
+  final int order; // Use int instead of String
 
   CategoryModel({
+    required this.order,
     required this.categoryName,
     required this.subCategories,
   });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     final subCatList = json['subCategories'];
+
     return CategoryModel(
+      order: int.tryParse(json['order']?.toString() ?? '0') ?? 0,
       categoryName: json['categoryName']?.toString() ?? '',
       subCategories: subCatList is List
           ? subCatList
@@ -93,6 +100,7 @@ class CategoryModel {
     return {
       'categoryName': categoryName,
       'subCategories': subCategories.map((sc) => sc.toJson()).toList(),
+      'order': order,
     };
   }
 }

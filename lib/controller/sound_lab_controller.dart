@@ -75,6 +75,8 @@ class SoundLabController extends GetxController {
       } else {
         await audioPlayer.stop();
         await audioPlayer.setUrl(soundSubcategory.soundsPractice![index].file);
+        await audioPlayer.playerStateStream.firstWhere(
+            (state) => state.processingState == ProcessingState.ready);
         currentlyPlayingIndex = index;
         update();
         await audioPlayer.play();

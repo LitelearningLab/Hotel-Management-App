@@ -140,6 +140,12 @@ class FrontOfficeController extends GetxController {
             (item) => item.category.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
+    // Debug
+    for (var item in frontOfficeData) {
+      print(
+          "Filtered Item Category: ${item.category}"); // Should print the original casing
+    }
+
     update();
   }
 
@@ -155,31 +161,60 @@ class FrontOfficeController extends GetxController {
     if (query.isEmpty) {
       return [TextSpan(text: text)];
     }
-    var matches = text.toLowerCase().split(query.toLowerCase());
-    List<TextSpan> spans = [];
+
+    final List<TextSpan> spans = [];
+    final lowerText = text.toLowerCase();
+    final lowerQuery = query.toLowerCase();
+
     int start = 0;
 
-    for (int i = 0; i < matches.length; i++) {
-      String matchText = matches[i];
-      // Add normal text
-      spans.add(TextSpan(
-        text: matchText,
-        style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 15),
-      ));
-      start += matchText.length;
-      // Add bold text (if not at the end)
-      if (i < matches.length - 1) {
+    while (true) {
+      final matchIndex = lowerText.indexOf(lowerQuery, start);
+
+      if (matchIndex == -1) {
+        // Add the remaining part of the text
         spans.add(TextSpan(
-          text: text.substring(start, start + query.length),
+          text: text.substring(start),
           style: GoogleFonts.inter(
-            fontWeight: FontWeight.bold,
-            color: linearColor,
-            fontSize: 15,
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
+            // fontSize: kText.scale(
+            //     isKwidth > 700
+            //         ? 16
+            //         : 14)
           ),
         ));
-        start += query.length;
+        break;
       }
+
+      // Add normal text before the match
+      if (matchIndex > start) {
+        spans.add(TextSpan(
+          text: text.substring(start, matchIndex),
+          style: GoogleFonts.inter(
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
+            // fontSize: kText.scale(
+            //     isKwidth > 700
+            //         ? 16
+            //         : 14)
+          ),
+        ));
+      }
+
+      // Add highlighted match text
+      spans.add(TextSpan(
+        text: text.substring(matchIndex, matchIndex + query.length),
+        style: GoogleFonts.inter(
+          fontWeight: FontWeight.bold,
+          color: linearColor,
+          // fontSize: 15,
+        ),
+      ));
+
+      start = matchIndex + query.length;
     }
+
     return spans;
   }
 }

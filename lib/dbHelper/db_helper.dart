@@ -31,7 +31,7 @@ class DBHelper {
     await db.execute('''
     CREATE TABLE IF NOT EXISTS "$id" (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      file TEXT,
+      file TEXT UNIQUE,
       isPriority TEXT,
       syllables TEXT,
       text TEXT,
@@ -79,6 +79,62 @@ class DBHelper {
         'meaningSamples': jsonEncode(item.meaningSamples), // ✅ new field
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<void> removeDuplicates(String tableId) async {
+    final db = await database;
+    await ensureTableExists(tableId);
+
+    // Find files with duplicates
+    final duplicateFilesQuery = await db.rawQuery('''
+    SELECT file, COUNT(*) as cnt
+    FROM "$tableId"
+    GROUP BY file
+    HAVING cnt > 1
+  ''');
+
+    for (var row in duplicateFilesQuery) {
+      String file = row['file'] as String;
+
+      // Get all rows with this file, ordered by id
+      final rows = await db.query('"$tableId"',
+          where: 'file = ?',
+          whereArgs: [file],
+          orderBy: 'id ASC' // Keep the oldest one
+          );
+
+      if (rows.length > 1) {
+        final idToKeep = rows.first['id'];
+
+        await db.delete(
+          '"$tableId"',
+          where: 'file = ? AND id != ?',
+          whereArgs: [file, idToKeep],
+        );
+
+        log('🧹 Removed duplicates for file: $file, kept id: $idToKeep');
+      }
+    }
+  }
+
+  static Future<void> updateSubcategory(
+      SubcategoryPro item, String tableId) async {
+    final db = await database;
+    await ensureTableExists(tableId);
+
+    await db.update(
+      '"$tableId"',
+      {
+        'isPriority': item.isPriority,
+        'syllables': item.syllables,
+        'text': item.text,
+        'pronun': item.pronun,
+        'sentenceSamples': jsonEncode(item.sentenceSamples),
+        'meaningSamples': jsonEncode(item.meaningSamples),
+      },
+      where: 'file = ?',
+      whereArgs: [item.file],
     );
   }
 

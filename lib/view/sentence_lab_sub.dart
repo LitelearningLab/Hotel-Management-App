@@ -28,6 +28,8 @@ class _SentenceLabSubState extends State<SentenceLabSub> {
 
   @override
   Widget build(BuildContext context) {
+    final sortedSubcategories = [...widget.subcategories]
+      ..sort((a, b) => a.order.compareTo(b.order));
     return PopScope(
       onPopInvoked: (didPop) {},
       child: Scaffold(
@@ -61,27 +63,28 @@ class _SentenceLabSubState extends State<SentenceLabSub> {
           padding: EdgeInsets.symmetric(
               vertical: getWidgetHeight(height: 10),
               horizontal: getWidgetWidth(width: 10)),
-          itemCount: widget.subcategories.length,
+          itemCount: sortedSubcategories.length,
           itemBuilder: (context, index) {
+            log("here im printing which order this are showing ${sortedSubcategories[index].order}");
             return Padding(
               padding: EdgeInsets.only(
-                  bottom: index == widget.subcategories.length - 1
+                  bottom: index == sortedSubcategories.length - 1
                       ? getWidgetHeight(height: 80)
                       : 0),
               child: GestureDetector(
                 onTap: () {
-                  sessionName = widget.subcategories[index].categoryName;
+                  sessionName = sortedSubcategories[index].categoryName;
                   log(sessionName);
                   addToRecentHistory(
                       path: "Language Lab > Sentence Lab > ${widget.title}",
-                      category: widget.subcategories[index].categoryName,
+                      category: sortedSubcategories[index].categoryName,
                       section: "Sentence Lab",
                       link: "",
                       proLabTitle: "",
-                      subCategories: widget.subcategories[index].subCategories);
+                      subCategories: sortedSubcategories[index].subCategories);
                   Get.toNamed(AppRoutes.sentenceLabSub, arguments: {
-                    "title": widget.subcategories[index].categoryName,
-                    "CategoryModel": widget.subcategories[index].subCategories
+                    "title": sortedSubcategories[index].categoryName,
+                    "CategoryModel": sortedSubcategories[index].subCategories
                   });
                 },
                 child: Container(
@@ -113,8 +116,7 @@ class _SentenceLabSubState extends State<SentenceLabSub> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            child: Text(
-                                widget.subcategories[index].categoryName,
+                            child: Text(sortedSubcategories[index].categoryName,
                                 // maxLines: 2,
                                 style: TextStyle(
                                     fontFamily: Keys.fontFamily,

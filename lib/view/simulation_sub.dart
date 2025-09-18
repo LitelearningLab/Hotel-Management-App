@@ -138,8 +138,15 @@ class _SimulationSubState extends State<SimulationSub> {
                                     horizontal: getWidgetWidth(width: 20),
                                   ),
                                   child: Text(
-                                    controller
-                                        .simulation.subcategory[index].title,
+                                    controller.simulation.subcategory[index]
+                                            .title.isNotEmpty
+                                        ? controller.simulation
+                                                .subcategory[index].title[0]
+                                                .toUpperCase() +
+                                            controller.simulation
+                                                .subcategory[index].title
+                                                .substring(1)
+                                        : '',
                                     style: GoogleFonts.inter(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 14,
