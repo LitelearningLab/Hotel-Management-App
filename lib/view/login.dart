@@ -22,6 +22,7 @@ import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custom_button.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 // import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -41,7 +42,15 @@ class _LoginPageState extends State<LoginPage> {
   bool error = false;
   bool isLoading = true;
   bool _obscurePassword = true;
+  String? appVersion;
   Timer? _hideTimer;
+  Future<void> _loadAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      appVersion = packageInfo.version; // e.g. "1.0.3"
+    });
+  }
+
   String? validateEmail(String? val) {
     if (val == null || val.isEmpty) {
       setState(() {
@@ -65,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
-  login() async {
+  Future<void> login() async {
     if (!_isLogin) {
       if (_formKey.currentState!.validate()) {
         error = false;
@@ -228,6 +237,7 @@ class _LoginPageState extends State<LoginPage> {
       log("User ID saved: $userId");
       Get.offAllNamed(AppRoutes.home);
     } catch (e) {
+      print("Login error: $e");
       log("Login error: $e");
       isLoading = true;
       setState(() {});
@@ -290,6 +300,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void initState() {
+    _loadAppVersion();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -329,7 +345,8 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           SizedBox(
                             // height: getWidgetHeight(height: 140),
-                            width: getWidgetWidth(width: 200),
+                            width:
+                                getWidgetWidth(width: kWidth > 500 ? 100 : 200),
                             child: Image.asset(
                               AllAssets.splashLogo,
                               fit: BoxFit.contain,
@@ -376,7 +393,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: SizedBox(
                         width: getWidgetWidth(width: kWidth > 500 ? 200 : 375),
-                        height: getWidgetHeight(height: error ? 75 : 50),
+                        // height: getWidgetHeight(height: kWidth > 500 ? 75 : 50),
                         child: TextFormField(
                           cursorColor: Colors.black,
                           controller:
@@ -456,16 +473,23 @@ class _LoginPageState extends State<LoginPage> {
                           ? CircularProgressIndicator(
                               color: linearColor,
                             )
-                          : CustomButton(
-                              buttonText:
-                                  _isLogin ? "Verify Login" : "Verify & Login",
-                              onPressed: () async {
-                                if (_isLogin) {
-                                  isLoading = false;
-                                  setState(() {});
-                                }
-                                login();
-                              },
+                          : SizedBox(
+                              width: getWidgetWidth(
+                                  width: kWidth > 500 ? 200 : 375),
+                              height: getWidgetHeight(
+                                  height: kWidth > 500 ? 40 : 50),
+                              child: CustomButton(
+                                buttonText: _isLogin
+                                    ? "Verify Login"
+                                    : "Verify & Login",
+                                onPressed: () async {
+                                  if (_isLogin) {
+                                    isLoading = false;
+                                    setState(() {});
+                                  }
+                                  login();
+                                },
+                              ),
                             ),
                     ),
                     if (_isLogin && isLoading)
@@ -481,23 +505,30 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: TextButton(
-                        onPressed: () async {
-                          Get.toNamed(AppRoutes.inAppWebView, arguments: {
-                            "url": ApiRoutes.privacyPolicy,
-                          });
-                        },
-                        child: Text(
-                          "Privacy & Policy",
-                          style: GoogleFonts.inter(
-                            height: 0.5,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            color: lightWhite,
-                          ),
+
+                    TextButton(
+                      onPressed: () async {
+                        Get.toNamed(AppRoutes.inAppWebView, arguments: {
+                          "url": ApiRoutes.privacyPolicy,
+                        });
+                      },
+                      child: Text(
+                        "Privacy & Policy",
+                        style: GoogleFonts.inter(
+                          height: 0.5,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          color: lightWhite,
                         ),
+                      ),
+                    ),
+                    Text(
+                      "App version $appVersion",
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w300,
+                        height: 0.5,
+                        fontSize: 12,
+                        color: lightWhite,
                       ),
                     ),
                     SizedBox(height: 30),

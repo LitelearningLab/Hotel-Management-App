@@ -43,43 +43,57 @@ class FrontOfficeController extends GetxController {
     update();
   }
 
-  init() async {
-    loading = true;
-    update();
-    final args = Get.arguments as Map<String, dynamic>?;
-    title = args?['title'] ?? "";
-    image = args?['image'] ?? "";
-    index = args?['index'] ?? "";
-    isExpanded = List.generate(itemCount, (_) => false);
-    pronunCollectionName = index == 0
-        ? CollectionNames.frontOfficePronun
-        : index == 1
-            ? CollectionNames.foodAndBeveragePronun
-            : index == 2
-                ? CollectionNames.foodProductionPronun
-                : index == 3
-                    ? CollectionNames.houseKeepingPronun
-                    : "";
+  Future<void> init() async {
+    try {
+      loading = true;
+      update();
 
-    collectionName = index == 0
-        ? CollectionNames.frontOffice
-        : index == 1
-            ? CollectionNames.foodAndBeverage
-            : index == 2
-                ? CollectionNames.foodProduction
-                : index == 3
-                    ? CollectionNames.houseKeeping
-                    : "";
-    log(collectionName);
-    frontOfficeData =
-        await frontOfficeResponse.getFrontOfficeCollection(collectionName);
-    originalData = List.from(frontOfficeData);
-    totalPercentage = originalData.length * 3;
-    await _loadProgress();
-    particularPercentage = await _getTotalProgress();
-    log("here im printing the total percentage $totalPercentage and here im printing the particular percentage $particularPercentage");
-    loading = false;
-    update();
+      final args = Get.arguments as Map<String, dynamic>?;
+      title = args?['title'] ?? "";
+      image = args?['image'] ?? "";
+      index = args?['index'] ?? "";
+
+      isExpanded = List.generate(itemCount, (_) => false);
+
+      pronunCollectionName = index == 0
+          ? CollectionNames.frontOfficePronun
+          : index == 1
+              ? CollectionNames.foodAndBeveragePronun
+              : index == 2
+                  ? CollectionNames.foodProductionPronun
+                  : index == 3
+                      ? CollectionNames.houseKeepingPronun
+                      : "";
+
+      collectionName = index == 0
+          ? CollectionNames.frontOffice
+          : index == 1
+              ? CollectionNames.foodAndBeverage
+              : index == 2
+                  ? CollectionNames.foodProduction
+                  : index == 3
+                      ? CollectionNames.houseKeeping
+                      : "";
+
+      log("Collection Name: $collectionName");
+
+      frontOfficeData =
+          await frontOfficeResponse.getFrontOfficeCollection(collectionName);
+
+      originalData = List.from(frontOfficeData);
+      totalPercentage = originalData.length * 3;
+
+      await _loadProgress();
+      particularPercentage = await _getTotalProgress();
+
+      log("Total percentage: $totalPercentage | Particular percentage: $particularPercentage");
+    } catch (e, s) {
+      print("Error in init(): $e");
+      print("Stacktrace: $s");
+    } finally {
+      loading = false;
+      update();
+    }
   }
 
   Future<void> _loadProgress() async {

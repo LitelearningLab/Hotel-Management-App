@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 // import 'package:litelearninglab/constants/app_colors.dart';
 
@@ -44,6 +45,7 @@ class _CustomButtonState extends State<CustomButton> {
         }
       },
       child: Container(
+        width: kWidth > 500 ? displayWidth(context) * 0.5 : double.infinity,
         alignment: Alignment.center,
         decoration: BoxDecoration(
             color: linearColor, borderRadius: BorderRadius.circular(10)),

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:hotelmanagementapp/controller/in_app_web_view_controller.dart';
 import 'package:hotelmanagementapp/dbHelper/progress_bar_db_helper.dart';
 import 'package:hotelmanagementapp/main.dart';
@@ -15,11 +16,10 @@ import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
+import 'package:path_provider/path_provider.dart';
 
 class InAppWebViewPage extends StatefulWidget {
-  InAppWebViewPage({
-    Key? key,
-  }) : super(key: key);
+  InAppWebViewPage({Key? key}) : super(key: key);
 
   @override
   _InAppWebViewPageState createState() => _InAppWebViewPageState();
@@ -32,6 +32,45 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
   bool isMeetingEtiquite = false;
   Map<String, ProgressModel> progressData = {};
   Timer? _timer;
+  String? cachedHtml;
+  late Box<String> cacheBox;
+  bool cacheReady = false;
+
+  // guard so we don't repeatedly init cache on rebuilds
+  bool _cacheRequested = false;
+  String? _cachedForUrl;
+
+  InAppWebViewController? webViewCtrl;
+
+  Future<void> _initCache(String url) async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      if (!Hive.isBoxOpen("web_cache")) {
+        Hive.init(dir.path);
+      }
+      cacheBox = await Hive.openBox<String>("web_cache");
+
+      // Check if URL already cached
+      if (cacheBox.containsKey(url)) {
+        cachedHtml = cacheBox.get(url);
+        onLoad = false; // already have cache, skip loader
+        log("📦 Loaded from cache: $url");
+      } else {
+        cachedHtml = null;
+      }
+
+      setState(() {
+        cacheReady = true;
+        _cachedForUrl = url;
+      });
+    } catch (e, st) {
+      log("Cache init error: $e\n$st");
+      setState(() {
+        cacheReady = true; // proceed even if cache fails
+      });
+    }
+  }
+
   Future<bool> _checkInternetAndHandleBack() async {
     var results = await Connectivity().checkConnectivity();
 
@@ -41,7 +80,7 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
 
     if (!isConnected) {
       isOnNoInternetPage = true;
-      Get.toNamed(AppRoutes.noInternet);
+      // Get.toNamed(AppRoutes.noInternet);
       return false;
     }
     return true;
@@ -50,6 +89,7 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
   @override
   void initState() {
     _startTimer(subCategoryTitle, 1);
+    _cacheRequested = false;
     super.initState();
   }
 
@@ -57,6 +97,7 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     resetOrientationIfNeeded();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -146,6 +187,34 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
     }
   }
 
+  // helper to cache HTML after load stop
+  Future<void> _cacheHtmlIfNeeded(
+      String url, InAppWebViewController controller) async {
+    try {
+      // don't cache if we already have it
+      if (cacheBox.isOpen && cacheBox.containsKey(url)) return;
+
+      // evaluate JS to get full HTML
+      final dynamic raw = await controller.evaluateJavascript(
+        source: "document.documentElement.outerHTML;",
+      );
+      if (raw == null) return;
+      String html;
+      if (raw is String) {
+        html = raw;
+      } else {
+        html = raw.toString();
+      }
+
+      if (html.isNotEmpty) {
+        await cacheBox.put(url, html);
+        log("✅ Cached $url");
+      }
+    } catch (e, st) {
+      log("Error caching HTML: $e\n$st");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -154,6 +223,25 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
         stopTimerMainCategory();
       },
       child: GetBuilder<InAppWebViewGetController>(builder: (controller) {
+        // Request cache init only once per distinct URL
+        if (!_cacheRequested && controller.url.isNotEmpty) {
+          _cacheRequested = true;
+          _initCache(controller.url);
+        } else if (_cachedForUrl != null &&
+            controller.url.isNotEmpty &&
+            controller.url != _cachedForUrl) {
+          // controller url changed: re-init cache for new url
+          _cacheRequested = true;
+          _initCache(controller.url);
+        }
+
+        // If cache not ready yet show loader to avoid race
+        if (!cacheReady) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
         return Scaffold(
           backgroundColor: Colors.white,
           body: Stack(
@@ -167,41 +255,76 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
                     child: Padding(
                       padding:
                           EdgeInsets.only(top: getWidgetHeight(height: 50)),
-                      child: InAppWebView(
-                        initialUrlRequest: URLRequest(
-                          url: WebUri(controller
-                              .url), // ✅ Wrap your string URL in WebUri
-                        ),
-                        initialOptions: InAppWebViewGroupOptions(
-                          crossPlatform: InAppWebViewOptions(
-                            mediaPlaybackRequiresUserGesture: false,
-                            disableContextMenu: true,
-                          ),
-                          android: AndroidInAppWebViewOptions(
-                            allowFileAccess: false,
-                            allowContentAccess: false,
-                          ),
-                          ios: IOSInAppWebViewOptions(
-                            allowsLinkPreview: false,
-                          ),
-                        ),
-                        onLoadStart: (controller, url) {
-                          setState(() => onLoad = true);
-                        },
-                        onLoadStop: (controller, url) {
-                          setState(() => onLoad = false);
-                        },
-                        shouldOverrideUrlLoading: (controller, action) async {
-                          return NavigationActionPolicy.ALLOW;
-                        },
-                        androidOnPermissionRequest:
-                            (controller, origin, resources) async {
-                          return PermissionRequestResponse(
-                            resources: resources,
-                            action: PermissionRequestResponseAction.GRANT,
-                          );
-                        },
-                      ),
+                      child: cachedHtml != null
+                          ? InAppWebView(
+                              initialData: InAppWebViewInitialData(
+                                data: cachedHtml!,
+                                baseUrl: WebUri(controller.url),
+                                mimeType: "text/html",
+                                encoding: "utf-8",
+                              ),
+                              onWebViewCreated: (c) {
+                                webViewCtrl = c;
+                              },
+                              onLoadStart: (c, url) {
+                                setState(() => onLoad = true);
+                              },
+                              onLoadStop: (c, url) {
+                                setState(() => onLoad = false);
+                              },
+                            )
+                          : InAppWebView(
+                              initialUrlRequest: URLRequest(
+                                url: WebUri(controller.url),
+                              ),
+                              initialOptions: InAppWebViewGroupOptions(
+                                crossPlatform: InAppWebViewOptions(
+                                  mediaPlaybackRequiresUserGesture: false,
+                                  disableContextMenu: true,
+                                ),
+                                android: AndroidInAppWebViewOptions(
+                                  allowFileAccess: false,
+                                  allowContentAccess: false,
+                                ),
+                                ios: IOSInAppWebViewOptions(
+                                  allowsLinkPreview: false,
+                                ),
+                              ),
+                              onWebViewCreated: (c) {
+                                webViewCtrl = c;
+                              },
+                              onLoadStart: (c, url) {
+                                setState(() => onLoad = true);
+                              },
+                              onLoadStop: (c, url) async {
+                                setState(() => onLoad = false);
+                                // cache HTML for this URL if not already cached
+                                try {
+                                  // ensure cacheBox is open (init may have succeeded earlier)
+                                  if (!Hive.isBoxOpen("web_cache")) {
+                                    final dir =
+                                        await getApplicationDocumentsDirectory();
+                                    Hive.init(dir.path);
+                                    cacheBox =
+                                        await Hive.openBox<String>("web_cache");
+                                  }
+                                  await _cacheHtmlIfNeeded(controller.url, c);
+                                } catch (e, st) {
+                                  log("onLoadStop cache error: $e\n$st");
+                                }
+                              },
+                              shouldOverrideUrlLoading: (c, action) async {
+                                // allow all navigation (you can add custom logic)
+                                return NavigationActionPolicy.ALLOW;
+                              },
+                              androidOnPermissionRequest:
+                                  (c, origin, resources) async {
+                                return PermissionRequestResponse(
+                                  resources: resources,
+                                  action: PermissionRequestResponseAction.GRANT,
+                                );
+                              },
+                            ),
                     ),
                   ),
                 ],

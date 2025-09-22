@@ -52,6 +52,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                       ),
                     ),
                   ),
+                  // if (!kIsWeb)
                   Positioned(
                       top: getWidgetHeight(height: 15),
                       left: getWidgetWidth(width: isKwidth > 700 ? 0 : 5),
@@ -190,8 +191,8 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                         child: SizedBox(
                           width:
                               getWidgetWidth(width: isKwidth > 700 ? 10 : 40),
-                          height:
-                              getWidgetHeight(height: isKwidth > 700 ? 40 : 40),
+                          // height:
+                          //     getWidgetHeight(height: isKwidth > 700 ? 40 : 40),
                           child: CircularProgressIndicator(
                             strokeWidth: isKwidth > 700 ? 6 : 4,
                             color: linearColor,
@@ -220,27 +221,21 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                               final isExpanded =
                                   controller.expandedIndex == index;
                               final linkAvailable = ((controller
-                                          .frontOfficeData[index]
-                                          .subcategory[0]
-                                          .link
-                                          .isNotEmpty ||
-                                      controller.frontOfficeData[index]
-                                              .subcategory[0].link !=
-                                          "") &&
-                                  accessLinks
-                                      .toLowerCase()
-                                      .contains("e-learning".toLowerCase()));
+                                      .frontOfficeData[index]
+                                      .subcategory[0]
+                                      .link
+                                      .isNotEmpty ||
+                                  controller.frontOfficeData[index]
+                                          .subcategory[0].link !=
+                                      ""));
                               final linkAvailable1 = ((controller
-                                          .frontOfficeData[index]
-                                          .subcategory[1]
-                                          .link
-                                          .isNotEmpty ||
-                                      controller.frontOfficeData[index]
-                                              .subcategory[1].link !=
-                                          "") &&
-                                  accessLinks
-                                      .toLowerCase()
-                                      .contains("glossary".toLowerCase()));
+                                      .frontOfficeData[index]
+                                      .subcategory[1]
+                                      .link
+                                      .isNotEmpty ||
+                                  controller.frontOfficeData[index]
+                                          .subcategory[1].link !=
+                                      ""));
                               final linkAvailable2 = ((controller
                                           .frontOfficeData[index]
                                           .subcategory[2]
@@ -248,9 +243,11 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                           .isNotEmpty ||
                                       controller.frontOfficeData[index]
                                               .subcategory[2].link !=
-                                          "") &&
-                                  accessLinks.toLowerCase().contains(
-                                      "knowledge check".toLowerCase()));
+                                          "")
+                                  //  &&
+                                  // accessLinks.toLowerCase().contains(
+                                  //     "knowledge check".toLowerCase())
+                                  );
 
                               return Column(
                                 children: [

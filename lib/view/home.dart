@@ -37,6 +37,7 @@ import 'package:hotelmanagementapp/view/login.dart';
 import 'package:hotelmanagementapp/view/pdf.dart';
 import 'package:hotelmanagementapp/view/profile_screen.dart';
 import 'package:hotelmanagementapp/view/university_lab.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -54,10 +55,12 @@ class _HomeState extends State<Home>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabController;
   HomeController historyController = Get.put(HomeController());
+  String? appVersion;
 
   @override
   void initState() {
     super.initState();
+    _loadAppVersion();
     UpdateChecker.checkForUpdate(context);
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 3, vsync: this);
@@ -76,6 +79,13 @@ class _HomeState extends State<Home>
     // This is like onResume
     historyController.loadRecentHistory();
     // }
+  }
+
+  Future<void> _loadAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      appVersion = packageInfo.version;
+    });
   }
 
   exitPop() async {
@@ -325,25 +335,34 @@ class _HomeState extends State<Home>
                     ),
                   ),
 
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: TextButton(
-                      onPressed: () async {
-                        Get.toNamed(AppRoutes.inAppWebView, arguments: {
-                          "url": ApiRoutes.privacyPolicy,
-                        });
-                      },
-                      child: Text(
-                        "Privacy & Policy",
-                        style: GoogleFonts.inter(
-                          height: 0.5,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: lightWhite,
-                        ),
+                  TextButton(
+                    onPressed: () async {
+                      Get.toNamed(AppRoutes.inAppWebView, arguments: {
+                        "url": ApiRoutes.privacyPolicy,
+                      });
+                    },
+                    child: Text(
+                      "Privacy & Policy",
+                      style: GoogleFonts.inter(
+                        height: 0.5,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                        color: lightWhite,
                       ),
                     ),
                   ),
+                  Text(
+                    "App version $appVersion",
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w300,
+                      height: 0.5,
+                      fontSize: 12,
+                      color: lightWhite,
+                    ),
+                  ),
+                  SizedBox(
+                    height: getWidgetHeight(height: 30),
+                  )
                 ],
               ),
             );
@@ -359,7 +378,7 @@ class _HomeState extends State<Home>
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: getWidgetHeight(height: isKwidth > 700 ? 20 : 60)),
+            SizedBox(height: getWidgetHeight(height: isKwidth > 500 ? 20 : 60)),
             Padding(
               padding:
                   EdgeInsets.symmetric(horizontal: getWidgetWidth(width: 20)),
@@ -367,8 +386,13 @@ class _HomeState extends State<Home>
                 // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    // height: getWidgetHeight(height: 81),
-                    width: getWidgetWidth(width: isKwidth > 700 ? 40 : 130),
+                    height: getWidgetHeight(height: kWidth > 700 ? 40 : 40),
+                    width: getWidgetWidth(
+                        width: isKwidth > 1204
+                            ? 40
+                            : (isKwidth > 700 && kWidth < 1204)
+                                ? 60
+                                : 130),
                     child: CircleAvatar(
                       backgroundColor: Colors.transparent,
                       // radius: 25,
@@ -433,6 +457,10 @@ class _HomeState extends State<Home>
                               width: getWidgetWidth(
                                   width: isKwidth > 700 ? 80 : 218),
                               child: InkWell(
+                                highlightColor: Colors.transparent,
+                                focusColor: Colors.transparent,
+                                hoverColor: Colors.transparent,
+                                splashColor: Colors.transparent,
                                 onTap: () {
                                   timestampIndex = index;
                                   mianCategoryTitile =
@@ -648,10 +676,13 @@ class _HomeState extends State<Home>
                                 // timestampIndex = index;
                                 final tapPosition = details.globalPosition;
                                 index == 0
-                                    ? accessLinks.toLowerCase().contains(
-                                            "simulation".toLowerCase())
-                                        ? Get.toNamed(AppRoutes.simulation)
-                                        : controller.showPopupAtTap(tapPosition)
+                                    ?
+                                    //  accessLinks.toLowerCase().contains(
+                                    //         "simulation".toLowerCase())
+                                    //     ?
+                                    Get.toNamed(AppRoutes.simulation)
+                                    //     :
+                                    // controller.showPopupAtTap(tapPosition)
                                     : index == 1
                                         ? Get.toNamed(AppRoutes.languageLab)
                                         : index == 2

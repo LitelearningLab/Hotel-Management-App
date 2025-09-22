@@ -65,7 +65,7 @@ class SentenceLabController extends GetxController {
     title.value = args?['title'] ?? "Sentence Lab";
 
     final prefs = await SharedPreferences.getInstance();
-    hasInitialized = prefs.getBool("sentenceLabInitialized2") ?? false;
+    hasInitialized = prefs.getBool("sentenceLabInitialized3") ?? false;
     update();
 
     if (!hasInitialized) {
@@ -91,7 +91,7 @@ class SentenceLabController extends GetxController {
       }
 
       // ✅ Mark initialization as done
-      await prefs.setBool("sentenceLabInitialized2", true);
+      await prefs.setBool("sentenceLabInitialized3", true);
       isLoading.value = false;
       update();
       return;

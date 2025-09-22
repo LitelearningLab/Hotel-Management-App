@@ -66,7 +66,7 @@ class _MyAppState extends State<MyApp> {
         if (lastRoute == AppRoutes.noInternet) return;
 
         isOnNoInternetPage = true;
-        Get.toNamed(AppRoutes.noInternet);
+        // Get.toNamed(AppRoutes.noInternet);
       } else {
         if (isOnNoInternetPage) {
           isOnNoInternetPage = false;
@@ -87,7 +87,7 @@ class _MyAppState extends State<MyApp> {
     return GetMaterialApp(
       getPages: RouteService.getPages,
       initialBinding: InitialBinding(),
-      title: 'Hotel Management App',
+      title: 'Profluent Hotelier',
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,

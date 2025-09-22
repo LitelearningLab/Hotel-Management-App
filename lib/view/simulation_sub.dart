@@ -15,6 +15,7 @@ import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
+import 'package:hotelmanagementapp/utility/web_view_page.dart';
 
 class SimulationSub extends StatefulWidget {
   final SimulationSubController controller = Get.put(SimulationSubController());
@@ -111,11 +112,26 @@ class _SimulationSubState extends State<SimulationSub> {
                                     link: controller
                                         .simulation.subcategory[index].links[0],
                                     proLabTitle: "");
-                                Get.toNamed(AppRoutes.inAppWebView, arguments: {
-                                  "isSimulation": true,
-                                  "url": controller
-                                      .simulation.subcategory[index].links[0],
-                                });
+                                if (kIsWeb) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => WebContentPage(
+                                          title: controller.simulation
+                                              .subcategory[index].title,
+                                          url: controller.simulation
+                                              .subcategory[index].links[0]),
+                                    ),
+                                  );
+                                } else {
+                                  Get.toNamed(AppRoutes.inAppWebView,
+                                      arguments: {
+                                        "isSimulation": true,
+                                        "url": controller.simulation
+                                            .subcategory[index].links[0],
+                                      });
+                                }
+
                                 setState(() {});
                                 // controller.update();
                               },
