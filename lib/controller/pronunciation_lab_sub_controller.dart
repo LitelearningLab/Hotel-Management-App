@@ -96,7 +96,13 @@ class PronunciationLabSubController extends GetxController {
     });
     id = Get.arguments['id'] ?? "";
     if (id == "") {
-      elseCase();
+      if (!kIsWeb) {
+        elseCase();
+      } else {
+        subcategories = ogSubCategories;
+        isLoading = false;
+      }
+
       // isPriorityList =
       //     subcategories.map((e) => e.downloadStatus == true).toList();
       // isLoading = false;
@@ -107,6 +113,7 @@ class PronunciationLabSubController extends GetxController {
     userId = prefs.getString("userId") ?? "";
     collegeId = prefs.getString("collegeId") ?? "";
     batchName = prefs.getString("batchName") ?? "";
+    update();
   }
 
   void applyDownloadedFilter(bool onlyDownloaded) {
@@ -199,7 +206,10 @@ class PronunciationLabSubController extends GetxController {
     isSaving = index;
     String tableName = title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
     String fileKey = subcategories[index].file; // Use exact file key
-    String fileName = subcategories[index].text.replaceAll(' ', '_');
+    String fileName = subcategories[index]
+        .text
+        .replaceAll(' ', '_')
+        .replaceAll(RegExp(r'[<>:"/\\|?*]'), '');
     String url = subcategories[index].file;
 
     // Toggle current UI state first
@@ -277,7 +287,10 @@ class PronunciationLabSubController extends GetxController {
           log("🔐 Decrypting local file before playing...");
           playPath = await AudioCryptoHelper.decryptFile(
             subcategories[index].localPath,
-            subcategories[index].text.replaceAll(' ', '_'),
+            subcategories[index]
+                .text
+                .replaceAll(' ', '_')
+                .replaceAll(RegExp(r'[<>:"/\\|?*]'), ''),
           );
           log("Decrypted to temp file: $playPath");
         } else {

@@ -23,6 +23,7 @@ import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/public/size_helpers.dart';
 import 'package:hotelmanagementapp/public/update_checker.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
@@ -130,6 +131,7 @@ class _HomeState extends State<Home>
   @override
   Widget build(BuildContext context) {
     double isKwidth = MediaQuery.of(context).size.width;
+    double isKheight = MediaQuery.of(context).size.height;
     print("width is printing  ${isKwidth}");
     Widget _tile(
         {required Widget icon, required String menu, Function()? onTap}) {
@@ -449,13 +451,17 @@ class _HomeState extends State<Home>
                                     width: isKwidth > 700 ? 5 : 20),
                                 bottom: getWidgetHeight(height: 20),
                                 top: getWidgetHeight(height: 10)),
-                            child: Container(
+                            child: AnimatedContainer(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              height: getWidgetHeight(height: 300),
-                              width: getWidgetWidth(
-                                  width: isKwidth > 700 ? 80 : 218),
+                              height: displayWidth(context) > 500
+                                  ? isKheight * 0.38
+                                  : getWidgetHeight(height: 300),
+                              width: isKwidth > 900
+                                  ? isKwidth * 0.15
+                                  : getWidgetWidth(width: 218),
+                              duration: const Duration(milliseconds: 300),
                               child: InkWell(
                                 highlightColor: Colors.transparent,
                                 focusColor: Colors.transparent,
@@ -496,7 +502,8 @@ class _HomeState extends State<Home>
                                     );
                                   }
                                 },
-                                child: Container(
+                                child: AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16),
                                     color: Colors.white,
@@ -514,9 +521,14 @@ class _HomeState extends State<Home>
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        SizedBox(
-                                          width: getWidgetWidth(width: 235),
-                                          height: getWidgetHeight(height: 160),
+                                        AnimatedContainer(
+                                          duration: Duration(microseconds: 300),
+                                          width: isKwidth > 700
+                                              ? isKwidth * 0.15
+                                              : getWidgetWidth(width: 235),
+                                          height: displayWidth(context) > 500
+                                              ? isKheight * 0.18
+                                              : getWidgetHeight(height: 160),
                                           child: index == 4
                                               ? SvgPicture.network(
                                                   controller.cardImages[index],
@@ -527,7 +539,9 @@ class _HomeState extends State<Home>
                                                   controller.cardImages[index]),
                                         ),
                                         SizedBox(
-                                            height: getWidgetHeight(height: 8)),
+                                            height: isKwidth > 700
+                                                ? isKwidth * 0.01
+                                                : getWidgetHeight(height: 8)),
                                         Padding(
                                           padding: EdgeInsets.symmetric(
                                               horizontal: getWidgetWidth(
@@ -549,11 +563,17 @@ class _HomeState extends State<Home>
                                                             : 10)),
                                               ),
                                               SizedBox(
-                                                  height: getWidgetHeight(
-                                                      height: 8)),
-                                              SizedBox(
-                                                height:
-                                                    getWidgetHeight(height: 78),
+                                                  height: isKwidth > 700
+                                                      ? isKheight * 0.01
+                                                      : getWidgetHeight(
+                                                          height: 8)),
+                                              AnimatedContainer(
+                                                duration:
+                                                    Duration(milliseconds: 300),
+                                                height: isKwidth > 700
+                                                    ? isKheight * 0.11
+                                                    : getWidgetHeight(
+                                                        height: 78),
                                                 child: Text(
                                                   controller.cardNames[index],
                                                   textAlign: TextAlign.start,
@@ -568,11 +588,15 @@ class _HomeState extends State<Home>
                                                 ),
                                               ),
                                               SizedBox(
-                                                  height: getWidgetHeight(
-                                                      height: 5)),
+                                                  height: isKwidth > 700
+                                                      ? isKheight * 0.01
+                                                      : getWidgetHeight(
+                                                          height: 5)),
                                               SizedBox(
-                                                height:
-                                                    getWidgetHeight(height: 15),
+                                                height: isKwidth > 700
+                                                    ? isKheight * 0.015
+                                                    : getWidgetHeight(
+                                                        height: 15),
                                                 child: Row(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.center,
@@ -662,6 +686,9 @@ class _HomeState extends State<Home>
                       return ListView.builder(
                         shrinkWrap: true,
                         itemCount: 3,
+                        physics: kIsWeb
+                            ? const NeverScrollableScrollPhysics()
+                            : const BouncingScrollPhysics(),
                         padding: EdgeInsets.only(
                             top: getWidgetHeight(height: 10),
                             bottom: getWidgetHeight(height: 100)),
@@ -704,7 +731,8 @@ class _HomeState extends State<Home>
                               },
                               child: Container(
                                 height: getWidgetHeight(
-                                    height: isKwidth > 700 ? 100 : 75),
+                                    height:
+                                        isKwidth > 700 ? isKheight * 0.07 : 75),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(16),
@@ -721,9 +749,13 @@ class _HomeState extends State<Home>
                                     SizedBox(width: getWidgetWidth(width: 4)),
                                     Container(
                                       width: getWidgetWidth(
-                                          width: isKwidth > 700 ? 25 : 55),
+                                          width: isKwidth > 900
+                                              ? isKheight * 0.015
+                                              : 55),
                                       height: getWidgetHeight(
-                                          height: isKwidth > 700 ? 80 : 68),
+                                          height: isKwidth > 900
+                                              ? isKheight * 0.05
+                                              : 68),
                                       decoration: BoxDecoration(
                                         color: linearColor,
                                         borderRadius: BorderRadius.circular(12),
@@ -742,18 +774,19 @@ class _HomeState extends State<Home>
                                                 vertical: index == 1
                                                     ? 0
                                                     : getWidgetHeight(
-                                                        height: isKwidth > 700
-                                                            ? 15
+                                                        height: isKwidth > 900
+                                                            ? 6
                                                             : 22),
                                                 horizontal: index == 1
                                                     ? 0
                                                     : getWidgetWidth(
-                                                        width: isKwidth > 700
-                                                            ? 8
+                                                        width: isKwidth > 900
+                                                            ? 3
                                                             : 16),
                                               ),
                                               child: index == 0
                                                   ? Image.asset(
+                                                      fit: BoxFit.fill,
                                                       AllAssets
                                                           .interactiveSimulations,
                                                       color: Colors.white,
@@ -773,7 +806,10 @@ class _HomeState extends State<Home>
                                         ),
                                       ),
                                     ),
-                                    SizedBox(width: getWidgetWidth(width: 12)),
+                                    SizedBox(
+                                        width: isKwidth > 900
+                                            ? isKwidth * 0.01
+                                            : getWidgetWidth(width: 12)),
                                     Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,

@@ -11,6 +11,7 @@ import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/public/size_helpers.dart';
 import 'package:hotelmanagementapp/public/spacing.dart';
 import 'package:hotelmanagementapp/utility/boom_menu.dart';
 
@@ -237,14 +238,20 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                           ),
                                           child: Padding(
                                             padding: EdgeInsets.symmetric(
-                                                vertical: getWidgetHeight(
-                                                    height: isKwidth > 700
-                                                        ? 10
-                                                        : 4),
-                                                horizontal: getWidgetWidth(
-                                                    width: isKwidth > 700
-                                                        ? 5
-                                                        : 10)),
+                                                vertical:
+                                                    displayWidth(context) > 500
+                                                        ? displayHeight(
+                                                                context) *
+                                                            0.02
+                                                        : getWidgetHeight(
+                                                            height: 6),
+                                                horizontal: displayWidth(
+                                                            context) >
+                                                        500
+                                                    ? displayWidth(context) *
+                                                        0.01
+                                                    : getWidgetWidth(
+                                                        width: 10)),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
@@ -316,11 +323,13 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                                         index
                                                                     ? SizedBox(
                                                                         height: getWidgetHeight(
-                                                                            height:
-                                                                                20),
+                                                                            height: displayWidth(context) > 500
+                                                                                ? 20
+                                                                                : 20),
                                                                         width: getWidgetWidth(
-                                                                            width:
-                                                                                22),
+                                                                            width: displayWidth(context) > 500
+                                                                                ? 5
+                                                                                : 22),
                                                                         child:
                                                                             CircularProgressIndicator(
                                                                           strokeWidth:
@@ -338,8 +347,8 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                               ),
                                                     SizedBox(
                                                       width: getWidgetWidth(
-                                                          width: isKwidth > 700
-                                                              ? 5
+                                                          width: isKwidth > 500
+                                                              ? 2
                                                               : 10),
                                                     ),
                                                     Text(
@@ -404,11 +413,20 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                               child: controller
                                                                           .isSaving ==
                                                                       index
-                                                                  ? CircularProgressIndicator(
-                                                                      strokeWidth:
-                                                                          2.0,
-                                                                      color:
-                                                                          linearColor,
+                                                                  ? SizedBox(
+                                                                      height: getWidgetHeight(
+                                                                          height:
+                                                                              19),
+                                                                      width: getWidgetWidth(
+                                                                          width:
+                                                                              19),
+                                                                      child:
+                                                                          CircularProgressIndicator(
+                                                                        strokeWidth:
+                                                                            2.0,
+                                                                        color:
+                                                                            linearColor,
+                                                                      ),
                                                                     )
                                                                   : Image.asset(
                                                                       AllAssets

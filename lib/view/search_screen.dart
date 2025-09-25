@@ -53,7 +53,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       horizontal: getWidgetWidth(width: 12),
                       vertical: getWidgetHeight(height: 8)),
                   child: Container(
-                    height: 45,
+                    height: getWidgetHeight(height: 45),
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(10),
@@ -74,6 +74,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         SizedBox(width: getWidgetWidth(width: 10)),
                         Expanded(
                           child: TextField(
+                            cursorColor: Colors.black,
                             controller: controller.controller,
                             onChanged: (value) {
                               controller.searchTerm = value.trim();

@@ -1,6 +1,7 @@
 // import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
@@ -10,6 +11,7 @@ import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/public/size_helpers.dart';
 import 'package:hotelmanagementapp/public/spacing.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 
@@ -106,8 +108,12 @@ class _SoundLabState extends State<SoundLab> {
                       ),
                       child: Padding(
                         padding: EdgeInsets.symmetric(
-                            vertical: getWidgetHeight(height: 6),
-                            horizontal: getWidgetWidth(width: 10)),
+                            vertical: displayWidth(context) > 500
+                                ? displayHeight(context) * 0.02
+                                : getWidgetHeight(height: 6),
+                            horizontal: displayWidth(context) > 500
+                                ? displayWidth(context) * 0.01
+                                : getWidgetWidth(width: 10)),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -115,14 +121,17 @@ class _SoundLabState extends State<SoundLab> {
                               children: [
                                 (controller.loadingIndex == index)
                                     ? SizedBox(
-                                        height: getWidgetHeight(height: 25),
-                                        width: getWidgetWidth(width: 25),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(3.0),
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: linearColor,
-                                          ),
+                                        height: getWidgetHeight(
+                                            height: displayWidth(context) > 500
+                                                ? 20
+                                                : 20),
+                                        width: getWidgetWidth(
+                                            width: displayWidth(context) > 500
+                                                ? 8
+                                                : 22),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.0,
+                                          color: linearColor,
                                         ),
                                       )
                                     : (controller.currentlyPlayingIndex ==
@@ -162,7 +171,9 @@ class _SoundLabState extends State<SoundLab> {
                                                 ),
                                               ),
                                 SizedBox(
-                                  width: getWidgetWidth(width: 10),
+                                  width: getWidgetWidth(
+                                      width:
+                                          displayWidth(context) > 500 ? 4 : 10),
                                 ),
                                 Text(soundPractice.text,
                                     style: TextStyle(
@@ -171,52 +182,28 @@ class _SoundLabState extends State<SoundLab> {
                                     )),
                               ],
                             ),
-                            Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    // controller.saveUpdate(index);
-                                  },
-                                  child: SizedBox(
-                                    // width: displayWidth(context) / 18.75,
-                                    // height: displayHeight(context) / 40.6,
-                                    height: 19,
-                                    width: 19,
-                                    child: ImageIcon(
-                                      AssetImage(AllAssets.download),
-                                      color:
-                                          //  controller
-                                          //         .isPriorityList[index]
-                                          //     ? linearColor
-                                          //     :
-                                          Colors.black,
-                                      // size: size.height * 0.03,
-                                    ),
+                            if (!kIsWeb)
+                              IconButton(
+                                onPressed: () {
+                                  // controller.saveUpdate(index);
+                                },
+                                icon: SizedBox(
+                                  // width: displayWidth(context) / 18.75,
+                                  // height: displayHeight(context) / 40.6,
+                                  height: 19,
+                                  width: 19,
+                                  child: Image.asset(
+                                    AllAssets.save,
+                                    width: 18,
+                                    color:
+                                        // controller
+                                        //         .isPriorityList[index]
+                                        //     ? linearColor
+                                        //     :
+                                        Colors.black,
                                   ),
                                 ),
-                                IconButton(
-                                  onPressed: () {
-                                    // controller.saveUpdate(index);
-                                  },
-                                  icon: SizedBox(
-                                    // width: displayWidth(context) / 18.75,
-                                    // height: displayHeight(context) / 40.6,
-                                    height: 19,
-                                    width: 19,
-                                    child: Image.asset(
-                                      AllAssets.save,
-                                      width: 18,
-                                      color:
-                                          // controller
-                                          //         .isPriorityList[index]
-                                          //     ? linearColor
-                                          //     :
-                                          Colors.black,
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
+                              ),
                           ],
                         ),
                       ),
@@ -318,49 +305,51 @@ class _SoundLabState extends State<SoundLab> {
                                       // )
                                     ],
                                   ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      controller.kShowDialog(
-                                          soundPractice.text, false, context);
-                                    },
-                                    child: Container(
-                                      width: getWidgetWidth(width: 130),
-                                      height: getWidgetHeight(height: 45),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        color: Colors.white,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.1),
-                                            offset: const Offset(0, 4),
-                                            blurRadius: 10,
-                                          ),
-                                        ],
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        children: [
-                                          const Icon(
-                                            Icons.mic,
-                                            color: Color.fromARGB(
-                                                255, 112, 112, 112),
-                                          ),
-                                          Text(
-                                            "Practice",
-                                            style: GoogleFonts.inter(
-                                              color: const Color.fromARGB(
-                                                  255, 112, 112, 112),
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 16,
+                                  if (!kIsWeb)
+                                    GestureDetector(
+                                      onTap: () {
+                                        controller.kShowDialog(
+                                            soundPractice.text, false, context);
+                                      },
+                                      child: Container(
+                                        width: getWidgetWidth(width: 130),
+                                        height: getWidgetHeight(height: 45),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              offset: const Offset(0, 4),
+                                              blurRadius: 10,
                                             ),
-                                          ),
-                                          const SizedBox()
-                                        ],
+                                          ],
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            const Icon(
+                                              Icons.mic,
+                                              color: Color.fromARGB(
+                                                  255, 112, 112, 112),
+                                            ),
+                                            Text(
+                                              "Practice",
+                                              style: GoogleFonts.inter(
+                                                color: const Color.fromARGB(
+                                                    255, 112, 112, 112),
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            const SizedBox()
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
                                 ],
                               ),
                               if (controller.selectedWord.toLowerCase() ==

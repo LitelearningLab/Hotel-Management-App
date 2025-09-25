@@ -1,16 +1,24 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/sentence_attempt.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
+import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/audio_helper.dart';
 import 'package:hotelmanagementapp/dbHelper/sentence_db_helper.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/utility/result_dialog.dart';
 import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+enum AudioStatus { idle, loading, playing, error }
+
+enum DownloadStatus { idle, loading, success, error }
 
 class SentenceLabSubCatController extends GetxController {
   late String title;
@@ -26,6 +34,7 @@ class SentenceLabSubCatController extends GetxController {
   List<bool> isSaved = [];
   int isSaving = -1;
   Map<String, bool> isLoadingMap = {};
+  Map<String, bool> isLoadingMapPlay = {};
   bool isSearching = false;
   TextEditingController searchController = TextEditingController();
   String searchTerm = "";
@@ -36,6 +45,10 @@ class SentenceLabSubCatController extends GetxController {
   String userId = "";
   String collegeId = "";
   String batchName = "";
+  String? currentKey;
+  Map<String, AudioStatus> audioStatusMap = {};
+
+  Map<String, DownloadStatus> downloadStatusMap = {};
 
   @override
   void onInit() {
@@ -51,9 +64,15 @@ class SentenceLabSubCatController extends GetxController {
   }
 
   Future<void> reloadFromDB(String categoryName) async {
-    allSubcategories =
-        await SentenceDBHelper().getSubCategoriesByCategoryName(categoryName);
-    subcategories = List.from(allSubcategories);
+    if (!kIsWeb) {
+      allSubcategories =
+          await SentenceDBHelper().getSubCategoriesByCategoryName(categoryName);
+      subcategories = List.from(allSubcategories);
+    } else {
+      final args = Get.arguments as Map<String, dynamic>?;
+      subcategories = args?["CategoryModel"] ?? [];
+      allSubcategories = List.from(subcategories);
+    }
     final prefs = await SharedPreferences.getInstance();
     userId = prefs.getString("userId") ?? "";
     collegeId = prefs.getString("collegeId") ?? "";
@@ -133,55 +152,125 @@ class SentenceLabSubCatController extends GetxController {
     applySearchAndFilter(); // still applies search if active
   }
 
-  saveUpdate(int index, int subIndex) async {
+  Future<void> saveUpdate(int index, int subIndex) async {
     final key = "$index-$subIndex";
-    isLoadingMap[key] = true;
+    downloadStatusMap[key] = DownloadStatus.loading;
     update();
+
     final sentence = subcategories[index].sentence[subIndex];
 
-    if (sentence.isDownloaded && (sentence.localPath?.isNotEmpty ?? false)) {
-      final file = File(sentence.localPath!);
-      if (await file.exists()) {
-        await file.delete();
-        log("Deleted local file: ${sentence.localPath}");
+    try {
+      if (sentence.isDownloaded && (sentence.localPath?.isNotEmpty ?? false)) {
+        final file = File(sentence.localPath!);
+        if (await file.exists()) {
+          await file.delete();
+          log("🗑 Deleted local file: ${sentence.localPath}");
+        }
+
+        await SentenceDBHelper().updateSentenceDownloadStatusAndPath(
+          sentence.id ?? 0,
+          false,
+          '',
+        );
+
+        sentence.isDownloaded = false;
+        sentence.localPath = '';
+
+        Fluttertoast.showToast(
+          msg: "Removed from your priority list",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: linearColor,
+          textColor: Colors.white,
+          fontSize: 12.0,
+        );
+      } else {
+        final encryptedPath = await AudioCryptoHelper.downloadAndEncryptAudio(
+          sentence.file,
+          sentence.text
+              .replaceAll(' ', '_')
+              .replaceAll(RegExp(r'[<>:"/\\|?*]'), ''),
+        );
+
+        await SentenceDBHelper().updateSentenceDownloadStatusAndPath(
+          sentence.id ?? 0,
+          true,
+          encryptedPath,
+        );
+
+        sentence.isDownloaded = true;
+        sentence.localPath = encryptedPath;
+
+        Fluttertoast.showToast(
+          msg: "Added to your priority list",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: linearColor,
+          textColor: Colors.white,
+          fontSize: 12.0,
+        );
       }
 
-      await SentenceDBHelper().updateSentenceDownloadStatusAndPath(
-        sentence.id ?? 0,
-        false,
-        '',
-      );
+      downloadStatusMap[key] = DownloadStatus.success;
+    } catch (e) {
+      log("❌ Download error: $e");
+      downloadStatusMap[key] = DownloadStatus.error;
 
-      sentence.isDownloaded = false;
-      sentence.localPath = '';
-    } else {
-      final encryptedPath = await AudioCryptoHelper.downloadAndEncryptAudio(
-        sentence.file,
-        sentence.text.replaceAll(' ', '_'),
+      Fluttertoast.showToast(
+        msg: "Download failed. Please try again.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 12.0,
       );
-
-      await SentenceDBHelper().updateSentenceDownloadStatusAndPath(
-        sentence.id ?? 0,
-        true,
-        encryptedPath,
-      );
-
-      sentence.isDownloaded = true;
-      sentence.localPath = encryptedPath;
     }
 
-    isLoadingMap[key] = false;
     update();
   }
 
+  // track currently playing audio
+
   void handlePlayPause(int index, int subIndex) async {
-    loadingIndex = subIndex;
-    isPlaying = true;
+    final newKey = "$index-$subIndex";
+
+    // If tapped the same audio
+    if (currentKey == newKey) {
+      if (audioPlayer.playing) {
+        await audioPlayer.pause();
+        audioStatusMap[newKey] = AudioStatus.idle;
+      } else {
+        audioStatusMap[newKey] = AudioStatus.loading;
+        update();
+
+        try {
+          await audioPlayer.play();
+          audioStatusMap[newKey] = AudioStatus.playing;
+        } catch (e) {
+          audioStatusMap[newKey] = AudioStatus.error;
+        }
+      }
+      update();
+      return;
+    }
+
+    // Stop previous audio if any
+    if (currentKey != null) {
+      audioStatusMap[currentKey!] = AudioStatus.idle;
+      await audioPlayer.stop();
+    }
+
+    // Set new key to loading
+    currentKey = newKey;
+    audioStatusMap[newKey] = AudioStatus.loading;
     update();
 
     try {
-      final sentence = subcategories[index].sentence[subIndex];
       String? filePathToPlay;
+      final sentence = subcategories[index].sentence[subIndex];
 
       if (sentence.localPath != null && sentence.localPath!.isNotEmpty) {
         final localFile = File(sentence.localPath!);
@@ -189,58 +278,89 @@ class SentenceLabSubCatController extends GetxController {
           log("✅ Local encrypted file found. Decrypting...");
           filePathToPlay = await AudioCryptoHelper.decryptFile(
             sentence.localPath!,
-            sentence.text.replaceAll(' ', '_'),
+            sentence.text
+                .replaceAll(' ', '_')
+                .replaceAll(RegExp(r'[<>:"/\\|?*]'), ''),
           );
-          log("🎵 Playing decrypted local file: $filePathToPlay");
         }
       }
 
-      if (filePathToPlay == null) {
-        log("🌐 No local file found, streaming from network...");
-        filePathToPlay = sentence.file;
-      }
+      filePathToPlay ??= sentence.file;
 
-      if (currentlyPlayingIndex == subIndex) {
-        await audioPlayer.pause();
-        currentlyPlayingIndex = null;
-      } else {
-        await audioPlayer.stop();
-        currentlyPlayingIndex = subIndex;
+      await audioPlayer.setUrl(filePathToPlay);
+
+      // Wait until it’s actually ready
+      audioPlayer.play().then((_) {
+        audioStatusMap[newKey] = AudioStatus.playing;
         update();
+      });
 
-        await audioPlayer.setUrl(filePathToPlay);
-        await audioPlayer.play();
-
-        currentlyPlayingIndex = null;
-        final attempt = SentenceAttempt(
-          batch: "Your-Batch",
-          companyId: collegeId,
-          correct: 0,
-          dateTime: DateTime.now().toString(),
-          focusWord: [],
-          lastAttempt: DateTime.now().toString(),
-          lastScore: 0,
-          listAtt: 1,
-          load: title,
-          main: subCategoryTitle,
-          pracAtt: 0,
-          score: 0,
-          sentence: sentence.text,
-          time: 1,
-          timeCal: DateTime.now().millisecondsSinceEpoch,
-          title: subcategories[index].id,
-          userId: userId,
-        );
-        await SentenceAttempt.saveAttempt(attempt);
-      }
+      // Listen for completion
+      audioPlayer.playerStateStream.listen((state) {
+        if (state.processingState == ProcessingState.completed) {
+          audioStatusMap[newKey] = AudioStatus.idle;
+          update();
+          currentKey = null;
+        }
+      });
     } catch (e) {
       log("❌ Audio load error: $e");
-      currentlyPlayingIndex = null;
-      errorPlaying = subIndex;
-    } finally {
-      loadingIndex = null;
-      isPlaying = false;
+      audioStatusMap[newKey] = AudioStatus.error;
       update();
+      currentKey = null;
+    }
+  }
+
+  Widget buildAudioIcon(int index, int subIndex) {
+    final key = "$index-$subIndex";
+    final status = audioStatusMap[key] ?? AudioStatus.idle;
+
+    switch (status) {
+      case AudioStatus.loading:
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: getWidgetWidth(width: 4)),
+          child: SizedBox(
+            width: getWidgetWidth(width: 18),
+            height: getWidgetHeight(height: 18),
+            child:
+                CircularProgressIndicator(strokeWidth: 2, color: linearColor),
+          ),
+        );
+      case AudioStatus.playing:
+        return Icon(Icons.pause_circle_outline, color: Colors.black);
+      case AudioStatus.error:
+        return const Icon(Icons.error, color: Colors.red);
+      case AudioStatus.idle:
+      default:
+        return const Icon(Icons.play_circle_outline, color: Colors.black);
+    }
+  }
+
+  Widget buildDownloadIcon(int index, int subIndex) {
+    final key = "$index-$subIndex";
+    final status = downloadStatusMap[key] ?? DownloadStatus.idle;
+    final sentence = subcategories[index].sentence[subIndex];
+
+    switch (status) {
+      case DownloadStatus.loading:
+        return SizedBox(
+          height: 19,
+          width: 19,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: linearColor,
+          ),
+        );
+      case DownloadStatus.error:
+        return const Icon(Icons.error, color: Colors.red, size: 19);
+      case DownloadStatus.success:
+      case DownloadStatus.idle:
+      default:
+        return Image.asset(
+          AllAssets.save,
+          width: 18,
+          color: sentence.isDownloaded ? linearColor : Colors.black,
+        );
     }
   }
 

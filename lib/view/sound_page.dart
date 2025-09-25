@@ -6,6 +6,7 @@ import 'package:hotelmanagementapp/controller/sound_page_controller.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/public/size_helpers.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:video_player/video_player.dart';
 
@@ -73,9 +74,11 @@ class _SoundPageState extends State<SoundPage> {
                         width: kWidth,
                         height:
                             controller.videoPlayerController.value.isInitialized
-                                ? kWidth /
-                                    controller
-                                        .videoPlayerController.value.aspectRatio
+                                ? displayWidth(context) > 700
+                                    ? displayHeight(context) * 0.5
+                                    : kWidth /
+                                        controller.videoPlayerController.value
+                                            .aspectRatio
                                 : displayWidth(context),
                         child: controller.isPlaying == false
                             ? controller.hasInitError
@@ -127,7 +130,7 @@ class _SoundPageState extends State<SoundPage> {
                                       ),
                                       Text(
                                         'Loading...',
-                                        style: TextStyle(color: Colors.white),
+                                        style: TextStyle(color: linearColor),
                                       ),
                                     ],
                                   ))

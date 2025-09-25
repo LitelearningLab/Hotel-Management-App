@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
@@ -64,82 +65,79 @@ class SentenceLabController extends GetxController {
     final args = Get.arguments as Map<String, dynamic>?;
     title.value = args?['title'] ?? "Sentence Lab";
 
+    // 🔥 Web: Directly load from Firebase (NO DB CALL)
+    if (kIsWeb) {
+      log('[onFirst] Running on Web → Skipping local DB.');
+      try {
+        log('[onFirst] Fetching data from Firebase (Web)...');
+        sentenceLabList = await fetchSentenceLabData();
+        log('[onFirst] Loaded ${sentenceLabList.length} sections from Firebase.');
+      } catch (e, st) {
+        log('[onFirst] Web fetch failed: $e');
+        log('$st');
+      }
+      isLoading.value = false;
+      update();
+      return;
+    }
+
+    // 📱 Non-Web: Local DB logic
     final prefs = await SharedPreferences.getInstance();
-    hasInitialized = prefs.getBool("sentenceLabInitialized3") ?? false;
+    hasInitialized = prefs.getBool("sentenceLabInitialized6") ?? false;
     update();
 
     if (!hasInitialized) {
-      // 🚨 First-time run → clear everything
+      // 🚨 First run → clear DB and fetch new data
       log('[onFirst] First-time run detected → clearing local DB...');
       await SentenceDBHelper().deleteDatabaseFile();
 
       try {
         log('[onFirst] Fetching latest data from Firebase (first run)...');
         final firebaseData = await fetchSentenceLabData();
-        log('[onFirst] Fetched ${firebaseData.length} sections from Firebase');
+        log('[onFirst] Fetched ${firebaseData.length} sections');
 
-        log('[onFirst] Saving fresh data locally...');
-        // sentenceLabList = firebaseData;
+        log('[onFirst] Saving data locally...');
         await SentenceDBHelper().saveDataLocally(firebaseData);
-        // log('[onFirst] Initial save completed');
 
-        // // Reload local after save
         sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
-      } catch (e, stacktrace) {
-        log('[onFirst] Error during first-time fetch: $e');
-        log("$stacktrace");
+      } catch (e, st) {
+        log('[onFirst] Error during first fetch: $e');
+        log('$st');
       }
 
-      // ✅ Mark initialization as done
-      await prefs.setBool("sentenceLabInitialized3", true);
-      isLoading.value = false;
-      update();
-      return;
-    }
-
-    // 🔄 Normal logic after initialization
-    sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
-    log('[onFirst] Loaded ${sentenceLabList.length} items from local DB');
-
-    if (sentenceLabList.isNotEmpty) {
-      // ✅ Already have local data → use it directly
-      isLoading.value = false;
-      update();
-
-      // 🔄 Background refresh from Firebase
-      unawaited(() async {
-        try {
-          log('[onFirst] Background sync started...');
-          final firebaseData = await fetchSentenceLabData();
-          await SentenceDBHelper().syncData(firebaseData);
-
-          // Reload after sync
-          sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
-          log('[onFirst] Sync completed → ${sentenceLabList.length} items');
-          update();
-        } catch (e, st) {
-          log('[onFirst] Sync failed: $e');
-          log("$st");
-        }
-      }());
-      return;
-    }
-
-    // 2. If no local data → fetch from Firebase once
-    try {
-      log('[onFirst] Fetching latest data from Firebase...');
-      final firebaseData = await fetchSentenceLabData();
-      log('[onFirst] Fetched ${firebaseData.length} sections from Firebase');
-
-      log('[onFirst] Saving data locally...');
-      await SentenceDBHelper().saveDataLocally(firebaseData);
-      log('[onFirst] Initial save completed');
-
-      // Reload local after save
+      await prefs.setBool("sentenceLabInitialized6", true);
+    } else {
+      // ✅ Already initialized
       sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
-    } catch (e, stacktrace) {
-      log('[onFirst] Error fetching data: $e');
-      log("$stacktrace");
+      log('[onFirst] Loaded ${sentenceLabList.length} items locally');
+
+      if (sentenceLabList.isNotEmpty) {
+        // 🔄 Background sync
+        unawaited(() async {
+          try {
+            log('[onFirst] Background sync started...');
+            final firebaseData = await fetchSentenceLabData();
+            await SentenceDBHelper().syncData(firebaseData);
+            sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
+            log('[onFirst] Sync complete → ${sentenceLabList.length} items');
+            update();
+          } catch (e, st) {
+            log('[onFirst] Sync failed: $e');
+            log('$st');
+          }
+        }());
+      } else {
+        // No local data → fetch directly and save
+        try {
+          log('[onFirst] No local data → fetching from Firebase...');
+          final firebaseData = await fetchSentenceLabData();
+          await SentenceDBHelper().saveDataLocally(firebaseData);
+          sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
+        } catch (e, st) {
+          log('[onFirst] Error fetching data: $e');
+          log('$st');
+        }
+      }
     }
 
     isLoading.value = false;

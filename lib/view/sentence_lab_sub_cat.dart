@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
@@ -227,12 +228,29 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                               children: [
                                                 Padding(
                                                   padding: EdgeInsets.only(
-                                                    top: getWidgetHeight(
-                                                        height: 8),
-                                                    bottom: getWidgetHeight(
-                                                        height: 8),
-                                                    left: getWidgetWidth(
-                                                        width: 10),
+                                                    top: displayWidth(context) >
+                                                            500
+                                                        ? displayWidth(
+                                                                context) *
+                                                            0.008
+                                                        : getWidgetHeight(
+                                                            height: 8),
+                                                    bottom:
+                                                        displayWidth(context) >
+                                                                500
+                                                            ? displayWidth(
+                                                                    context) *
+                                                                0.008
+                                                            : getWidgetHeight(
+                                                                height: 8),
+                                                    left:
+                                                        displayWidth(context) >
+                                                                500
+                                                            ? displayWidth(
+                                                                    context) *
+                                                                0.008
+                                                            : getWidgetWidth(
+                                                                width: 10),
                                                     // right: getWidgetWidth(width: 15)
                                                   ),
                                                   child: Row(
@@ -250,38 +268,18 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                                           ),
                                                         ),
                                                       ),
-                                                      IconButton(
-                                                        onPressed: () {
-                                                          controller.saveUpdate(
-                                                              index, subIndex);
-                                                        },
-                                                        icon: SizedBox(
-                                                          // width: displayWidth(context) / 18.75,
-                                                          // height: displayHeight(context) / 40.6,
-                                                          height: 19,
-                                                          width: 19,
-                                                          child: controller
-                                                                          .isLoadingMap[
-                                                                      "$index-$subIndex"] ==
-                                                                  true
-                                                              ? CircularProgressIndicator(
-                                                                  strokeWidth:
-                                                                      2,
-                                                                  color:
-                                                                      linearColor,
-                                                                )
-                                                              : Image.asset(
-                                                                  AllAssets
-                                                                      .save,
-                                                                  width: 18,
-                                                                  color: sentence
-                                                                          .isDownloaded
-                                                                      ? linearColor
-                                                                      : Colors
-                                                                          .black,
-                                                                ),
-                                                        ),
-                                                      )
+                                                      if (!kIsWeb)
+                                                        IconButton(
+                                                            onPressed: () {
+                                                              controller
+                                                                  .saveUpdate(
+                                                                      index,
+                                                                      subIndex);
+                                                            },
+                                                            icon: controller
+                                                                .buildDownloadIcon(
+                                                                    index,
+                                                                    subIndex))
                                                     ],
                                                   ),
                                                 ),
@@ -330,14 +328,17 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                                                   },
                                                                   child: Row(
                                                                     children: [
-                                                                      Icon(
-                                                                        controller.currentlyPlayingIndex ==
-                                                                                subIndex
-                                                                            ? Icons.pause_circle_outline
-                                                                            : Icons.play_circle_outline,
-                                                                        color: Colors
-                                                                            .black,
-                                                                      ),
+                                                                      controller.buildAudioIcon(
+                                                                          index,
+                                                                          subIndex),
+                                                                      // Icon(
+                                                                      //   controller.isLoadingMapPlay["$index-$subIndex"] ==
+                                                                      //           true
+                                                                      //       ? Icons.pause_circle_outline
+                                                                      //       : Icons.play_circle_outline,
+                                                                      //   color: Colors
+                                                                      //       .black,
+                                                                      // ),
                                                                       SizedBox(
                                                                           width:
                                                                               getWidgetWidth(width: 5)),
@@ -348,31 +349,31 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                                                     ],
                                                                   ),
                                                                 ),
-                                                                InkWell(
-                                                                  onTap: () {
-                                                                    controller.kShowDialog(
-                                                                        subname,
-                                                                        sentence
-                                                                            .text,
-                                                                        false,
-                                                                        context);
-                                                                    // Add dialog or recording functionality
-                                                                  },
-                                                                  child: Row(
-                                                                    children: [
-                                                                      const Icon(
-                                                                          Icons
-                                                                              .mic),
-                                                                      SizedBox(
-                                                                          width:
-                                                                              getWidgetWidth(width: 5)),
-                                                                      const Text(
-                                                                          "Practice",
-                                                                          style:
-                                                                              TextStyle(fontSize: 13)),
-                                                                    ],
+                                                                if (!kIsWeb)
+                                                                  InkWell(
+                                                                    onTap: () {
+                                                                      controller.kShowDialog(
+                                                                          subname,
+                                                                          sentence
+                                                                              .text,
+                                                                          false,
+                                                                          context);
+                                                                      // Add dialog or recording functionality
+                                                                    },
+                                                                    child: Row(
+                                                                      children: [
+                                                                        const Icon(
+                                                                            Icons.mic),
+                                                                        SizedBox(
+                                                                            width:
+                                                                                getWidgetWidth(width: 5)),
+                                                                        const Text(
+                                                                            "Practice",
+                                                                            style:
+                                                                                TextStyle(fontSize: 13)),
+                                                                      ],
+                                                                    ),
                                                                   ),
-                                                                ),
                                                               ],
                                                             ),
                                                           ],

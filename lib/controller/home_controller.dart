@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -61,7 +62,9 @@ class HomeController extends GetxController {
     final alreadyAsked = prefs.getBool('mic_permission_requested') ?? false;
 
     if (!alreadyAsked) {
-      await _requestMicPermission();
+      if (!kIsWeb) {
+        await _requestMicPermission();
+      }
 
       // Save so we don’t ask again
       await prefs.setBool('mic_permission_requested', true);

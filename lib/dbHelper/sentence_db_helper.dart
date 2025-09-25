@@ -460,9 +460,10 @@ class SentenceDBHelper {
   }
 
   Future<void> deleteDatabaseFile() async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'sentence_lab.db');
-    await deleteDatabase(path);
+    await clearAllData();
+    // final dbPath = await getDatabasesPath();
+    // final path = join(dbPath, 'sentence_lab.db');
+    // await deleteDatabase(path);
   }
 
   // -----------------------------

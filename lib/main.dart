@@ -20,6 +20,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 bool isOnNoInternetPage = false;
 void main() async {
+  // WebView.platform = WebWebViewPlatform();
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     await Firebase.initializeApp(

@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
@@ -264,16 +266,15 @@ class _ContentLabState extends State<ContentLab> {
                             itemBuilder: (context, index) {
                               final post = controller.showPosts[index];
 
-                              if (controller.controllers[index] == null) {
-                                final embedUrl = controller
-                                    .convertToEmbedUrl(post["videoUrl"]);
-                                final webViewCtrl = WebViewController()
-                                  ..setJavaScriptMode(
-                                      JavaScriptMode.unrestricted)
-                                  ..loadHtmlString(
-                                      controller.buildHtmlForUrl(embedUrl));
-                                controller.controllers[index] = webViewCtrl;
-                              }
+                              // if (controller.controllers[index] == null) {
+                              final embedUrl = controller
+                                  .convertToEmbedUrl(post["videoUrl"]);
+                              // final webViewCtrl = WebViewController()
+                              //   ..setJavaScriptMode(JavaScriptMode.unrestricted)
+                              //   ..loadHtmlString(
+                              //       controller.buildHtmlForUrl(embedUrl));
+                              // controller.controllers[index] = webViewCtrl;
+                              // }
                               final ctr = controller.controllers[index];
                               final isExpanded =
                                   controller.expandedDescriptions[index];
@@ -295,7 +296,11 @@ class _ContentLabState extends State<ContentLab> {
                                       borderRadius: BorderRadius.circular(12),
                                       child: SizedBox(
                                         height: getWidgetHeight(height: 200),
-                                        child: WebViewWidget(controller: ctr!),
+                                        child: kIsWeb
+                                            ? _buildWebVideoPlayer(
+                                                embedUrl) // For web
+                                            : _buildMobileVideoPlayer(
+                                                controller, index, embedUrl),
                                       ),
                                     ),
                                     SizedBox(
@@ -555,5 +560,37 @@ class _ContentLabState extends State<ContentLab> {
         ),
       );
     });
+  }
+
+  Widget _buildMobileVideoPlayer(
+      ContentLabController controller, int index, String embedUrl) {
+    if (controller.controllers[index] == null) {
+      final webViewCtrl = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..loadHtmlString(controller.buildHtmlForUrl(embedUrl));
+      controller.controllers[index] = webViewCtrl;
+    }
+    return WebViewWidget(controller: controller.controllers[index]!);
+  }
+
+  Widget _buildWebVideoPlayer(String embedUrl) {
+    return Html(
+      data: '''
+      <div style="width: 100%; height: 100%;">
+        <iframe 
+          src="$embedUrl" 
+          width="100%" 
+          height="100%" 
+          frameborder="0" 
+          allowfullscreen
+          style="border-radius: 12px;"
+        ></iframe>
+      </div>
+    ''',
+      style: {
+        "body": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
+        "div": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
+      },
+    );
   }
 }

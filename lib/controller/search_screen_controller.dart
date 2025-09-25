@@ -19,7 +19,7 @@ class SearchScreenController extends GetxController {
     fetchAllDocs();
   }
 
-  fetchAllDocs() async {
+  Future<void> fetchAllDocs() async {
     await FirebaseFirestore.instance
         .collection('GlobalSearchCollection')
         .get()

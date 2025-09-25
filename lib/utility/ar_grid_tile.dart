@@ -28,7 +28,9 @@ class ARGridTile extends StatelessWidget {
       },
       child: Container(
         // height: getWidgetHeight(height: 230),
-        width: getWidgetWidth(width: 160),
+        width: displayWidth(context) > 1200
+            ? getWidgetWidth(width: 140)
+            : getWidgetWidth(width: 160),
         height: height,
         padding: EdgeInsets.symmetric(vertical: getWidgetHeight(height: 5)),
         decoration: BoxDecoration(
@@ -44,44 +46,86 @@ class ARGridTile extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              // mainAxisAlignment: MainAxisAlignment.,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: getWidgetWidth(width: 10)),
-                  child: Align(
-                    // alignment: Alignment.bottomRight,
-                    child: SizedBox(
-                      // height: displayHeight(context) * 0.061,
-                      // width: displayWidth(context) * 0.133,
-                      height: getWidgetHeight(height: 100),
-                      // width: 50,
-                      child: Image.asset(
-                        icon,
-                        // gridTileDatas[0]['image'],
+            displayWidth(context) > 1200
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    // mainAxisAlignment: MainAxisAlignment.,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: getWidgetWidth(width: 10)),
+                        child: Align(
+                          // alignment: Alignment.bottomRight,
+                          child: SizedBox(
+                            // height: displayHeight(context) * 0.061,
+                            // width: displayWidth(context) * 0.133,
+                            height: getWidgetHeight(height: 100),
+                            // width: 50,
+                            child: Image.asset(
+                              icon,
+                              // gridTileDatas[0]['image'],
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(left: 10, top: 10, right: 20),
+                        child: Text(
+                          title,
+                          textAlign: TextAlign.start,
+                          // overflow: TextOverflow.fade,
+                          style: GoogleFonts.inter(
+                            // fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: getWidgetHeight(height: 20),
+                      )
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    // mainAxisAlignment: MainAxisAlignment.,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: getWidgetWidth(width: 10)),
+                        child: Align(
+                          // alignment: Alignment.bottomRight,
+                          child: SizedBox(
+                            // height: displayHeight(context) * 0.061,
+                            // width: displayWidth(context) * 0.133,
+                            height: getWidgetHeight(height: 100),
+                            // width: 50,
+                            child: Image.asset(
+                              icon,
+                              // gridTileDatas[0]['image'],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(left: 10, top: 10, right: 20),
+                        child: Text(
+                          title,
+                          textAlign: TextAlign.start,
+                          // overflow: TextOverflow.fade,
+                          style: GoogleFonts.inter(
+                            // fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: getWidgetHeight(height: 20),
+                      )
+                    ],
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10, top: 10, right: 20),
-                  child: Text(
-                    title,
-                    textAlign: TextAlign.start,
-                    // overflow: TextOverflow.fade,
-                    style: GoogleFonts.inter(
-                      // fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: getWidgetHeight(height: 20),
-                )
-              ],
-            ),
+
             // Align(
             //   alignment: Alignment.bottomLeft,
             //   child: ClipRRect(

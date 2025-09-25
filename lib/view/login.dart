@@ -402,6 +402,14 @@ class _LoginPageState extends State<LoginPage> {
                               ? TextInputType.text
                               : TextInputType.emailAddress,
                           obscureText: _isLogin ? _obscurePassword : false,
+                          textInputAction: TextInputAction.done,
+                          onFieldSubmitted: (value) {
+                            if (_isLogin) {
+                              isLoading = false;
+                              setState(() {});
+                            }
+                            login();
+                          },
                           validator: (val) {
                             if (!_isLogin) {
                               return validateEmail(val);

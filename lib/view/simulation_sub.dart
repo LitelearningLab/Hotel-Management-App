@@ -151,7 +151,10 @@ class _SimulationSubState extends State<SimulationSub> {
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(
                                     vertical: getWidgetHeight(height: 12),
-                                    horizontal: getWidgetWidth(width: 20),
+                                    horizontal: getWidgetWidth(
+                                        width: displayWidth(context) > 500
+                                            ? 5
+                                            : 20),
                                   ),
                                   child: Text(
                                     controller.simulation.subcategory[index]

@@ -110,8 +110,12 @@ class _SentenceLabSubState extends State<SentenceLabSub> {
                     ),
                     child: Padding(
                       padding: EdgeInsets.symmetric(
-                          vertical: getWidgetHeight(height: 16),
-                          horizontal: getWidgetWidth(width: 15)),
+                          vertical: displayWidth(context) > 500
+                              ? displayWidth(context) * 0.01
+                              : getWidgetHeight(height: 15),
+                          horizontal: displayWidth(context) > 500
+                              ? displayWidth(context) * 0.008
+                              : getWidgetWidth(width: 10)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
