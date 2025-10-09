@@ -164,7 +164,9 @@ Future<void> startPracticeTime({
                         ? CollectionNames.interactiveSimulationTimestamp
                         : index == 6
                             ? CollectionNames.langauqeLabTimestamp
-                            : throw Exception('Invalid index: $index');
+                            : index == 7
+                                ? CollectionNames.contentLabTimestamp
+                                : throw Exception('Invalid index: $index');
     print('📂 Collection Name: $collectionName');
 
     // 3. Prepare Firestore instance
@@ -243,7 +245,8 @@ Future<void> startPracticeTime({
         'category': mainCategory,
         'subCategory': subCategory,
         'type': type,
-        'activityName': activityName == "" ? "E-Learning" : activityName,
+        'activityName': activityName,
+        // activityName == "" && index != 7 ? "E-Learning" : activityName,
         // 'topicNames': topicNames,
         'sessions': [newSession],
         'totalPracticeTime': duration.inSeconds,

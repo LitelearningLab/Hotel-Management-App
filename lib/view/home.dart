@@ -133,6 +133,7 @@ class _HomeState extends State<Home>
     double isKwidth = MediaQuery.of(context).size.width;
     double isKheight = MediaQuery.of(context).size.height;
     print("width is printing  ${isKwidth}");
+    print("height is printing  ${isKheight}");
     Widget _tile(
         {required Widget icon, required String menu, Function()? onTap}) {
       return ListTile(
@@ -456,7 +457,7 @@ class _HomeState extends State<Home>
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               height: displayWidth(context) > 500
-                                  ? isKheight * 0.38
+                                  ? isKheight * 0.39
                                   : getWidgetHeight(height: 300),
                               width: isKwidth > 900
                                   ? isKwidth * 0.15
@@ -581,9 +582,14 @@ class _HomeState extends State<Home>
                                                   style: GoogleFonts.inter(
                                                     fontWeight: FontWeight.w600,
                                                     fontSize: kText.scale(
-                                                        isKwidth > 700
-                                                            ? 18
-                                                            : 16),
+                                                        (isKwidth > 700 &&
+                                                                isKheight > 600)
+                                                            ? 16
+                                                            : (isKwidth > 700 &&
+                                                                    isKheight <
+                                                                        600)
+                                                                ? 14
+                                                                : 16),
                                                   ),
                                                 ),
                                               ),
@@ -594,7 +600,7 @@ class _HomeState extends State<Home>
                                                           height: 5)),
                                               SizedBox(
                                                 height: isKwidth > 700
-                                                    ? isKheight * 0.015
+                                                    ? isKheight * 0.03
                                                     : getWidgetHeight(
                                                         height: 15),
                                                 child: Row(
@@ -640,9 +646,10 @@ class _HomeState extends State<Home>
                                                   ],
                                                 ),
                                               ),
-                                              SizedBox(
-                                                  height: getWidgetHeight(
-                                                      height: 10))
+                                              if (!kIsWeb)
+                                                SizedBox(
+                                                    height: getWidgetHeight(
+                                                        height: 10))
                                             ],
                                           ),
                                         ),
@@ -686,9 +693,7 @@ class _HomeState extends State<Home>
                       return ListView.builder(
                         shrinkWrap: true,
                         itemCount: 3,
-                        physics: kIsWeb
-                            ? const NeverScrollableScrollPhysics()
-                            : const BouncingScrollPhysics(),
+                        physics: BouncingScrollPhysics(),
                         padding: EdgeInsets.only(
                             top: getWidgetHeight(height: 10),
                             bottom: getWidgetHeight(height: 100)),
@@ -732,7 +737,7 @@ class _HomeState extends State<Home>
                               child: Container(
                                 height: getWidgetHeight(
                                     height:
-                                        isKwidth > 700 ? isKheight * 0.07 : 75),
+                                        isKwidth > 700 ? isKheight * 0.12 : 75),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(16),
@@ -754,7 +759,7 @@ class _HomeState extends State<Home>
                                               : 55),
                                       height: getWidgetHeight(
                                           height: isKwidth > 900
-                                              ? isKheight * 0.05
+                                              ? isKheight * 0.09
                                               : 68),
                                       decoration: BoxDecoration(
                                         color: linearColor,
@@ -773,16 +778,20 @@ class _HomeState extends State<Home>
                                               padding: EdgeInsets.symmetric(
                                                 vertical: index == 1
                                                     ? 0
-                                                    : getWidgetHeight(
-                                                        height: isKwidth > 900
-                                                            ? 6
-                                                            : 22),
+                                                    : isKwidth > 900
+                                                        ? displayWidth(
+                                                                context) *
+                                                            0.004
+                                                        : getWidgetHeight(
+                                                            height: 22),
                                                 horizontal: index == 1
                                                     ? 0
-                                                    : getWidgetWidth(
-                                                        width: isKwidth > 900
-                                                            ? 3
-                                                            : 16),
+                                                    : isKwidth > 900
+                                                        ? displayWidth(
+                                                                context) *
+                                                            0.004
+                                                        : getWidgetWidth(
+                                                            width: 16),
                                               ),
                                               child: index == 0
                                                   ? Image.asset(
@@ -796,7 +805,9 @@ class _HomeState extends State<Home>
                                                           Icons.mic,
                                                           color: Colors.white,
                                                           size: isKwidth > 700
-                                                              ? 45
+                                                              ? displayHeight(
+                                                                      context) *
+                                                                  0.04
                                                               : 28,
                                                         )
                                                       : Image.asset(

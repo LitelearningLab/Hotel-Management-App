@@ -1,22 +1,48 @@
 import 'dart:developer';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:hotelmanagementapp/dbHelper/db_helper.dart';
 import 'package:hotelmanagementapp/model/category_model.dart';
+import 'package:hotelmanagementapp/model/word_attempt.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
+import 'package:hotelmanagementapp/public/audio_helper.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/firebase_service.dart';
+import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PronunciationLabController extends GetxController {
   late DatabaseReference databaseRef;
   List<Category> categories = <Category>[].obs;
+  List<SubcategoryPro> searchBaseList = [];
+  List<SubcategoryPro> subcategories = [];
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
   RxString title = "Pronunciation Lab".obs;
+  bool isSearching = false;
+  TextEditingController searchController = TextEditingController();
+  int? currentlyPlayingIndex;
+  bool isPlaying = false;
+  int playingIs = -1;
+  int isSaving = -1;
+  int errorPlaying = -1;
+  late AudioPlayer audioPlayer;
+  String userId = "";
+  String collegeId = "";
+  String batchName = "";
+  String selectedWord = "";
+  bool isCorrect = false;
+  List<bool> isPriorityList = [];
+
   List<Map<String, dynamic>> pronunciationLabList = [
     {
       'title': 'Days, Dates, Months & Numbers',
@@ -151,6 +177,11 @@ class PronunciationLabController extends GetxController {
   void onInit() {
     final args = Get.arguments as Map<String, dynamic>?;
     title.value = args?['title'] ?? "";
+    audioPlayer = AudioPlayer();
+
+    audioPlayer.setUrl(
+        "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Hotel%20Management%2FWhatsApp%20Audio%202025-09-09%20at%203.41.09%20PM.mp4?alt=media&token=b99d9096-211b-45cc-b157-4582c7fc3312");
+    audioPlayer.play();
     databaseRef = FirebaseDatabase.instance.ref(title == "English Pronunciation"
         ? "EnglishLabCollection"
         : "FrenchLabCollection");
@@ -231,5 +262,229 @@ class PronunciationLabController extends GetxController {
       isLoading.value = false;
       update();
     }
+  }
+
+  void clearSearch() {
+    isSearching = false;
+    searchController.text = "";
+    update();
+  }
+
+  void searchSubcategories(String query) {
+    isSearching = query.trim().isNotEmpty;
+
+    // Pick the base category list
+    List<Category> base = categories;
+
+    if (isSearching) {
+      // 🔍 Flatten and filter all subcategories from all categories
+      searchBaseList = base.expand((cat) => cat.subcategories).where((sub) {
+        final q = query.toLowerCase();
+        return sub.text.toLowerCase().contains(q) ||
+            sub.syllables.toLowerCase().contains(q) ||
+            sub.pronun.toLowerCase().contains(q) ||
+            sub.sentenceSamples.any((s) => s.toLowerCase().contains(q)) ||
+            sub.meaningSamples.any((m) => m.toLowerCase().contains(q));
+      }).toList();
+
+      subcategories = List.from(searchBaseList);
+    } else {
+      // 🔁 If no search, show all subcategories from all categories
+      subcategories = base.expand((cat) => cat.subcategories).toList();
+    }
+    print(
+        "jhere im printing the search length after searching ${subcategories.length}");
+
+    isPriorityList =
+        subcategories.map((e) => e.downloadStatus == true).toList();
+    update();
+  }
+
+  void handlePlayPause(int index) async {
+    log("${subcategories[index].file}");
+    // loadingIndex = index;
+    isPlaying = true;
+    errorPlaying = -1;
+    playingIs = index;
+    update();
+
+    try {
+      if (currentlyPlayingIndex == index) {
+        await audioPlayer.pause();
+        currentlyPlayingIndex = null;
+      } else {
+        await audioPlayer.stop();
+        currentlyPlayingIndex = index;
+
+        String? playPath;
+        if (subcategories[index].localPath.isNotEmpty &&
+            await File(subcategories[index].localPath).exists()) {
+          log("🔐 Decrypting local file before playing...");
+          playPath = await AudioCryptoHelper.decryptFile(
+            subcategories[index].localPath,
+            subcategories[index]
+                .text
+                .replaceAll(' ', '_')
+                .replaceAll(RegExp(r'[<>:"/\\|?*]'), ''),
+          );
+          log("Decrypted to temp file: $playPath");
+        } else {
+          playPath = subcategories[index].file; // URL
+          log("Playing from URL: $playPath");
+        }
+
+        await audioPlayer.setUrl(playPath);
+        playingIs = -1;
+
+        update();
+        await audioPlayer.play();
+
+        final attempt = WordAttempt(
+          batch: "yourBatch",
+          companyId: collegeId,
+          correct: 0,
+          date: "",
+          lastAttempt: "",
+          listAtt: 1,
+          load: mianCategoryTitile,
+          pracAtt: 0,
+          time: 0,
+          timeCal: DateTime.now().millisecondsSinceEpoch,
+          title: title.value,
+          userId: userId,
+          word: subcategories[index].text,
+        );
+
+        await WordAttempt.saveAttempt(attempt);
+      }
+      errorPlaying = -1;
+      currentlyPlayingIndex = null;
+      update();
+    } on PlayerException catch (e) {
+      print("❌ Audio player error: ${e.message} ${subcategories[index].file}");
+      errorPlaying = index;
+      currentlyPlayingIndex = null;
+    } on Exception catch (e) {
+      print("❌ General audio error: $e");
+      errorPlaying = index;
+      currentlyPlayingIndex = null;
+    } finally {
+      // loadingIndex = null;
+      isPlaying = false;
+      update();
+    }
+  }
+
+  void saveUpdate(int index) async {
+    isSaving = index;
+    String tableName = title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
+    String fileKey = subcategories[index].file; // Use exact file key
+    String fileName = subcategories[index]
+        .text
+        .replaceAll(' ', '_')
+        .replaceAll(RegExp(r'[<>:"/\\|?*]'), '');
+    String url = subcategories[index].file;
+
+    // Toggle current UI state first
+    bool newValue = !isPriorityList[index];
+    isPriorityList[index] = newValue;
+    subcategories[index].downloadStatus = !subcategories[index].downloadStatus;
+    try {
+      update();
+
+      if (newValue) {
+        log("⬇️ Downloading and encrypting for $fileName...");
+        final encryptedPath =
+            await AudioCryptoHelper.downloadAndEncryptAudio(url, fileName);
+
+        // Update DB with local path and downloadStatus = true
+        await DBHelper.updateLocalPath(fileKey, tableName, encryptedPath);
+        await DBHelper.setDownloadStatus(fileKey, tableName, 1);
+
+        subcategories[index] =
+            subcategories[index].copyWith(localPath: encryptedPath);
+        log("✅ Downloaded & saved local path: $encryptedPath");
+      } else {
+        final localPath = subcategories[index].localPath;
+        if (localPath.isNotEmpty && await File(localPath).exists()) {
+          await File(localPath).delete();
+          log("🗑 Deleted local file: $localPath");
+        }
+
+        // Update DB with empty localPath and downloadStatus = false
+        await DBHelper.updateLocalPath(fileKey, tableName, "");
+        await DBHelper.setDownloadStatus(fileKey, tableName, 0);
+
+        subcategories[index] = subcategories[index].copyWith(localPath: "");
+      }
+
+      log("✅ isPriority updated to $newValue at index $index");
+      update();
+    } catch (e) {
+      log("❌ Failed to update isPriority at index $index: $e");
+    }
+    isSaving = -1;
+    Fluttertoast.showToast(
+        msg: newValue
+            ? "Added to your priority list"
+            : "Removed from your priority list",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: linearColor,
+        textColor: Colors.white,
+        fontSize: 12.0);
+    update();
+  }
+
+  void kShowDialog(String word, bool notCatch, BuildContext context) async {
+    Get.dialog(
+      Container(
+        child: Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
+          child: SpeechAnalyticsDialog(
+            true,
+            isShowDidNotCatch: notCatch,
+            word: word,
+            title: "widget.title", // replace with actual title
+            load: "widget.load", // replace with actual load
+          ),
+        ),
+      ),
+    ).then((value) async {
+      if (value != null &&
+          (value.isCorrect == "true" || value.isCorrect == "false")) {
+        selectedWord = word;
+        isCorrect = value.isCorrect == "true";
+        log("is correct or not $isCorrect");
+
+        final attempt = WordAttempt(
+          batch: "yourBatch",
+          companyId: collegeId,
+          correct: isCorrect ? 1 : 0,
+          date: "",
+          lastAttempt: "",
+          listAtt: 0,
+          load: mianCategoryTitile,
+          pracAtt: 1,
+          time: 0,
+          timeCal: DateTime.now().millisecondsSinceEpoch,
+          title: title.value,
+          userId: userId,
+          word: word,
+        );
+
+        await WordAttempt.saveAttempt(attempt);
+
+        update();
+      } else if (value != null && value.isCorrect == "notCatch") {
+        kShowDialog(word, true, context);
+      } else if (value != null && value.isCorrect == "openDialog") {
+        kShowDialog(word, false, context);
+      }
+    }).onError((error, stackTrace) {
+      log("Dialog error: $error");
+    });
   }
 }

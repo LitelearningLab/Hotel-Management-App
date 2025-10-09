@@ -22,6 +22,7 @@ class CollectionNames {
   static String interactiveSimulationTimestamp =
       'InteractiveSimulationTimeStamp';
   static String langauqeLabTimestamp = 'LanguageLabTimeStamp';
+  static String contentLabTimestamp = 'ContentLabTimeStamp';
 }
 
 class ApiRoutes {

@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hotelmanagementapp/model/word_attempt.dart';
@@ -41,7 +41,7 @@ class PronunciationLabSubController extends GetxController {
   bool isFiltering = false;
   bool isSearching = false;
 
-  late CategoryModel category;
+  late Category category;
   bool isLoading = true;
   String collectionName = '';
   String id = "";
@@ -332,7 +332,7 @@ class PronunciationLabSubController extends GetxController {
       errorPlaying = index;
       currentlyPlayingIndex = null;
     } finally {
-      loadingIndex = null;
+      // loadingIndex = null;
       isPlaying = false;
       update();
     }
@@ -443,7 +443,7 @@ class PronunciationLabSubController extends GetxController {
           }
         });
 
-        category = CategoryModel.fromMap(parsed);
+        category = Category.fromMap(parsed);
         List<SubcategoryPro> tempList = [];
 
         for (var item in category.subcategories) {
@@ -506,7 +506,7 @@ class PronunciationLabSubController extends GetxController {
             }
           });
 
-          category = CategoryModel.fromMap(parsed);
+          category = Category.fromMap(parsed);
           List<SubcategoryPro> tempList = [];
 
           for (var item in category.subcategories) {

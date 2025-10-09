@@ -8,7 +8,14 @@ class Category {
     required this.category,
     required this.subcategories,
   });
-
+  factory Category.fromMap(Map<String, dynamic> map) {
+    return Category(
+      category: map['category'] ?? '',
+      subcategories: (map['subcategories'] as List<dynamic>)
+          .map((item) => SubcategoryPro.fromMap(item))
+          .toList(),
+    );
+  }
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
       category: json['category'] ?? '',
@@ -108,25 +115,6 @@ class SubcategoryPro {
       localPath: localPath ?? this.localPath,
       sentenceSamples: sentenceSamples ?? this.sentenceSamples,
       meaningSamples: meaningSamples ?? this.meaningSamples,
-    );
-  }
-}
-
-class CategoryModel {
-  final String category;
-  final List<SubcategoryPro> subcategories;
-
-  CategoryModel({
-    required this.category,
-    required this.subcategories,
-  });
-
-  factory CategoryModel.fromMap(Map<String, dynamic> map) {
-    return CategoryModel(
-      category: map['category'] ?? '',
-      subcategories: (map['subcategories'] as List<dynamic>)
-          .map((item) => SubcategoryPro.fromMap(item))
-          .toList(),
     );
   }
 }

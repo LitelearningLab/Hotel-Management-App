@@ -119,6 +119,14 @@ class ContentLabController extends GetxController {
   @override
   void onReady() {
     super.onReady();
+    mianCategoryTitile = "Content Library";
+    subCategoryTitle = "";
+    activityName = "";
+    sessionName = "";
+    sessionName2 = "";
+    timestampIndex = 7;
+
+    startTimerMainCategory("");
     fetchPostsFromFirebase();
     // showPosts = posts;
     // sortPosts();

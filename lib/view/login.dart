@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -340,39 +341,55 @@ class _LoginPageState extends State<LoginPage> {
                       padding: EdgeInsets.symmetric(
                         horizontal: getWidgetHeight(height: 25),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            // height: getWidgetHeight(height: 140),
-                            width:
-                                getWidgetWidth(width: kWidth > 500 ? 100 : 200),
-                            child: Image.asset(
-                              AllAssets.splashLogo,
-                              fit: BoxFit.contain,
-                              // width: getWidgetWidth(width: 200),
-                              // height: getWidgetHeight(height: 200),
+                      child: SizedBox(
+                        width: getWidgetWidth(width: kWidth > 500 ? 200 : 375),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            SizedBox(
+                              // height: getWidgetHeight(height: 140),
+                              width: getWidgetWidth(
+                                  width: kWidth > 1200 ? 80 : 200),
+                              child: Image.asset(
+                                AllAssets.splashLogo,
+                                fit: BoxFit.contain,
+                                // width: getWidgetWidth(width: 200),
+                                // height: getWidgetHeight(height: 200),
+                              ),
                             ),
-                          ),
-                          // Container(
-                          //     height: 40,
-                          //     width: 40,
-                          //     child: Image.asset(
-                          //         "assets/images/profluent_ar_icon.png"))
-                        ],
+                            if (displayWidth(context) > 1200)
+                              SizedBox(
+                                  height: getWidgetHeight(height: 200),
+                                  width: getWidgetWidth(
+                                      width: kWidth > 1200 ? 100 : 375),
+                                  child: !_isLogin
+                                      ? SvgPicture.asset(
+                                          'assets/emailScreen.svg')
+                                      : SvgPicture.asset(
+                                          'assets/pasScreen.svg')),
+                            // Container(
+                            //     height: 40,
+                            //     width: 40,
+                            //     child: Image.asset(
+                            //         "assets/images/profluent_ar_icon.png"))
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(height: getWidgetHeight(height: 30)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
+
+                    if (displayWidth(context) < 1200)
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: getWidgetHeight(height: 25),
+                        ),
+                        child: SizedBox(
+                            height: getWidgetHeight(height: 200),
+                            child: !_isLogin
+                                ? SvgPicture.asset('assets/emailScreen.svg')
+                                : SvgPicture.asset('assets/pasScreen.svg')),
                       ),
-                      child: SizedBox(
-                          height: getWidgetHeight(height: 200),
-                          child: Image.asset(!_isLogin
-                              ? 'assets/images/undraw_Messaging_app_re_aytg.png'
-                              : 'assets/images/SMSOTP.png')),
-                    ),
                     SizedBox(height: getWidgetHeight(height: 20)),
                     Padding(
                       padding: EdgeInsets.symmetric(

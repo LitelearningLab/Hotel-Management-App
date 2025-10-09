@@ -285,845 +285,839 @@ class Languagelab extends StatelessWidget {
                         ],
                       ),
                       controller.selectedIndex == 0
-                          ? kIsWeb
-                              ? Expanded(
-                                  child: ListView.builder(
-                                    physics: BouncingScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: controller.importantSound
-                                            ?.subcategories.length ??
-                                        0,
-                                    itemBuilder: (context, index) {
-                                      return Column(
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                vertical:
-                                                    getWidgetHeight(height: 3),
-                                                horizontal:
-                                                    getWidgetWidth(width: 15)),
-                                            child: InkWell(
-                                              onTap: () {
-                                                mianCategoryTitile =
-                                                    "Important Sounds";
-                                                activityName = 'Sound Lab';
-                                                subCategoryTitle = controller
-                                                    .importantSound!
-                                                    .subcategories[index]
-                                                    .name;
-                                                addToRecentHistory(
-                                                    path:
-                                                        "Language Lab > Important Sounds",
-                                                    category: controller
+                          ?
+                          // kIsWeb
+                          //     ? Expanded(
+                          //         child: ListView.builder(
+                          //           physics: BouncingScrollPhysics(),
+                          //           shrinkWrap: true,
+                          //           itemCount: controller.importantSound
+                          //                   ?.subcategories.length ??
+                          //               0,
+                          //           itemBuilder: (context, index) {
+                          //             return Column(
+                          //               children: [
+                          //                 Padding(
+                          //                   padding: EdgeInsets.symmetric(
+                          //                       vertical:
+                          //                           getWidgetHeight(height: 3),
+                          //                       horizontal:
+                          //                           getWidgetWidth(width: 15)),
+                          //                   child: InkWell(
+                          //                     onTap: () {
+                          //                       mianCategoryTitile =
+                          //                           "Important Sounds";
+                          //                       activityName = 'Sound Lab';
+                          //                       subCategoryTitle = controller
+                          //                           .importantSound!
+                          //                           .subcategories[index]
+                          //                           .name;
+                          //                       addToRecentHistory(
+                          //                           path:
+                          //                               "Language Lab > Important Sounds",
+                          //                           category: controller
+                          //                               .importantSound!
+                          //                               .subcategories[index]
+                          //                               .name,
+                          //                           section: "Sound Lab",
+                          //                           link: "",
+                          //                           proLabTitle: "",
+                          //                           soundSubcategory: controller
+                          //                               .importantSound!
+                          //                               .subcategories[index]);
+                          //                       Get.toNamed(AppRoutes.soundPage,
+                          //                           arguments: {
+                          //                             "title": controller
+                          //                                 .importantSound!
+                          //                                 .subcategories[index]
+                          //                                 .name,
+                          //                             "soundModel": controller
+                          //                                 .importantSound!
+                          //                                 .subcategories[index]
+                          //                           });
+                          //                     },
+                          //                     child: Container(
+                          //                       padding:
+                          //                           const EdgeInsets.symmetric(
+                          //                               horizontal: 12),
+                          //                       child: Row(
+                          //                         children: [
+                          //                           Text(
+                          //                             controller
+                          //                                 .importantSound!
+                          //                                 .subcategories[index]
+                          //                                 .name,
+                          //                             style: TextStyle(
+                          //                               letterSpacing: 0,
+                          //                               color: Colors.black,
+                          //                               fontWeight:
+                          //                                   FontWeight.w500,
+                          //                               fontFamily: Keys
+                          //                                   .lucidaFontFamily,
+                          //                               fontSize:
+                          //                                   kText.scale(15),
+                          //                             ),
+                          //                           ),
+                          //                           const Spacer(),
+                          //                           const Icon(
+                          //                             Icons
+                          //                                 .chevron_right_rounded,
+                          //                             size: 30,
+                          //                             color: Color.fromARGB(
+                          //                                 45, 82, 82, 82),
+                          //                           ),
+                          //                         ],
+                          //                       ),
+                          //                     ),
+                          //                   ),
+                          //                 ),
+                          //                 const Divider(
+                          //                   color:
+                          //                       Color.fromARGB(45, 82, 82, 82),
+                          //                 ),
+                          //                 if (index ==
+                          //                     controller.importantSound!
+                          //                             .subcategories.length -
+                          //                         1)
+                          //                   SizedBox(
+                          //                     height:
+                          //                         displayHeight(context) * 0.1,
+                          //                   )
+                          //               ],
+                          //             );
+                          //           },
+                          //         ),
+                          //       )
+                          // :
+                          SizedBox(
+                              height: displayWidth(context) > 700
+                                  ? displayHeight(context) * 0.5
+                                  : getWidgetHeight(height: 255),
+                              child: Scrollbar(
+                                thickness: 2,
+                                thumbVisibility: true,
+                                radius: Radius.circular(10),
+                                child: ListView.builder(
+                                  itemCount: controller.importantSound
+                                          ?.subcategories.length ??
+                                      0,
+                                  itemBuilder: (context, index) {
+                                    return Column(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical:
+                                                  getWidgetHeight(height: 3),
+                                              horizontal:
+                                                  getWidgetWidth(width: 15)),
+                                          child: InkWell(
+                                            onTap: () {
+                                              mianCategoryTitile =
+                                                  "Important Sounds";
+                                              activityName = 'Sound Lab';
+                                              subCategoryTitle = controller
+                                                  .importantSound!
+                                                  .subcategories[index]
+                                                  .name;
+                                              addToRecentHistory(
+                                                  path:
+                                                      "Language Lab > Important Sounds",
+                                                  category: controller
+                                                      .importantSound!
+                                                      .subcategories[index]
+                                                      .name,
+                                                  section: "Sound Lab",
+                                                  link: "",
+                                                  proLabTitle: "",
+                                                  soundSubcategory: controller
+                                                      .importantSound!
+                                                      .subcategories[index]);
+                                              Get.toNamed(AppRoutes.soundPage,
+                                                  arguments: {
+                                                    "title": controller
                                                         .importantSound!
                                                         .subcategories[index]
                                                         .name,
-                                                    section: "Sound Lab",
-                                                    link: "",
-                                                    proLabTitle: "",
-                                                    soundSubcategory: controller
+                                                    "soundModel": controller
                                                         .importantSound!
-                                                        .subcategories[index]);
-                                                Get.toNamed(AppRoutes.soundPage,
-                                                    arguments: {
-                                                      "title": controller
-                                                          .importantSound!
-                                                          .subcategories[index]
-                                                          .name,
-                                                      "soundModel": controller
-                                                          .importantSound!
-                                                          .subcategories[index]
-                                                    });
-                                              },
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 12),
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                      controller
-                                                          .importantSound!
-                                                          .subcategories[index]
-                                                          .name,
-                                                      style: TextStyle(
-                                                        letterSpacing: 0,
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontFamily: Keys
-                                                            .lucidaFontFamily,
-                                                        fontSize:
-                                                            kText.scale(15),
-                                                      ),
+                                                        .subcategories[index]
+                                                  });
+                                            },
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12),
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    controller
+                                                        .importantSound!
+                                                        .subcategories[index]
+                                                        .name,
+                                                    style: TextStyle(
+                                                      letterSpacing: 0,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontFamily:
+                                                          Keys.lucidaFontFamily,
+                                                      fontSize: kText.scale(15),
                                                     ),
-                                                    const Spacer(),
-                                                    const Icon(
-                                                      Icons
-                                                          .chevron_right_rounded,
-                                                      size: 30,
-                                                      color: Color.fromARGB(
-                                                          45, 82, 82, 82),
-                                                    ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                  const Spacer(),
+                                                  const Icon(
+                                                    Icons.chevron_right_rounded,
+                                                    size: 30,
+                                                    color: Color.fromARGB(
+                                                        45, 82, 82, 82),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
-                                          const Divider(
-                                            color:
-                                                Color.fromARGB(45, 82, 82, 82),
-                                          ),
-                                          if (index ==
-                                              controller.importantSound!
-                                                      .subcategories.length -
-                                                  1)
-                                            SizedBox(
-                                              height:
-                                                  displayHeight(context) * 0.1,
-                                            )
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                )
-                              : SizedBox(
-                                  height: getWidgetHeight(height: 255),
+                                        ),
+                                        const Divider(
+                                          color: Color.fromARGB(45, 82, 82, 82),
+                                        ),
+                                        if (index ==
+                                            (controller.importantSound!
+                                                    .subcategories.length -
+                                                1))
+                                          SizedBox(
+                                            height: getWidgetHeight(height: 45),
+                                          )
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            )
+                          : ((controller.selectedIndex == 1) ||
+                                  (controller.selectedIndex == 2))
+                              ?
+                              // kIsWeb
+                              //     ? Expanded(
+                              //         child: ListView.builder(
+                              //           shrinkWrap: true,
+                              //           physics: BouncingScrollPhysics(),
+                              //           itemCount: controller.selectedIndex == 1
+                              //               ? controller.vowelSoundsList.length
+                              //               : controller
+                              //                   .consonantSoundsList.length,
+                              //           itemBuilder: (context, index) {
+                              //             final isExpanded =
+                              //                 controller.expandedIndex == index;
+                              //             return Column(
+                              //               children: [
+                              //                 GestureDetector(
+                              //                   onTap: () {
+                              //                     subCategoryTitle = controller
+                              //                                 .selectedIndex ==
+                              //                             1
+                              //                         ? controller
+                              //                             .vowelSoundsList[
+                              //                                 index]
+                              //                             .category
+                              //                         : controller
+                              //                             .consonantSoundsList[
+                              //                                 index]
+                              //                             .category;
+                              //                     controller.expandedIndex =
+                              //                         isExpanded ? -1 : index;
+                              //                     controller.update();
+                              //                   },
+                              //                   child: Container(
+                              //                     width: displayWidth(context),
+                              //                     // height: getWidgetHeight(height: 60),
+                              //                     margin: EdgeInsets.symmetric(
+                              //                         vertical: getWidgetHeight(
+                              //                             height: 5),
+                              //                         horizontal:
+                              //                             getWidgetWidth(
+                              //                                 width: 15)),
+                              //                     decoration: BoxDecoration(
+                              //                       borderRadius:
+                              //                           BorderRadius.circular(
+                              //                               12),
+                              //                       boxShadow: [
+                              //                         BoxShadow(
+                              //                           color: Colors.black
+                              //                               .withOpacity(0.1),
+                              //                           offset:
+                              //                               const Offset(0, 4),
+                              //                           blurRadius: 10,
+                              //                         ),
+                              //                       ],
+                              //                     ),
+                              //                     child: Container(
+                              //                       width:
+                              //                           displayWidth(context),
+                              //                       // height: getWidgetHeight(height: 75),
+                              //                       decoration: BoxDecoration(
+                              //                         borderRadius:
+                              //                             BorderRadius.circular(
+                              //                                 12),
+                              //                         color: Colors.white,
+                              //                       ),
+                              //                       child: Padding(
+                              //                         padding:
+                              //                             EdgeInsets.symmetric(
+                              //                                 vertical:
+                              //                                     getWidgetHeight(
+                              //                                         height:
+                              //                                             6),
+                              //                                 horizontal:
+                              //                                     getWidgetWidth(
+                              //                                         width:
+                              //                                             5)),
+                              //                         child: Row(
+                              //                           mainAxisAlignment:
+                              //                               MainAxisAlignment
+                              //                                   .spaceBetween,
+                              //                           children: [
+                              //                             Row(
+                              //                               children: [
+                              //                                 CircleAvatar(
+                              //                                   backgroundColor:
+                              //                                       controller
+                              //                                               .colorList[
+                              //                                           index],
+                              //                                   child:
+                              //                                       Image.asset(
+                              //                                     AllAssets
+                              //                                         .quickLinkPL,
+                              //                                     scale: displayHeight(
+                              //                                             context) /
+                              //                                         300,
+                              //                                   ),
+                              //                                 ),
+                              //                                 SizedBox(
+                              //                                   width:
+                              //                                       getWidgetWidth(
+                              //                                           width:
+                              //                                               3),
+                              //                                 ),
+                              //                                 Text(
+                              //                                     controller.selectedIndex ==
+                              //                                             1
+                              //                                         ? controller
+                              //                                             .vowelSoundsList[
+                              //                                                 index]
+                              //                                             .category
+                              //                                             .split(
+                              //                                                 ':')
+                              //                                             .last
+                              //                                             .trim()
+                              //                                         : controller
+                              //                                             .consonantSoundsList[
+                              //                                                 index]
+                              //                                             .category
+                              //                                             .split(
+                              //                                                 ':')
+                              //                                             .last
+                              //                                             .trim(),
+                              //                                     style:
+                              //                                         TextStyle(
+                              //                                       fontFamily:
+                              //                                           Keys.fontFamily,
+                              //                                       letterSpacing:
+                              //                                           0,
+                              //                                     )),
+                              //                               ],
+                              //                             ),
+                              //                             Spacer(),
+                              //                             IconButton(
+                              //                                 onPressed: () {},
+                              //                                 icon: Icon(
+                              //                                   Icons
+                              //                                       .expand_more,
+                              //                                   color: Color(
+                              //                                       0xFF64748B),
+                              //                                 ))
+                              //                           ],
+                              //                         ),
+                              //                       ),
+                              //                     ),
+                              //                   ),
+                              //                 ),
+                              //                 if (controller.expandedIndex > -1)
+
+                              //                   // Expandable Section
+                              //                   AnimatedCrossFade(
+                              //                     duration: const Duration(
+                              //                         milliseconds: 300),
+                              //                     firstChild:
+                              //                         const SizedBox.shrink(),
+                              //                     secondChild: ListView.builder(
+                              //                       shrinkWrap: true,
+                              //                       physics:
+                              //                           const NeverScrollableScrollPhysics(),
+                              //                       itemCount: controller
+                              //                                   .selectedIndex ==
+                              //                               1
+                              //                           ? controller
+                              //                               .vowelSoundsList[
+                              //                                   controller
+                              //                                       .expandedIndex]
+                              //                               .subcategories
+                              //                               .length
+                              //                           : controller
+                              //                               .consonantSoundsList[
+                              //                                   controller
+                              //                                       .expandedIndex]
+                              //                               .subcategories
+                              //                               .length,
+                              //                       itemBuilder:
+                              //                           (context, index) {
+                              //                         final sub = controller
+                              //                                     .selectedIndex ==
+                              //                                 1
+                              //                             ? controller
+                              //                                     .vowelSoundsList[
+                              //                                         controller
+                              //                                             .expandedIndex]
+                              //                                     .subcategories[
+                              //                                 index]
+                              //                             : controller
+                              //                                 .consonantSoundsList[
+                              //                                     controller
+                              //                                         .expandedIndex]
+                              //                                 .subcategories[index];
+                              //                         return Column(
+                              //                           children: [
+                              //                             Padding(
+                              //                               padding: EdgeInsets.symmetric(
+                              //                                   vertical:
+                              //                                       getWidgetHeight(
+                              //                                           height:
+                              //                                               3),
+                              //                                   horizontal:
+                              //                                       getWidgetWidth(
+                              //                                           width:
+                              //                                               15)),
+                              //                               child: InkWell(
+                              //                                 onTap: () {
+                              //                                   activityName =
+                              //                                       "Sound Lab";
+                              //                                   sessionName =
+                              //                                       sub.name;
+                              //                                   log("${sessionName} session name is printing here");
+                              //                                   addToRecentHistory(
+                              //                                     path:
+                              //                                         "Language Lab > $mianCategoryTitile > $subCategoryTitle",
+                              //                                     category:
+                              //                                         sessionName,
+                              //                                     section:
+                              //                                         "Sound Lab",
+                              //                                     link: "",
+                              //                                     proLabTitle:
+                              //                                         "",
+                              //                                     soundSubcategory:
+                              //                                         sub,
+                              //                                   );
+                              //                                   Get.toNamed(
+                              //                                       AppRoutes
+                              //                                           .soundPage,
+                              //                                       arguments: {
+                              //                                         "title": sub
+                              //                                             .name,
+                              //                                         "soundModel":
+                              //                                             sub,
+                              //                                       });
+                              //                                 },
+                              //                                 child: Container(
+                              //                                   padding: const EdgeInsets
+                              //                                       .symmetric(
+                              //                                       horizontal:
+                              //                                           12),
+                              //                                   child: Row(
+                              //                                     children: [
+                              //                                       Text(
+                              //                                         sub.name,
+                              //                                         style:
+                              //                                             TextStyle(
+                              //                                           letterSpacing:
+                              //                                               0,
+                              //                                           color: Colors
+                              //                                               .black,
+                              //                                           fontWeight:
+                              //                                               FontWeight.w500,
+                              //                                           fontFamily:
+                              //                                               Keys.lucidaFontFamily,
+                              //                                           fontSize:
+                              //                                               kText.scale(15),
+                              //                                         ),
+                              //                                       ),
+                              //                                       const Spacer(),
+                              //                                       const Icon(
+                              //                                         Icons
+                              //                                             .chevron_right_rounded,
+                              //                                         size: 30,
+                              //                                         color: Color
+                              //                                             .fromARGB(
+                              //                                                 45,
+                              //                                                 82,
+                              //                                                 82,
+                              //                                                 82),
+                              //                                       ),
+                              //                                     ],
+                              //                                   ),
+                              //                                 ),
+                              //                               ),
+                              //                             ),
+                              //                             const Divider(
+                              //                                 color: Color
+                              //                                     .fromARGB(
+                              //                                         45,
+                              //                                         82,
+                              //                                         82,
+                              //                                         82)),
+                              //                           ],
+                              //                         );
+                              //                       },
+                              //                     ),
+                              //                     crossFadeState: isExpanded
+                              //                         ? CrossFadeState
+                              //                             .showSecond
+                              //                         : CrossFadeState
+                              //                             .showFirst,
+                              //                   ),
+                              //                 if (index ==
+                              //                     (controller.selectedIndex == 1
+                              //                         ? controller
+                              //                                 .vowelSoundsList
+                              //                                 .length -
+                              //                             1
+                              //                         : controller
+                              //                                 .consonantSoundsList
+                              //                                 .length -
+                              //                             1))
+                              //                   SizedBox(
+                              //                     height:
+                              //                         displayHeight(context) *
+                              //                             0.1,
+                              //                   )
+                              //               ],
+                              //             );
+                              //           },
+                              //         ),
+                              //       )
+                              //     :
+                              SizedBox(
+                                  height: displayWidth(context) > 700
+                                      ? displayWidth(context) * 0.5
+                                      : getWidgetHeight(height: 255),
                                   child: Scrollbar(
                                     thickness: 2,
                                     thumbVisibility: true,
                                     radius: Radius.circular(10),
                                     child: ListView.builder(
-                                      itemCount: controller.importantSound
-                                              ?.subcategories.length ??
-                                          0,
+                                      itemCount: controller.selectedIndex == 1
+                                          ? controller.vowelSoundsList.length
+                                          : controller
+                                              .consonantSoundsList.length,
                                       itemBuilder: (context, index) {
+                                        final isExpanded =
+                                            controller.expandedIndex == index;
                                         return Column(
                                           children: [
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: getWidgetHeight(
-                                                      height: 3),
-                                                  horizontal: getWidgetWidth(
-                                                      width: 15)),
-                                              child: InkWell(
-                                                onTap: () {
-                                                  mianCategoryTitile =
-                                                      "Important Sounds";
-                                                  activityName = 'Sound Lab';
-                                                  subCategoryTitle = controller
-                                                      .importantSound!
-                                                      .subcategories[index]
-                                                      .name;
-                                                  addToRecentHistory(
-                                                      path:
-                                                          "Language Lab > Important Sounds",
-                                                      category: controller
-                                                          .importantSound!
-                                                          .subcategories[index]
-                                                          .name,
-                                                      section: "Sound Lab",
-                                                      link: "",
-                                                      proLabTitle: "",
-                                                      soundSubcategory: controller
-                                                              .importantSound!
-                                                              .subcategories[
-                                                          index]);
-                                                  Get.toNamed(
-                                                      AppRoutes.soundPage,
-                                                      arguments: {
-                                                        "title": controller
-                                                            .importantSound!
-                                                            .subcategories[
-                                                                index]
-                                                            .name,
-                                                        "soundModel": controller
-                                                                .importantSound!
-                                                                .subcategories[
+                                            GestureDetector(
+                                              onTap: () {
+                                                subCategoryTitle = controller
+                                                            .selectedIndex ==
+                                                        1
+                                                    ? controller
+                                                        .vowelSoundsList[index]
+                                                        .category
+                                                    : controller
+                                                        .consonantSoundsList[
                                                             index]
-                                                      });
-                                                },
+                                                        .category;
+                                                controller.expandedIndex =
+                                                    isExpanded ? -1 : index;
+                                                controller.update();
+                                              },
+                                              child: Container(
+                                                width:
+                                                    getWidgetWidth(width: 375),
+                                                // height: getWidgetHeight(height: 60),
+                                                margin: EdgeInsets.symmetric(
+                                                    vertical: getWidgetHeight(
+                                                        height: 5),
+                                                    horizontal: getWidgetWidth(
+                                                        width: 15)),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withOpacity(0.1),
+                                                      offset:
+                                                          const Offset(0, 4),
+                                                      blurRadius: 10,
+                                                    ),
+                                                  ],
+                                                ),
                                                 child: Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 12),
-                                                  child: Row(
-                                                    children: [
-                                                      Text(
-                                                        controller
-                                                            .importantSound!
-                                                            .subcategories[
-                                                                index]
-                                                            .name,
-                                                        style: TextStyle(
-                                                          letterSpacing: 0,
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontFamily: Keys
-                                                              .lucidaFontFamily,
-                                                          fontSize:
-                                                              kText.scale(15),
+                                                  width: getWidgetWidth(
+                                                      width: 375),
+                                                  // height: getWidgetHeight(height: 75),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Padding(
+                                                    padding: EdgeInsets.symmetric(
+                                                        vertical:
+                                                            getWidgetHeight(
+                                                                height: 6),
+                                                        horizontal: displayWidth(
+                                                                    context) >
+                                                                700
+                                                            ? getWidgetWidth(
+                                                                width: 5)
+                                                            : getWidgetWidth(
+                                                                width: 10)),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            CircleAvatar(
+                                                              backgroundColor:
+                                                                  controller
+                                                                          .colorList[
+                                                                      index],
+                                                              child:
+                                                                  Image.asset(
+                                                                AllAssets
+                                                                    .quickLinkPL,
+                                                                scale: displayWidth(context) > 500
+                                                                    ? displayHeight(
+                                                                            context) /
+                                                                        250
+                                                                    : displayWidth(
+                                                                            context) /
+                                                                        101.5,
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              width: displayWidth(
+                                                                          context) >
+                                                                      700
+                                                                  ? getWidgetWidth(
+                                                                      width: 3)
+                                                                  : getWidgetWidth(
+                                                                      width:
+                                                                          10),
+                                                            ),
+                                                            Text(
+                                                                controller.selectedIndex ==
+                                                                        1
+                                                                    ? controller
+                                                                        .vowelSoundsList[
+                                                                            index]
+                                                                        .category
+                                                                        .split(
+                                                                            ':')
+                                                                        .last
+                                                                        .trim()
+                                                                    : controller
+                                                                        .consonantSoundsList[
+                                                                            index]
+                                                                        .category
+                                                                        .split(
+                                                                            ':')
+                                                                        .last
+                                                                        .trim(),
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily: Keys
+                                                                      .fontFamily,
+                                                                  letterSpacing:
+                                                                      0,
+                                                                )),
+                                                          ],
                                                         ),
-                                                      ),
-                                                      const Spacer(),
-                                                      const Icon(
-                                                        Icons
-                                                            .chevron_right_rounded,
-                                                        size: 30,
-                                                        color: Color.fromARGB(
-                                                            45, 82, 82, 82),
-                                                      ),
-                                                    ],
+                                                        Spacer(),
+                                                        IconButton(
+                                                            onPressed: () {},
+                                                            icon: Icon(
+                                                              Icons.expand_more,
+                                                              color: Color(
+                                                                  0xFF64748B),
+                                                            ))
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                            const Divider(
-                                              color: Color.fromARGB(
-                                                  45, 82, 82, 82),
-                                            ),
+                                            if (controller.expandedIndex > -1)
+
+                                              // Expandable Section
+                                              AnimatedCrossFade(
+                                                duration: const Duration(
+                                                    milliseconds: 300),
+                                                firstChild:
+                                                    const SizedBox.shrink(),
+                                                secondChild: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  itemCount: controller
+                                                              .selectedIndex ==
+                                                          1
+                                                      ? controller
+                                                          .vowelSoundsList[
+                                                              controller
+                                                                  .expandedIndex]
+                                                          .subcategories
+                                                          .length
+                                                      : controller
+                                                          .consonantSoundsList[
+                                                              controller
+                                                                  .expandedIndex]
+                                                          .subcategories
+                                                          .length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final sub = controller
+                                                                .selectedIndex ==
+                                                            1
+                                                        ? controller
+                                                                .vowelSoundsList[
+                                                                    controller
+                                                                        .expandedIndex]
+                                                                .subcategories[
+                                                            index]
+                                                        : controller
+                                                            .consonantSoundsList[
+                                                                controller
+                                                                    .expandedIndex]
+                                                            .subcategories[index];
+                                                    return Column(
+                                                      children: [
+                                                        Padding(
+                                                          padding: EdgeInsets.symmetric(
+                                                              vertical:
+                                                                  getWidgetHeight(
+                                                                      height:
+                                                                          3),
+                                                              horizontal:
+                                                                  getWidgetWidth(
+                                                                      width:
+                                                                          15)),
+                                                          child: InkWell(
+                                                            onTap: () {
+                                                              activityName =
+                                                                  "Sound Lab";
+                                                              sessionName =
+                                                                  sub.name;
+                                                              log("${sessionName} session name is printing here");
+                                                              addToRecentHistory(
+                                                                path:
+                                                                    "Language Lab > $mianCategoryTitile > $subCategoryTitle",
+                                                                category:
+                                                                    sessionName,
+                                                                section:
+                                                                    "Sound Lab",
+                                                                link: "",
+                                                                proLabTitle: "",
+                                                                soundSubcategory:
+                                                                    sub,
+                                                              );
+                                                              Get.toNamed(
+                                                                  AppRoutes
+                                                                      .soundPage,
+                                                                  arguments: {
+                                                                    "title": sub
+                                                                        .name,
+                                                                    "soundModel":
+                                                                        sub,
+                                                                  });
+                                                            },
+                                                            child: Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          12),
+                                                              child: Row(
+                                                                children: [
+                                                                  Text(
+                                                                    sub.name,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      letterSpacing:
+                                                                          0,
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                      fontFamily:
+                                                                          Keys.lucidaFontFamily,
+                                                                      fontSize:
+                                                                          kText.scale(
+                                                                              15),
+                                                                    ),
+                                                                  ),
+                                                                  const Spacer(),
+                                                                  const Icon(
+                                                                    Icons
+                                                                        .chevron_right_rounded,
+                                                                    size: 30,
+                                                                    color: Color
+                                                                        .fromARGB(
+                                                                            45,
+                                                                            82,
+                                                                            82,
+                                                                            82),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const Divider(
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    45,
+                                                                    82,
+                                                                    82,
+                                                                    82)),
+                                                      ],
+                                                    );
+                                                  },
+                                                ),
+                                                crossFadeState: isExpanded
+                                                    ? CrossFadeState.showSecond
+                                                    : CrossFadeState.showFirst,
+                                              ),
                                             if (index ==
-                                                (controller.importantSound!
-                                                        .subcategories.length -
-                                                    1))
+                                                (controller.selectedIndex == 1
+                                                    ? controller.vowelSoundsList
+                                                            .length -
+                                                        1
+                                                    : controller
+                                                            .consonantSoundsList
+                                                            .length -
+                                                        1))
                                               SizedBox(
-                                                height:
-                                                    getWidgetHeight(height: 45),
-                                              )
+                                                  height: getWidgetHeight(
+                                                      height: 45))
                                           ],
                                         );
                                       },
                                     ),
                                   ),
                                 )
-                          : ((controller.selectedIndex == 1) ||
-                                  (controller.selectedIndex == 2))
-                              ? kIsWeb
-                                  ? Expanded(
-                                      child: ListView.builder(
-                                        shrinkWrap: true,
-                                        physics: BouncingScrollPhysics(),
-                                        itemCount: controller.selectedIndex == 1
-                                            ? controller.vowelSoundsList.length
-                                            : controller
-                                                .consonantSoundsList.length,
-                                        itemBuilder: (context, index) {
-                                          final isExpanded =
-                                              controller.expandedIndex == index;
-                                          return Column(
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  subCategoryTitle = controller
-                                                              .selectedIndex ==
-                                                          1
-                                                      ? controller
-                                                          .vowelSoundsList[
-                                                              index]
-                                                          .category
-                                                      : controller
-                                                          .consonantSoundsList[
-                                                              index]
-                                                          .category;
-                                                  controller.expandedIndex =
-                                                      isExpanded ? -1 : index;
-                                                  controller.update();
-                                                },
-                                                child: Container(
-                                                  width: displayWidth(context),
-                                                  // height: getWidgetHeight(height: 60),
-                                                  margin: EdgeInsets.symmetric(
-                                                      vertical: getWidgetHeight(
-                                                          height: 5),
-                                                      horizontal:
-                                                          getWidgetWidth(
-                                                              width: 15)),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withOpacity(0.1),
-                                                        offset:
-                                                            const Offset(0, 4),
-                                                        blurRadius: 10,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: Container(
-                                                    width:
-                                                        displayWidth(context),
-                                                    // height: getWidgetHeight(height: 75),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                      color: Colors.white,
-                                                    ),
-                                                    child: Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              vertical:
-                                                                  getWidgetHeight(
-                                                                      height:
-                                                                          6),
-                                                              horizontal:
-                                                                  getWidgetWidth(
-                                                                      width:
-                                                                          5)),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Row(
-                                                            children: [
-                                                              CircleAvatar(
-                                                                backgroundColor:
-                                                                    controller
-                                                                            .colorList[
-                                                                        index],
-                                                                child:
-                                                                    Image.asset(
-                                                                  AllAssets
-                                                                      .quickLinkPL,
-                                                                  scale: displayHeight(
-                                                                          context) /
-                                                                      300,
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                width:
-                                                                    getWidgetWidth(
-                                                                        width:
-                                                                            3),
-                                                              ),
-                                                              Text(
-                                                                  controller.selectedIndex ==
-                                                                          1
-                                                                      ? controller
-                                                                          .vowelSoundsList[
-                                                                              index]
-                                                                          .category
-                                                                          .split(
-                                                                              ':')
-                                                                          .last
-                                                                          .trim()
-                                                                      : controller
-                                                                          .consonantSoundsList[
-                                                                              index]
-                                                                          .category
-                                                                          .split(
-                                                                              ':')
-                                                                          .last
-                                                                          .trim(),
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontFamily:
-                                                                        Keys.fontFamily,
-                                                                    letterSpacing:
-                                                                        0,
-                                                                  )),
-                                                            ],
-                                                          ),
-                                                          Spacer(),
-                                                          IconButton(
-                                                              onPressed: () {},
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .expand_more,
-                                                                color: Color(
-                                                                    0xFF64748B),
-                                                              ))
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              if (controller.expandedIndex > -1)
-
-                                                // Expandable Section
-                                                AnimatedCrossFade(
-                                                  duration: const Duration(
-                                                      milliseconds: 300),
-                                                  firstChild:
-                                                      const SizedBox.shrink(),
-                                                  secondChild: ListView.builder(
-                                                    shrinkWrap: true,
-                                                    physics:
-                                                        const NeverScrollableScrollPhysics(),
-                                                    itemCount: controller
-                                                                .selectedIndex ==
-                                                            1
-                                                        ? controller
-                                                            .vowelSoundsList[
-                                                                controller
-                                                                    .expandedIndex]
-                                                            .subcategories
-                                                            .length
-                                                        : controller
-                                                            .consonantSoundsList[
-                                                                controller
-                                                                    .expandedIndex]
-                                                            .subcategories
-                                                            .length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      final sub = controller
-                                                                  .selectedIndex ==
-                                                              1
-                                                          ? controller
-                                                                  .vowelSoundsList[
-                                                                      controller
-                                                                          .expandedIndex]
-                                                                  .subcategories[
-                                                              index]
-                                                          : controller
-                                                              .consonantSoundsList[
-                                                                  controller
-                                                                      .expandedIndex]
-                                                              .subcategories[index];
-                                                      return Column(
-                                                        children: [
-                                                          Padding(
-                                                            padding: EdgeInsets.symmetric(
-                                                                vertical:
-                                                                    getWidgetHeight(
-                                                                        height:
-                                                                            3),
-                                                                horizontal:
-                                                                    getWidgetWidth(
-                                                                        width:
-                                                                            15)),
-                                                            child: InkWell(
-                                                              onTap: () {
-                                                                activityName =
-                                                                    "Sound Lab";
-                                                                sessionName =
-                                                                    sub.name;
-                                                                log("${sessionName} session name is printing here");
-                                                                addToRecentHistory(
-                                                                  path:
-                                                                      "Language Lab > $mianCategoryTitile > $subCategoryTitle",
-                                                                  category:
-                                                                      sessionName,
-                                                                  section:
-                                                                      "Sound Lab",
-                                                                  link: "",
-                                                                  proLabTitle:
-                                                                      "",
-                                                                  soundSubcategory:
-                                                                      sub,
-                                                                );
-                                                                Get.toNamed(
-                                                                    AppRoutes
-                                                                        .soundPage,
-                                                                    arguments: {
-                                                                      "title": sub
-                                                                          .name,
-                                                                      "soundModel":
-                                                                          sub,
-                                                                    });
-                                                              },
-                                                              child: Container(
-                                                                padding: const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        12),
-                                                                child: Row(
-                                                                  children: [
-                                                                    Text(
-                                                                      sub.name,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        letterSpacing:
-                                                                            0,
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                        fontFamily:
-                                                                            Keys.lucidaFontFamily,
-                                                                        fontSize:
-                                                                            kText.scale(15),
-                                                                      ),
-                                                                    ),
-                                                                    const Spacer(),
-                                                                    const Icon(
-                                                                      Icons
-                                                                          .chevron_right_rounded,
-                                                                      size: 30,
-                                                                      color: Color
-                                                                          .fromARGB(
-                                                                              45,
-                                                                              82,
-                                                                              82,
-                                                                              82),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          const Divider(
-                                                              color: Color
-                                                                  .fromARGB(
-                                                                      45,
-                                                                      82,
-                                                                      82,
-                                                                      82)),
-                                                        ],
-                                                      );
-                                                    },
-                                                  ),
-                                                  crossFadeState: isExpanded
-                                                      ? CrossFadeState
-                                                          .showSecond
-                                                      : CrossFadeState
-                                                          .showFirst,
-                                                ),
-                                              if (index ==
-                                                  (controller.selectedIndex == 1
-                                                      ? controller
-                                                              .vowelSoundsList
-                                                              .length -
-                                                          1
-                                                      : controller
-                                                              .consonantSoundsList
-                                                              .length -
-                                                          1))
-                                                SizedBox(
-                                                  height:
-                                                      displayHeight(context) *
-                                                          0.1,
-                                                )
-                                            ],
-                                          );
-                                        },
-                                      ),
-                                    )
-                                  : SizedBox(
-                                      height: getWidgetHeight(height: 255),
-                                      child: Scrollbar(
-                                        thickness: 2,
-                                        thumbVisibility: true,
-                                        radius: Radius.circular(10),
-                                        child: ListView.builder(
-                                          itemCount:
-                                              controller.selectedIndex == 1
-                                                  ? controller
-                                                      .vowelSoundsList.length
-                                                  : controller
-                                                      .consonantSoundsList
-                                                      .length,
-                                          itemBuilder: (context, index) {
-                                            final isExpanded =
-                                                controller.expandedIndex ==
-                                                    index;
-                                            return Column(
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    subCategoryTitle = controller
-                                                                .selectedIndex ==
-                                                            1
-                                                        ? controller
-                                                            .vowelSoundsList[
-                                                                index]
-                                                            .category
-                                                        : controller
-                                                            .consonantSoundsList[
-                                                                index]
-                                                            .category;
-                                                    controller.expandedIndex =
-                                                        isExpanded ? -1 : index;
-                                                    controller.update();
-                                                  },
-                                                  child: Container(
-                                                    width: getWidgetWidth(
-                                                        width: 375),
-                                                    // height: getWidgetHeight(height: 60),
-                                                    margin:
-                                                        EdgeInsets.symmetric(
-                                                            vertical:
-                                                                getWidgetHeight(
-                                                                    height: 5),
-                                                            horizontal:
-                                                                getWidgetWidth(
-                                                                    width: 15)),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.black
-                                                              .withOpacity(0.1),
-                                                          offset: const Offset(
-                                                              0, 4),
-                                                          blurRadius: 10,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Container(
-                                                      width: getWidgetWidth(
-                                                          width: 375),
-                                                      // height: getWidgetHeight(height: 75),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        color: Colors.white,
-                                                      ),
-                                                      child: Padding(
-                                                        padding: EdgeInsets.symmetric(
-                                                            vertical:
-                                                                getWidgetHeight(
-                                                                    height: 6),
-                                                            horizontal:
-                                                                getWidgetWidth(
-                                                                    width: 10)),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Row(
-                                                              children: [
-                                                                CircleAvatar(
-                                                                  backgroundColor:
-                                                                      controller
-                                                                              .colorList[
-                                                                          index],
-                                                                  child: Image
-                                                                      .asset(
-                                                                    AllAssets
-                                                                        .quickLinkPL,
-                                                                    scale: displayWidth(
-                                                                            context) /
-                                                                        101.5,
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                  width:
-                                                                      getWidgetWidth(
-                                                                          width:
-                                                                              10),
-                                                                ),
-                                                                Text(
-                                                                    controller.selectedIndex ==
-                                                                            1
-                                                                        ? controller
-                                                                            .vowelSoundsList[
-                                                                                index]
-                                                                            .category
-                                                                            .split(
-                                                                                ':')
-                                                                            .last
-                                                                            .trim()
-                                                                        : controller
-                                                                            .consonantSoundsList[
-                                                                                index]
-                                                                            .category
-                                                                            .split(
-                                                                                ':')
-                                                                            .last
-                                                                            .trim(),
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontFamily:
-                                                                          Keys.fontFamily,
-                                                                      letterSpacing:
-                                                                          0,
-                                                                    )),
-                                                              ],
-                                                            ),
-                                                            Spacer(),
-                                                            IconButton(
-                                                                onPressed:
-                                                                    () {},
-                                                                icon: Icon(
-                                                                  Icons
-                                                                      .expand_more,
-                                                                  color: Color(
-                                                                      0xFF64748B),
-                                                                ))
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                if (controller.expandedIndex >
-                                                    -1)
-
-                                                  // Expandable Section
-                                                  AnimatedCrossFade(
-                                                    duration: const Duration(
-                                                        milliseconds: 300),
-                                                    firstChild:
-                                                        const SizedBox.shrink(),
-                                                    secondChild:
-                                                        ListView.builder(
-                                                      shrinkWrap: true,
-                                                      physics:
-                                                          const NeverScrollableScrollPhysics(),
-                                                      itemCount: controller
-                                                                  .selectedIndex ==
-                                                              1
-                                                          ? controller
-                                                              .vowelSoundsList[
-                                                                  controller
-                                                                      .expandedIndex]
-                                                              .subcategories
-                                                              .length
-                                                          : controller
-                                                              .consonantSoundsList[
-                                                                  controller
-                                                                      .expandedIndex]
-                                                              .subcategories
-                                                              .length,
-                                                      itemBuilder:
-                                                          (context, index) {
-                                                        final sub = controller
-                                                                    .selectedIndex ==
-                                                                1
-                                                            ? controller
-                                                                    .vowelSoundsList[
-                                                                        controller
-                                                                            .expandedIndex]
-                                                                    .subcategories[
-                                                                index]
-                                                            : controller
-                                                                .consonantSoundsList[
-                                                                    controller
-                                                                        .expandedIndex]
-                                                                .subcategories[index];
-                                                        return Column(
-                                                          children: [
-                                                            Padding(
-                                                              padding: EdgeInsets.symmetric(
-                                                                  vertical:
-                                                                      getWidgetHeight(
-                                                                          height:
-                                                                              3),
-                                                                  horizontal:
-                                                                      getWidgetWidth(
-                                                                          width:
-                                                                              15)),
-                                                              child: InkWell(
-                                                                onTap: () {
-                                                                  activityName =
-                                                                      "Sound Lab";
-                                                                  sessionName =
-                                                                      sub.name;
-                                                                  log("${sessionName} session name is printing here");
-                                                                  addToRecentHistory(
-                                                                    path:
-                                                                        "Language Lab > $mianCategoryTitile > $subCategoryTitle",
-                                                                    category:
-                                                                        sessionName,
-                                                                    section:
-                                                                        "Sound Lab",
-                                                                    link: "",
-                                                                    proLabTitle:
-                                                                        "",
-                                                                    soundSubcategory:
-                                                                        sub,
-                                                                  );
-                                                                  Get.toNamed(
-                                                                      AppRoutes
-                                                                          .soundPage,
-                                                                      arguments: {
-                                                                        "title":
-                                                                            sub.name,
-                                                                        "soundModel":
-                                                                            sub,
-                                                                      });
-                                                                },
-                                                                child:
-                                                                    Container(
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          12),
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Text(
-                                                                        sub.name,
-                                                                        style:
-                                                                            TextStyle(
-                                                                          letterSpacing:
-                                                                              0,
-                                                                          color:
-                                                                              Colors.black,
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                          fontFamily:
-                                                                              Keys.lucidaFontFamily,
-                                                                          fontSize:
-                                                                              kText.scale(15),
-                                                                        ),
-                                                                      ),
-                                                                      const Spacer(),
-                                                                      const Icon(
-                                                                        Icons
-                                                                            .chevron_right_rounded,
-                                                                        size:
-                                                                            30,
-                                                                        color: Color.fromARGB(
-                                                                            45,
-                                                                            82,
-                                                                            82,
-                                                                            82),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            const Divider(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        45,
-                                                                        82,
-                                                                        82,
-                                                                        82)),
-                                                          ],
-                                                        );
-                                                      },
-                                                    ),
-                                                    crossFadeState: isExpanded
-                                                        ? CrossFadeState
-                                                            .showSecond
-                                                        : CrossFadeState
-                                                            .showFirst,
-                                                  ),
-                                                if (index ==
-                                                    (controller
-                                                                .selectedIndex ==
-                                                            1
-                                                        ? controller
-                                                                .vowelSoundsList
-                                                                .length -
-                                                            1
-                                                        : controller
-                                                                .consonantSoundsList
-                                                                .length -
-                                                            1))
-                                                  SizedBox(
-                                                      height: getWidgetHeight(
-                                                          height: 45))
-                                              ],
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    )
                               : Center(
                                   child: Text("No Data"),
                                 ),
