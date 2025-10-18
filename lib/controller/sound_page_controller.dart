@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:hotelmanagementapp/model/sound_model.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
@@ -27,8 +29,23 @@ class SoundPageController extends GetxController {
   @override
   void onInit() {
     log("🔁 onInit called");
-    title = Get.arguments['title'] ?? "Sound Page";
-    soundModel = Get.arguments['soundModel'];
+    final args = Get.arguments;
+    final box = GetStorage();
+    if (args != null) {
+      title = args['title'] ?? "Sound Page";
+      soundModel = args['soundModel'];
+    } else {
+      final saved = box.read(AppRoutes.soundPage) ?? {};
+      title = saved['title'] ?? "Sound Page";
+
+      final storedSound = saved['soundModel'];
+      if (storedSound is Map<String, dynamic>) {
+        soundModel = SoundSubcategory.fromJson(storedSound);
+      } else if (storedSound is SoundSubcategory) {
+        soundModel = storedSound;
+      }
+    }
+
     super.onInit();
   }
 
@@ -65,7 +82,7 @@ class SoundPageController extends GetxController {
     isLoading = true;
     isPlaying = false;
     selected = index;
-
+    update();
     if (videoPlayerController.value.isInitialized) {
       await videoPlayerController.pause();
       await videoPlayerController.dispose();
@@ -83,9 +100,17 @@ class SoundPageController extends GetxController {
                   : index == 3
                       ? soundModel.links.v4
                       : soundModel.links.v5;
+      debugPrint("Selected URL: $url");
 
-      final file = await DefaultCacheManager().getSingleFile(url!);
-      videoPlayerController = VideoPlayerController.file(file);
+      if (kIsWeb) {
+        // Web must use network URL (cannot load local file)
+        videoPlayerController =
+            VideoPlayerController.networkUrl(Uri.parse(url));
+      } else {
+        // Mobile/Desktop can cache for faster replay
+        final file = await DefaultCacheManager().getSingleFile(url!);
+        videoPlayerController = VideoPlayerController.file(file);
+      }
 
       await videoPlayerController.initialize();
       videoPlayerController.setLooping(false);
@@ -94,11 +119,18 @@ class SoundPageController extends GetxController {
       videoPlayerController.addListener(update);
       isPlaying = true;
     } else if (index == 5) {
-      // 👇 This part is important
-      await Get.toNamed(
-        AppRoutes.soundLab,
-        arguments: {'soundSubcategory': soundModel},
-      );
+      GetStorage().write(AppRoutes.soundLab, {'soundSubcategory': soundModel});
+      kIsWeb
+          ? Get.rootDelegate.offNamed(
+              AppRoutes.soundLab,
+              arguments: {'soundSubcategory': soundModel},
+            )
+          :
+          // 👇 This part is important
+          await Get.toNamed(
+              AppRoutes.soundLab,
+              arguments: {'soundSubcategory': soundModel},
+            );
 
       log("🔁 Returned from third page, refreshing...");
       refreshScreen(selected);

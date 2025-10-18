@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_controller.dart';
@@ -98,7 +99,9 @@ class ARCallSimulation extends StatelessWidget {
               iconSize: 30,
               onPressed: () {
                 homeController.loadRecentHistory();
-                Navigator.pop(context);
+                kIsWeb
+                    ? Get.rootDelegate.offNamed(AppRoutes.home)
+                    : Navigator.pop(context);
               },
               icon: const Icon(Icons.arrow_back),
             ),
@@ -193,15 +196,60 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[0].category;
-                                                  Get.toNamed(
-                                                      AppRoutes.simulationSub,
-                                                      arguments: {
-                                                        'title': controller
-                                                            .simulations[0]
-                                                            .category,
-                                                        'simulation': controller
-                                                            .simulations[0]
-                                                      });
+                                                  // GetStorage().write(
+                                                  //     AppRoutes.simulationSub, {
+                                                  //   'title': controller
+                                                  //       .simulations[0]
+                                                  //       .category,
+                                                  //   'simulation': controller
+                                                  //       .simulations[0]
+                                                  // });
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    final data = {
+                                                      'title': controller
+                                                          .simulations[0]
+                                                          .category,
+                                                      'simulation': controller
+                                                          .simulations[0]
+                                                    };
+                                                    GetStorage().write(
+                                                        AppRoutes.simulationSub,
+                                                        {
+                                                          'title':
+                                                              data['title'],
+                                                          'simulation': controller
+                                                              .simulations[0]
+                                                              .toJson(), // ✅ ensure JSON safe
+                                                        });
+                                                    kIsWeb
+                                                        ? Get.rootDelegate
+                                                            .offNamed(
+                                                                AppRoutes
+                                                                    .simulationSub,
+                                                                arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        0]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[0]
+                                                              })
+                                                        : Get.toNamed(
+                                                            AppRoutes
+                                                                .simulationSub,
+                                                            arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        0]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[0]
+                                                              });
+                                                  });
                                                   // Navigator.push(
                                                   //     context,
                                                   //     MaterialPageRoute(
@@ -232,15 +280,60 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[2].category;
-                                                  Get.toNamed(
-                                                      AppRoutes.simulationSub,
-                                                      arguments: {
-                                                        'title': controller
-                                                            .simulations[2]
-                                                            .category,
-                                                        'simulation': controller
-                                                            .simulations[2]
-                                                      });
+                                                  // GetStorage().write(
+                                                  //     AppRoutes.simulationSub, {
+                                                  //   'title': controller
+                                                  //       .simulations[2]
+                                                  //       .category,
+                                                  //   'simulation': controller
+                                                  //       .simulations[2]
+                                                  // });
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    final data = {
+                                                      'title': controller
+                                                          .simulations[2]
+                                                          .category,
+                                                      'simulation': controller
+                                                          .simulations[2]
+                                                    };
+                                                    GetStorage().write(
+                                                        AppRoutes.simulationSub,
+                                                        {
+                                                          'title':
+                                                              data['title'],
+                                                          'simulation': controller
+                                                              .simulations[2]
+                                                              .toJson(), // ✅ ensure JSON safe
+                                                        });
+                                                    kIsWeb
+                                                        ? Get.rootDelegate
+                                                            .offNamed(
+                                                                AppRoutes
+                                                                    .simulationSub,
+                                                                arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        2]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[2]
+                                                              })
+                                                        : Get.toNamed(
+                                                            AppRoutes
+                                                                .simulationSub,
+                                                            arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        2]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[2]
+                                                              });
+                                                  });
                                                 },
                                                 tileColor: gridTileDatas[2]
                                                     ['tileColor'],
@@ -260,15 +353,60 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[4].category;
-                                                  Get.toNamed(
-                                                      AppRoutes.simulationSub,
-                                                      arguments: {
-                                                        'title': controller
-                                                            .simulations[4]
-                                                            .category,
-                                                        'simulation': controller
-                                                            .simulations[4]
-                                                      });
+                                                  // GetStorage().write(
+                                                  //     AppRoutes.simulationSub, {
+                                                  //   'title': controller
+                                                  //       .simulations[4]
+                                                  //       .category,
+                                                  //   'simulation': controller
+                                                  //       .simulations[4]
+                                                  // });
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    final data = {
+                                                      'title': controller
+                                                          .simulations[4]
+                                                          .category,
+                                                      'simulation': controller
+                                                          .simulations[4]
+                                                    };
+                                                    GetStorage().write(
+                                                        AppRoutes.simulationSub,
+                                                        {
+                                                          'title':
+                                                              data['title'],
+                                                          'simulation': controller
+                                                              .simulations[4]
+                                                              .toJson(), // ✅ ensure JSON safe
+                                                        });
+                                                    kIsWeb
+                                                        ? Get.rootDelegate
+                                                            .offNamed(
+                                                                AppRoutes
+                                                                    .simulationSub,
+                                                                arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        4]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[4]
+                                                              })
+                                                        : Get.toNamed(
+                                                            AppRoutes
+                                                                .simulationSub,
+                                                            arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        4]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[4]
+                                                              });
+                                                  });
                                                 },
                                                 // height: getWidgetHeight(height: 180),
                                                 tileColor: gridTileDatas[4]
@@ -289,15 +427,60 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[6].category;
-                                                  Get.toNamed(
-                                                      AppRoutes.simulationSub,
-                                                      arguments: {
-                                                        'title': controller
-                                                            .simulations[6]
-                                                            .category,
-                                                        'simulation': controller
-                                                            .simulations[6]
-                                                      });
+                                                  // GetStorage().write(
+                                                  //     AppRoutes.simulationSub, {
+                                                  //   'title': controller
+                                                  //       .simulations[6]
+                                                  //       .category,
+                                                  //   'simulation': controller
+                                                  //       .simulations[6]
+                                                  // });
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    final data = {
+                                                      'title': controller
+                                                          .simulations[6]
+                                                          .category,
+                                                      'simulation': controller
+                                                          .simulations[6]
+                                                    };
+                                                    GetStorage().write(
+                                                        AppRoutes.simulationSub,
+                                                        {
+                                                          'title':
+                                                              data['title'],
+                                                          'simulation': controller
+                                                              .simulations[6]
+                                                              .toJson(), // ✅ ensure JSON safe
+                                                        });
+                                                    kIsWeb
+                                                        ? Get.rootDelegate
+                                                            .offNamed(
+                                                                AppRoutes
+                                                                    .simulationSub,
+                                                                arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        6]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[6]
+                                                              })
+                                                        : Get.toNamed(
+                                                            AppRoutes
+                                                                .simulationSub,
+                                                            arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        6]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[6]
+                                                              });
+                                                  });
                                                 },
                                                 // height: getWidgetHeight(height: 180),
                                                 tileColor: gridTileDatas[6]
@@ -326,15 +509,60 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[1].category;
-                                                  Get.toNamed(
-                                                      AppRoutes.simulationSub,
-                                                      arguments: {
-                                                        'title': controller
-                                                            .simulations[1]
-                                                            .category,
-                                                        'simulation': controller
-                                                            .simulations[1]
-                                                      });
+                                                  // GetStorage().write(
+                                                  //     AppRoutes.simulationSub, {
+                                                  //   'title': controller
+                                                  //       .simulations[1]
+                                                  //       .category,
+                                                  //   'simulation': controller
+                                                  //       .simulations[1]
+                                                  // });
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    final data = {
+                                                      'title': controller
+                                                          .simulations[1]
+                                                          .category,
+                                                      'simulation': controller
+                                                          .simulations[1]
+                                                    };
+                                                    GetStorage().write(
+                                                        AppRoutes.simulationSub,
+                                                        {
+                                                          'title':
+                                                              data['title'],
+                                                          'simulation': controller
+                                                              .simulations[1]
+                                                              .toJson(), // ✅ ensure JSON safe
+                                                        });
+                                                    kIsWeb
+                                                        ? Get.rootDelegate
+                                                            .offNamed(
+                                                                AppRoutes
+                                                                    .simulationSub,
+                                                                arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        1]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[1]
+                                                              })
+                                                        : Get.toNamed(
+                                                            AppRoutes
+                                                                .simulationSub,
+                                                            arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        1]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[1]
+                                                              });
+                                                  });
                                                 },
                                                 tileColor: gridTileDatas[1]
                                                     ['tileColor'],
@@ -354,15 +582,60 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[3].category;
-                                                  Get.toNamed(
-                                                      AppRoutes.simulationSub,
-                                                      arguments: {
-                                                        'title': controller
-                                                            .simulations[3]
-                                                            .category,
-                                                        'simulation': controller
-                                                            .simulations[3]
-                                                      });
+                                                  // GetStorage().write(
+                                                  //     AppRoutes.simulationSub, {
+                                                  //   'title': controller
+                                                  //       .simulations[3]
+                                                  //       .category,
+                                                  //   'simulation': controller
+                                                  //       .simulations[3]
+                                                  // });
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    final data = {
+                                                      'title': controller
+                                                          .simulations[3]
+                                                          .category,
+                                                      'simulation': controller
+                                                          .simulations[3]
+                                                    };
+                                                    GetStorage().write(
+                                                        AppRoutes.simulationSub,
+                                                        {
+                                                          'title':
+                                                              data['title'],
+                                                          'simulation': controller
+                                                              .simulations[3]
+                                                              .toJson(), // ✅ ensure JSON safe
+                                                        });
+                                                    kIsWeb
+                                                        ? Get.rootDelegate
+                                                            .offNamed(
+                                                                AppRoutes
+                                                                    .simulationSub,
+                                                                arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        3]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[3]
+                                                              })
+                                                        : Get.toNamed(
+                                                            AppRoutes
+                                                                .simulationSub,
+                                                            arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        3]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[3]
+                                                              });
+                                                  });
                                                 },
                                                 tileColor: gridTileDatas[3]
                                                     ['tileColor'],
@@ -382,15 +655,60 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[5].category;
-                                                  Get.toNamed(
-                                                      AppRoutes.simulationSub,
-                                                      arguments: {
-                                                        'title': controller
-                                                            .simulations[5]
-                                                            .category,
-                                                        'simulation': controller
-                                                            .simulations[5]
-                                                      });
+                                                  // GetStorage().write(
+                                                  //     AppRoutes.simulationSub, {
+                                                  //   'title': controller
+                                                  //       .simulations[5]
+                                                  //       .category,
+                                                  //   'simulation': controller
+                                                  //       .simulations[5]
+                                                  // });
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    final data = {
+                                                      'title': controller
+                                                          .simulations[5]
+                                                          .category,
+                                                      'simulation': controller
+                                                          .simulations[5]
+                                                    };
+                                                    GetStorage().write(
+                                                        AppRoutes.simulationSub,
+                                                        {
+                                                          'title':
+                                                              data['title'],
+                                                          'simulation': controller
+                                                              .simulations[5]
+                                                              .toJson(), // ✅ ensure JSON safe
+                                                        });
+                                                    kIsWeb
+                                                        ? Get.rootDelegate
+                                                            .offNamed(
+                                                                AppRoutes
+                                                                    .simulationSub,
+                                                                arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        5]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[5]
+                                                              })
+                                                        : Get.toNamed(
+                                                            AppRoutes
+                                                                .simulationSub,
+                                                            arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        5]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[5]
+                                                              });
+                                                  });
                                                 },
                                                 tileColor: gridTileDatas[5]
                                                     ['tileColor'],
@@ -410,15 +728,6 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[7].category;
-                                                  Get.toNamed(
-                                                      AppRoutes.simulationSub,
-                                                      arguments: {
-                                                        'title': controller
-                                                            .simulations[7]
-                                                            .category,
-                                                        'simulation': controller
-                                                            .simulations[7]
-                                                      });
                                                 },
                                                 tileColor: gridTileDatas[7]
                                                     ['tileColor'],

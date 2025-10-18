@@ -13,6 +13,7 @@ import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class ContentLab extends StatefulWidget {
   const ContentLab({Key? key}) : super(key: key);
@@ -296,276 +297,608 @@ class _ContentLabState extends State<ContentLab> {
                                     post["externalSource"] ?? "";
                                 String title = post['title'];
 
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                      bottom: getWidgetHeight(height: 10)),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: SizedBox(
-                                          height: getWidgetHeight(height: 200),
-                                          child: kIsWeb
-                                              ? _buildWebVideoPlayer(
-                                                  embedUrl) // For web
-                                              : _buildMobileVideoPlayer(
-                                                  controller, index, embedUrl),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: getWidgetHeight(height: 6),
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: RichText(
-                                              softWrap: true,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              text: TextSpan(
-                                                style: TextStyle(
-                                                  fontSize: kText.scale(10),
-                                                  color: Colors.grey,
-                                                ),
-                                                children: [
-                                                  TextSpan(
-                                                    text: "Video Title",
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: kText.scale(13),
-                                                      color: Colors.grey[700],
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: " : ",
-                                                    style: TextStyle(
-                                                      fontSize: kText.scale(13),
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: title,
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Colors.black,
-                                                      fontSize: kText.scale(13),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: getWidgetHeight(height: 2),
-                                      ),
-                                      if (externalSource.isNotEmpty)
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
+                                return kIsWeb
+                                    ? Padding(
+                                        padding: EdgeInsets.only(
+                                            bottom:
+                                                getWidgetHeight(height: 10)),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Expanded(
-                                              child: RichText(
-                                                softWrap: true,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                text: TextSpan(
-                                                  style: TextStyle(
-                                                    fontSize: kText.scale(10),
-                                                    color: Colors.grey,
-                                                  ),
-                                                  children: [
-                                                    TextSpan(
-                                                      text: "External Source",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontSize:
-                                                            kText.scale(12),
-                                                        color: Colors.grey[700],
-                                                      ),
-                                                    ),
-                                                    TextSpan(
-                                                      text: " : ",
-                                                      style: TextStyle(
-                                                        fontSize:
-                                                            kText.scale(10),
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                    TextSpan(
-                                                      text: post[
-                                                              "externalSource"] ??
-                                                          '',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Colors.black,
-                                                        fontSize:
-                                                            kText.scale(12),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: SizedBox(
+                                                height: getWidgetHeight(
+                                                    height: 200),
+                                                child: _buildMobileVideoPlayer(
+                                                    controller,
+                                                    index,
+                                                    embedUrl),
                                               ),
                                             ),
+
+                                            // Row(
+                                            //   mainAxisAlignment:
+                                            //       MainAxisAlignment.start,
+                                            //   children: [
+                                            //     Expanded(
+                                            //       child: RichText(
+                                            //         softWrap: true,
+                                            //         maxLines: 2,
+                                            //         overflow:
+                                            //             TextOverflow.ellipsis,
+                                            //         text: TextSpan(
+                                            //           style: TextStyle(
+                                            //             fontSize:
+                                            //                 kText.scale(10),
+                                            //             color: Colors.grey,
+                                            //           ),
+                                            //           children: [
+                                            //             TextSpan(
+                                            //               text: "Video Title",
+                                            //               style: TextStyle(
+                                            //                 fontWeight:
+                                            //                     FontWeight.w600,
+                                            //                 fontSize:
+                                            //                     kText.scale(13),
+                                            //                 color: Colors
+                                            //                     .grey[700],
+                                            //               ),
+                                            //             ),
+                                            //             TextSpan(
+                                            //               text: " : ",
+                                            //               style: TextStyle(
+                                            //                 fontSize:
+                                            //                     kText.scale(13),
+                                            //                 color: Colors.black,
+                                            //                 fontWeight:
+                                            //                     FontWeight.w600,
+                                            //               ),
+                                            //             ),
+                                            //             TextSpan(
+                                            //               text: title,
+                                            //               style: TextStyle(
+                                            //                 fontWeight:
+                                            //                     FontWeight.w600,
+                                            //                 color: Colors.black,
+                                            //                 fontSize:
+                                            //                     kText.scale(13),
+                                            //               ),
+                                            //             ),
+                                            //           ],
+                                            //         ),
+                                            //       ),
+                                            //     ),
+                                            //   ],
+                                            // ),
+                                            SizedBox(
+                                              height:
+                                                  getWidgetHeight(height: 2),
+                                            ),
+                                            // if (externalSource.isNotEmpty)
+                                            //   Row(
+                                            //     mainAxisAlignment:
+                                            //         MainAxisAlignment.start,
+                                            //     children: [
+                                            //       Expanded(
+                                            //         child: RichText(
+                                            //           softWrap: true,
+                                            //           maxLines: 2,
+                                            //           overflow:
+                                            //               TextOverflow.ellipsis,
+                                            //           text: TextSpan(
+                                            //             style: TextStyle(
+                                            //               fontSize:
+                                            //                   kText.scale(10),
+                                            //               color: Colors.grey,
+                                            //             ),
+                                            //             children: [
+                                            //               TextSpan(
+                                            //                 text:
+                                            //                     "External Source",
+                                            //                 style: TextStyle(
+                                            //                   fontWeight:
+                                            //                       FontWeight
+                                            //                           .w500,
+                                            //                   fontSize: kText
+                                            //                       .scale(12),
+                                            //                   color: Colors
+                                            //                       .grey[700],
+                                            //                 ),
+                                            //               ),
+                                            //               TextSpan(
+                                            //                 text: " : ",
+                                            //                 style: TextStyle(
+                                            //                   fontSize: kText
+                                            //                       .scale(10),
+                                            //                   color:
+                                            //                       Colors.black,
+                                            //                 ),
+                                            //               ),
+                                            //               TextSpan(
+                                            //                 text: post[
+                                            //                         "externalSource"] ??
+                                            //                     '',
+                                            //                 style: TextStyle(
+                                            //                   fontWeight:
+                                            //                       FontWeight
+                                            //                           .w500,
+                                            //                   color:
+                                            //                       Colors.black,
+                                            //                   fontSize: kText
+                                            //                       .scale(12),
+                                            //                 ),
+                                            //               ),
+                                            //             ],
+                                            //           ),
+                                            //         ),
+                                            //       ),
+                                            //     ],
+                                            //   ),
+                                            // SizedBox(
+                                            //   height:
+                                            //       getWidgetHeight(height: 8),
+                                            // ),
+                                            // Row(
+                                            //   mainAxisAlignment:
+                                            //       MainAxisAlignment.start,
+                                            //   children: [
+                                            //     Row(
+                                            //       children: [
+                                            //         RichText(
+                                            //           text: TextSpan(
+                                            //             style: TextStyle(
+                                            //               fontSize:
+                                            //                   kText.scale(10),
+                                            //               color: Colors.grey,
+                                            //             ),
+                                            //             children: [
+                                            //               TextSpan(
+                                            //                   text: post[
+                                            //                           "category"] ??
+                                            //                       "Content Title"),
+                                            //               TextSpan(
+                                            //                   text: " | ",
+                                            //                   style: TextStyle(
+                                            //                       fontSize: kText
+                                            //                           .scale(
+                                            //                               10),
+                                            //                       color: Colors
+                                            //                           .black)),
+                                            //               TextSpan(
+                                            //                 text: post[
+                                            //                         "subcategory"] ??
+                                            //                     "Content Title",
+                                            //                 style: TextStyle(
+                                            //                   fontSize: kText
+                                            //                       .scale(10),
+                                            //                 ),
+                                            //               ),
+                                            //             ],
+                                            //           ),
+                                            //         ),
+                                            //       ],
+                                            //     ),
+                                            //   ],
+                                            // ),
+                                            // SizedBox(
+                                            //     height:
+                                            //         getWidgetHeight(height: 4)),
+                                            // description.isEmpty
+                                            //     ? const SizedBox.shrink()
+                                            //     : RichText(
+                                            //         text: TextSpan(
+                                            //           style: TextStyle(
+                                            //               fontSize:
+                                            //                   kText.scale(12),
+                                            //               color: Colors.black),
+                                            //           children: [
+                                            //             TextSpan(
+                                            //               text: isExpanded ||
+                                            //                       !isLongDesc
+                                            //                   ? description
+                                            //                   : controller
+                                            //                       .truncateText(
+                                            //                           description,
+                                            //                           100), // Adjust char count as needed
+                                            //             ),
+                                            //             if (!isExpanded &&
+                                            //                 isLongDesc)
+                                            //               TextSpan(
+                                            //                 text: " See more",
+                                            //                 style: TextStyle(
+                                            //                     color:
+                                            //                         Colors.grey,
+                                            //                     fontSize: kText
+                                            //                         .scale(11)),
+                                            //                 recognizer:
+                                            //                     TapGestureRecognizer()
+                                            //                       ..onTap = () {
+                                            //                         controller.expandedDescriptions[
+                                            //                                 index] =
+                                            //                             true;
+                                            //                         controller
+                                            //                             .update();
+                                            //                       },
+                                            //               ),
+                                            //             if (isExpanded &&
+                                            //                 isLongDesc)
+                                            //               TextSpan(
+                                            //                 text: " See less",
+                                            //                 style: TextStyle(
+                                            //                     color:
+                                            //                         Colors.grey,
+                                            //                     fontSize: kText
+                                            //                         .scale(11)),
+                                            //                 recognizer:
+                                            //                     TapGestureRecognizer()
+                                            //                       ..onTap = () {
+                                            //                         controller.expandedDescriptions[
+                                            //                                 index] =
+                                            //                             false;
+                                            //                         controller
+                                            //                             .update();
+                                            //                       },
+                                            //               ),
+                                            //           ],
+                                            //         ),
+                                            //       ),
+                                            // SizedBox(
+                                            //     height:
+                                            //         getWidgetHeight(height: 6)),
+                                            // Row(
+                                            //   mainAxisAlignment:
+                                            //       MainAxisAlignment
+                                            //           .spaceBetween,
+                                            //   children: [
+                                            //     InkWell(
+                                            //       onTap: () {
+                                            //         controller.toggleLike(post);
+                                            //       },
+                                            //       child: Row(
+                                            //         children: [
+                                            //           Icon(Icons.thumb_up,
+                                            //               size: 16,
+                                            //               color: post['isLike']
+                                            //                   ? linearColor
+                                            //                   : Colors.grey),
+                                            //           const SizedBox(width: 4),
+                                            //           Text(
+                                            //             "${post["likes"]}",
+                                            //             style: TextStyle(
+                                            //                 color: post[
+                                            //                         'isLike']
+                                            //                     ? linearColor
+                                            //                     : Colors.grey),
+                                            //           ),
+                                            //         ],
+                                            //       ),
+                                            //     ),
+                                            //     Row(
+                                            //       children: [
+                                            //         Text(
+                                            //           controller.formatTimeAgo(
+                                            //               post["uploadDate"]),
+                                            //           style: const TextStyle(
+                                            //               fontSize: 12,
+                                            //               color: Colors.grey),
+                                            //         ),
+                                            //       ],
+                                            //     )
+                                            //   ],
+                                            // ),
+                                            // Divider(
+                                            //   color:
+                                            //       Colors.grey.withOpacity(0.5),
+                                            //   // height: 20,
+                                            // ),
                                           ],
                                         ),
-                                      SizedBox(
-                                        height: getWidgetHeight(height: 8),
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              RichText(
-                                                text: TextSpan(
-                                                  style: TextStyle(
-                                                    fontSize: kText.scale(10),
-                                                    color: Colors.grey,
-                                                  ),
-                                                  children: [
-                                                    TextSpan(
-                                                        text: post[
-                                                                "category"] ??
-                                                            "Content Title"),
-                                                    TextSpan(
-                                                        text: " | ",
-                                                        style: TextStyle(
-                                                            fontSize:
-                                                                kText.scale(10),
-                                                            color:
-                                                                Colors.black)),
-                                                    TextSpan(
-                                                      text:
-                                                          post["subcategory"] ??
-                                                              "Content Title",
+                                      )
+                                    : Padding(
+                                        padding: EdgeInsets.only(
+                                            bottom:
+                                                getWidgetHeight(height: 10)),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: SizedBox(
+                                                height: getWidgetHeight(
+                                                    height: 200),
+                                                child: _buildMobileVideoPlayer(
+                                                    controller,
+                                                    index,
+                                                    embedUrl),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height:
+                                                  getWidgetHeight(height: 6),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Expanded(
+                                                  child: RichText(
+                                                    softWrap: true,
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    text: TextSpan(
                                                       style: TextStyle(
                                                         fontSize:
                                                             kText.scale(10),
+                                                        color: Colors.grey,
                                                       ),
+                                                      children: [
+                                                        TextSpan(
+                                                          text: "Video Title",
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontSize:
+                                                                kText.scale(13),
+                                                            color: Colors
+                                                                .grey[700],
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: " : ",
+                                                          style: TextStyle(
+                                                            fontSize:
+                                                                kText.scale(13),
+                                                            color: Colors.black,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: title,
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color: Colors.black,
+                                                            fontSize:
+                                                                kText.scale(13),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                          height: getWidgetHeight(height: 4)),
-                                      description.isEmpty
-                                          ? const SizedBox.shrink()
-                                          : RichText(
-                                              text: TextSpan(
-                                                style: TextStyle(
-                                                    fontSize: kText.scale(12),
-                                                    color: Colors.black),
-                                                children: [
-                                                  TextSpan(
-                                                    text: isExpanded ||
-                                                            !isLongDesc
-                                                        ? description
-                                                        : controller.truncateText(
-                                                            description,
-                                                            100), // Adjust char count as needed
                                                   ),
-                                                  if (!isExpanded && isLongDesc)
-                                                    TextSpan(
-                                                      text: " See more",
-                                                      style: TextStyle(
-                                                          color: Colors.grey,
-                                                          fontSize:
-                                                              kText.scale(11)),
-                                                      recognizer:
-                                                          TapGestureRecognizer()
-                                                            ..onTap = () {
-                                                              controller
-                                                                      .expandedDescriptions[
-                                                                  index] = true;
-                                                              controller
-                                                                  .update();
-                                                            },
-                                                    ),
-                                                  if (isExpanded && isLongDesc)
-                                                    TextSpan(
-                                                      text: " See less",
-                                                      style: TextStyle(
-                                                          color: Colors.grey,
-                                                          fontSize:
-                                                              kText.scale(11)),
-                                                      recognizer:
-                                                          TapGestureRecognizer()
-                                                            ..onTap = () {
-                                                              controller
-                                                                      .expandedDescriptions[
-                                                                  index] = false;
-                                                              controller
-                                                                  .update();
-                                                            },
-                                                    ),
-                                                ],
-                                              ),
-                                            ),
-                                      SizedBox(
-                                          height: getWidgetHeight(height: 6)),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          InkWell(
-                                            onTap: () {
-                                              controller.toggleLike(post);
-                                            },
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.thumb_up,
-                                                    size: 16,
-                                                    color: post['isLike']
-                                                        ? linearColor
-                                                        : Colors.grey),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  "${post["likes"]}",
-                                                  style: TextStyle(
-                                                      color: post['isLike']
-                                                          ? linearColor
-                                                          : Colors.grey),
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                controller.formatTimeAgo(
-                                                    post["uploadDate"]),
-                                                style: const TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey),
+                                            SizedBox(
+                                              height:
+                                                  getWidgetHeight(height: 2),
+                                            ),
+                                            if (externalSource.isNotEmpty)
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Expanded(
+                                                    child: RichText(
+                                                      softWrap: true,
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      text: TextSpan(
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              kText.scale(10),
+                                                          color: Colors.grey,
+                                                        ),
+                                                        children: [
+                                                          TextSpan(
+                                                            text:
+                                                                "External Source",
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              fontSize: kText
+                                                                  .scale(12),
+                                                              color: Colors
+                                                                  .grey[700],
+                                                            ),
+                                                          ),
+                                                          TextSpan(
+                                                            text: " : ",
+                                                            style: TextStyle(
+                                                              fontSize: kText
+                                                                  .scale(10),
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
+                                                          ),
+                                                          TextSpan(
+                                                            text: post[
+                                                                    "externalSource"] ??
+                                                                '',
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: kText
+                                                                  .scale(12),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                      Divider(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        // height: 20,
-                                      ),
-                                    ],
-                                  ),
-                                );
+                                            SizedBox(
+                                              height:
+                                                  getWidgetHeight(height: 8),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    RichText(
+                                                      text: TextSpan(
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              kText.scale(10),
+                                                          color: Colors.grey,
+                                                        ),
+                                                        children: [
+                                                          TextSpan(
+                                                              text: post[
+                                                                      "category"] ??
+                                                                  "Content Title"),
+                                                          TextSpan(
+                                                              text: " | ",
+                                                              style: TextStyle(
+                                                                  fontSize: kText
+                                                                      .scale(
+                                                                          10),
+                                                                  color: Colors
+                                                                      .black)),
+                                                          TextSpan(
+                                                            text: post[
+                                                                    "subcategory"] ??
+                                                                "Content Title",
+                                                            style: TextStyle(
+                                                              fontSize: kText
+                                                                  .scale(10),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(
+                                                height:
+                                                    getWidgetHeight(height: 4)),
+                                            description.isEmpty
+                                                ? const SizedBox.shrink()
+                                                : RichText(
+                                                    text: TextSpan(
+                                                      style: TextStyle(
+                                                          fontSize:
+                                                              kText.scale(12),
+                                                          color: Colors.black),
+                                                      children: [
+                                                        TextSpan(
+                                                          text: isExpanded ||
+                                                                  !isLongDesc
+                                                              ? description
+                                                              : controller
+                                                                  .truncateText(
+                                                                      description,
+                                                                      100), // Adjust char count as needed
+                                                        ),
+                                                        if (!isExpanded &&
+                                                            isLongDesc)
+                                                          TextSpan(
+                                                            text: " See more",
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.grey,
+                                                                fontSize: kText
+                                                                    .scale(11)),
+                                                            recognizer:
+                                                                TapGestureRecognizer()
+                                                                  ..onTap = () {
+                                                                    controller.expandedDescriptions[
+                                                                            index] =
+                                                                        true;
+                                                                    controller
+                                                                        .update();
+                                                                  },
+                                                          ),
+                                                        if (isExpanded &&
+                                                            isLongDesc)
+                                                          TextSpan(
+                                                            text: " See less",
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.grey,
+                                                                fontSize: kText
+                                                                    .scale(11)),
+                                                            recognizer:
+                                                                TapGestureRecognizer()
+                                                                  ..onTap = () {
+                                                                    controller.expandedDescriptions[
+                                                                            index] =
+                                                                        false;
+                                                                    controller
+                                                                        .update();
+                                                                  },
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                            SizedBox(
+                                                height:
+                                                    getWidgetHeight(height: 6)),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                InkWell(
+                                                  onTap: () {
+                                                    controller.toggleLike(post);
+                                                  },
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.thumb_up,
+                                                          size: 16,
+                                                          color: post['isLike']
+                                                              ? linearColor
+                                                              : Colors.grey),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        "${post["likes"]}",
+                                                        style: TextStyle(
+                                                            color: post[
+                                                                    'isLike']
+                                                                ? linearColor
+                                                                : Colors.grey),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      controller.formatTimeAgo(
+                                                          post["uploadDate"]),
+                                                      style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey),
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                            Divider(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              // height: 20,
+                                            ),
+                                          ],
+                                        ),
+                                      );
                               },
                             ),
                           ),
@@ -586,35 +919,68 @@ class _ContentLabState extends State<ContentLab> {
     });
   }
 
-  Widget _buildMobileVideoPlayer(
-      ContentLabController controller, int index, String embedUrl) {
-    if (controller.controllers[index] == null) {
-      final webViewCtrl = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..loadHtmlString(controller.buildHtmlForUrl(embedUrl));
-      controller.controllers[index] = webViewCtrl;
-    }
-    return WebViewWidget(controller: controller.controllers[index]!);
+  Widget _buildTestIframe() {
+    const testUrl =
+        "https://www.youtube.com/embed/aqz-KE-bpKQ"; // ✅ Sample working video
+
+    return Container(
+      margin: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.black12,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Html(
+        data: """
+      <iframe 
+        width="100%" 
+        height="250"
+        src="$testUrl?autoplay=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+        style="display:block; width:100%; border:none; border-radius: 12px; overflow:hidden;"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+      """,
+      ),
+    );
   }
 
-  Widget _buildWebVideoPlayer(String embedUrl) {
-    return Html(
-      data: '''
-      <div style="width: 100%; height: 100%;">
-        <iframe 
-          src="$embedUrl" 
-          width="100%" 
-          height="100%" 
-          frameborder="0" 
-          allowfullscreen
-          style="border-radius: 12px;"
-        ></iframe>
-      </div>
-    ''',
-      style: {
-        "body": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
-        "div": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
-      },
-    );
+  Widget _buildMobileVideoPlayer(
+      ContentLabController controller, int index, String embedUrl) {
+    if (!kIsWeb) {
+      // Your existing WebView logic for Mobile ✅
+      if (controller.controllers[index] == null) {
+        final webViewCtrl = WebViewController()
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
+          ..loadHtmlString(controller.buildHtmlForUrl(embedUrl));
+        controller.controllers[index] = webViewCtrl;
+      }
+      return WebViewWidget(controller: controller.controllers[index]!);
+    } else {
+      // ✅ WEB FIX: SEPARATE CONTROLLER PER INDEX
+      if (controller.ytControllers.length <= index ||
+          controller.ytControllers[index] == null) {
+        final videoId = YoutubePlayerController.convertUrlToId(embedUrl) ?? "";
+        final ytCtrl = YoutubePlayerController(
+          // initialVideoId: videoId,
+          params: const YoutubePlayerParams(
+            showControls: true,
+            showFullscreenButton: true,
+          ),
+        );
+
+        // Expand list if needed
+        if (controller.ytControllers.length <= index) {
+          controller.ytControllers.add(ytCtrl);
+        } else {
+          controller.ytControllers[index] = ytCtrl;
+        }
+      }
+
+      return YoutubePlayer(
+        controller: controller.ytControllers[index]!,
+        aspectRatio: 16 / 9,
+      );
+    }
   }
 }

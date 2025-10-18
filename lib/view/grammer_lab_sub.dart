@@ -4,6 +4,7 @@ import 'package:hotelmanagementapp/model/grammer_lab_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/public/size_helpers.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 
 class GrammerLabSub extends StatefulWidget {
@@ -81,15 +82,22 @@ class _GrammerLabSubState extends State<GrammerLabSub> {
                   children: [
                     Padding(
                       padding: EdgeInsets.symmetric(
-                        vertical: getWidgetHeight(height: 16),
-                        horizontal: getWidgetWidth(width: 10),
-                      ),
+                          vertical: displayWidth(context) > 500
+                              ? displayWidth(context) * 0.01
+                              : getWidgetHeight(height: 15),
+                          horizontal: displayWidth(context) > 500
+                              ? displayWidth(context) * 0.008
+                              : getWidgetWidth(width: 10)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
                             children: [
-                              SizedBox(width: getWidgetWidth(width: 10)),
+                              SizedBox(
+                                width: displayWidth(context) > 500
+                                    ? displayHeight(context) * 0.02
+                                    : getWidgetWidth(width: 36),
+                              ),
                               Text(
                                 widget.doc.subcategory[index].text,
                                 style: TextStyle(
@@ -133,6 +141,8 @@ class _GrammerLabSubState extends State<GrammerLabSub> {
                                   padding: const EdgeInsets.only(
                                       left: 30, right: 30),
                                   child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: [
                                       // SPW(35),
                                       // if (!_isPlaying)
@@ -154,7 +164,7 @@ class _GrammerLabSubState extends State<GrammerLabSub> {
                                           ],
                                         ),
                                       ),
-                                      Spacer(),
+                                      // Spacer(),
                                       InkWell(
                                         onTap: () async {},
                                         child: Wrap(
@@ -176,7 +186,7 @@ class _GrammerLabSubState extends State<GrammerLabSub> {
                                         ),
                                       ),
                                       // SPW(20),
-                                      Spacer(),
+                                      // Spacer(),
                                     ],
                                   ),
                                 ),

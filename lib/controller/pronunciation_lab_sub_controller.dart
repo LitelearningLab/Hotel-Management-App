@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:hotelmanagementapp/model/word_attempt.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
@@ -17,6 +18,7 @@ import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:hotelmanagementapp/public/audio_helper.dart';
 import 'package:hotelmanagementapp/dbHelper/db_helper.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 
 import 'package:just_audio/just_audio.dart';
@@ -29,7 +31,7 @@ import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PronunciationLabSubController extends GetxController {
-  late String title;
+  String title = "";
   List<SubcategoryPro> subcategories = [];
   List<SubcategoryPro> ogSubCategories = [];
   List<SubcategoryPro> beforesearchResults = [];
@@ -73,8 +75,25 @@ class PronunciationLabSubController extends GetxController {
 
   void readyFirs() async {
     audioPlayer = AudioPlayer();
-    title = Get.arguments['title'];
-    final argList = Get.arguments['subcategories'] as List;
+    final args = Get.arguments;
+    final box = GetStorage();
+    var argList = [];
+    if (args != null) {
+      title = args['title'];
+      argList = args['subcategories'] as List;
+      collectionName = args['pronunCollectionName'] ?? '';
+      id = args['id'] ?? "";
+    } else {
+      final saved = box.read(AppRoutes.pronunciationLabSub) ?? {};
+      title = saved['title'] ?? "";
+      argList = saved['subcategories'] ?? [];
+      collectionName = saved['pronunCollectionName'] ?? '';
+      id = saved['id'] ?? "";
+    }
+    debugPrint("collection name is $collectionName");
+    debugPrint("argument list is $argList");
+    debugPrint("title is $title");
+
     audioPlayer.setUrl(
         "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Hotel%20Management%2FWhatsApp%20Audio%202025-09-09%20at%203.41.09%20PM.mp4?alt=media&token=b99d9096-211b-45cc-b157-4582c7fc3312");
     audioPlayer.play();
@@ -84,7 +103,6 @@ class PronunciationLabSubController extends GetxController {
             : SubcategoryPro.fromMap(Map<String, dynamic>.from(item)))
         .toList();
 
-    collectionName = Get.arguments['pronunCollectionName'] ?? '';
     audioPlayer.playerStateStream.listen((state) {
       if (state.playing && state.processingState == ProcessingState.ready) {
         update();
@@ -94,7 +112,7 @@ class PronunciationLabSubController extends GetxController {
         update();
       }
     });
-    id = Get.arguments['id'] ?? "";
+
     if (id == "") {
       if (!kIsWeb) {
         elseCase();

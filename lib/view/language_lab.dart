@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
 import 'package:hotelmanagementapp/controller/language_lab_controller.dart';
@@ -52,7 +53,9 @@ class Languagelab extends StatelessWidget {
               iconSize: 30,
               onPressed: () {
                 homeController.loadRecentHistory();
-                Navigator.pop(context);
+                kIsWeb
+                    ? Get.rootDelegate.offNamed(AppRoutes.home)
+                    : Navigator.pop(context);
               },
               icon: const Icon(Icons.arrow_back),
             ),
@@ -93,10 +96,20 @@ class Languagelab extends StatelessWidget {
                             imageUrl: AllAssets.pePl,
                             onTap: () async {
                               mianCategoryTitile = 'English Pronunciation';
-                              Get.toNamed(AppRoutes.pronunciationLab,
-                                  arguments: {
-                                    "title": "English Pronunciation"
-                                  });
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                GetStorage().write(AppRoutes.pronunciationLab,
+                                    {"title": "English Pronunciation"});
+                                kIsWeb
+                                    ? Get.rootDelegate.offNamed(
+                                        AppRoutes.pronunciationLab,
+                                        arguments: {
+                                            "title": "English Pronunciation"
+                                          })
+                                    : Get.toNamed(AppRoutes.pronunciationLab,
+                                        arguments: {
+                                            "title": "English Pronunciation"
+                                          });
+                              });
                             },
                             cardColor: Color(0xFF398480),
                           ),
@@ -109,8 +122,20 @@ class Languagelab extends StatelessWidget {
                             imageUrl: AllAssets.peScl,
                             onTap: () async {
                               mianCategoryTitile = 'French Pronunciation';
-                              Get.toNamed(AppRoutes.pronunciationLab,
-                                  arguments: {"title": "French Pronunciation"});
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                GetStorage().write(AppRoutes.pronunciationLab,
+                                    {"title": "French Pronunciation"});
+                                kIsWeb
+                                    ? Get.rootDelegate.offNamed(
+                                        AppRoutes.pronunciationLab,
+                                        arguments: {
+                                            "title": "French Pronunciation"
+                                          })
+                                    : Get.toNamed(AppRoutes.pronunciationLab,
+                                        arguments: {
+                                            "title": "French Pronunciation"
+                                          });
+                              });
                             },
                             cardColor: Color(0xFF445EA9),
                           ),
@@ -123,8 +148,16 @@ class Languagelab extends StatelessWidget {
                             imageUrl: AllAssets.peCfpl,
                             onTap: () async {
                               mianCategoryTitile = 'Sentence Lab';
-                              Get.toNamed(AppRoutes.sentenceLab,
-                                  arguments: {"title": "Sentence Lab"});
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                GetStorage().write(AppRoutes.sentenceLab,
+                                    {"title": "Sentence Lab"});
+                                kIsWeb
+                                    ? Get.rootDelegate.offNamed(
+                                        AppRoutes.sentenceLab,
+                                        arguments: {"title": "Sentence Lab"})
+                                    : Get.toNamed(AppRoutes.sentenceLab,
+                                        arguments: {"title": "Sentence Lab"});
+                              });
                             },
                             cardColor: Color(0xFF636CFF),
                           ),
@@ -137,8 +170,16 @@ class Languagelab extends StatelessWidget {
                             imageUrl: AllAssets.peGl,
                             onTap: () {
                               mianCategoryTitile = 'Grammer Lab';
-                              Get.toNamed(AppRoutes.grmmaerLab,
-                                  arguments: {"title": "Grammer Lab"});
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                GetStorage().write(AppRoutes.grmmaerLab,
+                                    {"title": "Grammer Lab"});
+                                kIsWeb
+                                    ? Get.rootDelegate.offNamed(
+                                        AppRoutes.grmmaerLab,
+                                        arguments: {"title": "Grammer Lab"})
+                                    : Get.toNamed(AppRoutes.grmmaerLab,
+                                        arguments: {"title": "Grammer Lab"});
+                              });
                             },
                             cardColor: Color(0xFFDC6379),
                           ),
@@ -432,16 +473,44 @@ class Languagelab extends StatelessWidget {
                                                   soundSubcategory: controller
                                                       .importantSound!
                                                       .subcategories[index]);
-                                              Get.toNamed(AppRoutes.soundPage,
-                                                  arguments: {
-                                                    "title": controller
-                                                        .importantSound!
-                                                        .subcategories[index]
-                                                        .name,
-                                                    "soundModel": controller
-                                                        .importantSound!
-                                                        .subcategories[index]
-                                                  });
+                                              GetStorage()
+                                                  .write(AppRoutes.soundPage, {
+                                                "title": controller
+                                                    .importantSound!
+                                                    .subcategories[index]
+                                                    .name,
+                                                "soundModel": controller
+                                                    .importantSound!
+                                                    .subcategories[index]
+                                              });
+                                              WidgetsBinding.instance
+                                                  .addPostFrameCallback((_) {
+                                                kIsWeb
+                                                    ? Get.rootDelegate.offNamed(
+                                                        AppRoutes.soundPage,
+                                                        arguments: {
+                                                            "title": controller
+                                                                .importantSound!
+                                                                .subcategories[
+                                                                    index]
+                                                                .name,
+                                                            "soundModel": controller
+                                                                .importantSound!
+                                                                .subcategories[index]
+                                                          })
+                                                    : Get.toNamed(
+                                                        AppRoutes.soundPage,
+                                                        arguments: {
+                                                            "title": controller
+                                                                .importantSound!
+                                                                .subcategories[
+                                                                    index]
+                                                                .name,
+                                                            "soundModel": controller
+                                                                .importantSound!
+                                                                .subcategories[index]
+                                                          });
+                                              });
                                             },
                                             child: Container(
                                               padding:
@@ -1032,15 +1101,42 @@ class Languagelab extends StatelessWidget {
                                                                 soundSubcategory:
                                                                     sub,
                                                               );
-                                                              Get.toNamed(
+                                                              GetStorage().write(
                                                                   AppRoutes
                                                                       .soundPage,
-                                                                  arguments: {
+                                                                  {
                                                                     "title": sub
                                                                         .name,
                                                                     "soundModel":
                                                                         sub,
                                                                   });
+                                                              WidgetsBinding
+                                                                  .instance
+                                                                  .addPostFrameCallback(
+                                                                      (_) {
+                                                                kIsWeb
+                                                                    ? Get
+                                                                        .rootDelegate
+                                                                        .offNamed(
+                                                                        AppRoutes
+                                                                            .soundPage,
+                                                                        arguments: {
+                                                                          "title":
+                                                                              sub.name,
+                                                                          "soundModel":
+                                                                              sub,
+                                                                        },
+                                                                      )
+                                                                    : Get.toNamed(
+                                                                        AppRoutes
+                                                                            .soundPage,
+                                                                        arguments: {
+                                                                            "title":
+                                                                                sub.name,
+                                                                            "soundModel":
+                                                                                sub,
+                                                                          });
+                                                              });
                                                             },
                                                             child: Container(
                                                               padding:

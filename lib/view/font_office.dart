@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/front_office_controller.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
@@ -14,6 +15,7 @@ import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/route/app_router_delegate.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/utility/web_view_page.dart';
@@ -62,7 +64,11 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                         highlightColor: Colors.transparent,
                         splashColor: Colors.transparent,
                         color: Colors.transparent,
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          kIsWeb
+                              ? Get.rootDelegate.offNamed(AppRoutes.home)
+                              : Get.back();
+                        },
                         icon: Stack(
                           alignment: Alignment.center,
                           children: [
@@ -218,6 +224,8 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                 horizontal: getWidgetWidth(width: 20)),
                             itemCount: controller.frontOfficeData.length,
                             itemBuilder: (context, index) {
+                              final glossaryIndex =
+                                  controller.glossaryIndex == index;
                               final isExpanded =
                                   controller.expandedIndex == index;
                               final linkAvailable = ((controller
@@ -236,19 +244,27 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                   controller.frontOfficeData[index]
                                           .subcategory[1].link !=
                                       ""));
-                              final linkAvailable2 = ((controller
-                                          .frontOfficeData[index]
-                                          .subcategory[2]
-                                          .link
-                                          .isNotEmpty ||
-                                      controller.frontOfficeData[index]
-                                              .subcategory[2].link !=
-                                          "")
-                                  //  &&
-                                  // accessLinks.toLowerCase().contains(
-                                  //     "knowledge check".toLowerCase())
-                                  );
 
+                              final subcat = controller.frontOfficeData[index]
+                                  .subcategory[2]; // Knowledge Check
+
+                              final linksToShow = subcat.linkList;
+                              // .isNotEmpty
+                              //     ? subcat.linkList
+                              //     : [
+                              //         {'name': subcat.name, 'link': subcat.link}
+                              //       ]; // fallback to single link
+                              final linkAvailable2 = linksToShow.isNotEmpty;
+                              // final linkAvailable2 =
+                              //  ((controller
+                              //                                 .frontOfficeData[index]
+                              //                                 .subcategory[2]
+                              //                                 .link
+                              //                                 .isEmpty)
+                              //                             //  &&
+                              //                             // accessLinks.toLowerCase().contains(
+                              //                             //     "knowledge check".toLowerCase())
+                              //                             );
                               return Column(
                                 children: [
                                   Padding(
@@ -258,6 +274,9 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                         onTap: () {
                                           controller.expandedIndex =
                                               isExpanded ? -1 : index;
+                                          controller.glossaryIndex =
+                                              glossaryIndex ? -1 : -1;
+
                                           controller.update();
                                         },
                                         child: AnimatedSize(
@@ -406,7 +425,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                           onTap: linkAvailable1
                                                               ? () {
                                                                   activityName =
-                                                                      'Knowledge Check';
+                                                                      'Glossary';
                                                                   subCategoryTitle = controller
                                                                       .frontOfficeData[
                                                                           index]
@@ -462,66 +481,6 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                           ),
                                                         ),
                                                         GestureDetector(
-                                                          onTap: linkAvailable2
-                                                              ? () {
-                                                                  activityName =
-                                                                      "Glossary";
-
-                                                                  subCategoryTitle = controller
-                                                                      .frontOfficeData[
-                                                                          index]
-                                                                      .category;
-                                                                  addToRecentHistory(
-                                                                      path:
-                                                                          "Core Department > ${controller.title} ",
-                                                                      category:
-                                                                          subCategoryTitle,
-                                                                      section:
-                                                                          activityName,
-                                                                      link: controller
-                                                                          .frontOfficeData[
-                                                                              index]
-                                                                          .subcategory[
-                                                                              2]
-                                                                          .link,
-                                                                      proLabTitle:
-                                                                          "");
-                                                                  if (kIsWeb) {
-                                                                    Navigator.push(
-                                                                        context,
-                                                                        MaterialPageRoute(
-                                                                            builder: (context) =>
-                                                                                WebContentPage(title: controller.frontOfficeData[index].category, url: controller.frontOfficeData[index].subcategory[2].link)));
-                                                                  } else {
-                                                                    Get.toNamed(
-                                                                        AppRoutes
-                                                                            .inAppWebView,
-                                                                        arguments: {
-                                                                          "url": controller
-                                                                              .frontOfficeData[index]
-                                                                              .subcategory[2]
-                                                                              .link
-                                                                        });
-                                                                  }
-                                                                }
-                                                              : null,
-                                                          child: Image.asset(
-                                                            AllAssets.approval,
-                                                            color:
-                                                                linkAvailable2
-                                                                    ? Colors
-                                                                        .black
-                                                                    : Colors
-                                                                        .grey,
-                                                            width:
-                                                                getWidgetWidth(
-                                                                    width: 22),
-                                                            height:
-                                                                getWidgetHeight(
-                                                                    height: 26),
-                                                          ),
-                                                        ),
-                                                        GestureDetector(
                                                           // onTapDown:
                                                           //     (TapDownDetails
                                                           //         details) {
@@ -533,28 +492,24 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                           //           tapPosition);
                                                           // },
                                                           onTap: () {
+                                                            controller
+                                                                .glossaryIndex = -1;
+
+                                                            controller.update();
                                                             activityName =
                                                                 "Prounciation Lab";
+                                                            debugPrint(
+                                                                "pronunCollectionName: ${controller.pronunCollectionName}");
 
                                                             subCategoryTitle =
                                                                 controller
                                                                     .frontOfficeData[
                                                                         index]
                                                                     .category;
-                                                            addToRecentHistory(
-                                                                path:
-                                                                    "Core Department > ${controller.title}",
-                                                                category:
-                                                                    subCategoryTitle,
-                                                                section:
-                                                                    "proLab",
-                                                                link: "",
-                                                                proLabTitle:
-                                                                    "");
-                                                            Get.toNamed(
+                                                            GetStorage().write(
                                                                 AppRoutes
                                                                     .pronunciationLabSub,
-                                                                arguments: {
+                                                                {
                                                                   'title': controller
                                                                       .frontOfficeData[
                                                                           index]
@@ -569,6 +524,52 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                       controller
                                                                           .pronunCollectionName,
                                                                 });
+                                                            addToRecentHistory(
+                                                                path:
+                                                                    "Core Department > ${controller.title}",
+                                                                category:
+                                                                    subCategoryTitle,
+                                                                section:
+                                                                    "proLab",
+                                                                link: "",
+                                                                proLabTitle:
+                                                                    "");
+                                                            WidgetsBinding
+                                                                .instance
+                                                                .addPostFrameCallback(
+                                                                    (_) {
+                                                              kIsWeb
+                                                                  ? Get.rootDelegate.offNamed(
+                                                                      AppRoutes
+                                                                          .pronunciationLabSub,
+                                                                      arguments: {
+                                                                          'title': controller
+                                                                              .frontOfficeData[index]
+                                                                              .category,
+                                                                          'subcategories':
+                                                                              <SubcategoryPro>[],
+                                                                          "id": controller
+                                                                              .frontOfficeData[index]
+                                                                              .pronunID,
+                                                                          "pronunCollectionName":
+                                                                              controller.pronunCollectionName,
+                                                                        })
+                                                                  : Get.toNamed(
+                                                                      AppRoutes
+                                                                          .pronunciationLabSub,
+                                                                      arguments: {
+                                                                          'title': controller
+                                                                              .frontOfficeData[index]
+                                                                              .category,
+                                                                          'subcategories':
+                                                                              <SubcategoryPro>[],
+                                                                          "id": controller
+                                                                              .frontOfficeData[index]
+                                                                              .pronunID,
+                                                                          "pronunCollectionName":
+                                                                              controller.pronunCollectionName,
+                                                                        });
+                                                            });
                                                             // Navigator.push(
                                                             //     context,
                                                             //     MaterialPageRoute(
@@ -589,9 +590,170 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                             ),
                                                           ),
                                                         ),
+                                                        GestureDetector(
+                                                          onTap: linkAvailable2
+                                                              ? () {
+                                                                  controller
+                                                                          .glossaryIndex =
+                                                                      glossaryIndex
+                                                                          ? -1
+                                                                          : index;
+                                                                  controller
+                                                                      .update();
+
+                                                                  // if (kIsWeb) {
+                                                                  //   Navigator.push(
+                                                                  //       context,
+                                                                  //       MaterialPageRoute(
+                                                                  //           builder: (context) =>
+                                                                  //               WebContentPage(title: controller.frontOfficeData[index].category, url: controller.frontOfficeData[index].subcategory[2].link)));
+                                                                  // } else {
+                                                                  //   Get.toNamed(
+                                                                  //       AppRoutes
+                                                                  //           .inAppWebView,
+                                                                  //       arguments: {
+                                                                  //         "url": controller
+                                                                  //             .frontOfficeData[index]
+                                                                  //             .subcategory[2]
+                                                                  //             .link
+                                                                  //       });
+                                                                  // }
+                                                                }
+                                                              : null,
+                                                          child: Image.asset(
+                                                            AllAssets.approval,
+                                                            color: (isExpanded)
+                                                                ? linearColor
+                                                                : linkAvailable2
+                                                                    ? Colors
+                                                                        .black
+                                                                    : Colors
+                                                                        .grey,
+                                                            width:
+                                                                getWidgetWidth(
+                                                                    width: 22),
+                                                            height:
+                                                                getWidgetHeight(
+                                                                    height: 26),
+                                                          ),
+                                                        ),
                                                       ],
                                                     ),
                                                   ),
+                                                if (isExpanded)
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: getWidgetWidth(
+                                                            width: 10),
+                                                        right: getWidgetWidth(
+                                                            width: 80)),
+                                                    child: const Divider(
+                                                      color: Color.fromARGB(
+                                                          255, 107, 107, 107),
+                                                    ),
+                                                  ),
+                                                if (isExpanded)
+                                                  Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                      horizontal:
+                                                          getWidgetWidth(
+                                                              width: 15),
+                                                      vertical: getWidgetHeight(
+                                                          height: 8),
+                                                    ),
+                                                    child: ListView.builder(
+                                                      shrinkWrap: true,
+                                                      itemCount:
+                                                          linksToShow.length,
+                                                      physics:
+                                                          NeverScrollableScrollPhysics(),
+                                                      itemBuilder: (context,
+                                                          glossaryIndex) {
+                                                        final linkItem =
+                                                            linksToShow[
+                                                                glossaryIndex];
+                                                        return Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            GestureDetector(
+                                                              onTap: linksToShow[
+                                                                              glossaryIndex]
+                                                                          [
+                                                                          'link']!
+                                                                      .isEmpty
+                                                                  ? null
+                                                                  : () {
+                                                                      activityName =
+                                                                          "Knowledge Check";
+
+                                                                      subCategoryTitle = controller
+                                                                          .frontOfficeData[
+                                                                              index]
+                                                                          .category;
+                                                                      addToRecentHistory(
+                                                                          path:
+                                                                              "Core Department > ${controller.title} ",
+                                                                          category:
+                                                                              subCategoryTitle,
+                                                                          section:
+                                                                              activityName,
+                                                                          link: linksToShow[glossaryIndex]
+                                                                              [
+                                                                              'link']!,
+                                                                          proLabTitle:
+                                                                              "");
+                                                                      log("printing the link here ${linksToShow[glossaryIndex]['link']!}");
+                                                                      if (kIsWeb) {
+                                                                        Navigator.push(
+                                                                            context,
+                                                                            MaterialPageRoute(builder: (context) => WebContentPage(title: controller.frontOfficeData[index].category, url: linksToShow[glossaryIndex]['link']!)));
+                                                                      } else {
+                                                                        Get.toNamed(
+                                                                            AppRoutes.inAppWebView,
+                                                                            arguments: {
+                                                                              "url": linksToShow[glossaryIndex]['link']!
+                                                                            });
+                                                                      }
+                                                                      // ✅ Launch link here
+                                                                      // launchUrl(Uri.parse(linkItem['link']!)); → use url_launcher plugin
+                                                                    },
+                                                              child: Text(
+                                                                "> ${linkItem['name']!.isEmpty ? 'Open check' : linkItem['name']}",
+                                                                style: TextStyle(
+                                                                    color: linksToShow[glossaryIndex]['link']!
+                                                                            .isEmpty
+                                                                        ? Colors
+                                                                            .grey
+                                                                        : linearColor),
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                horizontal: kIsWeb
+                                                                    ? 15
+                                                                    : getWidgetWidth(
+                                                                        width:
+                                                                            10),
+                                                              ),
+                                                              child:
+                                                                  const Divider(
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        57,
+                                                                        107,
+                                                                        107,
+                                                                        107),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    ),
+                                                  )
                                               ],
                                             ),
                                           ),

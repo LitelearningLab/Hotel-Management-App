@@ -5,9 +5,11 @@ import 'dart:ui';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/dbHelper/sentence_db_helper.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SentenceLabController extends GetxController {
@@ -60,10 +62,16 @@ class SentenceLabController extends GetxController {
     super.onInit();
   }
 
-  onFirst() async {
+  void onFirst() async {
     log('[onFirst] Called');
     final args = Get.arguments as Map<String, dynamic>?;
-    title.value = args?['title'] ?? "Sentence Lab";
+    final box = GetStorage();
+    if (args != null) {
+      title.value = args['title'] ?? "Sentence Lab";
+    } else {
+      final saved = box.read(AppRoutes.sentenceLab) ?? {};
+      title.value = saved['title'] ?? "Sentence Lab";
+    }
 
     // 🔥 Web: Directly load from Firebase (NO DB CALL)
     if (kIsWeb) {

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/dbHelper/progress_bar_db_helper.dart';
 import 'package:hotelmanagementapp/model/front_office_model.dart';
@@ -11,6 +12,7 @@ import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/response/front_office_responce.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 
 class FrontOfficeController extends GetxController {
   String title = '';
@@ -19,6 +21,7 @@ class FrontOfficeController extends GetxController {
   final int itemCount = 10;
   late List<bool> isExpanded;
   int expandedIndex = -1;
+  int glossaryIndex = -1;
 
   FrontOfficeResponse frontOfficeResponse = FrontOfficeResponse();
   List<FrontOfficeDocument> frontOfficeData = [];
@@ -48,10 +51,24 @@ class FrontOfficeController extends GetxController {
       loading = true;
       update();
 
-      final args = Get.arguments as Map<String, dynamic>?;
-      title = args?['title'] ?? "";
-      image = args?['image'] ?? "";
-      index = args?['index'] ?? "";
+      final args = Get.arguments;
+      final box = GetStorage();
+
+      if (args != null) {
+        // Mobile navigation ✅
+        title = args['title'] ?? "";
+        image = args['image'] ?? "";
+        index = args['index'] ?? "";
+
+        // Store for web refresh
+        box.write('pageData', args);
+      } else {
+        // Web refresh fallback ✅
+        final saved = box.read(AppRoutes.frontOffice) ?? {};
+        title = saved['title'] ?? "";
+        image = saved['image'] ?? "";
+        index = saved['index'] ?? "";
+      }
 
       isExpanded = List.generate(itemCount, (_) => false);
 

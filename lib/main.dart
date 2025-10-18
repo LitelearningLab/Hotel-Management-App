@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/firebase_options.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/route/app_router_delegate.dart';
 import 'package:hotelmanagementapp/route/binding.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/route/route_service.dart';
@@ -18,8 +19,13 @@ import 'package:hotelmanagementapp/view/login.dart';
 import 'package:hotelmanagementapp/view/splash.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+import 'package:get_storage/get_storage.dart';
+
 bool isOnNoInternetPage = false;
 void main() async {
+  await GetStorage.init();
+  Get.lazyPut<AppRouterDelegate>(() => AppRouterDelegate());
+
   // WebView.platform = WebWebViewPlatform();
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
@@ -85,34 +91,66 @@ class _MyAppState extends State<MyApp> {
     kWidth = MediaQuery.of(context).size.width;
     kText = MediaQuery.of(context).textScaler;
 
-    return GetMaterialApp(
-      getPages: RouteService.getPages,
-      initialBinding: InitialBinding(),
-      title: 'Profluent Hotelier',
-      theme: ThemeData(
-        useMaterial3: true,
-        scaffoldBackgroundColor: Colors.white,
-        primaryColor: Colors.white,
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: Colors.white,
-          surface: Colors.white,
-          onSurface: Colors.black,
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.transparent,
-          elevation: 0,
-        ),
-        popupMenuTheme: const PopupMenuThemeData(
-          color: Colors.white,
-          surfaceTintColor: Colors.transparent,
-        ),
-        dialogTheme: const DialogThemeData(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.transparent,
-        ),
-      ),
-      initialRoute: AppRoutes.splashScreen,
-    );
+    return kIsWeb
+        ? GetMaterialApp.router(
+            key: Get.key,
+            routerDelegate: AppRouterDelegate(),
+            getPages: RouteService.getPages,
+            // initialBinding: InitialBinding(),
+            title: 'Profluent Hotelier',
+            theme: ThemeData(
+              useMaterial3: true,
+              scaffoldBackgroundColor: Colors.white,
+              primaryColor: Colors.white,
+              colorScheme: ColorScheme.fromSwatch().copyWith(
+                primary: Colors.white,
+                surface: Colors.white,
+                onSurface: Colors.black,
+              ),
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.white,
+                surfaceTintColor: Colors.transparent,
+                elevation: 0,
+              ),
+              popupMenuTheme: const PopupMenuThemeData(
+                color: Colors.white,
+                surfaceTintColor: Colors.transparent,
+              ),
+              dialogTheme: const DialogThemeData(
+                backgroundColor: Colors.white,
+                surfaceTintColor: Colors.transparent,
+              ),
+            ),
+          )
+        : GetMaterialApp(
+            // key: Get.key,
+            getPages: RouteService.getPages,
+            initialBinding: InitialBinding(),
+            title: 'Profluent Hotelier',
+            theme: ThemeData(
+              useMaterial3: true,
+              scaffoldBackgroundColor: Colors.white,
+              primaryColor: Colors.white,
+              colorScheme: ColorScheme.fromSwatch().copyWith(
+                primary: Colors.white,
+                surface: Colors.white,
+                onSurface: Colors.black,
+              ),
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.white,
+                surfaceTintColor: Colors.transparent,
+                elevation: 0,
+              ),
+              popupMenuTheme: const PopupMenuThemeData(
+                color: Colors.white,
+                surfaceTintColor: Colors.transparent,
+              ),
+              dialogTheme: const DialogThemeData(
+                backgroundColor: Colors.white,
+                surfaceTintColor: Colors.transparent,
+              ),
+            ),
+            initialRoute: AppRoutes.splashScreen,
+          );
   }
 }

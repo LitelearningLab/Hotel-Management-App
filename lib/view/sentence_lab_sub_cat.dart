@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/sentence_lab_sub_cat_controller.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
@@ -9,6 +12,7 @@ import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:intl/intl.dart';
 
 class SentenceLabSubCat extends StatefulWidget {
@@ -71,7 +75,19 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                 if (controller.isSearching) {
                   controller.clearSearch();
                 } else {
-                  Navigator.pop(context);
+                  if (kIsWeb) {
+                    final box = GetStorage();
+                    final saved = box.read(AppRoutes.sentenceLabSub) ?? {};
+                    Get.rootDelegate.offNamed(
+                      AppRoutes.sentenceLabSub,
+                      arguments: {
+                        "title": saved['title'] ?? "",
+                        "subcategories": saved['subcategories'] ?? [],
+                      },
+                    );
+                  } else {
+                    Navigator.pop(context);
+                  }
                 }
               },
               icon:

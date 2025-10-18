@@ -29,7 +29,7 @@ class SimulationSub extends StatefulWidget {
 class _SimulationSubState extends State<SimulationSub> {
   late List<bool> isExpanded;
   int expandedIndex = -1;
-  HomeController homeController = Get.find<HomeController>();
+  HomeController homeController = Get.put(HomeController());
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -48,7 +48,9 @@ class _SimulationSubState extends State<SimulationSub> {
               icon: const Icon(Icons.arrow_back, color: Colors.black),
               onPressed: () {
                 sessionName = "";
-                Navigator.pop(context);
+                kIsWeb
+                    ? Get.rootDelegate.offNamed(AppRoutes.simulation)
+                    : Navigator.pop(context);
               }, // or Get.back()
             ),
             forceMaterialTransparency: true,

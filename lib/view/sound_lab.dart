@@ -4,15 +4,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/sound_lab_controller.dart';
+import 'package:hotelmanagementapp/model/sound_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/public/size_helpers.dart';
 import 'package:hotelmanagementapp/public/spacing.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 
 class SoundLab extends StatefulWidget {
@@ -50,7 +54,22 @@ class _SoundLabState extends State<SoundLab> {
           ),
           leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              final box = GetStorage();
+              final saved = box.read(AppRoutes.soundPage) ?? {};
+
+              late SoundSubcategory soundModel;
+              final storedSound = saved['soundModel'];
+              if (storedSound is Map<String, dynamic>) {
+                soundModel = SoundSubcategory.fromJson(storedSound);
+              } else if (storedSound is SoundSubcategory) {
+                soundModel = storedSound;
+              }
+              kIsWeb
+                  ? Get.rootDelegate.offNamed(AppRoutes.soundPage, arguments: {
+                      'title': saved['title'] ?? "Sound Page",
+                      'soundModel': soundModel,
+                    })
+                  : Navigator.pop(context);
             },
             icon: const Icon(Icons.arrow_back),
           ),

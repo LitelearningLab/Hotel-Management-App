@@ -10,6 +10,7 @@ import 'package:hotelmanagementapp/view/content_lab.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/home.dart';
 import 'package:hotelmanagementapp/view/language_lab.dart';
+import 'package:hotelmanagementapp/view/login.dart';
 import 'package:hotelmanagementapp/view/no_internet_page.dart';
 import 'package:hotelmanagementapp/view/prnouniciation_lab_sub.dart';
 import 'package:hotelmanagementapp/view/pronounciation_lab.dart';
@@ -27,10 +28,19 @@ import '../view/grammer_lab.dart';
 class RouteService {
   static List<GetPage<dynamic>>? getPages = [
     GetPage(
+      name: AppRoutes.splashScreen,
+      page: () => SplashScreen(),
+      binding: SplashScreenBinding(),
+    ),
+    GetPage(
       name: AppRoutes.home,
       page: () => const Home(),
       binding: InitialBinding(),
     ),
+    GetPage(
+        name: AppRoutes.login,
+        page: () => LoginPage(),
+        preventDuplicates: true),
     GetPage(
         name: AppRoutes.frontOffice,
         page: () => const FrontOfficeHotelReception(),
@@ -79,6 +89,11 @@ class RouteService {
     ),
     GetPage(
       name: AppRoutes.sentenceLabSub,
+      page: () => SentenceLabSub(),
+      binding: SentenceLabSubBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.sentenceLabSubCat,
       page: () => SentenceLabSubCat(),
       binding: SentenceLabSubCatBinding(),
     ),
@@ -91,11 +106,6 @@ class RouteService {
       name: AppRoutes.contentLibrary,
       page: () => ContentLab(),
       binding: ContentLabBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.splashScreen,
-      page: () => SplashScreen(),
-      binding: SplashScreenBinding(),
     ),
     GetPage(
       name: AppRoutes.noInternet,

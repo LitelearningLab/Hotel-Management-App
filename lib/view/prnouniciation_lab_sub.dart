@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/pronunciation_lab_sub_controller.dart';
 import 'package:hotelmanagementapp/model/category_model.dart';
@@ -13,6 +15,7 @@ import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/public/size_helpers.dart';
 import 'package:hotelmanagementapp/public/spacing.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/boom_menu.dart';
 
 import 'package:hotelmanagementapp/utility/boom_menu_item.dart' as bm;
@@ -92,7 +95,28 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                   controller.clearSearch(); // Clear filter
                   controller.update();
                 } else {
-                  Navigator.pop(context);
+                  if (kIsWeb) {
+                    final box = GetStorage();
+
+                    if (controller.id != "") {
+                      final saved = box.read(AppRoutes.frontOffice) ?? {};
+                      Get.rootDelegate
+                          .offNamed(AppRoutes.frontOffice, arguments: {
+                        'title': saved['title'] ?? "Front Office",
+                        'image': saved['image'],
+                        'index': saved['index'],
+                      });
+                    } else {
+                      final saved = box.read(AppRoutes.pronunciationLab) ?? {};
+                      Get.rootDelegate
+                          .offNamed(AppRoutes.pronunciationLab, arguments: {
+                        'title': saved['title'] ?? "Pronunciation Lab",
+                      });
+                      debugPrint("No data found in storage for front office");
+                    }
+                  } else {
+                    Navigator.pop(context);
+                  }
                 }
               },
               icon:

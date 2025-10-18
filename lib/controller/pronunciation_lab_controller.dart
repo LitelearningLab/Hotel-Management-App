@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:hotelmanagementapp/dbHelper/db_helper.dart';
 import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:hotelmanagementapp/model/word_attempt.dart';
@@ -16,6 +17,7 @@ import 'package:hotelmanagementapp/public/audio_helper.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/firebase_service.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -176,7 +178,15 @@ class PronunciationLabController extends GetxController {
   @override
   void onInit() {
     final args = Get.arguments as Map<String, dynamic>?;
-    title.value = args?['title'] ?? "";
+    final box = GetStorage();
+    if (args != null) {
+      title.value = args['title'] ?? "";
+    } else {
+      final saved = box.read(AppRoutes.pronunciationLab) ?? {};
+      title.value = saved['title'] ?? "";
+    }
+    debugPrint("PronunciationLabController title: ${title.value}");
+
     audioPlayer = AudioPlayer();
 
     audioPlayer.setUrl(
@@ -262,6 +272,8 @@ class PronunciationLabController extends GetxController {
       isLoading.value = false;
       update();
     }
+    isLoading.value = false;
+    update();
   }
 
   void clearSearch() {

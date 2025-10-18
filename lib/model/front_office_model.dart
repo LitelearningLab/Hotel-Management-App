@@ -42,23 +42,48 @@ class FrontOfficeDocument {
 class SubCategory {
   final String name;
   final String link;
+  final List<Map<String, String>> linkList;
 
   SubCategory({
     required this.name,
     required this.link,
+    required this.linkList,
   });
 
   factory SubCategory.fromMap(Map<String, dynamic> map) {
+    dynamic rawLink = map['link'];
+    String extractedLink = '';
+    List<Map<String, String>> extractedList = [];
+
+    if (rawLink is String) {
+      extractedLink = rawLink;
+    } else if (rawLink is List) {
+      for (var item in rawLink) {
+        if (item is Map) {
+          extractedList.add({
+            'name': item['name'] ?? '',
+            'link': item['link'] ?? '',
+          });
+
+          if (extractedLink.isEmpty &&
+              (item['link'] ?? '').toString().isNotEmpty) {
+            extractedLink = item['link'];
+          }
+        }
+      }
+    }
+
     return SubCategory(
       name: map['name'] ?? '',
-      link: map['link'] ?? '',
+      link: extractedLink,
+      linkList: extractedList,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      'link': link,
+      'link': linkList.isNotEmpty ? linkList : link, // ✅ FIX HERE
     };
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -39,16 +40,22 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> startTimer() async {
+    log("checking whether it goes here or not");
     await Future.delayed(Duration(seconds: 2));
     final prefs = await SharedPreferences.getInstance();
     final email = prefs.getString('email');
     final password = prefs.getString('password');
-
     if (email != null && password != null) {
-      Get.offAllNamed(AppRoutes.home);
+      log('navigating to home');
+      kIsWeb
+          ? Get.rootDelegate.offNamed(AppRoutes.home)
+          : Get.offAllNamed(AppRoutes.home);
     } else {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => LoginPage()));
+      log("navigating to login");
+      kIsWeb
+          ? Get.rootDelegate.offNamed(AppRoutes.login)
+          : Get.offAllNamed(AppRoutes.login);
+      // Get.offAllNamed(AppRoutes.login);
     }
   }
 

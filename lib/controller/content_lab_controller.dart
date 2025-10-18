@@ -6,6 +6,7 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 import '../public/common_function.dart';
 
@@ -35,6 +36,7 @@ class ContentLabController extends GetxController {
   bool hasMorePosts = true;
   String? _lastFetchedKey;
   bool _hasMoreData = true;
+  List<YoutubePlayerController?> ytControllers = [];
 
   ScrollController scrollController = ScrollController();
   Future<void> fetchPostsFromFirebase() async {

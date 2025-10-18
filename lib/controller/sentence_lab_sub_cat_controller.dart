@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:hotelmanagementapp/model/sentence_attempt.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
@@ -11,6 +12,7 @@ import 'package:hotelmanagementapp/public/audio_helper.dart';
 import 'package:hotelmanagementapp/dbHelper/sentence_db_helper.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/result_dialog.dart';
 import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 import 'package:just_audio/just_audio.dart';
@@ -53,9 +55,14 @@ class SentenceLabSubCatController extends GetxController {
   @override
   void onInit() {
     audioPlayer = AudioPlayer();
-    final args = Get.arguments as Map<String, dynamic>?;
-
-    title = args?['title'] ?? "";
+    final args = Get.arguments;
+    final box = GetStorage();
+    if (args != null) {
+      title = args?['title'] ?? "";
+    } else {
+      final saved = box.read(AppRoutes.sentenceLabSubCat) ?? {};
+      title = saved['title'] ?? "";
+    }
 
     // subcategories = args?["CategoryModel"] ?? [];
 
@@ -70,7 +77,38 @@ class SentenceLabSubCatController extends GetxController {
       subcategories = List.from(allSubcategories);
     } else {
       final args = Get.arguments as Map<String, dynamic>?;
-      subcategories = args?["CategoryModel"] ?? [];
+      final box = GetStorage();
+
+      if (args == null) {
+        final saved = box.read(AppRoutes.sentenceLabSubCat) ?? {};
+        final rawList = saved['CategoryModel'];
+
+        if (rawList is List) {
+          subcategories = rawList.map((item) {
+            if (item is SubCategoryModel) return item;
+            if (item is Map<String, dynamic>) {
+              return SubCategoryModel.fromJson(item);
+            }
+            throw Exception("Invalid item type in CategoryModel list");
+          }).toList();
+        } else {
+          subcategories = [];
+        }
+      } else {
+        final rawList = args["CategoryModel"];
+
+        if (rawList is List) {
+          subcategories = rawList.map((item) {
+            if (item is SubCategoryModel) return item;
+            if (item is Map<String, dynamic>) {
+              return SubCategoryModel.fromJson(item);
+            }
+            throw Exception("Invalid item type passed in arguments");
+          }).toList();
+        } else {
+          subcategories = [];
+        }
+      }
       allSubcategories = List.from(subcategories);
     }
     final prefs = await SharedPreferences.getInstance();

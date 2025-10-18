@@ -2,12 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/sentence_lab_controller.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/size_helpers.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/view/sentence_lab_sub.dart';
 
@@ -32,14 +34,32 @@ class _SentenceLabState extends State<SentenceLab> {
             forceMaterialTransparency: true,
             backgroundColor: Colors.white,
             titleSpacing: 0,
-            title: Text(
-              controller.title.value,
-              textAlign: TextAlign.left,
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w600,
-                fontSize: 20,
-                color: Colors.black,
-              ),
+            title: Row(
+              children: [
+                if (kIsWeb)
+                  SizedBox(
+                    width: getWidgetWidth(width: 12),
+                    child: IconButton(
+                        onPressed: () {
+                          kIsWeb
+                              ? Get.rootDelegate.offNamed(AppRoutes.languageLab)
+                              : Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        )),
+                  ),
+                Text(
+                  controller.title.value,
+                  textAlign: TextAlign.left,
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
             )),
         body: Padding(
           padding: EdgeInsets.symmetric(
@@ -77,17 +97,39 @@ class _SentenceLabState extends State<SentenceLab> {
                           onTap: () {
                             subCategoryTitle =
                                 controller.sentenceLabList[index].sectionName;
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SentenceLabSub(
-                                          title: controller
-                                              .sentenceLabList[index]
-                                              .sectionName,
-                                          subcategories: controller
-                                              .sentenceLabList[index]
-                                              .categories,
-                                        )));
+                            GetStorage().write(AppRoutes.sentenceLabSub, {
+                              "title":
+                                  controller.sentenceLabList[index].sectionName,
+                              "subcategories":
+                                  controller.sentenceLabList[index].categories,
+                            });
+                            kIsWeb
+                                ? Get.rootDelegate.offNamed(
+                                    AppRoutes.sentenceLabSub,
+                                    arguments: {
+                                        "title": controller
+                                            .sentenceLabList[index].sectionName,
+                                        "subcategories": controller
+                                            .sentenceLabList[index].categories,
+                                      })
+                                : Get.toNamed(AppRoutes.sentenceLabSub,
+                                    arguments: {
+                                        "title": controller
+                                            .sentenceLabList[index].sectionName,
+                                        "subcategories": controller
+                                            .sentenceLabList[index].categories,
+                                      });
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (context) => SentenceLabSub(
+                            //               title: controller
+                            //                   .sentenceLabList[index]
+                            //                   .sectionName,
+                            //               subcategories: controller
+                            //                   .sentenceLabList[index]
+                            //                   .categories,
+                            //             )));
                           },
                           child: Container(
                             width: getWidgetWidth(width: 375),

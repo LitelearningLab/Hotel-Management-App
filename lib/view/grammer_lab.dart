@@ -1,11 +1,16 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/grammer_lab_controller.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/public/size_helpers.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/view/grammer_lab_sub.dart';
 
@@ -30,14 +35,32 @@ class _GrammerLabState extends State<GrammerLab> {
             forceMaterialTransparency: true,
             backgroundColor: Colors.white,
             titleSpacing: 0,
-            title: Text(
-              controller.title.value,
-              textAlign: TextAlign.left,
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w600,
-                fontSize: 20,
-                color: Colors.black,
-              ),
+            title: Row(
+              children: [
+                if (kIsWeb)
+                  SizedBox(
+                    width: getWidgetWidth(width: 12),
+                    child: IconButton(
+                        onPressed: () {
+                          kIsWeb
+                              ? Get.rootDelegate.offNamed(AppRoutes.languageLab)
+                              : Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        )),
+                  ),
+                Text(
+                  controller.title.value,
+                  textAlign: TextAlign.left,
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
             )),
         body: Padding(
           padding: EdgeInsets.symmetric(
@@ -100,13 +123,19 @@ class _GrammerLabState extends State<GrammerLab> {
                               ),
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
-                                    vertical: getWidgetHeight(height: 15),
-                                    horizontal: getWidgetWidth(width: 10)),
+                                    vertical: displayWidth(context) > 500
+                                        ? displayWidth(context) * 0.01
+                                        : getWidgetHeight(height: 15),
+                                    horizontal: displayWidth(context) > 500
+                                        ? displayWidth(context) * 0.008
+                                        : getWidgetWidth(width: 10)),
                                 child: Row(
                                   children: [
                                     Container(
                                       height: getWidgetHeight(height: 36),
-                                      width: getWidgetWidth(width: 36),
+                                      width: displayWidth(context) > 500
+                                          ? displayHeight(context) * 0.04
+                                          : getWidgetWidth(width: 36),
                                       decoration: BoxDecoration(
                                           color: controller.grammarCheckLabList[
                                                   index]['bgColor'] ??
@@ -125,7 +154,9 @@ class _GrammerLabState extends State<GrammerLab> {
                                       ),
                                     ),
                                     SizedBox(
-                                      width: getWidgetWidth(width: 10),
+                                      width: displayWidth(context) > 500
+                                          ? displayWidth(context) * 0.01
+                                          : getWidgetWidth(width: 10),
                                     ),
                                     Expanded(
                                       child: Text(

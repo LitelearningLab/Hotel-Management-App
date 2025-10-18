@@ -2,7 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:hotelmanagementapp/model/sound_model.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -18,7 +20,20 @@ class SoundLabController extends GetxController {
   @override
   void onInit() {
     audioPlayer = AudioPlayer();
-    soundSubcategory = Get.arguments["soundSubcategory"];
+    final args = Get.arguments;
+    final box = GetStorage();
+    if (args != null) {
+      soundSubcategory = args["soundSubcategory"];
+    } else {
+      final saved = box.read(AppRoutes.soundLab) ?? {};
+      final storedSound = saved['soundSubcategory'];
+      if (storedSound is Map<String, dynamic>) {
+        soundSubcategory = SoundSubcategory.fromJson(storedSound);
+      } else if (storedSound is SoundSubcategory) {
+        soundSubcategory = storedSound;
+      }
+    }
+
     audioPlayer.playerStateStream.listen((state) {
       if (state.playing && state.processingState == ProcessingState.ready) {
         update();

@@ -66,7 +66,11 @@ class _SearchScreenState extends State<SearchScreen> {
                         GestureDetector(
                           onTap: () {
                             homeController.loadRecentHistory();
-                            Navigator.pop(context);
+                            if (kIsWeb) {
+                              Get.rootDelegate.offNamed(AppRoutes.home);
+                            } else {
+                              Navigator.pop(context);
+                            }
                           },
                           child: const Icon(Icons.arrow_back_ios,
                               size: 20, color: Colors.black),

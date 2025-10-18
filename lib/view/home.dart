@@ -12,6 +12,7 @@ import 'package:flutter_launcher_icons/xml_templates.dart';
 
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
 import 'package:hotelmanagementapp/model/category_model.dart';
@@ -32,7 +33,6 @@ import 'package:hotelmanagementapp/utility/web_view_page.dart';
 import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/grammer_lab_sub.dart';
-import 'package:hotelmanagementapp/view/interactive_simulations.dart';
 import 'package:hotelmanagementapp/view/language_lab.dart';
 import 'package:hotelmanagementapp/view/login.dart';
 import 'package:hotelmanagementapp/view/pdf.dart';
@@ -340,8 +340,15 @@ class _HomeState extends State<Home>
 
                   TextButton(
                     onPressed: () async {
-                      Get.toNamed(AppRoutes.inAppWebView, arguments: {
-                        "url": ApiRoutes.privacyPolicy,
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        kIsWeb
+                            ? Get.rootDelegate
+                                .offNamed(AppRoutes.inAppWebView, arguments: {
+                                "url": ApiRoutes.privacyPolicy,
+                              })
+                            : Get.toNamed(AppRoutes.inAppWebView, arguments: {
+                                "url": ApiRoutes.privacyPolicy,
+                              });
                       });
                     },
                     child: Text(
@@ -378,136 +385,449 @@ class _HomeState extends State<Home>
           child: CustomeBottomNavigation(),
         ),
         backgroundColor: Colors.white,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: getWidgetHeight(height: isKwidth > 500 ? 20 : 60)),
-            Padding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: getWidgetWidth(width: 20)),
-              child: Row(
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    height: getWidgetHeight(height: kWidth > 700 ? 40 : 40),
-                    width: getWidgetWidth(
-                        width: isKwidth > 1204
-                            ? 40
-                            : (isKwidth > 700 && kWidth < 1204)
-                                ? 60
-                                : 130),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      // radius: 25,
-                      child: Image.asset(
-                        AllAssets.splashLogo,
-                        fit: BoxFit.fitWidth,
-                        // width: getWidgetWidth(width: 200),
-                        // height: getWidgetHeight(height: 200),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                  height: getWidgetHeight(height: isKwidth > 500 ? 20 : 60)),
+              Padding(
+                padding:
+                    EdgeInsets.symmetric(horizontal: getWidgetWidth(width: 20)),
+                child: Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      height: kWidth > 700 ? 50 : getWidgetHeight(height: 40),
+                      width: isKwidth > 700 ? 150 : getWidgetWidth(width: 130),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        // radius: 25,
+                        child: Image.asset(
+                          AllAssets.splashLogo,
+                          fit: BoxFit.fitWidth,
+                          // width: getWidgetWidth(width: 200),
+                          // height: getWidgetHeight(height: 200),
+                        ),
                       ),
                     ),
-                  ),
-                  Spacer(),
-                  Builder(builder: (context) {
-                    return InkWell(
-                      onTap: () {
-                        _scaffoldKey.currentState?.openEndDrawer();
-                      },
-                      child: Container(
-                        height: getWidgetHeight(height: 40),
-                        width: getWidgetWidth(width: 40),
-                        padding: EdgeInsets.symmetric(
-                            horizontal: getWidgetWidth(width: 8),
-                            vertical: getWidgetHeight(height: 10)),
-                        decoration: BoxDecoration(
-                            color: const Color(0xFFF7F8F8),
-                            borderRadius: BorderRadius.circular(16)),
-                        child: Image.asset(
-                          AllAssets.drawerIcon,
-                          color: Colors.black,
+                    Spacer(),
+                    Builder(builder: (context) {
+                      return InkWell(
+                        onTap: () {
+                          _scaffoldKey.currentState?.openEndDrawer();
+                        },
+                        child: Container(
+                          height: getWidgetHeight(height: 40),
+                          width: getWidgetWidth(width: 40),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: getWidgetWidth(width: 8),
+                              vertical: getWidgetHeight(height: 10)),
+                          decoration: BoxDecoration(
+                              color: const Color(0xFFF7F8F8),
+                              borderRadius: BorderRadius.circular(16)),
+                          child: Image.asset(
+                            AllAssets.drawerIcon,
+                            color: Colors.black,
+                          ),
+                        ),
+                      );
+                    })
+                  ],
+                ),
+              ),
+              SizedBox(height: getWidgetHeight(height: 5)),
+              if (kIsWeb) SizedBox(height: getWidgetHeight(height: 20)),
+              GetBuilder<HomeController>(
+                  init: HomeController(),
+                  builder: (controller) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                            right: getWidgetWidth(width: 20),
+                            left:
+                                getWidgetWidth(width: isKwidth > 700 ? 18 : 0)),
+                        child: Row(
+                          children: List.generate(controller.cardNames.length,
+                              (index) {
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                  left: getWidgetWidth(
+                                      width: isKwidth > 700 ? 5 : 20),
+                                  bottom: getWidgetHeight(height: 20),
+                                  top: getWidgetHeight(height: 10)),
+                              child: AnimatedContainer(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                height: displayWidth(context) > 800
+                                    ? 340
+                                    : getWidgetHeight(height: 300),
+                                width: isKwidth > 800
+                                    ? 240
+                                    : getWidgetWidth(width: 218),
+                                duration: const Duration(milliseconds: 300),
+                                child: InkWell(
+                                  highlightColor: Colors.transparent,
+                                  focusColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  splashColor: Colors.transparent,
+                                  onTap: () {
+                                    timestampIndex = index;
+                                    mianCategoryTitile =
+                                        controller.cardNames[index];
+                                    if (index != 4) {
+                                      debugPrint(
+                                          "Card name is and the click is happening or not ${controller.cardNames[index]}");
+                                      GetStorage()
+                                          .write(AppRoutes.frontOffice, {
+                                        'title': controller.cardNames[index] ==
+                                                "Front Office\nManagement"
+                                            ? "Front Office Management"
+                                            : controller.cardNames[index] ==
+                                                    "Food & Beverage Service\nManagement"
+                                                ? "Food & Beverage Service Management"
+                                                : controller.cardNames[index] ==
+                                                        "Accommodation\nManagement - Housekeeping"
+                                                    ? "Accommodation Management - Housekeeping"
+                                                    : controller
+                                                        .cardNames[index],
+                                        'image': controller.cardImages[index],
+                                        'index': index,
+                                      });
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                        if (kIsWeb) {
+                                          Get.rootDelegate.offNamed(
+                                              AppRoutes.frontOffice,
+                                              arguments: {
+                                                'title': controller
+                                                            .cardNames[index] ==
+                                                        "Front Office\nManagement"
+                                                    ? "Front Office Management"
+                                                    : controller.cardNames[
+                                                                index] ==
+                                                            "Food & Beverage Service\nManagement"
+                                                        ? "Food & Beverage Service Management"
+                                                        : controller.cardNames[
+                                                                    index] ==
+                                                                "Accommodation\nManagement - Housekeeping"
+                                                            ? "Accommodation Management - Housekeeping"
+                                                            : controller
+                                                                    .cardNames[
+                                                                index],
+                                                'image': controller
+                                                    .cardImages[index],
+                                                'index': index,
+                                              });
+                                        } else {
+                                          Get.toNamed(AppRoutes.frontOffice,
+                                              arguments: {
+                                                'title': controller
+                                                            .cardNames[index] ==
+                                                        "Front Office\nManagement"
+                                                    ? "Front Office Management"
+                                                    : controller.cardNames[
+                                                                index] ==
+                                                            "Food & Beverage Service\nManagement"
+                                                        ? "Food & Beverage Service Management"
+                                                        : controller.cardNames[
+                                                                    index] ==
+                                                                "Accommodation\nManagement - Housekeeping"
+                                                            ? "Accommodation Management - Housekeeping"
+                                                            : controller
+                                                                    .cardNames[
+                                                                index],
+                                                'image': controller
+                                                    .cardImages[index],
+                                                'index': index,
+                                              });
+                                        }
+                                      });
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => UniversityLab(
+                                            universityModel:
+                                                controller.universityModel,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: Duration(milliseconds: 300),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          offset: const Offset(0, 4),
+                                          blurRadius: 10,
+                                        ),
+                                      ],
+                                    ),
+                                    child: GetBuilder<HomeController>(
+                                        builder: (ctr) {
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          AnimatedContainer(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            duration:
+                                                Duration(microseconds: 300),
+                                            width: isKwidth > 800
+                                                ? 240
+                                                : getWidgetWidth(width: 218),
+                                            height: displayWidth(context) > 800
+                                                ? 180
+                                                : getWidgetHeight(height: 157),
+                                            child: index == 4
+                                                ? Image.network(
+                                                    controller
+                                                        .cardImages[index],
+                                                    fit: BoxFit.fill,
+                                                  ) // fallback for web
+                                                // : SvgPicture.network(
+                                                //     fit: BoxFit.fill,
+                                                //     controller
+                                                //         .cardImages[index],
+                                                //     placeholderBuilder:
+                                                //         (context) =>
+                                                //             const CircularProgressIndicator(),
+                                                //     hea ders: const {},
+                                                //   )
+                                                : SvgPicture.asset(
+                                                    fit: isKwidth > 800
+                                                        ? BoxFit.fill
+                                                        : BoxFit.fitWidth,
+                                                    controller
+                                                        .cardImages[index]),
+                                          ),
+                                          SizedBox(
+                                              height: isKwidth > 700
+                                                  ? 5
+                                                  : getWidgetHeight(height: 8)),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: isKwidth > 700
+                                                    ? 10
+                                                    : getWidgetWidth(
+                                                        width: 10)),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  index == 4
+                                                      ? ""
+                                                      : "Hotel Management",
+                                                  style: TextStyle(
+                                                    color: lightWhite,
+                                                    fontSize: kText.scale(
+                                                      // (isKwidth >
+                                                      //         1200) // full desktop
+                                                      //     ? 12
+                                                      //     : (isKwidth <
+                                                      //             500) // mobile
+                                                      //         ?
+                                                      12
+                                                      // :
+                                                      // 10
+                                                      , // tablet / in-between
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                    height: isKwidth > 700
+                                                        ? 6
+                                                        : getWidgetHeight(
+                                                            height: 8)),
+                                                AnimatedContainer(
+                                                  duration: Duration(
+                                                      milliseconds: 300),
+                                                  height: isKwidth > 700
+                                                      ? 90
+                                                      : getWidgetHeight(
+                                                          height: 78),
+                                                  child: Text(
+                                                    controller.cardNames[index],
+                                                    textAlign: TextAlign.start,
+                                                    overflow: TextOverflow.fade,
+                                                    style: GoogleFonts.inter(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: kText.scale(
+                                                        // (isKwidth > 1200)
+                                                        //     ? 16
+                                                        //     : (isKwidth <
+                                                        //             500) // mobile
+                                                        //         ?
+                                                        16
+                                                        // :
+                                                        // 13
+                                                        , // tablet / in-between
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                    height: isKwidth > 700
+                                                        ? 5
+                                                        : getWidgetHeight(
+                                                            height: 5)),
+                                                SizedBox(
+                                                  height: isKwidth > 700
+                                                      ? 18
+                                                      : getWidgetHeight(
+                                                          height: 15),
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        "View Details",
+                                                        textAlign:
+                                                            TextAlign.start,
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              kText.scale(12),
+                                                          color: linearColor,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                      // LinearPercentIndicator(
+                                                      //   center: Text(
+                                                      //     "20%",
+                                                      //     style: TextStyle(
+                                                      //         color: Colors.white,
+                                                      //         fontSize: kText
+                                                      //             .scale(10)),
+                                                      //   ),
+                                                      //   barRadius:
+                                                      //       Radius.circular(6),
+                                                      //   width: getWidgetWidth(
+                                                      //       width: 150),
+                                                      //   lineHeight:
+                                                      //       getWidgetHeight(
+                                                      //           height: 14),
+                                                      //   percent: 0.2,
+                                                      //   backgroundColor:
+                                                      //       Colors.grey,
+                                                      //   progressColor:
+                                                      //       linearColor,
+                                                      // ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                // if (!kIsWeb)
+                                                SizedBox(
+                                                    height: isKwidth > 700
+                                                        ? 14
+                                                        : getWidgetHeight(
+                                                            height: 10))
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
                         ),
                       ),
                     );
-                  })
-                ],
+                  }),
+              Container(
+                padding:
+                    EdgeInsets.symmetric(horizontal: getWidgetWidth(width: 20)),
+                child: TabBar(
+                  controller: _tabController,
+                  labelPadding: EdgeInsets.zero,
+                  indicatorPadding: EdgeInsets.zero,
+                  labelColor: darkBlack,
+                  unselectedLabelColor: lightWhite,
+                  indicatorColor: linearColor,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  tabs: const [
+                    Tab(text: 'Smart Shots'),
+                    Tab(text: 'Recent History'),
+                    Tab(text: 'To Do'),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: getWidgetHeight(height: 5)),
-            if (kIsWeb) SizedBox(height: getWidgetHeight(height: 20)),
-            GetBuilder<HomeController>(
-                init: HomeController(),
-                builder: (controller) {
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                          right: getWidgetWidth(width: 20),
-                          left: getWidgetWidth(width: isKwidth > 700 ? 18 : 0)),
-                      child: Row(
-                        children:
-                            List.generate(controller.cardNames.length, (index) {
-                          return Padding(
-                            padding: EdgeInsets.only(
-                                left: getWidgetWidth(
-                                    width: isKwidth > 700 ? 5 : 20),
-                                bottom: getWidgetHeight(height: 20),
-                                top: getWidgetHeight(height: 10)),
-                            child: AnimatedContainer(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
+              GetBuilder<HomeController>(builder: (homeController) {
+                return SizedBox(
+                  height: getWidgetHeight(height: 300),
+                  child: TabBarView(
+                    controller: _tabController,
+                    physics: const BouncingScrollPhysics(),
+                    children: [
+                      GetBuilder<HomeController>(builder: (controller) {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: 3,
+                          physics: BouncingScrollPhysics(),
+                          padding: EdgeInsets.only(
+                              top: isKwidth > 700
+                                  ? 5
+                                  : getWidgetHeight(height: 10),
+                              bottom: isKwidth > 700
+                                  ? 80
+                                  : getWidgetHeight(height: 100)),
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: getWidgetWidth(width: 20),
+                                vertical: getWidgetHeight(height: 6),
                               ),
-                              height: displayWidth(context) > 500
-                                  ? isKheight * 0.39
-                                  : getWidgetHeight(height: 300),
-                              width: isKwidth > 900
-                                  ? isKwidth * 0.15
-                                  : getWidgetWidth(width: 218),
-                              duration: const Duration(milliseconds: 300),
-                              child: InkWell(
-                                highlightColor: Colors.transparent,
-                                focusColor: Colors.transparent,
-                                hoverColor: Colors.transparent,
-                                splashColor: Colors.transparent,
-                                onTap: () {
-                                  timestampIndex = index;
-                                  mianCategoryTitile =
-                                      controller.cardNames[index];
-                                  if (index != 4) {
-                                    Get.toNamed(AppRoutes.frontOffice,
-                                        arguments: {
-                                          'title': controller
-                                                      .cardNames[index] ==
-                                                  "Front Office\nManagement"
-                                              ? "Front Office Management"
-                                              : controller.cardNames[index] ==
-                                                      "Food & Beverage Service\nManagement"
-                                                  ? "Food & Beverage Service Management"
-                                                  : controller.cardNames[
-                                                              index] ==
-                                                          "Accommodation\nManagement - Housekeeping"
-                                                      ? "Accommodation Management - Housekeeping"
-                                                      : controller
-                                                          .cardNames[index],
-                                          'image': controller.cardImages[index],
-                                          'index': index,
-                                        });
+                              child: GestureDetector(
+                                onTapDown: (TapDownDetails details) {
+                                  // timestampIndex = index;
+                                  final tapPosition = details.globalPosition;
+                                  if (index == 0) {
+                                    kIsWeb
+                                        ? Get.rootDelegate.toNamed(AppRoutes
+                                            .simulation) // ✅ Use toNamed() instead of offNamed()
+                                        : Get.toNamed(AppRoutes.simulation);
+                                  } else if (index == 1) {
+                                    kIsWeb
+                                        ? Get.rootDelegate
+                                            .toNamed(AppRoutes.languageLab)
+                                        : Get.toNamed(AppRoutes.languageLab);
+                                  } else if (index == 2) {
+                                    kIsWeb
+                                        ? Get.rootDelegate
+                                            .toNamed(AppRoutes.contentLibrary)
+                                        : Get.toNamed(AppRoutes.contentLibrary);
                                   } else {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => UniversityLab(
-                                          universityModel:
-                                              controller.universityModel,
-                                        ),
-                                      ),
-                                    );
+                                    controller.showPopupAtTap(tapPosition);
                                   }
                                 },
-                                child: AnimatedContainer(
-                                  duration: Duration(milliseconds: 300),
+                                child: Container(
+                                  // height: isKwidth > 700
+                                  //     ? 100
+                                  //     : getWidgetHeight(height: 75),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: getWidgetHeight(height: 5)),
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
                                     color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black.withOpacity(0.1),
@@ -516,588 +836,393 @@ class _HomeState extends State<Home>
                                       ),
                                     ],
                                   ),
-                                  child: GetBuilder<HomeController>(
-                                      builder: (ctr) {
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        AnimatedContainer(
-                                          duration: Duration(microseconds: 300),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
                                           width: isKwidth > 700
-                                              ? isKwidth * 0.15
-                                              : getWidgetWidth(width: 235),
-                                          height: displayWidth(context) > 500
-                                              ? isKheight * 0.18
-                                              : getWidgetHeight(height: 160),
-                                          child: index == 4
-                                              ? SvgPicture.network(
-                                                  controller.cardImages[index],
-                                                  placeholderBuilder: (context) =>
-                                                      const CircularProgressIndicator(),
-                                                )
-                                              : SvgPicture.asset(
-                                                  controller.cardImages[index]),
+                                              ? 5
+                                              : getWidgetWidth(width: 4)),
+                                      Container(
+                                        width: isKwidth > 700
+                                            ? 65
+                                            : getWidgetWidth(width: 55),
+                                        height: isKwidth > 700
+                                            ? 65
+                                            : getWidgetHeight(height: 68),
+                                        decoration: BoxDecoration(
+                                          color: linearColor,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
-                                        SizedBox(
-                                            height: isKwidth > 700
-                                                ? isKwidth * 0.01
-                                                : getWidgetHeight(height: 8)),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: getWidgetWidth(
-                                                  width:
-                                                      isKwidth > 700 ? 3 : 10)),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          child: Stack(
+                                            fit: StackFit.expand,
                                             children: [
-                                              Text(
-                                                index == 4
-                                                    ? ""
-                                                    : "Hotel Management",
-                                                style: TextStyle(
-                                                    color: lightWhite,
-                                                    fontSize: kText.scale(
-                                                        isKwidth > 700
-                                                            ? 12
-                                                            : 10)),
+                                              SvgPicture.asset(
+                                                "assets/Square Vector.svg",
+                                                fit: BoxFit.cover,
                                               ),
-                                              SizedBox(
-                                                  height: isKwidth > 700
-                                                      ? isKheight * 0.01
-                                                      : getWidgetHeight(
-                                                          height: 8)),
-                                              AnimatedContainer(
-                                                duration:
-                                                    Duration(milliseconds: 300),
-                                                height: isKwidth > 700
-                                                    ? isKheight * 0.11
-                                                    : getWidgetHeight(
-                                                        height: 78),
-                                                child: Text(
-                                                  controller.cardNames[index],
-                                                  textAlign: TextAlign.start,
-                                                  overflow: TextOverflow.fade,
-                                                  style: GoogleFonts.inter(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: kText.scale(
-                                                        (isKwidth > 700 &&
-                                                                isKheight > 600)
-                                                            ? 16
-                                                            : (isKwidth > 700 &&
-                                                                    isKheight <
-                                                                        600)
-                                                                ? 14
-                                                                : 16),
-                                                  ),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: index == 1
+                                                      ? 0
+                                                      : isKwidth > 700
+                                                          ? 18
+                                                          : getWidgetHeight(
+                                                              height: 22),
+                                                  horizontal: index == 1
+                                                      ? 0
+                                                      : isKwidth > 700
+                                                          ? 18
+                                                          : getWidgetWidth(
+                                                              width: 16),
                                                 ),
+                                                child: index == 0
+                                                    ? Image.asset(
+                                                        fit: BoxFit.fill,
+                                                        AllAssets
+                                                            .interactiveSimulations,
+                                                        color: Colors.white,
+                                                      )
+                                                    : index == 1
+                                                        ? Icon(
+                                                            Icons.mic,
+                                                            color: Colors.white,
+                                                            size: isKwidth > 700
+                                                                ? 30
+                                                                : 28,
+                                                          )
+                                                        : Image.asset(
+                                                            "assets/language_lab.png"),
                                               ),
-                                              SizedBox(
-                                                  height: isKwidth > 700
-                                                      ? isKheight * 0.01
-                                                      : getWidgetHeight(
-                                                          height: 5)),
-                                              SizedBox(
-                                                height: isKwidth > 700
-                                                    ? isKheight * 0.03
-                                                    : getWidgetHeight(
-                                                        height: 15),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      "View Details",
-                                                      textAlign:
-                                                          TextAlign.start,
-                                                      style: TextStyle(
-                                                        fontSize:
-                                                            kText.scale(12),
-                                                        color: linearColor,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                    // LinearPercentIndicator(
-                                                    //   center: Text(
-                                                    //     "20%",
-                                                    //     style: TextStyle(
-                                                    //         color: Colors.white,
-                                                    //         fontSize: kText
-                                                    //             .scale(10)),
-                                                    //   ),
-                                                    //   barRadius:
-                                                    //       Radius.circular(6),
-                                                    //   width: getWidgetWidth(
-                                                    //       width: 150),
-                                                    //   lineHeight:
-                                                    //       getWidgetHeight(
-                                                    //           height: 14),
-                                                    //   percent: 0.2,
-                                                    //   backgroundColor:
-                                                    //       Colors.grey,
-                                                    //   progressColor:
-                                                    //       linearColor,
-                                                    // ),
-                                                  ],
-                                                ),
-                                              ),
-                                              if (!kIsWeb)
-                                                SizedBox(
-                                                    height: getWidgetHeight(
-                                                        height: 10))
                                             ],
                                           ),
                                         ),
-                                      ],
-                                    );
-                                  }),
-                                ),
-                              ),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  );
-                }),
-            Container(
-              padding:
-                  EdgeInsets.symmetric(horizontal: getWidgetWidth(width: 20)),
-              child: TabBar(
-                controller: _tabController,
-                labelPadding: EdgeInsets.zero,
-                indicatorPadding: EdgeInsets.zero,
-                labelColor: darkBlack,
-                unselectedLabelColor: lightWhite,
-                indicatorColor: linearColor,
-                indicatorSize: TabBarIndicatorSize.tab,
-                tabs: const [
-                  Tab(text: 'Smart Shots'),
-                  Tab(text: 'Recent History'),
-                  Tab(text: 'To Do'),
-                ],
-              ),
-            ),
-            Expanded(
-              child: GetBuilder<HomeController>(builder: (homeController) {
-                return TabBarView(
-                  controller: _tabController,
-                  physics: const BouncingScrollPhysics(),
-                  children: [
-                    GetBuilder<HomeController>(builder: (controller) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: 3,
-                        physics: BouncingScrollPhysics(),
-                        padding: EdgeInsets.only(
-                            top: getWidgetHeight(height: 10),
-                            bottom: getWidgetHeight(height: 100)),
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: getWidgetWidth(width: 20),
-                              vertical: getWidgetHeight(height: 6),
-                            ),
-                            child: GestureDetector(
-                              onTapDown: (TapDownDetails details) {
-                                // timestampIndex = index;
-                                final tapPosition = details.globalPosition;
-                                index == 0
-                                    ?
-                                    //  accessLinks.toLowerCase().contains(
-                                    //         "simulation".toLowerCase())
-                                    //     ?
-                                    Get.toNamed(AppRoutes.simulation)
-                                    //     :
-                                    // controller.showPopupAtTap(tapPosition)
-                                    : index == 1
-                                        ? Get.toNamed(AppRoutes.languageLab)
-                                        : index == 2
-                                            ?
-                                            //  Navigator.push(
-                                            //     context,
-                                            //     MaterialPageRoute(
-                                            //         builder: (context) =>
-                                            //             PDFPreviewWithFirstPage()))
-                                            Get.toNamed(
-                                                AppRoutes.contentLibrary)
-                                            : controller
-                                                .showPopupAtTap(tapPosition);
-                                // controller.showPopupAtTap(tapPosition);
-                                // for playstore
-                                // index == 0
-                                //     ? Get.toNamed(AppRoutes.simulation)
-                                //     : controller.showPopupAtTap(tapPosition);
-                              },
-                              child: Container(
-                                height: getWidgetHeight(
-                                    height:
-                                        isKwidth > 700 ? isKheight * 0.12 : 75),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      offset: const Offset(0, 4),
-                                      blurRadius: 10,
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    SizedBox(width: getWidgetWidth(width: 4)),
-                                    Container(
-                                      width: getWidgetWidth(
-                                          width: isKwidth > 900
-                                              ? isKheight * 0.015
-                                              : 55),
-                                      height: getWidgetHeight(
-                                          height: isKwidth > 900
-                                              ? isKheight * 0.09
-                                              : 68),
-                                      decoration: BoxDecoration(
-                                        color: linearColor,
-                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Stack(
-                                          fit: StackFit.expand,
-                                          children: [
-                                            SvgPicture.asset(
-                                              "assets/Square Vector.svg",
-                                              fit: BoxFit.cover,
+                                      SizedBox(
+                                          width: isKwidth > 700
+                                              ? 12
+                                              : getWidgetWidth(width: 12)),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            controller.smartShorts[index],
+                                            textAlign: TextAlign.start,
+                                            style: GoogleFonts.inter(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16,
                                             ),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                vertical: index == 1
-                                                    ? 0
-                                                    : isKwidth > 900
-                                                        ? displayWidth(
-                                                                context) *
-                                                            0.004
-                                                        : getWidgetHeight(
-                                                            height: 22),
-                                                horizontal: index == 1
-                                                    ? 0
-                                                    : isKwidth > 900
-                                                        ? displayWidth(
-                                                                context) *
-                                                            0.004
-                                                        : getWidgetWidth(
-                                                            width: 16),
-                                              ),
-                                              child: index == 0
-                                                  ? Image.asset(
-                                                      fit: BoxFit.fill,
-                                                      AllAssets
-                                                          .interactiveSimulations,
-                                                      color: Colors.white,
-                                                    )
+                                          ),
+                                          SizedBox(
+                                            width: getWidgetWidth(width: 240),
+                                            child: Text(
+                                              maxLines: 2,
+                                              index == 0
+                                                  ? "250+ Simulations - Experiential learning for handling challenging situations & interviews."
                                                   : index == 1
-                                                      ? Icon(
-                                                          Icons.mic,
-                                                          color: Colors.white,
-                                                          size: isKwidth > 700
-                                                              ? displayHeight(
-                                                                      context) *
-                                                                  0.04
-                                                              : 28,
-                                                        )
-                                                      : Image.asset(
-                                                          "assets/language_lab.png"),
+                                                      ? "English & French Pronunciation, Sentence Lab, Grammar, and Phonetic Sounds. "
+                                                      : "Excellent collection of content for casual and enjoyable micro-learning",
+                                              style: TextStyle(
+                                                overflow: TextOverflow.ellipsis,
+                                                color: lightWhite,
+                                                fontSize: kText.scale(10),
+                                              ),
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    SizedBox(
-                                        width: isKwidth > 900
-                                            ? isKwidth * 0.01
-                                            : getWidgetWidth(width: 12)),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          controller.smartShorts[index],
-                                          textAlign: TextAlign.start,
-                                          style: GoogleFonts.inter(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: getWidgetWidth(width: 240),
-                                          child: Text(
-                                            maxLines: 2,
-                                            index == 0
-                                                ? "250+ Simulations - Experiential learning for handling challenging situations & interviews."
-                                                : index == 1
-                                                    ? "English & French Pronunciation, Sentence Lab, Grammar, and Phonetic Sounds. "
-                                                    : "Excellent collection of content for casual and enjoyable micro-learning",
-                                            style: TextStyle(
-                                              overflow: TextOverflow.ellipsis,
-                                              color: lightWhite,
-                                              fontSize: kText.scale(10),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const Spacer(),
-                                    SvgPicture.asset("assets/threedots.svg"),
-                                    SizedBox(width: getWidgetWidth(width: 16)),
-                                  ],
+                                      const Spacer(),
+                                      SvgPicture.asset("assets/threedots.svg"),
+                                      SizedBox(
+                                          width: getWidgetWidth(width: 16)),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      );
-                    }),
-                    homeController.recentHistoryLoaded
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(
-                                color: linearColor,
-                              ),
-                              SizedBox(
-                                height: getWidgetHeight(height: 75),
-                              )
-                            ],
-                          )
-                        : homeController.homeRecentHistory.isEmpty
-                            ? Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text("No recent history found!"),
-                                  SizedBox(
-                                    height: getWidgetHeight(height: 75),
-                                  )
-                                ],
-                              )
-                            : ListView.builder(
-                                shrinkWrap: true,
-                                padding: EdgeInsets.only(
-                                    top: getWidgetHeight(height: 10),
-                                    bottom: getWidgetHeight(height: 100)),
-                                itemCount:
-                                    homeController.homeRecentHistory.length,
-                                itemBuilder: (context, index) {
-                                  final item =
-                                      homeController.homeRecentHistory[index];
+                            );
+                          },
+                        );
+                      }),
+                      homeController.recentHistoryLoaded
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  color: linearColor,
+                                ),
+                                SizedBox(
+                                  height: getWidgetHeight(height: 75),
+                                )
+                              ],
+                            )
+                          : homeController.homeRecentHistory.isEmpty
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text("No recent history found!"),
+                                    SizedBox(
+                                      height: getWidgetHeight(height: 75),
+                                    )
+                                  ],
+                                )
+                              : ListView.builder(
+                                  shrinkWrap: true,
+                                  padding: EdgeInsets.only(
+                                      top: getWidgetHeight(height: 10),
+                                      bottom: getWidgetHeight(height: 100)),
+                                  itemCount:
+                                      homeController.homeRecentHistory.length,
+                                  itemBuilder: (context, index) {
+                                    final item =
+                                        homeController.homeRecentHistory[index];
 
-                                  return Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      // vertical: getWidgetHeight(height: 8),
-                                      horizontal: getWidgetWidth(width: 12),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // collectionName
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal:
-                                                getWidgetWidth(width: 12),
-                                          ),
-                                          child: Text(
-                                            item['path'] ?? '',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: kText.scale(9),
-                                              fontWeight: FontWeight.w600,
+                                    return Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        // vertical: getWidgetHeight(height: 8),
+                                        horizontal: getWidgetWidth(width: 12),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // collectionName
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal:
+                                                  getWidgetWidth(width: 12),
+                                            ),
+                                            child: Text(
+                                              item['path'] ?? '',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: kText.scale(9),
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
                                           ),
-                                        ),
 
-                                        SizedBox(
-                                            height: getWidgetHeight(height: 6)),
+                                          SizedBox(
+                                              height:
+                                                  getWidgetHeight(height: 6)),
 
-                                        // category
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal:
-                                                getWidgetWidth(width: 12),
-                                          ),
-                                          child: Text(
-                                            item['category'] ?? '',
-                                            style: TextStyle(
-                                              fontSize: kText.scale(13),
-                                              fontWeight: FontWeight.w600,
+                                          // category
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal:
+                                                  getWidgetWidth(width: 12),
+                                            ),
+                                            child: Text(
+                                              item['category'] ?? '',
+                                              style: TextStyle(
+                                                fontSize: kText.scale(13),
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
                                           ),
-                                        ),
 
-                                        SizedBox(
-                                            height: getWidgetHeight(height: 6)),
+                                          SizedBox(
+                                              height:
+                                                  getWidgetHeight(height: 6)),
 
-                                        // keyword (or path or any identifier)
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal:
-                                                getWidgetWidth(width: 12),
-                                            vertical:
-                                                getWidgetHeight(height: 6),
-                                          ),
-                                          child: InkWell(
-                                            onTap: () async {
-                                              if (item['section'] ==
-                                                  'Sound Lab') {
-                                                SoundSubcategory?
-                                                    soundSubcategory =
-                                                    SoundSubcategory.fromJson(
-                                                        Map<String,
-                                                                dynamic>.from(
-                                                            item['soundSub']));
+                                          // keyword (or path or any identifier)
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal:
+                                                  getWidgetWidth(width: 12),
+                                              vertical:
+                                                  getWidgetHeight(height: 6),
+                                            ),
+                                            child: InkWell(
+                                              onTap: () async {
+                                                if (item['section'] ==
+                                                    'Sound Lab') {
+                                                  SoundSubcategory?
+                                                      soundSubcategory =
+                                                      SoundSubcategory.fromJson(
+                                                          Map<String,
+                                                                  dynamic>.from(
+                                                              item[
+                                                                  'soundSub']));
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    !kIsWeb
+                                                        ? Get.toNamed(
+                                                            AppRoutes.soundPage,
+                                                            arguments: {
+                                                                "title": item[
+                                                                    'category'],
+                                                                "soundModel":
+                                                                    soundSubcategory
+                                                              })
+                                                        : Get.rootDelegate
+                                                            .offNamed(
+                                                                AppRoutes
+                                                                    .soundPage,
+                                                                arguments: {
+                                                                "title": item[
+                                                                    'category'],
+                                                                "soundModel":
+                                                                    soundSubcategory
+                                                              });
+                                                  });
+                                                } else if (item['section'] ==
+                                                    'Grammer Lab') {
+                                                  GrammarDoc? grammerDocs =
+                                                      GrammarDoc.fromJson(Map<
+                                                              String,
+                                                              dynamic>.from(
+                                                          item['grammarDocs']));
 
-                                                Get.toNamed(AppRoutes.soundPage,
-                                                    arguments: {
-                                                      "title": item['category'],
-                                                      "soundModel":
-                                                          soundSubcategory
-                                                    });
-                                              } else if (item['section'] ==
-                                                  'Grammer Lab') {
-                                                GrammarDoc? grammerDocs =
-                                                    GrammarDoc.fromJson(Map<
-                                                            String,
-                                                            dynamic>.from(
-                                                        item['grammarDocs']));
-
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            GrammerLabSub(
-                                                              title: item[
-                                                                  'category'],
-                                                              doc: grammerDocs,
-                                                            )));
-                                              } else if (item['section'] ==
-                                                  'Sentence Lab') {
-                                                final subCategories = (item[
-                                                            'subCategories']
-                                                        as List)
-                                                    .map((e) => SubCategoryModel
-                                                        .fromJson(Map<String,
-                                                            dynamic>.from(e)))
-                                                    .toList();
-                                                Get.toNamed(
-                                                  AppRoutes.sentenceLabSub,
-                                                  arguments: {
-                                                    "title": item['category'],
-                                                    "CategoryModel":
-                                                        subCategories,
-                                                  },
-                                                );
-                                              } else if (item['section'] ==
-                                                  'proLab') {
-                                                log("proLab tapped");
-                                                Get.toNamed(
-                                                    AppRoutes
-                                                        .pronunciationLabSub,
-                                                    arguments: {
-                                                      'title': item['category'],
-                                                      'subcategories':
-                                                          <SubcategoryPro>[],
-                                                    });
-                                              } else {
-                                                if (kIsWeb) {
                                                   Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          WebContentPage(
-                                                              title: item[
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              GrammerLabSub(
+                                                                title: item[
+                                                                    'category'],
+                                                                doc:
+                                                                    grammerDocs,
+                                                              )));
+                                                } else if (item['section'] ==
+                                                    'Sentence Lab') {
+                                                  final subCategories = (item[
+                                                              'subCategories']
+                                                          as List)
+                                                      .map((e) => SubCategoryModel
+                                                          .fromJson(Map<String,
+                                                              dynamic>.from(e)))
+                                                      .toList();
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    !kIsWeb
+                                                        ? Get.toNamed(
+                                                            AppRoutes
+                                                                .sentenceLabSub,
+                                                            arguments: {
+                                                              "title": item[
                                                                   'category'],
-                                                              url:
-                                                                  item['link']),
-                                                    ),
-                                                  );
-                                                } else {
+                                                              "CategoryModel":
+                                                                  subCategories,
+                                                            },
+                                                          )
+                                                        : Get.rootDelegate
+                                                            .offNamed(
+                                                            AppRoutes
+                                                                .sentenceLabSub,
+                                                            arguments: {
+                                                              "title": item[
+                                                                  'category'],
+                                                              "CategoryModel":
+                                                                  subCategories,
+                                                            },
+                                                          );
+                                                  });
+                                                } else if (item['section'] ==
+                                                    'proLab') {
+                                                  log("proLab tapped");
                                                   Get.toNamed(
-                                                      AppRoutes.inAppWebView,
+                                                      AppRoutes
+                                                          .pronunciationLabSub,
                                                       arguments: {
-                                                        "isSimulation":
-                                                            item['section'] ==
-                                                                    'simulation'
-                                                                ? true
-                                                                : false,
-                                                        "url": item['link'],
+                                                        'title':
+                                                            item['category'],
+                                                        'subcategories':
+                                                            <SubcategoryPro>[],
                                                       });
-                                                }
-                                              }
-                                            },
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Flexible(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        item['section'] ?? '',
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              kText.scale(12),
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color:
-                                                              Colors.grey[700],
-                                                        ),
+                                                } else {
+                                                  if (kIsWeb) {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            WebContentPage(
+                                                                title: item[
+                                                                    'category'],
+                                                                url: item[
+                                                                    'link']),
                                                       ),
-                                                    ],
+                                                    );
+                                                  } else {
+                                                    Get.toNamed(
+                                                        AppRoutes.inAppWebView,
+                                                        arguments: {
+                                                          "isSimulation":
+                                                              item['section'] ==
+                                                                      'simulation'
+                                                                  ? true
+                                                                  : false,
+                                                          "url": item['link'],
+                                                        });
+                                                  }
+                                                }
+                                              },
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Flexible(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          item['section'] ?? '',
+                                                          style: TextStyle(
+                                                            fontSize:
+                                                                kText.scale(12),
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color: Colors
+                                                                .grey[700],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                                Icon(
-                                                  Icons
-                                                      .arrow_forward_ios_outlined,
-                                                  size: 16,
-                                                  color: Colors.black,
-                                                ),
-                                              ],
+                                                  Icon(
+                                                    Icons
+                                                        .arrow_forward_ios_outlined,
+                                                    size: 16,
+                                                    color: Colors.black,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
 
-                                        const Divider(
-                                            color: Color.fromARGB(
-                                                255, 248, 248, 248)),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Learning Assignments Coming Soon!"),
-                        SizedBox(
-                          height: getWidgetHeight(height: 75),
-                        )
-                      ],
-                    ),
-                  ],
+                                          const Divider(
+                                              color: Color.fromARGB(
+                                                  255, 248, 248, 248)),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Learning Assignments Coming Soon!"),
+                          SizedBox(
+                            height: getWidgetHeight(height: 75),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
                 );
               }),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

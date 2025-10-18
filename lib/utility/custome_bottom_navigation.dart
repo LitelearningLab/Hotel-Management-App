@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
@@ -26,7 +27,7 @@ class CustomeBottomNavigation extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withOpacity(kIsWeb ? 0.5 : 0.1),
               blurRadius: 15,
               offset: const Offset(0, 4),
             ),
@@ -42,13 +43,18 @@ class CustomeBottomNavigation extends StatelessWidget {
               log('BottomNavigationBar tapped: $index');
               if (index == 0) {
                 stopTimerMainCategory();
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const Home()),
-                  (Route<dynamic> route) => false,
-                );
+                kIsWeb
+                    ? Get.rootDelegate.offNamed(AppRoutes.home)
+                    : Get.offAndToNamed(AppRoutes.home);
+                // Navigator.of(context).pushAndRemoveUntil(
+                //   MaterialPageRoute(builder: (context) => const Home()),
+                //   (Route<dynamic> route) => false,
+                // );
               }
               if (index == 1) {
-                Get.toNamed(AppRoutes.searchScreen);
+                kIsWeb
+                    ? Get.rootDelegate.toNamed(AppRoutes.searchScreen)
+                    : Get.toNamed(AppRoutes.searchScreen);
                 // openDialog(context);
                 // ScaffoldMessenger.of(context).showSnackBar(
                 //   const SnackBar(content: Text("Work in progress")),

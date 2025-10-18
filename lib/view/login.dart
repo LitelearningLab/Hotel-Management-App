@@ -236,7 +236,11 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString("enddate", userData['subscriptionenddate'] ?? '');
 
       log("User ID saved: $userId");
-      Get.offAllNamed(AppRoutes.home);
+
+      kIsWeb
+          ? Get.rootDelegate.offNamed(AppRoutes.home)
+          : Get.offAllNamed(AppRoutes.home);
+      // Get.offAllNamed(AppRoutes.home);
     } catch (e) {
       print("Login error: $e");
       log("Login error: $e");
@@ -533,9 +537,14 @@ class _LoginPageState extends State<LoginPage> {
 
                     TextButton(
                       onPressed: () async {
-                        Get.toNamed(AppRoutes.inAppWebView, arguments: {
-                          "url": ApiRoutes.privacyPolicy,
-                        });
+                        kIsWeb
+                            ? Get.rootDelegate
+                                .offNamed(AppRoutes.inAppWebView, arguments: {
+                                "url": ApiRoutes.privacyPolicy,
+                              })
+                            : Get.to(() => InAppWebViewPage(), arguments: {
+                                "url": ApiRoutes.privacyPolicy,
+                              });
                       },
                       child: Text(
                         "Privacy & Policy",
