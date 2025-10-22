@@ -88,10 +88,8 @@ class Languagelab extends StatelessWidget {
                           PETopCategoriesCard(
                             height: getWidgetHeight(
                                 height:
-                                    displayWidth(context) > 500 ? 44 : 88.28),
-                            width: getWidgetWidth(
-                                width:
-                                    displayWidth(context) > 500 ? 44 : 96.11),
+                                    displayWidth(context) > 1200 ? 120 : 88.28),
+                            width: getWidgetWidth(width: 96.11),
                             title: 'English Pronunciation',
                             imageUrl: AllAssets.pePl,
                             onTap: () async {
@@ -115,9 +113,9 @@ class Languagelab extends StatelessWidget {
                           ),
                           PETopCategoriesCard(
                             height: getWidgetHeight(
-                                height: kWidth > 500 ? 44 : 88.28),
-                            width: getWidgetWidth(
-                                width: kWidth > 500 ? 44 : 96.11),
+                                height:
+                                    displayWidth(context) > 1200 ? 120 : 88.28),
+                            width: getWidgetWidth(width: 96.11),
                             title: 'French Pronunciation',
                             imageUrl: AllAssets.peScl,
                             onTap: () async {
@@ -141,9 +139,9 @@ class Languagelab extends StatelessWidget {
                           ),
                           PETopCategoriesCard(
                             height: getWidgetHeight(
-                                height: kWidth > 500 ? 44 : 88.28),
-                            width: getWidgetWidth(
-                                width: kWidth > 500 ? 44 : 96.11),
+                                height:
+                                    displayWidth(context) > 1200 ? 120 : 88.28),
+                            width: getWidgetWidth(width: 96.11),
                             title: 'Sentence Lab',
                             imageUrl: AllAssets.peCfpl,
                             onTap: () async {
@@ -163,9 +161,9 @@ class Languagelab extends StatelessWidget {
                           ),
                           PETopCategoriesCard(
                             height: getWidgetHeight(
-                                height: kWidth > 500 ? 44 : 88.28),
-                            width: getWidgetWidth(
-                                width: kWidth > 500 ? 44 : 96.11),
+                                height:
+                                    displayWidth(context) > 1200 ? 120 : 88.28),
+                            width: getWidgetWidth(width: 96.11),
                             title: 'Grammer Lab',
                             imageUrl: AllAssets.peGl,
                             onTap: () {

@@ -10,6 +10,7 @@ import 'package:hotelmanagementapp/model/university_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/update_checker.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/view/login.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -271,7 +272,7 @@ class HomeController extends GetxController {
           ),
           actions: [
             SizedBox(
-              width: kWidth / 2.5,
+              width: displayWidth(context) > 700 ? kWidth / 10 : kWidth / 2.5,
               child: TextButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -285,12 +286,17 @@ class HomeController extends GetxController {
                   )),
             ),
             SizedBox(
-              width: kWidth / 2.5,
+              width: displayWidth(context) > 700 ? kWidth / 10 : kWidth / 2.5,
               child: TextButton(
                   onPressed: () async {
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.clear();
-                    Get.offAll(() => LoginPage());
+                    debugPrint("printing the clickings");
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      kIsWeb
+                          ? Get.rootDelegate.offNamed(AppRoutes.login)
+                          : Get.offAll(() => LoginPage());
+                    });
 
                     // Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavigation()));
                   },

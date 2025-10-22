@@ -309,7 +309,7 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                                       : 0,
                                                   padding: EdgeInsets.symmetric(
                                                     horizontal: getWidgetWidth(
-                                                        width: 15),
+                                                        width: kIsWeb ? 0 : 15),
                                                   ),
                                                   child: isExpanded
                                                       ? Column(
@@ -317,13 +317,24 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                                               CrossAxisAlignment
                                                                   .start,
                                                           children: [
-                                                            const Divider(
-                                                              color: Color
-                                                                  .fromARGB(
-                                                                      255,
-                                                                      107,
-                                                                      107,
-                                                                      107),
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                horizontal:
+                                                                    getWidgetWidth(
+                                                                        width: !kIsWeb
+                                                                            ? 0
+                                                                            : 15),
+                                                              ),
+                                                              child:
+                                                                  const Divider(
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        107,
+                                                                        107,
+                                                                        107),
+                                                              ),
                                                             ),
                                                             SizedBox(
                                                                 height:
@@ -331,10 +342,18 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                                                         height:
                                                                             6)),
                                                             Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
+                                                              mainAxisAlignment: kIsWeb
+                                                                  ? MainAxisAlignment
+                                                                      .start
+                                                                  : MainAxisAlignment
                                                                       .spaceAround,
                                                               children: [
+                                                                if (kIsWeb)
+                                                                  SizedBox(
+                                                                    width: getWidgetWidth(
+                                                                        width:
+                                                                            3),
+                                                                  ),
                                                                 InkWell(
                                                                   onTap:
                                                                       () async {
@@ -357,7 +376,7 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
                                                                       // ),
                                                                       SizedBox(
                                                                           width:
-                                                                              getWidgetWidth(width: 5)),
+                                                                              getWidgetWidth(width: kIsWeb ? 2 : 5)),
                                                                       const Text(
                                                                           "Native Speaker",
                                                                           style:

@@ -413,7 +413,7 @@ class _HomeState extends State<Home>
                     ),
                     Spacer(),
                     Builder(builder: (context) {
-                      return InkWell(
+                      return GestureDetector(
                         onTap: () {
                           _scaffoldKey.currentState?.openEndDrawer();
                         },

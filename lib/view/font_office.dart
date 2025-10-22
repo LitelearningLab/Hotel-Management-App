@@ -40,153 +40,300 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(
-                children: [
-                  ClipPath(
-                    // clipper: CustomShape(),
-                    child: SizedBox(
-                      width: getWidgetWidth(width: 375),
-                      height:
-                          getWidgetHeight(height: isKwidth > 700 ? 400 : 270),
-                      child: SvgPicture.asset(
-                        controller.image,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                  // if (!kIsWeb)
-                  Positioned(
-                      top: getWidgetHeight(height: 15),
-                      left: getWidgetWidth(width: isKwidth > 700 ? 0 : 5),
-                      child: IconButton(
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        splashColor: Colors.transparent,
-                        color: Colors.transparent,
-                        onPressed: () {
-                          kIsWeb
-                              ? Get.rootDelegate.offNamed(AppRoutes.home)
-                              : Get.back();
-                        },
-                        icon: Stack(
-                          alignment: Alignment.center,
+              displayWidth(context) > 800
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: getWidgetWidth(width: 12)),
+                      child: SizedBox(
+                        // color: Colors.amber,
+                        width: getWidgetWidth(width: 375),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: getWidgetWidth(
-                                  width: isKwidth > 700 ? 56 : 36),
-                              height: getWidgetHeight(
-                                  height: isKwidth > 700 ? 56 : 36),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black.withOpacity(0.3),
-                                //   boxShadow: [
-                                //     BoxShadow(
-                                //       color: Colors.black.withOpacity(0.3),
-                                //       blurRadius: 5,
-                                //       spreadRadius: 0,
-                                //     ),
-                                //   ],
+                            // Image with back button
+                            SizedBox(
+                              // color: Colors.blueAccent,
+                              width: getWidgetWidth(width: 80),
+                              child: Stack(
+                                children: [
+                                  ClipPath(
+                                    // clipper: CustomShape(),
+                                    child: SizedBox(
+                                      width: getWidgetWidth(width: 80),
+                                      height: getWidgetHeight(
+                                          height: isKwidth > 700 ? 200 : 270),
+                                      child: SvgPicture.asset(
+                                        controller.image,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: getWidgetHeight(height: 15),
+                                    // left: getWidgetWidth(width: 5),
+                                    child: IconButton(
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      splashColor: Colors.transparent,
+                                      onPressed: () {
+                                        kIsWeb
+                                            ? Get.rootDelegate
+                                                .offNamed(AppRoutes.home)
+                                            : Get.back();
+                                      },
+                                      icon: Container(
+                                        width: getWidgetWidth(
+                                            width: isKwidth > 700 ? 40 : 36),
+                                        height: getWidgetHeight(
+                                            height: isKwidth > 700 ? 40 : 36),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.black.withOpacity(0.3),
+                                        ),
+                                        child: const Icon(
+                                          Icons.arrow_back,
+                                          color: Colors.white,
+                                          size: 30,
+                                        ),
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            // Icon with shadow
-                            const Icon(
-                              Icons.arrow_back,
-                              color: Colors.white,
-                              // shadows: [
-                              //   Shadow(
-                              //     color: Colors.black.withOpacity(0.5),
-                              //     blurRadius: 4,
-                              //     offset: Offset(2, 2),
-                              //   ),
-                              // ],
+
+                            // Space between image and column
+                            // SizedBox(width: getWidgetWidth(width: 10)),
+
+                            // Headline + Search TextField
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: getWidgetHeight(height: 20)),
+                                    child: Text(
+                                      controller.title,
+                                      style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: kText
+                                            .scale(isKwidth > 700 ? 25 : 20),
+                                        color: Colors.black,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                    ),
+                                  ),
+                                  SizedBox(height: getWidgetHeight(height: 10)),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: getWidgetWidth(width: 10)),
+                                    child: TextField(
+                                      cursorColor: Colors.grey,
+                                      controller: controller.searchController,
+                                      autofocus: true,
+                                      decoration: InputDecoration(
+                                        hintText: 'Search...',
+                                        hintStyle:
+                                            const TextStyle(color: Colors.grey),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 12, vertical: 8),
+                                        suffixIcon: IconButton(
+                                          icon: const Icon(Icons.clear,
+                                              color: Colors.grey),
+                                          onPressed: () {
+                                            controller.clearSearch();
+                                          },
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: const BorderSide(
+                                              color: Colors.grey),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: const BorderSide(
+                                              color: Colors.grey, width: 0.2),
+                                        ),
+                                      ),
+                                      onChanged: (value) {
+                                        controller.searchByCategory(value);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                        iconSize: isKwidth > 700 ? 50 : 30,
-                        padding: EdgeInsets.zero,
-                      )),
-                ],
-              ),
-              SizedBox(
-                height: getWidgetHeight(height: 10),
-              ),
-              controller.isSearching
-                  ? Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetWidth(width: 20),
-                      ),
-                      child: TextField(
-                        cursorColor: Colors.grey,
-                        controller: controller.searchController,
-                        autofocus: true,
-                        decoration: InputDecoration(
-                          hintText: 'Search...',
-                          hintStyle: TextStyle(color: Colors.grey),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.clear, color: Colors.grey),
-                            onPressed: () {
-                              controller.clearSearch();
-                            },
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.grey),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide:
-                                BorderSide(color: Colors.grey, width: 0.2),
-                          ),
-                        ),
-                        onChanged: (value) {
-                          controller.searchByCategory(value);
-                        },
                       ),
                     )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: getWidgetWidth(width: 20),
-                            ),
-                            child: Text(
-                              controller.title,
-                              style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w600,
-                                fontSize: kText.scale(isKwidth > 700 ? 25 : 20),
-                                color: Colors.black,
+                  : SizedBox(
+                      child: Column(
+                        children: [
+                          Stack(
+                            children: [
+                              ClipPath(
+                                // clipper: CustomShape(),
+                                child: SizedBox(
+                                  width: getWidgetWidth(width: 375),
+                                  height: getWidgetHeight(
+                                      height: isKwidth > 700 ? 400 : 270),
+                                  child: SvgPicture.asset(
+                                    controller.image,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
                               ),
-                              overflow:
-                                  TextOverflow.ellipsis, // Prevent overflow
-                              maxLines: 2,
-                            ),
+                              // if (!kIsWeb)
+                              Positioned(
+                                  top: getWidgetHeight(height: 15),
+                                  left: getWidgetWidth(
+                                      width: isKwidth > 700 ? 0 : 5),
+                                  child: IconButton(
+                                    focusColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    splashColor: Colors.transparent,
+                                    color: Colors.transparent,
+                                    onPressed: () {
+                                      kIsWeb
+                                          ? Get.rootDelegate
+                                              .offNamed(AppRoutes.home)
+                                          : Get.back();
+                                    },
+                                    icon: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        Container(
+                                          width: getWidgetWidth(
+                                              width: isKwidth > 700 ? 56 : 36),
+                                          height: getWidgetHeight(
+                                              height: isKwidth > 700 ? 56 : 36),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color:
+                                                Colors.black.withOpacity(0.3),
+                                            //   boxShadow: [
+                                            //     BoxShadow(
+                                            //       color: Colors.black.withOpacity(0.3),
+                                            //       blurRadius: 5,
+                                            //       spreadRadius: 0,
+                                            //     ),
+                                            //   ],
+                                          ),
+                                        ),
+                                        // Icon with shadow
+                                        const Icon(
+                                          Icons.arrow_back,
+                                          color: Colors.white,
+                                          // shadows: [
+                                          //   Shadow(
+                                          //     color: Colors.black.withOpacity(0.5),
+                                          //     blurRadius: 4,
+                                          //     offset: Offset(2, 2),
+                                          //   ),
+                                          // ],
+                                        ),
+                                      ],
+                                    ),
+                                    iconSize: isKwidth > 700 ? 50 : 30,
+                                    padding: EdgeInsets.zero,
+                                  )),
+                            ],
                           ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                            right:
-                                getWidgetWidth(width: isKwidth > 700 ? 20 : 10),
-                            top: getWidgetHeight(height: 4),
+                          SizedBox(
+                            height: getWidgetHeight(height: 10),
                           ),
-                          child: IconButton(
-                            onPressed: () {
-                              controller.isSearching = true;
-                              controller.update();
-                            },
-                            icon: Icon(
-                              Icons.search,
-                              color: Colors.black.withOpacity(0.9),
-                              size: isKwidth > 700 ? 36 : 26,
-                              weight: 800,
-                            ),
-                          ),
-                        ),
-                      ],
+                          controller.isSearching
+                              ? Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: getWidgetWidth(width: 20),
+                                  ),
+                                  child: TextField(
+                                    cursorColor: Colors.grey,
+                                    controller: controller.searchController,
+                                    autofocus: true,
+                                    decoration: InputDecoration(
+                                      hintText: 'Search...',
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                      contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 8),
+                                      suffixIcon: IconButton(
+                                        icon: Icon(Icons.clear,
+                                            color: Colors.grey),
+                                        onPressed: () {
+                                          controller.clearSearch();
+                                        },
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide:
+                                            BorderSide(color: Colors.grey),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey, width: 0.2),
+                                      ),
+                                    ),
+                                    onChanged: (value) {
+                                      controller.searchByCategory(value);
+                                    },
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: getWidgetWidth(width: 20),
+                                        ),
+                                        child: Text(
+                                          controller.title,
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: kText.scale(
+                                                isKwidth > 700 ? 25 : 20),
+                                            color: Colors.black,
+                                          ),
+                                          overflow: TextOverflow
+                                              .ellipsis, // Prevent overflow
+                                          maxLines: 2,
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        right: getWidgetWidth(
+                                            width: isKwidth > 700 ? 20 : 10),
+                                        top: getWidgetHeight(height: 4),
+                                      ),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          controller.isSearching = true;
+                                          controller.update();
+                                        },
+                                        icon: Icon(
+                                          Icons.search,
+                                          color: Colors.black.withOpacity(0.9),
+                                          size: isKwidth > 700 ? 36 : 26,
+                                          weight: 800,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        ],
+                      ),
                     ),
               // SizedBox(
               //   height: getWidgetHeight(height: 6),

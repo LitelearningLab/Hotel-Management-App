@@ -304,8 +304,29 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future<void> _loginFailed() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final prefs = await SharedPreferences.getInstance();
+      final lastRoute = prefs.getString('lastFailedRoute');
+      if (lastRoute != null && lastRoute.isNotEmpty) {
+        debugPrint("printing where it is coming here or not");
+        Get.snackbar(
+          'Load Failed',
+          'Please log in first.',
+          duration: Duration(seconds: 3),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade600,
+          colorText: Colors.white,
+          margin: const EdgeInsets.all(12),
+        );
+        prefs.remove('lastFailedRoute');
+      }
+    });
+  }
+
   @override
   void initState() {
+    _loginFailed();
     _loadAppVersion();
     super.initState();
   }

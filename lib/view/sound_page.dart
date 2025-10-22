@@ -396,7 +396,7 @@ class _SoundPageState extends State<SoundPage> {
                                                       if (index == 5)
                                                         Icon(
                                                           Icons.mic,
-                                                          color: Colors.black,
+                                                          color: Colors.white,
                                                           size: getWidgetHeight(
                                                               height: 33),
                                                         ),
@@ -541,14 +541,14 @@ class _SoundPageState extends State<SoundPage> {
                                             MainAxisAlignment.center,
                                         children: [
                                           CircularProgressIndicator(
-                                              color: linearColor),
+                                              color: Colors.white),
                                           SizedBox(
                                             height: getWidgetHeight(height: 10),
                                           ),
                                           Text(
                                             'Loading...',
                                             style:
-                                                TextStyle(color: linearColor),
+                                                TextStyle(color: Colors.white),
                                           ),
                                         ],
                                       ))

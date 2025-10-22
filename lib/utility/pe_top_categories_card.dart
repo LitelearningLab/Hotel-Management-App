@@ -60,7 +60,7 @@ class _PETopCategoriesCardState extends State<PETopCategoriesCard> {
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
-                  fontSize: 16,
+                  fontSize: displayWidth(context) > 500 ? 20 : 16,
                   fontFamily: 'Roboto',
                   letterSpacing: 0,
                 )
@@ -69,12 +69,14 @@ class _PETopCategoriesCardState extends State<PETopCategoriesCard> {
             Align(
               alignment: Alignment.bottomRight,
               child: Container(
+                  // color: Colors.yellow,
                   height: widget.height,
-                  width: widget.width,
+                  // width: widget.width,
                   // decoration: BoxDecoration(
                   //   image: DecorationImage(image: AssetImage(imageUrl),fit: BoxFit.fitHeight)
                   // ),
                   child: Image.asset(
+                    fit: BoxFit.fitHeight,
                     widget.imageUrl,
                   )),
             )

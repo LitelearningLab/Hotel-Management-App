@@ -20,10 +20,12 @@ import 'package:hotelmanagementapp/view/splash.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:get_storage/get_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 bool isOnNoInternetPage = false;
 void main() async {
   await GetStorage.init();
+  final appRouterDelegate = Get.put(AppRouterDelegate(), permanent: true);
   Get.lazyPut<AppRouterDelegate>(() => AppRouterDelegate());
 
   // WebView.platform = WebWebViewPlatform();
@@ -44,11 +46,14 @@ void main() async {
   } else {
     await Firebase.initializeApp();
   }
-  runApp(const MyApp());
+  runApp(MyApp(
+    appRouterDelegate: appRouterDelegate,
+  ));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final AppRouterDelegate appRouterDelegate;
+  MyApp({required this.appRouterDelegate, super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -57,6 +62,18 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final Connectivity _connectivity = Connectivity();
   String? lastRoute;
+
+  // void checkAuth() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final email = prefs.getString('email');
+  //   final password = prefs.getString('password');
+
+  //   if (email != null && password != null) {
+  //     Get.rootDelegate.offNamed(AppRoutes.home);
+  //   } else {
+  //     Get.rootDelegate.offNamed(AppRoutes.login);
+  //   }
+  // }
 
   @override
   void initState() {
@@ -94,7 +111,7 @@ class _MyAppState extends State<MyApp> {
     return kIsWeb
         ? GetMaterialApp.router(
             key: Get.key,
-            routerDelegate: AppRouterDelegate(),
+            routerDelegate: widget.appRouterDelegate,
             getPages: RouteService.getPages,
             // initialBinding: InitialBinding(),
             title: 'Profluent Hotelier',
