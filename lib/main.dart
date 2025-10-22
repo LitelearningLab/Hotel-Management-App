@@ -1,12 +1,7 @@
-import 'dart:convert';
-import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/firebase_options.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
@@ -14,13 +9,9 @@ import 'package:hotelmanagementapp/route/app_router_delegate.dart';
 import 'package:hotelmanagementapp/route/binding.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/route/route_service.dart';
-import 'package:hotelmanagementapp/view/home.dart';
-import 'package:hotelmanagementapp/view/login.dart';
-import 'package:hotelmanagementapp/view/splash.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:get_storage/get_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 bool isOnNoInternetPage = false;
 void main() async {
@@ -44,8 +35,11 @@ void main() async {
       ),
     );
   } else {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   }
+
   runApp(MyApp(
     appRouterDelegate: appRouterDelegate,
   ));
