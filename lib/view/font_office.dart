@@ -51,57 +51,56 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Image with back button
-                            SizedBox(
-                              // color: Colors.blueAccent,
-                              width: getWidgetWidth(width: 80),
-                              child: Stack(
-                                children: [
-                                  ClipPath(
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(top: 20, left: 25),
+                                  // top: getWidgetHeight(height: 15),
+                                  // left: getWidgetWidth(width: 5),
+                                  child: IconButton(
+                                    focusColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    splashColor: Colors.transparent,
+                                    onPressed: () {
+                                      kIsWeb
+                                          ? Get.rootDelegate
+                                              .offNamed(AppRoutes.home)
+                                          : Get.back();
+                                    },
+                                    icon: Container(
+                                      width: getWidgetWidth(width: 10),
+                                      height: getWidgetHeight(height: 40),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.black.withOpacity(0.3),
+                                      ),
+                                      child: const Icon(
+                                        Icons.arrow_back,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: getWidgetWidth(width: 2),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 10),
+                                  child: ClipPath(
                                     // clipper: CustomShape(),
-                                    child: SizedBox(
-                                      width: getWidgetWidth(width: 80),
-                                      height: getWidgetHeight(
-                                          height: isKwidth > 700 ? 200 : 270),
-                                      child: SvgPicture.asset(
-                                        controller.image,
-                                        fit: BoxFit.contain,
-                                      ),
+                                    child: SvgPicture.asset(
+                                      width: getWidgetWidth(width: 60),
+                                      height: getWidgetHeight(height: 200),
+                                      controller.image,
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
-                                  Positioned(
-                                    top: getWidgetHeight(height: 15),
-                                    // left: getWidgetWidth(width: 5),
-                                    child: IconButton(
-                                      focusColor: Colors.transparent,
-                                      hoverColor: Colors.transparent,
-                                      highlightColor: Colors.transparent,
-                                      splashColor: Colors.transparent,
-                                      onPressed: () {
-                                        kIsWeb
-                                            ? Get.rootDelegate
-                                                .offNamed(AppRoutes.home)
-                                            : Get.back();
-                                      },
-                                      icon: Container(
-                                        width: getWidgetWidth(
-                                            width: isKwidth > 700 ? 40 : 36),
-                                        height: getWidgetHeight(
-                                            height: isKwidth > 700 ? 40 : 36),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.black.withOpacity(0.3),
-                                        ),
-                                        child: const Icon(
-                                          Icons.arrow_back,
-                                          color: Colors.white,
-                                          size: 30,
-                                        ),
-                                      ),
-                                      padding: EdgeInsets.zero,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
 
                             // Space between image and column
@@ -110,10 +109,12 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                             // Headline + Search TextField
                             Expanded(
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  SizedBox(height: getWidgetHeight(height: 15)),
                                   Padding(
                                     padding: EdgeInsets.symmetric(
+                                        horizontal: getWidgetWidth(width: 10),
                                         vertical: getWidgetHeight(height: 20)),
                                     child: Text(
                                       controller.title,
@@ -127,7 +128,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                       maxLines: 2,
                                     ),
                                   ),
-                                  SizedBox(height: getWidgetHeight(height: 10)),
+                                  SizedBox(height: getWidgetHeight(height: 5)),
                                   Padding(
                                     padding: EdgeInsets.symmetric(
                                         horizontal: getWidgetWidth(width: 10)),
@@ -136,7 +137,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                       controller: controller.searchController,
                                       autofocus: true,
                                       decoration: InputDecoration(
-                                        hintText: 'Search...',
+                                        hintText: 'Search Title...',
                                         hintStyle:
                                             const TextStyle(color: Colors.grey),
                                         contentPadding:
