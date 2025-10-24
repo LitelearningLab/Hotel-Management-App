@@ -332,6 +332,8 @@ class SentenceLabSubCatController extends GetxController {
         audioStatusMap[newKey] = AudioStatus.playing;
         update();
       });
+      
+      print("▶️ Playing audio from: $filePathToPlay and also from URL: ${sentence.file} and also : ${audioStatusMap[newKey]}");
 
       // Listen for completion
       audioPlayer.playerStateStream.listen((state) {

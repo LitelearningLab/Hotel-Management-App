@@ -31,8 +31,11 @@ class AudioCryptoHelper {
     final tempDir = await getTemporaryDirectory();
     final outputPath = p.join(tempDir.path, "$outputFileName.mp3");
     await File(outputPath).writeAsBytes(decryptedBytes);
-
-    return outputPath; // Return path for playback
+   if (Platform.isIOS) {
+    return "file://${outputPath}";
+  } else {
+    return outputPath;
+  }// Return path for playback
   }
 
   static Future<String> downloadAndEncryptAudio(
@@ -55,6 +58,8 @@ class AudioCryptoHelper {
     final file = File(filePath);
     await file.writeAsBytes(encrypted.bytes);
 
-    return filePath; // Return path to store in DB
+ 
+    return file.path;
+// Return path to store in DB
   }
 }

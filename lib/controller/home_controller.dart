@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/university_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/update_checker.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/view/login.dart';
@@ -338,14 +339,14 @@ class HomeController extends GetxController {
             actions: [
               TextButton(
                 onPressed: () => Get.back(),
-                child: const Text("Cancel"),
+                child:  Text("Cancel",style: TextStyle(color: linearColor),),
               ),
               TextButton(
                 onPressed: () {
                   openAppSettings();
                   Get.back();
                 },
-                child: const Text("Open Settings"),
+                child:  Text("Open Settings",style: TextStyle(color: linearColor),),
               ),
             ],
           ),

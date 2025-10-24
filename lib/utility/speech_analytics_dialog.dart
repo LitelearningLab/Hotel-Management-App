@@ -111,7 +111,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
     bool hasSpeech = await speech.initialize(
         onError: errorListener, onStatus: statusListener);
     if (hasSpeech) {
-      print("ojudsoudududuhdudu badhusha");
+      print("ojudsoudududuhdudu badhusha"); 
       var systemLocale = await speech.systemLocale();
       _currentLocaleId = systemLocale!.localeId;
     } else {
