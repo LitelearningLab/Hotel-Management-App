@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:android_id/android_id.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -45,12 +46,20 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
   String? appVersion;
   Timer? _hideTimer;
-  Future<void> _loadAppVersion() async {
+ Future<void> _loadAppVersion() async {
+  if (Platform.isIOS) {
+
+    setState(() {
+      appVersion = "1.0.0";
+    });
+  } else {
+    // For Android and others, fetch from package info
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       appVersion = packageInfo.version; // e.g. "1.0.3"
     });
   }
+}
 
   String? validateEmail(String? val) {
     if (val == null || val.isEmpty) {

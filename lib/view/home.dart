@@ -82,12 +82,20 @@ class _HomeState extends State<Home>
     // }
   }
 
-  Future<void> _loadAppVersion() async {
+ Future<void> _loadAppVersion() async {
+  if (Platform.isIOS) {
+
+    setState(() {
+      appVersion = "1.0.0";
+    });
+  } else {
+
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     setState(() {
-      appVersion = packageInfo.version;
+      appVersion = packageInfo.version; 
     });
   }
+}
 
   exitPop() async {
     showDialog(
@@ -140,7 +148,7 @@ class _HomeState extends State<Home>
         onTap: onTap,
         leading: icon,
         //  ImageIcon(
-        //   icon,
+        //   icon,  
         // color: Colors.grey.shade400,
         // size: 20,
         // ),

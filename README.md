@@ -1,4 +1,4 @@
-# hotelmanagementapp
+# Profluent Hotelier
 
 A new Flutter project.
 

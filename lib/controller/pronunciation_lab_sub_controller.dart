@@ -355,7 +355,12 @@ class PronunciationLabSubController extends GetxController {
       update();
     }
   }
-
+String normalizePath(String path) {
+  if (path.startsWith('file://')) {
+    return path.replaceFirst('file://', '');
+  }
+  return path;
+}
   void clearFilter() {
     isFiltering = false;
 
