@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
@@ -10,6 +11,7 @@ class UpdateChecker {
   static Future<void> checkForUpdate(BuildContext context) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String currentVersion = packageInfo.version;
+
     log("$currentVersion showing printing the current version");
 
     DocumentSnapshot versionDoc = await FirebaseFirestore.instance
@@ -17,7 +19,9 @@ class UpdateChecker {
         .doc('version_info')
         .get();
 
-    String latestVersion = versionDoc['latest_version'];
+    String latestVersion = Platform.isIOS
+        ? versionDoc['latest_version_app_store']
+        : versionDoc['latest_version'];
     String updateMessage = versionDoc['update_message'];
     log("$currentVersion showing printing the current version $latestVersion");
 

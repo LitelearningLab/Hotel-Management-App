@@ -4,10 +4,12 @@ import 'dart:io';
 
 import 'package:android_id/android_id.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -27,6 +29,7 @@ import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 // import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -46,6 +49,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
   String? appVersion;
   Timer? _hideTimer;
+ final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
  Future<void> _loadAppVersion() async {
   if (Platform.isIOS) {
 
@@ -202,9 +206,9 @@ class _LoginPageState extends State<LoginPage> {
       // 🔹 Step 4: Device verification (same as before)
       final prefs = await SharedPreferences.getInstance();
       if (!kIsWeb) {
-        final deviceId = await const AndroidId().getId();
+        final deviceId = Platform.isAndroid ?await const AndroidId().getId():await getPermanentDeviceId();
         final deviceName = await DeviceScreenInfo.getModelName();
-
+  
         if (userData.containsKey('imei')) {
           if (userData['imei'] != deviceId) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -332,7 +336,24 @@ class _LoginPageState extends State<LoginPage> {
       }
     });
   }
+Future<String> getPermanentDeviceId() async {
 
+  String? storedId = await _secureStorage.read(key: 'device_unique_id');
+  if (storedId != null) return storedId;
+
+
+
+    final iosInfo = await DeviceInfoPlugin().iosInfo;
+   String? deviceId = iosInfo. identifierForVendor;
+  
+
+  deviceId ??= const Uuid().v4();
+
+  // 4️⃣ Save it permanently (survives reinstall)
+  await _secureStorage.write(key: 'device_unique_id', value: deviceId);
+
+  return deviceId;
+}
   @override
   void initState() {
     _loginFailed();

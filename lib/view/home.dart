@@ -260,15 +260,16 @@ class _HomeState extends State<Home>
                             ),
                             menu: "Rate this app",
                             onTap: () {
-                              if (Platform.isAndroid || Platform.isIOS) {
-                                const appId = "com.profluent.hotelier.app";
-                                final url =
-                                    Uri.parse("market://details?id=$appId");
-                                launchUrl(
-                                  url,
-                                  mode: LaunchMode.externalApplication,
-                                );
-                              }
+                              controller.openAppStore();
+                              // if (Platform.isAndroid || Platform.isIOS) {
+                              //   const appId = "com.profluent.hotelier.app";
+                              //   final url =
+                              //       Uri.parse("market://details?id=$appId");
+                              //   launchUrl(  
+                              //     url,
+                              //     mode: LaunchMode.externalApplication,
+                              //   );
+                              // }
                             }),
                         /*_tile(
                         icon: SvgPicture.asset(

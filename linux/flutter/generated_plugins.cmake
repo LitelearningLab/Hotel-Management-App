@@ -3,6 +3,11 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+<<<<<<< HEAD
+=======
+  flutter_secure_storage
+  syncfusion_pdfviewer_linux
+>>>>>>> 41002b0b4eef83a3a925ef5c9db076b1227949c7
   url_launcher_linux
 )
 

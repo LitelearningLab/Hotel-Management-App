@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -15,6 +16,7 @@ import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/view/login.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeController extends GetxController {
   List<dynamic> categories = [];
@@ -354,4 +356,25 @@ class HomeController extends GetxController {
       }
     }
   }
+  Future<void> openAppStore() async {
+  const androidAppId = "com.profluent.hotelier.app";
+  const iosAppUrl =
+      "https://apps.apple.com/in/app/profluent-hotelier/id6754444749";
+
+  if (Platform.isAndroid) {
+    final url = Uri.parse("market://details?id=$androidAppId");
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      // Fallback to web Play Store if Play Store not found
+      final webUrl = Uri.parse(
+          "https://play.google.com/store/apps/details?id=$androidAppId");
+      await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+    }
+  } else if (Platform.isIOS) {
+    final url = Uri.parse(iosAppUrl);   
+    await launchUrl(url, mode: LaunchMode.externalApplication);
+  } else {
+    // optional fallback for other platforms
+    print("Unsupported platform");
+  }
+}
 }
