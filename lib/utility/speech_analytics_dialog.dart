@@ -111,7 +111,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
     bool hasSpeech = await speech.initialize(
         onError: errorListener, onStatus: statusListener);
     if (hasSpeech) {
-      print("ojudsoudududuhdudu badhusha"); 
+      print("ojudsoudududuhdudu badhusha");
       var systemLocale = await speech.systemLocale();
       _currentLocaleId = systemLocale!.localeId;
     } else {
@@ -241,8 +241,8 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
     lastError = "";
     await speech.listen(
       onResult: resultListener,
-      listenFor: Duration(minutes: 3),
-      pauseFor: Duration(seconds: 10),
+      listenFor: Duration(seconds: 30),
+      pauseFor: Duration(seconds: 2),
       localeId: _currentLocaleId,
       listenOptions: SpeechListenOptions(
         partialResults: true,
@@ -557,10 +557,16 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
     double correctPer = 0;
 
     if (result.finalResult) {
+      stopListening();
       heard = result.recognizedWords.split(" ");
       print("heard");
       print(heard);
-      List<String> actual = widget.word.split(" ");
+      List<String> actual = widget.word
+          .trim()
+          .split(" ")
+          .where((w) => w.trim().isNotEmpty)
+          .toList();
+
       print("actual");
       print(actual);
       // Clean up the heard words
@@ -653,63 +659,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
 
       if (_timer.isActive) {
         _timer.cancel();
-      }
-      // String company = await SharedPref.getSavedString("companyId");
-      // String batch = await SharedPref.getSavedString("batch");
-      // if (widget.isWord)
-      //   db.saveWordListReport(
-      //       companyId: company,
-      //       batch: batch,
-      //       time: _start,
-      //       company: userDatas.appUser?.company ?? "",
-      //       name: userDatas.appUser?.UserMname,
-      //       userID: userDatas.appUser!.id!,
-      //       word: widget.word,
-      //       isCorrect: _isCorrect,
-      //       team: userDatas.appUser?.team,
-      //       load: widget.load,
-      //       title: widget.title,
-      //       userprofile: userDatas.appUser?.profile,
-      //       city: userDatas.appUser?.city,
-      //       date: DateFormat('dd-MMM-yyyy').format(DateTime.now()));
-      else {
-        // if (widget.isCallflow) {
-        //   db.saveCallFlowReport(
-        //       company: userDatas.appUser!.company ?? "   ",
-        //       name: userDatas.appUser!.UserMname,
-        //       userID: userDatas.appUser!.id!,
-        //       sentence: widget.word,
-        //       isCorrect: _isCorrect,
-        //       team: userDatas.appUser?.team,
-        //       userprofile: userDatas.appUser?.profile,
-        //       city: userDatas.appUser?.city,
-        //       score: correctPer,
-        //       focusWords: focusWords,
-        //       correctWords: correctWords,
-        //       title: widget.title,
-        //       main: widget.main,
-        //       load: widget.load,
-        //       date: DateFormat('dd-MMM-yyyy').format(DateTime.now()));
-        // } else {
-        //   print("dli do ioud ou ffy oufou f");
-        //   db.saveSentenceListReport(
-        //       company: userDatas.appUser!.company ?? "",
-        //       name: userDatas.appUser!.UserMname,
-        //       userID: userDatas.appUser!.id!,
-        //       sentence: widget.word,
-        //       isCorrect: _isCorrect,
-        //       team: userDatas.appUser?.team,
-        //       userprofile: userDatas.appUser?.profile,
-        //       city: userDatas.appUser?.city,
-        //       score: correctPer,
-        //       focusWords: focusWords,
-        //       correctWords: correctWords,
-        //       title: widget.title,
-        //       load: widget.load,
-        //       main: widget.main,
-        //       date: DateFormat('dd-MMM-yyyy').format(DateTime.now()));
-        // }
-      }
+      } else {}
       print(correctPer);
       print("until go back>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
