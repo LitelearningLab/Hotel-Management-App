@@ -64,7 +64,25 @@ class SentenceLabSubCatController extends GetxController {
       title = saved['title'] ?? "";
     }
 
-    // subcategories = args?["CategoryModel"] ?? [];
+    audioPlayer.playerStateStream.listen((state) async {
+      if (state.processingState == ProcessingState.completed ||
+          state.processingState == ProcessingState.idle) {
+        if (currentKey != null) {
+          audioStatusMap[currentKey!] = AudioStatus.idle;
+          update();
+          currentKey = null;
+        }
+      }
+
+      // Optional: handle player stopped manually
+      if (state.playing == false &&
+          state.processingState == ProcessingState.ready) {
+        if (currentKey != null) {
+          audioStatusMap[currentKey!] = AudioStatus.idle;
+          update();
+        }
+      }
+    });
 
     reloadFromDB(title);
     super.onInit();
@@ -275,7 +293,7 @@ class SentenceLabSubCatController extends GetxController {
   void handlePlayPause(int index, int subIndex) async {
     final newKey = "$index-$subIndex";
 
-    // If tapped the same audio
+    // If tapped same item
     if (currentKey == newKey) {
       if (audioPlayer.playing) {
         await audioPlayer.pause();
@@ -295,25 +313,25 @@ class SentenceLabSubCatController extends GetxController {
       return;
     }
 
-    // Stop previous audio if any
+    // Stop previous playback
     if (currentKey != null) {
       audioStatusMap[currentKey!] = AudioStatus.idle;
       await audioPlayer.stop();
+      currentKey = null;
     }
 
-    // Set new key to loading
+    // Set loading state for new audio
     currentKey = newKey;
     audioStatusMap[newKey] = AudioStatus.loading;
     update();
 
     try {
-      String? filePathToPlay;
       final sentence = subcategories[index].sentence[subIndex];
+      String? filePathToPlay;
 
       if (sentence.localPath != null && sentence.localPath!.isNotEmpty) {
         final localFile = File(sentence.localPath!);
         if (await localFile.exists()) {
-          log("✅ Local encrypted file found. Decrypting...");
           filePathToPlay = await AudioCryptoHelper.decryptFile(
             sentence.localPath!,
             sentence.text
@@ -325,24 +343,18 @@ class SentenceLabSubCatController extends GetxController {
 
       filePathToPlay ??= sentence.file;
 
+      // Set URL and wait until ready
       await audioPlayer.setUrl(filePathToPlay);
+      // await audioPlayer.load(); // <- ensures it's fully buffered before play
 
-      // Wait until it’s actually ready
-      audioPlayer.play().then((_) {
-        audioStatusMap[newKey] = AudioStatus.playing;
-        update();
-      });
-      
-      print("▶️ Playing audio from: $filePathToPlay and also from URL: ${sentence.file} and also : ${audioStatusMap[newKey]}");
+      // Start playing immediately after loaded
+      audioStatusMap[newKey] = AudioStatus.playing;
+      update();
+      await audioPlayer.play();
 
-      // Listen for completion
-      audioPlayer.playerStateStream.listen((state) {
-        if (state.processingState == ProcessingState.completed) {
-          audioStatusMap[newKey] = AudioStatus.idle;
-          update();
-          currentKey = null;
-        }
-      });
+      // ✅ Mark as playing here
+
+      print("▶️ Playing: $filePathToPlay");
     } catch (e) {
       log("❌ Audio load error: $e");
       audioStatusMap[newKey] = AudioStatus.error;
