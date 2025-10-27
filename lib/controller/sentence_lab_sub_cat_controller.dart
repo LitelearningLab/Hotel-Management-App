@@ -342,7 +342,7 @@ class SentenceLabSubCatController extends GetxController {
       }
 
       filePathToPlay ??= sentence.file;
-
+      print("$filePathToPlay attempting to play this file");
       // Set URL and wait until ready
       await audioPlayer.setUrl(filePathToPlay);
       // await audioPlayer.load(); // <- ensures it's fully buffered before play
