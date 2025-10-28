@@ -1,4 +1,5 @@
 class AllAssets {
+  static const String search = "assets/images/searchIcon.png";
   static const String workersCompensation =
       "assets/images/Worker Compensation.png";
   static const String federalInsurance = "assets/images/Federal Insurance.png";
@@ -78,7 +79,7 @@ class AllAssets {
   static const String ptIcon = 'assets/images/PTIcon.png';
   static const String soft = 'assets/images/soft.jpg';
   static const String ameri = 'assets/images/ameri.jpg';
-  static const String bottomHome = 'assets/images/botomHome.png';
+  static const String bottomHome = 'assets/images/homehotelierpro.png';
   static const String bottomPL = 'assets/images/bottomPL.png';
   static const String bottomIS = 'assets/images/bottomIS.png';
   static const String bottomPE = 'assets/images/bottomPE.png';

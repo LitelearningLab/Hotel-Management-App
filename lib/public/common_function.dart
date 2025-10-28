@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/model/grammer_lab_model.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
@@ -12,6 +14,7 @@ import 'package:hotelmanagementapp/model/sound_model.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 double kHeight = 0.0;
 double kWidth = 0.0;
@@ -33,6 +36,7 @@ String activityName = "";
 int timestampIndex = 0;
 late TextScaler kText;
 String accessLinks = "";
+final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 // double fullScreenHeight = 805.33;
 
 Size displaySize(BuildContext context) {
@@ -419,4 +423,19 @@ void addToRecentHistory({
 
   final prefs = await SharedPreferences.getInstance();
   prefs.setString('recentHistory', jsonEncode(recentHistory));
+}
+
+Future<String> getPermanentDeviceId() async {
+  String? storedId = await _secureStorage.read(key: 'device_unique_id');
+  if (storedId != null) return storedId;
+
+  final iosInfo = await DeviceInfoPlugin().iosInfo;
+  String? deviceId = iosInfo.identifierForVendor;
+
+  deviceId ??= const Uuid().v4();
+
+  // 4️⃣ Save it permanently (survives reinstall)
+  await _secureStorage.write(key: 'device_unique_id', value: deviceId);
+
+  return deviceId;
 }
