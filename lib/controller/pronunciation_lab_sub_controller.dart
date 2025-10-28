@@ -65,6 +65,13 @@ class PronunciationLabSubController extends GetxController {
   String userId = "";
   String collegeId = "";
   String batchName = "";
+  bool isPlayingOne = false;
+  bool isPlayingThree = false;
+  bool isCancelled = false;
+  bool isPaused = false;
+  int currentIndex = 0;
+  int currentRepeat = 0;
+  final ScrollController scrollController = ScrollController();
 
   @override
   void onInit() {
@@ -283,7 +290,149 @@ class PronunciationLabSubController extends GetxController {
     update();
   }
 
-  void handlePlayPause(int index) async {
+  Future<void> stopAudio() async {
+    try {
+      await audioPlayer.stop();
+      currentlyPlayingIndex = null;
+      update();
+    } catch (e) {
+      print('Error stopping audio: $e');
+    }
+  }
+
+  Future<void> stopAllPlaying() async {
+    isCancelled = true;
+    isPaused = false;
+    await stopAudio();
+    isPlayingOne = false;
+    isPlayingThree = false;
+    update();
+  }
+
+  Future<void> scrollToIndex(int index) async {
+    if (!scrollController.hasClients || index < 5) return;
+    double offset = (index - 5) * 80.0;
+
+    final maxScroll = scrollController.position.maxScrollExtent;
+    if (offset > maxScroll) offset = maxScroll;
+
+    await scrollController.animateTo(
+      offset,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  Future<void> resetState() async {
+    isPlayingOne = false;
+    isPlayingThree = false;
+    isCancelled = false;
+    isPaused = false;
+    currentIndex = 0;
+    currentRepeat = 0;
+
+    // Smoothly scroll back to the top
+    if (scrollController.hasClients) {
+      await scrollController.animateTo(
+        0.0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOut,
+      );
+    }
+
+    update();
+  }
+
+  Future playOneTime() async {
+    await stopAllPlaying();
+    isPlayingOne = true;
+    isPlayingThree = false;
+    isCancelled = false;
+    isPaused = false;
+    currentIndex = 0;
+    update();
+    for (int i = currentIndex; i < subcategories.length; i++) {
+      if (isCancelled) break;
+      while (isPaused) {
+        await Future.delayed(const Duration(milliseconds: 200));
+      }
+      currentIndex = i;
+      update();
+      await scrollToIndex(currentIndex);
+      await handlePlayPause(currentIndex);
+      while (currentlyPlayingIndex != null && !isCancelled) {
+        if (isPaused) {
+          while (isPaused && !isCancelled) {
+            await Future.delayed(const Duration(milliseconds: 200));
+          }
+          if (isCancelled) break;
+        }
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+
+      if (isCancelled) break;
+    }
+    await resetState();
+  }
+
+  Future<void> playThreeTimes() async {
+    await stopAllPlaying();
+    isPlayingThree = true;
+    isPlayingOne = false;
+    isCancelled = false;
+    isPaused = false;
+    currentIndex = 0;
+    currentRepeat = 0;
+    update();
+    for (int index = currentIndex; index < subcategories.length; index++) {
+      for (int i = currentRepeat; i < 3; i++) {
+        if (isCancelled) break;
+        while (isPaused) {
+          await Future.delayed(const Duration(milliseconds: 200));
+        }
+        currentIndex = index;
+        currentRepeat = i;
+        await scrollToIndex(currentIndex);
+        await handlePlayPause(index);
+        while (currentlyPlayingIndex != null && !isCancelled) {
+          if (isPaused) {
+            while (isPaused && !isCancelled) {
+              await Future.delayed(const Duration(milliseconds: 200));
+            }
+            if (isCancelled) break;
+          }
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+        if (isCancelled) break;
+      }
+      currentRepeat = 0;
+      if (isCancelled) break;
+    }
+
+    await resetState();
+  }
+
+  void pausePlaying() {
+    isPaused = true;
+    update();
+  }
+
+  void resumePlaying() {
+    isPaused = false;
+    update();
+  }
+
+  void stopPlaying() {
+    isCancelled = true;
+    isPaused = false;
+    currentIndex = 0;
+    currentRepeat = 0;
+    // stopAudio(); // your stop method
+    isPlayingThree = false;
+    update();
+  }
+
+  Future handlePlayPause(int index) async {
     log("${subcategories[index].file}");
     loadingIndex = index;
     isPlaying = true;
@@ -355,12 +504,14 @@ class PronunciationLabSubController extends GetxController {
       update();
     }
   }
-String normalizePath(String path) {
-  if (path.startsWith('file://')) {
-    return path.replaceFirst('file://', '');
+
+  String normalizePath(String path) {
+    if (path.startsWith('file://')) {
+      return path.replaceFirst('file://', '');
+    }
+    return path;
   }
-  return path;
-}
+
   void clearFilter() {
     isFiltering = false;
 

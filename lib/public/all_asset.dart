@@ -173,4 +173,6 @@ class AllAssets {
   static const String headerLogo = 'assets/ph-logo-for-app-01.png';
   static const String loginScreen = 'assets/loginScreen.svg';
   static const String splashLogo = 'assets/ph-logo-transperant-bg-01.png';
+  static const String playOne = 'assets/images/Play_once_icon.png';
+  static const String playThree = 'assets/images/Play_thrice_icon.png';
 }
