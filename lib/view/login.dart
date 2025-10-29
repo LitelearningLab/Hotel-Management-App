@@ -40,6 +40,7 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final emailAuth = EmailAuthService();
+  OverlayEntry? _bottomMessageEntry;
   // final googleAuth = GoogleAuthService();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
@@ -87,6 +88,63 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
+  void showBottomStickyMessage(BuildContext context, String message) {
+    // If a message is already showing, remove it first
+    _bottomMessageEntry?.remove();
+
+    _bottomMessageEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: 0,
+        right: 0,
+        bottom: 0,
+        // top: 0,
+        child: Material(
+          color: Colors.transparent,
+          child: AnimatedSlide(
+            duration: const Duration(milliseconds: 300),
+            offset: const Offset(0, 0),
+            child: Container(
+              // height: 120,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              margin: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: primaryDark,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      message,
+                      style: const TextStyle(color: Colors.white, fontSize: 15),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _bottomMessageEntry?.remove();
+                      _bottomMessageEntry = null;
+                    },
+                    child: const Icon(Icons.close, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(_bottomMessageEntry!);
+  }
+
   Future<void> login() async {
     if (!_isLogin) {
       if (_formKey.currentState!.validate()) {
@@ -94,9 +152,10 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {});
         await isUserRegistered(emailController.text.toLowerCase());
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please enter a valid email')),
-        );
+        showBottomStickyMessage(context, "Please enter a valid email address.");
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Please enter a valid email')),
+        // );
       }
       return;
     }
@@ -116,10 +175,11 @@ class _LoginPageState extends State<LoginPage> {
           .get();
 
       if (snapshot.docs.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              backgroundColor: Colors.red, content: Text("Invalid password.")),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //       backgroundColor: Colors.red, content: Text("Invalid password.")),
+        // );
+        showBottomStickyMessage(context, "Invalid password.");
         // showCenterToast("Invalid password.");
         _isLoading = false;
         isLoading = true;
@@ -134,11 +194,12 @@ class _LoginPageState extends State<LoginPage> {
       // 🔹 Step 1: Fetch Company Data
       final companyId = userData['companyid'];
       if (companyId == null || companyId.toString().isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              backgroundColor: Colors.red,
-              content: Text("Company information missing.")),
-        );
+        showBottomStickyMessage(context, "Company information missing.");
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //       backgroundColor: Colors.red,
+        //       content: Text("Company information missing.")),
+        // );
         _isLoading = false;
         isLoading = true;
         setState(() {});
@@ -152,10 +213,11 @@ class _LoginPageState extends State<LoginPage> {
           .get();
 
       if (companySnapshot.docs.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              backgroundColor: Colors.red, content: Text("Company not found.")),
-        );
+        showBottomStickyMessage(context, "Company not found.");
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //       backgroundColor: Colors.red, content: Text("Company not found.")),
+        // );
         _isLoading = false;
         isLoading = true;
         setState(() {});
@@ -167,11 +229,12 @@ class _LoginPageState extends State<LoginPage> {
 
       // 🔹 Step 2: Check company status
       if (companyData['status'] != "1") {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              backgroundColor: Colors.red,
-              content: Text("Company status is invalid.")),
-        );
+        showBottomStickyMessage(context, "Company status is invalid.");
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //       backgroundColor: Colors.red,
+        //       content: Text("Company status is invalid.")),
+        // );
         _isLoading = false;
         isLoading = true;
         setState(() {});
@@ -191,11 +254,13 @@ class _LoginPageState extends State<LoginPage> {
           companySubDate != null && companySubDate.isAfter(now);
 
       if (!isUserActive && !isCompanyActive) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              backgroundColor: Colors.red,
-              content: Text("Subscription date has been finished.")),
-        );
+        showBottomStickyMessage(
+            context, "Subscription date has been finished.");
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //       backgroundColor: Colors.red,
+        //       content: Text("Subscription date has been finished.")),
+        // );
         _isLoading = false;
         isLoading = true;
         setState(() {});
@@ -212,11 +277,13 @@ class _LoginPageState extends State<LoginPage> {
 
         if (userData.containsKey('imei')) {
           if (userData['imei'] != deviceId) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  backgroundColor: Colors.red,
-                  content: Text("Login denied: Device not recognized.")),
-            );
+            showBottomStickyMessage(context,
+                "Your account is linked to another mobile device. Contact your administrator to register a new device.");
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(
+            //       backgroundColor: Colors.red,
+            //       content: Text("Login denied: Device not recognized.")),
+            // );
             _isLoading = false;
             isLoading = true;
             setState(() {});
@@ -260,11 +327,12 @@ class _LoginPageState extends State<LoginPage> {
       log("Login error: $e");
       isLoading = true;
       setState(() {});
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            backgroundColor: Colors.red,
-            content: Text("Login failed. Please try again.")),
-      );
+      showBottomStickyMessage(context, "Login failed. Please try again.");
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //       backgroundColor: Colors.red,
+      //       content: Text("Login failed. Please try again.")),
+      // );
     }
 
     _isLoading = false;
@@ -294,9 +362,10 @@ class _LoginPageState extends State<LoginPage> {
         return true;
       } else {
         log("User not found in database");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("User not registered.")),
-        );
+        showBottomStickyMessage(context, "User not registered.");
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text("User not registered.")),
+        // );
         return false;
       }
     } catch (e) {
@@ -460,6 +529,8 @@ class _LoginPageState extends State<LoginPage> {
                           obscureText: _isLogin ? _obscurePassword : false,
                           textInputAction: TextInputAction.done,
                           onFieldSubmitted: (value) {
+                            _bottomMessageEntry?.remove();
+                            _bottomMessageEntry = null;
                             if (_isLogin) {
                               isLoading = false;
                               setState(() {});
@@ -547,6 +618,8 @@ class _LoginPageState extends State<LoginPage> {
                                     ? "Verify Login"
                                     : "Verify & Login",
                                 onPressed: () async {
+                                  _bottomMessageEntry?.remove();
+                                  _bottomMessageEntry = null;
                                   if (_isLogin) {
                                     isLoading = false;
                                     setState(() {});

@@ -72,7 +72,7 @@ class PronunciationLabSubController extends GetxController {
   int currentIndex = 0;
   int currentRepeat = 0;
   final ScrollController scrollController = ScrollController();
-
+  int expandedIndex = -1;
   @override
   void onInit() {
     readyFirs();
@@ -93,7 +93,10 @@ class PronunciationLabSubController extends GetxController {
     } else {
       final saved = box.read(AppRoutes.pronunciationLabSub) ?? {};
       title = saved['title'] ?? "";
-      argList = saved['subcategories'] ?? [];
+      final subList = saved['subcategories'] ?? [];
+      argList = subList
+          .map<SubcategoryPro>((e) => SubcategoryPro.fromMap(e))
+          .toList();
       collectionName = saved['pronunCollectionName'] ?? '';
       id = saved['id'] ?? "";
     }
@@ -304,8 +307,8 @@ class PronunciationLabSubController extends GetxController {
     isCancelled = true;
     isPaused = false;
     await stopAudio();
-    isPlayingOne = false;
-    isPlayingThree = false;
+    // isPlayingOne = false;
+    // isPlayingThree = false;
     update();
   }
 
@@ -330,6 +333,8 @@ class PronunciationLabSubController extends GetxController {
     isPaused = false;
     currentIndex = 0;
     currentRepeat = 0;
+    expandedIndex = -1;
+    currentlyPlayingIndex = null;
 
     // Smoothly scroll back to the top
     if (scrollController.hasClients) {
@@ -345,6 +350,7 @@ class PronunciationLabSubController extends GetxController {
 
   Future playOneTime() async {
     await stopAllPlaying();
+    // await resetState();
     isPlayingOne = true;
     isPlayingThree = false;
     isCancelled = false;
@@ -352,11 +358,12 @@ class PronunciationLabSubController extends GetxController {
     currentIndex = 0;
     update();
     for (int i = currentIndex; i < subcategories.length; i++) {
-      if (isCancelled) break;
+      if (isCancelled || isPlayingThree) break;
       while (isPaused) {
         await Future.delayed(const Duration(milliseconds: 200));
       }
       currentIndex = i;
+      expandedIndex = i;
       update();
       await scrollToIndex(currentIndex);
       await handlePlayPause(currentIndex);
@@ -365,18 +372,20 @@ class PronunciationLabSubController extends GetxController {
           while (isPaused && !isCancelled) {
             await Future.delayed(const Duration(milliseconds: 200));
           }
-          if (isCancelled) break;
+          if (isCancelled || isPlayingThree) break;
         }
         await Future.delayed(const Duration(milliseconds: 100));
       }
 
-      if (isCancelled) break;
+      if (isCancelled || isPlayingThree) break;
+      await Future.delayed(const Duration(seconds: 2));
     }
     await resetState();
   }
 
   Future<void> playThreeTimes() async {
     await stopAllPlaying();
+    // await resetState();
     isPlayingThree = true;
     isPlayingOne = false;
     isCancelled = false;
@@ -386,12 +395,14 @@ class PronunciationLabSubController extends GetxController {
     update();
     for (int index = currentIndex; index < subcategories.length; index++) {
       for (int i = currentRepeat; i < 3; i++) {
-        if (isCancelled) break;
+        if (isCancelled || isPlayingOne) break;
         while (isPaused) {
           await Future.delayed(const Duration(milliseconds: 200));
         }
         currentIndex = index;
+        expandedIndex = index;
         currentRepeat = i;
+        update();
         await scrollToIndex(currentIndex);
         await handlePlayPause(index);
         while (currentlyPlayingIndex != null && !isCancelled) {
@@ -399,14 +410,15 @@ class PronunciationLabSubController extends GetxController {
             while (isPaused && !isCancelled) {
               await Future.delayed(const Duration(milliseconds: 200));
             }
-            if (isCancelled) break;
+            if (isCancelled || isPlayingOne) break;
           }
           await Future.delayed(const Duration(milliseconds: 100));
         }
-        if (isCancelled) break;
+        if (isCancelled || isPlayingOne) break;
+        await Future.delayed(const Duration(seconds: 2));
       }
       currentRepeat = 0;
-      if (isCancelled) break;
+      if (isCancelled || isPlayingOne) break;
     }
 
     await resetState();

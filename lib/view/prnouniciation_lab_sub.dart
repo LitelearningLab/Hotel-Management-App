@@ -32,7 +32,6 @@ class PronunciationLabSub extends StatefulWidget {
 }
 
 class _PronunciationLabSubState extends State<PronunciationLabSub> {
-  int expandedIndex = -1;
   @override
   void initState() {
     startTimerMainCategory("");
@@ -284,16 +283,16 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                       horizontal: getWidgetWidth(width: 10)),
                                   itemCount: controller.subcategories.length,
                                   itemBuilder: (context, index) {
-                                    final isExpanded = expandedIndex == index;
+                                    final isExpanded =
+                                        controller.expandedIndex == index;
 
                                     return Column(
                                       children: [
                                         GestureDetector(
                                           onTap: () {
-                                            setState(() {
-                                              expandedIndex =
-                                                  isExpanded ? -1 : index;
-                                            });
+                                            controller.expandedIndex =
+                                                isExpanded ? -1 : index;
+                                            controller.update();
                                           },
                                           child: Container(
                                             width: getWidgetWidth(width: 375),
@@ -638,6 +637,8 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                           if (!kIsWeb)
                                                             GestureDetector(
                                                               onTap: () {
+                                                                controller
+                                                                    .stopAllPlaying();
                                                                 controller.kShowDialog(
                                                                     controller
                                                                         .subcategories[
@@ -903,7 +904,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                               boxShadow: [
                                                 BoxShadow(
                                                   color: Colors.black
-                                                      .withOpacity(0.1),
+                                                      .withOpacity(0.3),
                                                   offset: const Offset(0, 4),
                                                   blurRadius: 10,
                                                 ),
@@ -917,7 +918,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                             children: [
                                               Padding(
                                                 padding: const EdgeInsets.only(
-                                                    left: 12, top: 5),
+                                                    left: 15, top: 5),
                                                 child: Image.asset(
                                                   controller.isPlayingOne
                                                       ? AllAssets.playOne
@@ -955,7 +956,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                   icon: Icon(
                                                     Icons.stop,
                                                     color: Color(0XFF34425D),
-                                                    size: 26,
+                                                    size: 30,
                                                   )),
                                             ],
                                           ),

@@ -62,7 +62,7 @@ class _CustomeBottomNavigationState extends State<CustomeBottomNavigation> {
                 kIsWeb
                     ? Get.rootDelegate.toNamed(AppRoutes.searchScreen)
                     : Get.toNamed(AppRoutes.searchScreen);
-                currentIndex = 0;
+                // currentIndex = 0;
                 // openDialog(context);
                 // ScaffoldMessenger.of(context).showSnackBar(
                 //   const SnackBar(content: Text("Work in progress")),

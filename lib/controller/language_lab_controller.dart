@@ -1,9 +1,11 @@
 import 'dart:developer';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:hotelmanagementapp/model/sound_model.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/view/home.dart';
 
 class LanguageLabController extends GetxController {
@@ -17,8 +19,14 @@ class LanguageLabController extends GetxController {
   SoundModel? importantSound;
   List<SoundModel> vowelSoundsList = [];
   List<SoundModel> consonantSoundsList = [];
+  Map<String, dynamic>? languageLabStatus;
 
   List<Color> colorList = [
+    Color(0xFF5AB963),
+    Color(0xFFDDD639),
+    Color(0xFF9C2780),
+    Color(0xFFFF9800),
+    Color(0xFFE91E63),
     Color(0xFF5AB963),
     Color(0xFFDDD639),
     Color(0xFF9C2780),
@@ -32,11 +40,54 @@ class LanguageLabController extends GetxController {
     currentIndex = 3;
     timestampIndex = 6;
     fetchAndCategorizeSounds();
+    fetchInReviewStatus();
   }
 
   void ontapTab(int index) {
     selectedIndex = index;
     update();
+  }
+
+  Future<void> fetchInReviewStatus() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('LanguageLabInReview')
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        languageLabStatus = snapshot.docs.first.data();
+        update();
+      }
+    } catch (e) {
+      print('Error fetching status: $e');
+    }
+  }
+
+  void showReviewPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        alignment: Alignment.center,
+        title: const Text('Section Under Review'),
+        content: const Text(
+          'This section is temporarily under review. We’ll inform you as soon as it’s available again.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'OK',
+              style: TextStyle(color: linearColor),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool isLabActive(String labKey) {
+    if (languageLabStatus == null) return false;
+    return (languageLabStatus![labKey] ?? '') == 'active';
   }
 
   Future<void> fetchAndCategorizeSounds() async {

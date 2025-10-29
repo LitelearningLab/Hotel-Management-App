@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/constant.dart';
 
 class ARGridTile extends StatelessWidget {
   final Function onTap;
@@ -8,64 +9,58 @@ class ARGridTile extends StatelessWidget {
   final String title;
   final String icon;
   final String ellipse;
-  double? height;
-  ARGridTile(
-      {required this.onTap,
-      required this.tileColor,
-      required this.title,
-      required this.icon,
-      required this.ellipse,
-      this.height,
-      Key? key})
-      : super(key: key);
+  final double? height;
+  final bool isUnderConstruction; // 🔹 new flag
+
+  const ARGridTile({
+    required this.onTap,
+    required this.tileColor,
+    required this.title,
+    required this.icon,
+    required this.ellipse,
+    this.height,
+    this.isUnderConstruction = false, // 🔹 default false
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        mianCategoryTitile = title;
+        if (!isUnderConstruction) {
+          mianCategoryTitile = title;
+        }
         onTap();
       },
-      child: Container(
-        // height: getWidgetHeight(height: 230),
-        width: displayWidth(context) > 1200
-            ? getWidgetWidth(width: 140)
-            : getWidgetWidth(width: 160),
-        height: height,
-        padding: EdgeInsets.symmetric(vertical: getWidgetHeight(height: 5)),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              offset: const Offset(0, 4),
-              blurRadius: 10,
+      child: Stack(
+        children: [
+          Container(
+            width: displayWidth(context) > 1200
+                ? getWidgetWidth(width: 140)
+                : getWidgetWidth(width: 160),
+            height: height,
+            padding: EdgeInsets.symmetric(vertical: getWidgetHeight(height: 5)),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  offset: const Offset(0, 4),
+                  blurRadius: 10,
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            displayWidth(context) > 1200
+            child: displayWidth(context) > 1200
                 ? Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    // mainAxisAlignment: MainAxisAlignment.,
                     children: [
                       Padding(
                         padding: EdgeInsets.symmetric(
                             horizontal: getWidgetWidth(width: 10)),
-                        child: Align(
-                          // alignment: Alignment.bottomRight,
-                          child: SizedBox(
-                            // height: displayHeight(context) * 0.061,
-                            // width: displayWidth(context) * 0.133,
-                            height: getWidgetHeight(height: 100),
-                            // width: 50,
-                            child: Image.asset(
-                              icon,
-                              // gridTileDatas[0]['image'],
-                            ),
-                          ),
+                        child: SizedBox(
+                          height: getWidgetHeight(height: 100),
+                          child: Image.asset(icon),
                         ),
                       ),
                       Padding(
@@ -73,38 +68,25 @@ class ARGridTile extends StatelessWidget {
                             const EdgeInsets.only(left: 10, top: 10, right: 20),
                         child: Text(
                           title,
-                          textAlign: TextAlign.start,
-                          // overflow: TextOverflow.fade,
                           style: GoogleFonts.inter(
-                            // fontWeight: FontWeight.w600,
                             fontSize: 14,
+                            color: isUnderConstruction
+                                ? Colors.grey
+                                : Colors.black, // 🔹 title color
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: getWidgetHeight(height: 20),
-                      )
                     ],
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    // mainAxisAlignment: MainAxisAlignment.,
                     children: [
                       Padding(
                         padding: EdgeInsets.symmetric(
                             horizontal: getWidgetWidth(width: 10)),
-                        child: Align(
-                          // alignment: Alignment.bottomRight,
-                          child: SizedBox(
-                            // height: displayHeight(context) * 0.061,
-                            // width: displayWidth(context) * 0.133,
-                            height: getWidgetHeight(height: 100),
-                            // width: 50,
-                            child: Image.asset(
-                              icon,
-                              // gridTileDatas[0]['image'],
-                            ),
-                          ),
+                        child: SizedBox(
+                          height: getWidgetHeight(height: 100),
+                          child: Image.asset(icon),
                         ),
                       ),
                       Padding(
@@ -112,35 +94,47 @@ class ARGridTile extends StatelessWidget {
                             const EdgeInsets.only(left: 10, top: 10, right: 20),
                         child: Text(
                           title,
-                          textAlign: TextAlign.start,
-                          // overflow: TextOverflow.fade,
                           style: GoogleFonts.inter(
-                            // fontWeight: FontWeight.w600,
                             fontSize: 14,
+                            color: isUnderConstruction
+                                ? Colors.grey
+                                : Colors.black,
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: getWidgetHeight(height: 20),
-                      )
+                      SizedBox(height: getWidgetHeight(height: 20)),
                     ],
                   ),
+          ),
 
-            // Align(
-            //   alignment: Alignment.bottomLeft,
-            //   child: ClipRRect(
-            //     borderRadius: BorderRadius.only(
-            //       bottomLeft: Radius.circular(10),
-            //     ),
-            //     child: Image.asset(
-            //       ellipse,
-            //       // gridTileDatas[0]['ellipse'],
-            //       scale: 3.5,
-            //     ),
-            //   ),
-            // ),
-          ],
-        ),
+          // 🔹 Overlay Layer for "Under Construction"
+          if (isUnderConstruction)
+            Container(
+                width: displayWidth(context) > 1200
+                    ? getWidgetWidth(width: 140)
+                    : getWidgetWidth(width: 160),
+                height: displayWidth(context) > 1200
+                    ? getWidgetHeight(height: 100)
+                    : getWidgetHeight(height: 180),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.75),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: Container(
+                    width: displayWidth(context) > 1200
+                        ? getWidgetWidth(width: 140)
+                        : getWidgetWidth(width: 160),
+                    color: linearColor,
+                    child: Text("Under Review",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontWeight: FontWeight.normal)),
+                  ),
+                )),
+        ],
       ),
     );
   }

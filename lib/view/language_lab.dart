@@ -48,8 +48,13 @@ class Languagelab extends StatelessWidget {
             ),
           ),
           leading: Padding(
-            padding: EdgeInsets.symmetric(vertical: getWidgetHeight(height: 8)),
+            padding: EdgeInsets.symmetric(vertical: getWidgetHeight(height: 0)),
             child: IconButton(
+              // hoverColor: Colors.transparent,
+              // color: Colors.black,
+              // splashColor: Colors.transparent,
+              // focusColor: Colors.transparent,
+              // highlightColor: Colors.transparent,
               iconSize: 30,
               onPressed: () {
                 homeController.loadRecentHistory();
@@ -93,6 +98,10 @@ class Languagelab extends StatelessWidget {
                             title: 'English Pronunciation',
                             imageUrl: AllAssets.pePl,
                             onTap: () async {
+                              if (!controller.isLabActive('english_lab')) {
+                                controller.showReviewPopup(context);
+                                return;
+                              }
                               mianCategoryTitile = 'English Pronunciation';
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 GetStorage().write(AppRoutes.pronunciationLab,
@@ -109,6 +118,8 @@ class Languagelab extends StatelessWidget {
                                           });
                               });
                             },
+                            isUnderConstruction:
+                                !controller.isLabActive('english_lab'),
                             cardColor: Color(0xFF398480),
                           ),
                           PETopCategoriesCard(
@@ -119,6 +130,10 @@ class Languagelab extends StatelessWidget {
                             title: 'French Pronunciation',
                             imageUrl: AllAssets.peScl,
                             onTap: () async {
+                              if (!controller.isLabActive('french_lab')) {
+                                controller.showReviewPopup(context);
+                                return;
+                              }
                               mianCategoryTitile = 'French Pronunciation';
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 GetStorage().write(AppRoutes.pronunciationLab,
@@ -135,6 +150,8 @@ class Languagelab extends StatelessWidget {
                                           });
                               });
                             },
+                            isUnderConstruction:
+                                !controller.isLabActive('french_lab'),
                             cardColor: Color(0xFF445EA9),
                           ),
                           PETopCategoriesCard(
@@ -145,6 +162,10 @@ class Languagelab extends StatelessWidget {
                             title: 'Sentence Lab',
                             imageUrl: AllAssets.peCfpl,
                             onTap: () async {
+                              if (!controller.isLabActive('sentence_lab')) {
+                                controller.showReviewPopup(context);
+                                return;
+                              }
                               mianCategoryTitile = 'Sentence Lab';
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 GetStorage().write(AppRoutes.sentenceLab,
@@ -157,6 +178,8 @@ class Languagelab extends StatelessWidget {
                                         arguments: {"title": "Sentence Lab"});
                               });
                             },
+                            isUnderConstruction:
+                                !controller.isLabActive('sentence_lab'),
                             cardColor: Color(0xFF636CFF),
                           ),
                           PETopCategoriesCard(
@@ -167,6 +190,10 @@ class Languagelab extends StatelessWidget {
                             title: 'Grammer Lab',
                             imageUrl: AllAssets.peGl,
                             onTap: () {
+                              if (!controller.isLabActive('grammer_lab')) {
+                                controller.showReviewPopup(context);
+                                return;
+                              }
                               mianCategoryTitile = 'Grammer Lab';
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 GetStorage().write(AppRoutes.grmmaerLab,
@@ -179,6 +206,8 @@ class Languagelab extends StatelessWidget {
                                         arguments: {"title": "Grammer Lab"});
                               });
                             },
+                            isUnderConstruction:
+                                !controller.isLabActive('grammer_lab'),
                             cardColor: Color(0xFFDC6379),
                           ),
                         ],

@@ -702,7 +702,9 @@ class _PronounciationLabState extends State<PronounciationLab> {
                                     'title':
                                         controller.categories[index].category,
                                     'subcategories': controller
-                                        .categories[index].subcategories,
+                                        .categories[index].subcategories
+                                        .map((e) => e.toMap())
+                                        .toList(),
                                   });
                                   kIsWeb
                                       ? Get.rootDelegate.offNamed(

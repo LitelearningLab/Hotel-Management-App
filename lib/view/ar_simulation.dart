@@ -196,6 +196,15 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[0].category;
+                                                  if (!controller.isLabActive(
+                                                      subCategoryTitle
+                                                          .toLowerCase()
+                                                          .replaceAll(
+                                                              ' ', '_'))) {
+                                                    controller.showReviewPopup(
+                                                        context);
+                                                    return;
+                                                  }
                                                   // GetStorage().write(
                                                   //     AppRoutes.simulationSub, {
                                                   //   'title': controller
@@ -262,6 +271,11 @@ class ARCallSimulation extends StatelessWidget {
                                                   //                 simulation: controller
                                                   //                     .simulations[0])));
                                                 },
+                                                isUnderConstruction: !controller
+                                                    .isLabActive(controller
+                                                        .simulations[0].category
+                                                        .toLowerCase()
+                                                        .replaceAll(' ', '_')),
                                                 tileColor: gridTileDatas[0]
                                                     ['tileColor'],
                                                 title: controller
@@ -280,6 +294,15 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[2].category;
+                                                  if (!controller.isLabActive(
+                                                      subCategoryTitle
+                                                          .toLowerCase()
+                                                          .replaceAll(
+                                                              ' ', '_'))) {
+                                                    controller.showReviewPopup(
+                                                        context);
+                                                    return;
+                                                  }
                                                   // GetStorage().write(
                                                   //     AppRoutes.simulationSub, {
                                                   //   'title': controller
@@ -335,6 +358,11 @@ class ARCallSimulation extends StatelessWidget {
                                                               });
                                                   });
                                                 },
+                                                isUnderConstruction: !controller
+                                                    .isLabActive(controller
+                                                        .simulations[2].category
+                                                        .toLowerCase()
+                                                        .replaceAll(' ', '_')),
                                                 tileColor: gridTileDatas[2]
                                                     ['tileColor'],
                                                 title: controller
@@ -353,6 +381,15 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[4].category;
+                                                  if (!controller.isLabActive(
+                                                      subCategoryTitle
+                                                          .toLowerCase()
+                                                          .replaceAll(
+                                                              ' ', '_'))) {
+                                                    controller.showReviewPopup(
+                                                        context);
+                                                    return;
+                                                  }
                                                   // GetStorage().write(
                                                   //     AppRoutes.simulationSub, {
                                                   //   'title': controller
@@ -409,6 +446,11 @@ class ARCallSimulation extends StatelessWidget {
                                                   });
                                                 },
                                                 // height: getWidgetHeight(height: 180),
+                                                isUnderConstruction: !controller
+                                                    .isLabActive(controller
+                                                        .simulations[4].category
+                                                        .toLowerCase()
+                                                        .replaceAll(' ', '_')),
                                                 tileColor: gridTileDatas[4]
                                                     ['tileColor'],
                                                 title: controller
@@ -427,6 +469,15 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[6].category;
+                                                  if (!controller.isLabActive(
+                                                      subCategoryTitle
+                                                          .toLowerCase()
+                                                          .replaceAll(
+                                                              ' ', '_'))) {
+                                                    controller.showReviewPopup(
+                                                        context);
+                                                    return;
+                                                  }
                                                   // GetStorage().write(
                                                   //     AppRoutes.simulationSub, {
                                                   //   'title': controller
@@ -483,6 +534,11 @@ class ARCallSimulation extends StatelessWidget {
                                                   });
                                                 },
                                                 // height: getWidgetHeight(height: 180),
+                                                isUnderConstruction: !controller
+                                                    .isLabActive(controller
+                                                        .simulations[6].category
+                                                        .toLowerCase()
+                                                        .replaceAll(' ', '_')),
                                                 tileColor: gridTileDatas[6]
                                                     ['tileColor'],
                                                 title: controller
@@ -509,6 +565,15 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[1].category;
+                                                  if (!controller.isLabActive(
+                                                      subCategoryTitle
+                                                          .toLowerCase()
+                                                          .replaceAll(
+                                                              ' ', '_'))) {
+                                                    controller.showReviewPopup(
+                                                        context);
+                                                    return;
+                                                  }
                                                   // GetStorage().write(
                                                   //     AppRoutes.simulationSub, {
                                                   //   'title': controller
@@ -564,6 +629,11 @@ class ARCallSimulation extends StatelessWidget {
                                                               });
                                                   });
                                                 },
+                                                isUnderConstruction: !controller
+                                                    .isLabActive(controller
+                                                        .simulations[1].category
+                                                        .toLowerCase()
+                                                        .replaceAll(' ', '_')),
                                                 tileColor: gridTileDatas[1]
                                                     ['tileColor'],
                                                 title: controller
@@ -582,6 +652,15 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[3].category;
+                                                  if (!controller.isLabActive(
+                                                      subCategoryTitle
+                                                          .toLowerCase()
+                                                          .replaceAll(
+                                                              ' ', '_'))) {
+                                                    controller.showReviewPopup(
+                                                        context);
+                                                    return;
+                                                  }
                                                   // GetStorage().write(
                                                   //     AppRoutes.simulationSub, {
                                                   //   'title': controller
@@ -637,6 +716,11 @@ class ARCallSimulation extends StatelessWidget {
                                                               });
                                                   });
                                                 },
+                                                isUnderConstruction: !controller
+                                                    .isLabActive(controller
+                                                        .simulations[3].category
+                                                        .toLowerCase()
+                                                        .replaceAll(' ', '_')),
                                                 tileColor: gridTileDatas[3]
                                                     ['tileColor'],
                                                 title: controller
@@ -655,6 +739,15 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[5].category;
+                                                  if (!controller.isLabActive(
+                                                      subCategoryTitle
+                                                          .toLowerCase()
+                                                          .replaceAll(
+                                                              ' ', '_'))) {
+                                                    controller.showReviewPopup(
+                                                        context);
+                                                    return;
+                                                  }
                                                   // GetStorage().write(
                                                   //     AppRoutes.simulationSub, {
                                                   //   'title': controller
@@ -710,6 +803,11 @@ class ARCallSimulation extends StatelessWidget {
                                                               });
                                                   });
                                                 },
+                                                isUnderConstruction: !controller
+                                                    .isLabActive(controller
+                                                        .simulations[5].category
+                                                        .toLowerCase()
+                                                        .replaceAll(' ', '_')),
                                                 tileColor: gridTileDatas[5]
                                                     ['tileColor'],
                                                 title: controller
@@ -728,7 +826,75 @@ class ARCallSimulation extends StatelessWidget {
                                                 onTap: () async {
                                                   subCategoryTitle = controller
                                                       .simulations[7].category;
+                                                  if (!controller.isLabActive(
+                                                      subCategoryTitle
+                                                          .toLowerCase()
+                                                          .replaceAll(
+                                                              ' ', '_'))) {
+                                                    controller.showReviewPopup(
+                                                        context);
+                                                    return;
+                                                  }
+                                                  // GetStorage().write(
+                                                  //     AppRoutes.simulationSub, {
+                                                  //   'title': controller
+                                                  //       .simulations[5]
+                                                  //       .category,
+                                                  //   'simulation': controller
+                                                  //       .simulations[5]
+                                                  // });
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    final data = {
+                                                      'title': controller
+                                                          .simulations[7]
+                                                          .category,
+                                                      'simulation': controller
+                                                          .simulations[7]
+                                                    };
+                                                    GetStorage().write(
+                                                        AppRoutes.simulationSub,
+                                                        {
+                                                          'title':
+                                                              data['title'],
+                                                          'simulation': controller
+                                                              .simulations[7]
+                                                              .toJson(), // ✅ ensure JSON safe
+                                                        });
+                                                    kIsWeb
+                                                        ? Get.rootDelegate
+                                                            .offNamed(
+                                                                AppRoutes
+                                                                    .simulationSub,
+                                                                arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        7]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[7]
+                                                              })
+                                                        : Get.toNamed(
+                                                            AppRoutes
+                                                                .simulationSub,
+                                                            arguments: {
+                                                                'title': controller
+                                                                    .simulations[
+                                                                        7]
+                                                                    .category,
+                                                                'simulation':
+                                                                    controller
+                                                                        .simulations[7]
+                                                              });
+                                                  });
                                                 },
+                                                isUnderConstruction: !controller
+                                                    .isLabActive(controller
+                                                        .simulations[7].category
+                                                        .toLowerCase()
+                                                        .replaceAll(' ', '_')),
                                                 tileColor: gridTileDatas[7]
                                                     ['tileColor'],
                                                 title: controller

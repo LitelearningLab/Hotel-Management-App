@@ -639,92 +639,84 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                           //       .showPopupAtTap(
                                                           //           tapPosition);
                                                           // },
-                                                          onTap: () {
-                                                            controller
-                                                                .glossaryIndex = -1;
+                                                          onTap: controller
+                                                                  .frontOfficeData[
+                                                                      index]
+                                                                  .pronunID
+                                                                  .isNotEmpty
+                                                              ? () {
+                                                                  print(
+                                                                      "pronunID: ${controller.frontOfficeData[index].pronunID}");
+                                                                  controller
+                                                                      .glossaryIndex = -1;
 
-                                                            controller.update();
-                                                            activityName =
-                                                                "Prounciation Lab";
-                                                            debugPrint(
-                                                                "pronunCollectionName: ${controller.pronunCollectionName}");
+                                                                  controller
+                                                                      .update();
+                                                                  activityName =
+                                                                      "Prounciation Lab";
+                                                                  debugPrint(
+                                                                      "pronunCollectionName: ${controller.pronunCollectionName}");
 
-                                                            subCategoryTitle =
-                                                                controller
-                                                                    .frontOfficeData[
-                                                                        index]
-                                                                    .category;
-                                                            GetStorage().write(
-                                                                AppRoutes
-                                                                    .pronunciationLabSub,
-                                                                {
-                                                                  'title': controller
+                                                                  subCategoryTitle = controller
                                                                       .frontOfficeData[
                                                                           index]
-                                                                      .category,
-                                                                  'subcategories':
-                                                                      <SubcategoryPro>[],
-                                                                  "id": controller
-                                                                      .frontOfficeData[
-                                                                          index]
-                                                                      .pronunID,
-                                                                  "pronunCollectionName":
-                                                                      controller
-                                                                          .pronunCollectionName,
-                                                                });
-                                                            addToRecentHistory(
-                                                                path:
-                                                                    "Core Department > ${controller.title}",
-                                                                category:
-                                                                    subCategoryTitle,
-                                                                section:
-                                                                    "proLab",
-                                                                link: "",
-                                                                proLabTitle:
-                                                                    "");
-                                                            WidgetsBinding
-                                                                .instance
-                                                                .addPostFrameCallback(
-                                                                    (_) {
-                                                              kIsWeb
-                                                                  ? Get.rootDelegate.offNamed(
+                                                                      .category;
+                                                                  GetStorage().write(
                                                                       AppRoutes
                                                                           .pronunciationLabSub,
-                                                                      arguments: {
-                                                                          'title': controller
-                                                                              .frontOfficeData[index]
-                                                                              .category,
-                                                                          'subcategories':
-                                                                              <SubcategoryPro>[],
-                                                                          "id": controller
-                                                                              .frontOfficeData[index]
-                                                                              .pronunID,
-                                                                          "pronunCollectionName":
-                                                                              controller.pronunCollectionName,
-                                                                        })
-                                                                  : Get.toNamed(
-                                                                      AppRoutes
-                                                                          .pronunciationLabSub,
-                                                                      arguments: {
-                                                                          'title': controller
-                                                                              .frontOfficeData[index]
-                                                                              .category,
-                                                                          'subcategories':
-                                                                              <SubcategoryPro>[],
-                                                                          "id": controller
-                                                                              .frontOfficeData[index]
-                                                                              .pronunID,
-                                                                          "pronunCollectionName":
-                                                                              controller.pronunCollectionName,
-                                                                        });
-                                                            });
-                                                            // Navigator.push(
-                                                            //     context,
-                                                            //     MaterialPageRoute(
-                                                            //         builder:
-                                                            //             (context) =>
-                                                            //                 AudioListPage()));
-                                                          },
+                                                                      {
+                                                                        'title': controller
+                                                                            .frontOfficeData[index]
+                                                                            .category,
+                                                                        'subcategories':
+                                                                            <SubcategoryPro>[],
+                                                                        "id": controller
+                                                                            .frontOfficeData[index]
+                                                                            .pronunID,
+                                                                        "pronunCollectionName":
+                                                                            controller.pronunCollectionName,
+                                                                      });
+                                                                  addToRecentHistory(
+                                                                      path:
+                                                                          "Core Department > ${controller.title}",
+                                                                      category:
+                                                                          subCategoryTitle,
+                                                                      section:
+                                                                          "proLab",
+                                                                      link: "",
+                                                                      proLabTitle:
+                                                                          "");
+                                                                  WidgetsBinding
+                                                                      .instance
+                                                                      .addPostFrameCallback(
+                                                                          (_) {
+                                                                    kIsWeb
+                                                                        ? Get.rootDelegate.offNamed(
+                                                                            AppRoutes
+                                                                                .pronunciationLabSub,
+                                                                            arguments: {
+                                                                                'title': controller.frontOfficeData[index].category,
+                                                                                'subcategories': <SubcategoryPro>[],
+                                                                                "id": controller.frontOfficeData[index].pronunID,
+                                                                                "pronunCollectionName": controller.pronunCollectionName,
+                                                                              })
+                                                                        : Get.toNamed(
+                                                                            AppRoutes.pronunciationLabSub,
+                                                                            arguments: {
+                                                                                'title': controller.frontOfficeData[index].category,
+                                                                                'subcategories': <SubcategoryPro>[],
+                                                                                "id": controller.frontOfficeData[index].pronunID,
+                                                                                "pronunCollectionName": controller.pronunCollectionName,
+                                                                              });
+                                                                  });
+                                                                  // Navigator.push(
+                                                                  //     context,
+                                                                  //     MaterialPageRoute(
+                                                                  //         builder:
+                                                                  //             (context) =>
+                                                                  //                 AudioListPage()));
+                                                                }
+                                                              : null,
                                                           child: SizedBox(
                                                             width:
                                                                 getWidgetWidth(
@@ -732,9 +724,16 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                             height:
                                                                 getWidgetHeight(
                                                                     height: 28),
-                                                            child: const Icon(
+                                                            child: Icon(
                                                               Icons.mic,
                                                               size: 30,
+                                                              color: controller
+                                                                      .frontOfficeData[
+                                                                          index]
+                                                                      .pronunID
+                                                                      .isNotEmpty
+                                                                  ? Colors.black
+                                                                  : Colors.grey,
                                                             ),
                                                           ),
                                                         ),
