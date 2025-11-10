@@ -21,6 +21,7 @@ import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/device_type.dart';
+import 'package:hotelmanagementapp/public/size_helpers.dart';
 import 'package:hotelmanagementapp/public/utils.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custom_button.dart';
@@ -96,8 +97,8 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context) => Positioned(
         left: 0,
         right: 0,
-        bottom: 0,
-        // top: 0,
+        bottom: displayHeight(context) / 6,
+        // top: displayHeight(context) / 18,
         child: Material(
           color: Colors.transparent,
           child: AnimatedSlide(
@@ -108,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               margin: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: primaryDark,
+                color: const Color.fromARGB(132, 212, 15, 1),
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
@@ -294,7 +295,7 @@ class _LoginPageState extends State<LoginPage> {
           await doc.reference.update({
             'imei': deviceId,
             'model': deviceName,
-            'firstTImeLogin': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+            // 'firstTImeLogin': DateFormat('yyyy-MM-dd').format(DateTime.now()),
           });
         }
       }

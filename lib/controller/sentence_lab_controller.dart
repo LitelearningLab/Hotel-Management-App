@@ -91,7 +91,7 @@ class SentenceLabController extends GetxController {
 
     // 📱 Non-Web: Local DB logic
     final prefs = await SharedPreferences.getInstance();
-    hasInitialized = prefs.getBool("sentenceLabInitialized6") ?? false;
+    hasInitialized = prefs.getBool("sentenceLabInitialized8") ?? false;
     update();
 
     if (!hasInitialized) {
@@ -113,7 +113,7 @@ class SentenceLabController extends GetxController {
         log('$st');
       }
 
-      await prefs.setBool("sentenceLabInitialized6", true);
+      await prefs.setBool("sentenceLabInitialized8", true);
     } else {
       // ✅ Already initialized
       sentenceLabList = await SentenceDBHelper().getAllSentenceLabData();
@@ -219,8 +219,23 @@ class SentenceLabController extends GetxController {
 
       return SentenceLabModel(sectionName: sectionName, categories: categories);
     }).toList();
+    const desiredOrder = [
+      'Front Office',
+      'F&B Services',
+      'Food Production',
+      'HouseKeeping',
+    ];
 
-    log('[parseSentenceLabCollection] Completed parsing JSON');
+    // 🪄 Sort based on desired order
+    sections.sort((a, b) {
+      final aIndex = desiredOrder.indexOf(a.sectionName);
+      final bIndex = desiredOrder.indexOf(b.sectionName);
+
+      if (aIndex == -1 && bIndex == -1) return 0;
+      if (aIndex == -1) return 1; // Unknown goes last
+      if (bIndex == -1) return -1;
+      return aIndex.compareTo(bIndex);
+    });
     return sections;
   }
 

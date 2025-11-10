@@ -595,7 +595,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                                     fontSize:
                                                                         12,
                                                                     color:
-                                                                        lightWhite),
+                                                                        linearColor),
                                                               ),
                                                               SizedBox(
                                                                 height:
@@ -628,7 +628,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                                     fontSize:
                                                                         20,
                                                                     fontFamily:
-                                                                        Keys.fontFamily,
+                                                                        Keys.lucidaFontFamily,
                                                                   ),
                                                                 ),
                                                               )

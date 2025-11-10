@@ -44,8 +44,8 @@ class _SoundLabState extends State<SoundLab> {
           backgroundColor: Colors.white,
           titleSpacing: 0,
           title: Text(
-            controller.soundSubcategory.name, maxLines: 2,
-            // textAlign: TextAlign.start,
+            controller.soundSubcategory.name,
+            maxLines: 2,
             style: const TextStyle(
               fontFamily: Keys.lucidaFontFamily,
               fontSize: 18,
@@ -74,19 +74,7 @@ class _SoundLabState extends State<SoundLab> {
             icon: const Icon(Icons.arrow_back),
           ),
         ),
-        body:
-            //  controller.isLoading
-            //     ? Center(
-            //         child: CircularProgressIndicator(
-            //           color: linearColor,
-            //         ),
-            //       )
-            //     : controller.subcategories.length < 1
-            //         ? Center(
-            //             child: Text("No Data Found"),
-            //           )
-            //         :
-            ListView.builder(
+        body: ListView.builder(
           padding: EdgeInsets.symmetric(
               vertical: getWidgetHeight(height: 10),
               horizontal: getWidgetWidth(width: 10)),
@@ -120,7 +108,6 @@ class _SoundLabState extends State<SoundLab> {
                     ),
                     child: Container(
                       width: getWidgetWidth(width: 375),
-                      // height: getWidgetHeight(height: 75),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         color: Colors.white,
@@ -167,11 +154,7 @@ class _SoundLabState extends State<SoundLab> {
                                           )
                                         : controller.errorPlaying == index
                                             ? GestureDetector(
-                                                onTap: () {
-                                                  // controller
-                                                  //     .handlePlayPause(
-                                                  //         index);
-                                                },
+                                                onTap: () {},
                                                 child: Icon(
                                                   Icons.info_outline,
                                                   color: Colors.red,
@@ -203,23 +186,14 @@ class _SoundLabState extends State<SoundLab> {
                             ),
                             if (!kIsWeb)
                               IconButton(
-                                onPressed: () {
-                                  // controller.saveUpdate(index);
-                                },
+                                onPressed: () {},
                                 icon: SizedBox(
-                                  // width: displayWidth(context) / 18.75,
-                                  // height: displayHeight(context) / 40.6,
                                   height: 19,
                                   width: 19,
                                   child: Image.asset(
                                     AllAssets.save,
                                     width: 18,
-                                    color:
-                                        // controller
-                                        //         .isPriorityList[index]
-                                        //     ? linearColor
-                                        //     :
-                                        Colors.black,
+                                    color: Colors.black,
                                   ),
                                 ),
                               ),
@@ -234,13 +208,6 @@ class _SoundLabState extends State<SoundLab> {
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.fastOutSlowIn,
-                  // height: isExpanded
-                  //     ? getWidgetHeight(
-                  //         height: (controller.selectedWord.toLowerCase() ==
-                  //                 soundPractice.text.toLowerCase())
-                  //             ? 230
-                  //             : 160)
-                  // : 0,
                   width: double.infinity,
                   child: isExpanded
                       ? Padding(
@@ -304,24 +271,6 @@ class _SoundLabState extends State<SoundLab> {
                                           ),
                                         ),
                                       )
-                                      // SizedBox(
-                                      //   width:
-                                      //       MediaQuery.of(context).size.width *
-                                      //           0.45,
-                                      //   child: FittedBox(
-                                      //     child: Text(
-                                      //       soundPractice.pronun == ""
-                                      //           ? "no data"
-                                      //           : soundPractice.pronun
-                                      //               .replaceAll("/", ""),
-                                      //       style: TextStyle(
-                                      //         color: Colors.black,
-                                      //         fontSize: 20,
-                                      //         fontFamily: Keys.fontFamily,
-                                      //       ),
-                                      //     ),
-                                      //   ),
-                                      // )
                                     ],
                                   ),
                                   if (!kIsWeb)

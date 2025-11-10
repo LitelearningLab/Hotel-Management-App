@@ -31,6 +31,7 @@ import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/utility/web_view_page.dart';
 import 'package:hotelmanagementapp/view/ar_simulation.dart';
+import 'package:hotelmanagementapp/view/feedback_form_page.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/grammer_lab_sub.dart';
 import 'package:hotelmanagementapp/view/language_lab.dart';
@@ -132,6 +133,289 @@ class _HomeState extends State<Home>
       ),
     );
   }
+
+  // Future<void> uploadFeedbackForm() async {
+  //   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  //   final feedbackRef = _firestore.collection('feedbackform').doc();
+
+  //   final List<Map<String, dynamic>> sections = [
+  //     {
+  //       "order": 1,
+  //       "title": "Industry Fundamentals",
+  //       "questions": [
+  //         {
+  //           "order": 1,
+  //           "text":
+  //               "How clearly do the eLearning modules explain hospitality concepts and procedures?",
+  //           "options": [
+  //             "Extremely clear",
+  //             "Very clear",
+  //             "Moderately clear",
+  //             "Slightly clear",
+  //             "Not clear"
+  //           ]
+  //         },
+  //         {
+  //           "order": 2,
+  //           "text":
+  //               "How helpful is the real-time scenario section in understanding how hospitality concepts are applied in actual work situations?",
+  //           "options": [
+  //             "Extremely helpful",
+  //             "Very helpful",
+  //             "Moderately helpful",
+  //             "Slightly helpful",
+  //             "Not helpful"
+  //           ]
+  //         },
+  //         {
+  //           "order": 3,
+  //           "text":
+  //               "How interesting and helpful are the quizzes and image-based quizzes in supporting your learning process?",
+  //           "options": [
+  //             "Extremely helpful",
+  //             "Very helpful",
+  //             "Moderately helpful",
+  //             "Slightly helpful",
+  //             "Not helpful"
+  //           ]
+  //         },
+  //         {
+  //           "order": 4,
+  //           "text":
+  //               "How interesting and helpful are the drag & drop activities in supporting your understanding of the topic?",
+  //           "options": [
+  //             "Extremely helpful",
+  //             "Very helpful",
+  //             "Moderately helpful",
+  //             "Slightly helpful",
+  //             "Not helpful"
+  //           ]
+  //         },
+  //         {
+  //           "order": 5,
+  //           "text":
+  //               "How useful are the case studies in connecting theory with real hotel situations?",
+  //           "options": [
+  //             "Extremely useful",
+  //             "Very useful",
+  //             "Moderately useful",
+  //             "Slightly useful",
+  //             "Not useful"
+  //           ]
+  //         },
+  //         {
+  //           "order": 6,
+  //           "text":
+  //               "How helpful is the Glossary in learning new terms and understanding their real-world use?",
+  //           "options": [
+  //             "Extremely helpful",
+  //             "Very helpful",
+  //             "Moderately helpful",
+  //             "Slightly helpful",
+  //             "Not helpful"
+  //           ]
+  //         },
+  //         {
+  //           "order": 7,
+  //           "text":
+  //               "How helpful is the Audio Book option in understanding the content by listening to the narration of each page?",
+  //           "options": [
+  //             "Extremely helpful",
+  //             "Very helpful",
+  //             "Moderately helpful",
+  //             "Slightly helpful",
+  //             "Not helpful"
+  //           ]
+  //         },
+  //         {
+  //           "order": 8,
+  //           "text":
+  //               "How well does the Pronunciation Lab help you in knowing and practicing the correct pronunciation of key hospitality terms?",
+  //           "options": [
+  //             "Extremely helpful",
+  //             "Very helpful",
+  //             "Moderately helpful",
+  //             "Slightly helpful",
+  //             "Not helpful"
+  //           ]
+  //         },
+  //         {"order": 9, "text": "Suggestions for improvement in this section:"},
+  //       ],
+  //     },
+  //     {
+  //       "order": 2,
+  //       "title": "Language Lab",
+  //       "questions": [
+  //         {
+  //           "order": 1,
+  //           "text":
+  //               "How well does the English Pronunciation section help you in knowing and practicing the correct pronunciation?",
+  //           "options": [
+  //             "Extremely helpful",
+  //             "Very helpful",
+  //             "Moderately helpful",
+  //             "Slightly helpful",
+  //             "Not helpful"
+  //           ]
+  //         },
+  //         {
+  //           "order": 2,
+  //           "text":
+  //               "How well does the French Pronunciation section help you in learning and practicing the correct pronunciation of hospitality terms?",
+  //           "options": [
+  //             "Extremely helpful",
+  //             "Very helpful",
+  //             "Moderately helpful",
+  //             "Slightly helpful",
+  //             "Not helpful"
+  //           ]
+  //         },
+  //         {
+  //           "order": 3,
+  //           "text":
+  //               "How effectively does the Sentence Lab help you improve your fluency and confidence in speaking?",
+  //           "options": [
+  //             "Extremely effective",
+  //             "Very effective",
+  //             "Moderately effective",
+  //             "Slightly effective",
+  //             "Not effective"
+  //           ]
+  //         },
+  //         {
+  //           "order": 4,
+  //           "text":
+  //               "How useful is the Grammar Lab in improving your sentence formation and accuracy?",
+  //           "options": [
+  //             "Extremely effective",
+  //             "Very effective",
+  //             "Moderately effective",
+  //             "Slightly effective",
+  //             "Not effective"
+  //           ]
+  //         },
+  //         {"order": 5, "text": "Suggestions for this section:"},
+  //       ],
+  //     },
+  //     {
+  //       "order": 3,
+  //       "title": "Interactive Simulations",
+  //       "questions": [
+  //         {
+  //           "order": 1,
+  //           "text":
+  //               "How interesting and helpful are the interactive simulations in understanding how to handle real hotel situations?",
+  //           "options": [
+  //             "Extremely interesting and helpful",
+  //             "Very interesting and helpful",
+  //             "Moderately helpful",
+  //             "Slightly helpful",
+  //             "Not helpful"
+  //           ]
+  //         },
+  //         {
+  //           "order": 2,
+  //           "text": "Suggestions on scenarios you’d like to see added:"
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       "order": 4,
+  //       "title": "Content Library",
+  //       "questions": [
+  //         {
+  //           "order": 1,
+  //           "text":
+  //               "How helpful is the Content Library in helping you know more about hospitality topics?",
+  //           "options": [
+  //             "Extremely helpful",
+  //             "Very helpful",
+  //             "Moderately helpful",
+  //             "Slightly helpful",
+  //             "Not helpful"
+  //           ]
+  //         },
+  //         {
+  //           "order": 2,
+  //           "text":
+  //               "What topics/content would you like to see added in this section:"
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       "order": 5,
+  //       "title": "PMS Simulation",
+  //       "questions": [
+  //         {
+  //           "order": 1,
+  //           "text":
+  //               "How helpful is the PMS simulation in understanding front office procedures and guest handling?",
+  //           "options": [
+  //             "Extremely helpful",
+  //             "Very helpful",
+  //             "Moderately helpful",
+  //             "Slightly helpful",
+  //             "Not helpful"
+  //           ]
+  //         },
+  //         {
+  //           "order": 2,
+  //           "text":
+  //               "How comfortable do you feel performing check-in, billing, and reservation tasks in the PMS simulation?",
+  //           "options": [
+  //             "Extremely comfortable",
+  //             "Very comfortable",
+  //             "Moderately comfortable",
+  //             "Slightly comfortable",
+  //             "Not comfortable"
+  //           ]
+  //         },
+  //         {
+  //           "order": 3,
+  //           "text": "Any difficulties or suggestions for improvement:"
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       "order": 6,
+  //       "title": "Overall Experience",
+  //       "questions": [
+  //         {
+  //           "order": 1,
+  //           "text":
+  //               "How satisfied are you with your overall experience using the Profluent Hotelier App?",
+  //           "options": [
+  //             "Extremely satisfied",
+  //             "Very satisfied",
+  //             "Moderately satisfied",
+  //             "Slightly satisfied",
+  //             "Dissatisfied"
+  //           ]
+  //         },
+  //         {
+  //           "order": 2,
+  //           "text":
+  //               "How likely are you to recommend the app to your classmates or friends?",
+  //           "options": [
+  //             "Definitely",
+  //             "Most likely",
+  //             "Probably",
+  //             "Maybe",
+  //             "Unlikely"
+  //           ]
+  //         },
+  //         {"order": 3, "text": "Any other comments or suggestions:"},
+  //       ],
+  //     },
+  //   ];
+
+  //   await feedbackRef.set({
+  //     "createdAt": FieldValue.serverTimestamp(),
+  //     "sections": sections,
+  //   });
+
+  //   print("✅ Feedback form uploaded successfully (ID: ${feedbackRef.id})");
+  // }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -243,13 +527,13 @@ class _HomeState extends State<Home>
                           size: 20,
                         ),*/
                             menu: "Share your feedback with us",
-                            onTap: () {
-                              // Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (context) => InAppWebViewPage(
-                              //               url: helpLink,
-                              //             )));
+                            onTap: () async {
+                              // uploadFeedbackForm();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          FeedbackFormScreen()));
                             }),
                         _tile(
                             icon: Icon(
@@ -597,27 +881,26 @@ class _HomeState extends State<Home>
                                             height: displayWidth(context) > 800
                                                 ? 180
                                                 : getWidgetHeight(height: 157),
-                                            child: index == 4
-                                                ? Image.network(
-                                                    controller
-                                                        .cardImages[index],
-                                                    fit: BoxFit.fill,
-                                                  ) // fallback for web
-                                                // : SvgPicture.network(
-                                                //     fit: BoxFit.fill,
-                                                //     controller
-                                                //         .cardImages[index],
-                                                //     placeholderBuilder:
-                                                //         (context) =>
-                                                //             const CircularProgressIndicator(),
-                                                //     hea ders: const {},
-                                                //   )
-                                                : SvgPicture.asset(
-                                                    fit: isKwidth > 800
-                                                        ? BoxFit.fill
-                                                        : BoxFit.fitWidth,
-                                                    controller
-                                                        .cardImages[index]),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                topLeft: Radius.circular(16),
+                                                topRight: Radius.circular(16),
+                                              ),
+                                              child: index == 4
+                                                  ? Image.network(
+                                                      controller
+                                                          .cardImages[index],
+                                                      fit: BoxFit.fill,
+                                                    )
+                                                  : SvgPicture.asset(
+                                                      controller
+                                                          .cardImages[index],
+                                                      fit: isKwidth > 800
+                                                          ? BoxFit.fill
+                                                          : BoxFit.fitWidth,
+                                                    ),
+                                            ),
                                           ),
                                           SizedBox(
                                               height: isKwidth > 700
@@ -635,7 +918,7 @@ class _HomeState extends State<Home>
                                               children: [
                                                 Text(
                                                   index == 4
-                                                      ? ""
+                                                      ? "Institute Specific Content"
                                                       : "Hotel Management",
                                                   style: TextStyle(
                                                     color: lightWhite,

@@ -197,7 +197,7 @@ class HomeController extends GetxController {
           FirebaseFirestore.instance.collection('UserNode').doc(userId);
       final userSnapshot = await userRef.get();
       final userData = userSnapshot.data() ?? {};
-      final String collegeId = userData['companyid'] ?? '';
+      final String collegeId = userData['collegeId'] ?? '';
       log("College ID: $collegeId");
       if (collegeId.isNotEmpty) {
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -341,14 +341,20 @@ class HomeController extends GetxController {
             actions: [
               TextButton(
                 onPressed: () => Get.back(),
-                child:  Text("Cancel",style: TextStyle(color: linearColor),),
+                child: Text(
+                  "Cancel",
+                  style: TextStyle(color: linearColor),
+                ),
               ),
               TextButton(
                 onPressed: () {
                   openAppSettings();
                   Get.back();
                 },
-                child:  Text("Open Settings",style: TextStyle(color: linearColor),),
+                child: Text(
+                  "Open Settings",
+                  style: TextStyle(color: linearColor),
+                ),
               ),
             ],
           ),
@@ -356,25 +362,26 @@ class HomeController extends GetxController {
       }
     }
   }
-  Future<void> openAppStore() async {
-  const androidAppId = "com.profluent.hotelier.app";
-  const iosAppUrl =
-      "https://apps.apple.com/in/app/profluent-hotelier/id6754444749";
 
-  if (Platform.isAndroid) {
-    final url = Uri.parse("market://details?id=$androidAppId");
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      // Fallback to web Play Store if Play Store not found
-      final webUrl = Uri.parse(
-          "https://play.google.com/store/apps/details?id=$androidAppId");
-      await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+  Future<void> openAppStore() async {
+    const androidAppId = "com.profluent.hotelier.app";
+    const iosAppUrl =
+        "https://apps.apple.com/in/app/profluent-hotelier/id6754444749";
+
+    if (Platform.isAndroid) {
+      final url = Uri.parse("market://details?id=$androidAppId");
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        // Fallback to web Play Store if Play Store not found
+        final webUrl = Uri.parse(
+            "https://play.google.com/store/apps/details?id=$androidAppId");
+        await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+      }
+    } else if (Platform.isIOS) {
+      final url = Uri.parse(iosAppUrl);
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      // optional fallback for other platforms
+      print("Unsupported platform");
     }
-  } else if (Platform.isIOS) {
-    final url = Uri.parse(iosAppUrl);   
-    await launchUrl(url, mode: LaunchMode.externalApplication);
-  } else {
-    // optional fallback for other platforms
-    print("Unsupported platform");
   }
-}
 }

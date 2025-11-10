@@ -29,6 +29,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class PronunciationLabSubController extends GetxController {
   String title = "";
@@ -306,9 +307,17 @@ class PronunciationLabSubController extends GetxController {
   Future<void> stopAllPlaying() async {
     isCancelled = true;
     isPaused = false;
-    await stopAudio();
-    // isPlayingOne = false;
-    // isPlayingThree = false;
+    isPlayingOne = false;
+    isPlayingThree = false;
+    currentlyPlayingIndex = null;
+
+    try {
+      await audioPlayer.stop();
+    } catch (e) {
+      log("Error stopping audio: $e");
+    }
+    await WakelockPlus.disable();
+
     update();
   }
 
@@ -356,6 +365,7 @@ class PronunciationLabSubController extends GetxController {
     isCancelled = false;
     isPaused = false;
     currentIndex = 0;
+    await WakelockPlus.enable();
     update();
     for (int i = currentIndex; i < subcategories.length; i++) {
       if (isCancelled || isPlayingThree) break;
@@ -381,6 +391,7 @@ class PronunciationLabSubController extends GetxController {
       await Future.delayed(const Duration(seconds: 2));
     }
     await resetState();
+    await WakelockPlus.disable();
   }
 
   Future<void> playThreeTimes() async {
@@ -392,6 +403,7 @@ class PronunciationLabSubController extends GetxController {
     isPaused = false;
     currentIndex = 0;
     currentRepeat = 0;
+    await WakelockPlus.enable();
     update();
     for (int index = currentIndex; index < subcategories.length; index++) {
       for (int i = currentRepeat; i < 3; i++) {
@@ -400,7 +412,7 @@ class PronunciationLabSubController extends GetxController {
           await Future.delayed(const Duration(milliseconds: 200));
         }
         currentIndex = index;
-        expandedIndex = index;
+
         currentRepeat = i;
         update();
         await scrollToIndex(currentIndex);
@@ -422,6 +434,7 @@ class PronunciationLabSubController extends GetxController {
     }
 
     await resetState();
+    await WakelockPlus.disable();
   }
 
   void pausePlaying() {
@@ -450,6 +463,7 @@ class PronunciationLabSubController extends GetxController {
     isPlaying = true;
     errorPlaying = -1;
     playingIs = index;
+    expandedIndex = index;
     update();
 
     try {
@@ -513,6 +527,7 @@ class PronunciationLabSubController extends GetxController {
     } finally {
       // loadingIndex = null;
       isPlaying = false;
+      // expandedIndex = -1;
       update();
     }
   }
@@ -760,5 +775,14 @@ class PronunciationLabSubController extends GetxController {
     isPriorityList =
         subcategories.map((e) => e.downloadStatus == true).toList();
     update();
+  }
+
+  @override
+  void onClose() {
+    stopAllPlaying();
+    audioPlayer.dispose();
+    WakelockPlus.disable();
+
+    super.onClose();
   }
 }

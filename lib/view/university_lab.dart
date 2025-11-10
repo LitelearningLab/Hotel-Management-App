@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/model/university_model.dart';
@@ -75,7 +76,8 @@ class _UniversityLabState extends State<UniversityLab> {
                         child: Padding(
                           padding: EdgeInsets.symmetric(
                               vertical: getWidgetHeight(height: 15),
-                              horizontal: getWidgetWidth(width: 10)),
+                              horizontal:
+                                  getWidgetWidth(width: kIsWeb ? 0 : 10)),
                           child: Row(
                             children: [
                               // Container(
@@ -95,7 +97,7 @@ class _UniversityLabState extends State<UniversityLab> {
                               //   ),
                               // ),
                               SizedBox(
-                                width: getWidgetWidth(width: 10),
+                                width: getWidgetWidth(width: kIsWeb ? 5 : 10),
                               ),
                               Text(
                                 widget.universityModel.category[index].name,
