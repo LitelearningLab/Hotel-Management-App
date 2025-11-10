@@ -1,4 +1,3 @@
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +9,9 @@ import 'package:hotelmanagementapp/route/binding.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/route/route_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-
+import 'dart:html' as html;
 import 'package:get_storage/get_storage.dart';
+import 'package:hotelmanagementapp/view/blocked_device_screen.dart';
 
 bool isOnNoInternetPage = false;
 void main() async {
@@ -34,6 +34,10 @@ void main() async {
             "https://hotel-management-app-d25d5-default-rtdb.firebaseio.com/",
       ),
     );
+    if (_isMobileOrTabletDevice()) {
+      runApp(const BlockedDeviceScreen());
+      return;
+    }
   } else {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -43,6 +47,23 @@ void main() async {
   runApp(MyApp(
     appRouterDelegate: appRouterDelegate,
   ));
+}
+
+bool _isMobileOrTabletDevice() {
+  try {
+    final userAgent = html.window.navigator.userAgent.toLowerCase();
+    final screenWidth = html.window.screen?.width ?? 0;
+
+    // Common mobile/tablet indicators
+    return userAgent.contains('mobile') ||
+        userAgent.contains('android') ||
+        userAgent.contains('iphone') ||
+        userAgent.contains('ipad') ||
+        userAgent.contains('tablet') ||
+        screenWidth < 900; // treat narrow screens as mobile/tablet
+  } catch (_) {
+    return false;
+  }
 }
 
 class MyApp extends StatefulWidget {
