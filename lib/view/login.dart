@@ -21,11 +21,13 @@ import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/device_type.dart';
+import 'package:hotelmanagementapp/public/sessio_service.dart';
 import 'package:hotelmanagementapp/public/size_helpers.dart';
 import 'package:hotelmanagementapp/public/utils.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custom_button.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
+import 'package:hotelmanagementapp/view/blocked_device_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 // import 'package:pin_code_fields/pin_code_fields.dart';
@@ -318,10 +320,21 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString("enddate", userData['subscriptionenddate'] ?? '');
 
       log("User ID saved: $userId");
+      bool session = await SessionService.loginUser(email, password);
+      if (session) {
+        kIsWeb
+            ? Get.rootDelegate.offNamed(AppRoutes.home)
+            : Get.offAllNamed(AppRoutes.home);
+      } else {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => BlockedDeviceScreen(
+                      reason:
+                          "Your account is already active on another device.",
+                    )));
+      }
 
-      kIsWeb
-          ? Get.rootDelegate.offNamed(AppRoutes.home)
-          : Get.offAllNamed(AppRoutes.home);
       // Get.offAllNamed(AppRoutes.home);
     } catch (e) {
       print("Login error: $e");

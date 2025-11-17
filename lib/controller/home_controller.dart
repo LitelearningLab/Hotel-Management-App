@@ -11,6 +11,7 @@ import 'package:hotelmanagementapp/model/university_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/public/sessio_service.dart';
 import 'package:hotelmanagementapp/public/update_checker.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/view/login.dart';
@@ -57,6 +58,7 @@ class HomeController extends GetxController {
     fetchCollegeSyllabus();
     checkSubscriptionValidity();
     _checkFirstTimeAndRequestMic();
+    SessionService.startHeartbeat();
 
     super.onReady();
   }

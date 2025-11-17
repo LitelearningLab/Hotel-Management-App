@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/sessio_service.dart';
+import 'package:hotelmanagementapp/view/blocked_device_screen.dart';
 import 'package:hotelmanagementapp/view/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
@@ -40,22 +42,44 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> startTimer() async {
-    log("checking whether it goes here or not");
-    await Future.delayed(Duration(seconds: 2));
+    print("A - STARTING startTimer function."); // Log A
+
+    // Fetch SharedPreferences early
     final prefs = await SharedPreferences.getInstance();
     final email = prefs.getString('email');
     final password = prefs.getString('password');
+
+    // CRITICAL: Log the state immediately after fetching data
+    print(
+        'B - SharedPreferences Check: Email is: ${email != null ? 'SET (${email.length} chars) $email' : 'NULL'}'); // Log B
+    print(
+        'C - SharedPreferences Check: Password is: ${password != null ? 'SET (${password.length} chars) $password' : 'NULL'}'); // Log C
+
+    await Future.delayed(Duration(seconds: 2)); // Wait for the splash animation
+
+    print("D - DELAY FINISHED. Navigating now."); // Log D
+
     if (email != null && password != null) {
-      log('navigating to home');
-      kIsWeb
-          ? Get.rootDelegate.offNamed(AppRoutes.home)
-          : Get.offAllNamed(AppRoutes.home);
+      bool session = await SessionService.loginUser(email, password);
+      print('E - Conditional check TRUE: Navigating to HOME'); // Log E
+      if (session) {
+        kIsWeb
+            ? Get.rootDelegate.offNamed(AppRoutes.home)
+            : Get.offAllNamed(AppRoutes.home);
+      } else {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => BlockedDeviceScreen(
+                      reason:
+                          "Your account is already active on another device.",
+                    )));
+      }
     } else {
-      log("navigating to login");
+      print("F - Conditional check FALSE: Navigating to LOGIN"); // Log F
       kIsWeb
           ? Get.rootDelegate.offNamed(AppRoutes.login)
           : Get.offAllNamed(AppRoutes.login);
-      // Get.offAllNamed(AppRoutes.login);
     }
   }
 

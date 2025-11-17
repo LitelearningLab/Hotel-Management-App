@@ -74,6 +74,8 @@ class PronunciationLabSubController extends GetxController {
   int currentRepeat = 0;
   final ScrollController scrollController = ScrollController();
   int expandedIndex = -1;
+  bool isProcessing = false;
+  int dialogCount = 0;
   @override
   void onInit() {
     readyFirs();
@@ -160,55 +162,72 @@ class PronunciationLabSubController extends GetxController {
     update();
   }
 
-  void kShowDialog(String word, bool notCatch, BuildContext context) async {
-    Get.dialog(
-      Container(
-        child: Dialog(
+  Future<void> kShowDialog(
+      String word, bool notCatch, BuildContext context) async {
+    dialogCount++;
+    isProcessing = true;
+    update();
+    log("isProcessing is true. Dialog Count: $dialogCount");
+
+    try {
+      final value = await Get.dialog(
+        Dialog(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
           child: SpeechAnalyticsDialog(
             true,
             isShowDidNotCatch: notCatch,
             word: word,
-            title: "widget.title", // replace with actual title
-            load: "widget.load", // replace with actual load
+            title: title,
+            load: mianCategoryTitile,
           ),
         ),
-      ),
-    ).then((value) async {
-      if (value != null &&
-          (value.isCorrect == "true" || value.isCorrect == "false")) {
-        selectedWord = word;
-        isCorrect = value.isCorrect == "true";
-        log("is correct or not $isCorrect");
+      );
 
-        final attempt = WordAttempt(
-          batch: "yourBatch",
-          companyId: collegeId,
-          correct: isCorrect ? 1 : 0,
-          date: "",
-          lastAttempt: "",
-          listAtt: 0,
-          load: mianCategoryTitile,
-          pracAtt: 1,
-          time: 0,
-          timeCal: DateTime.now().millisecondsSinceEpoch,
-          title: title,
-          userId: userId,
-          word: word,
-        );
+      if (value != null) {
+        final result = value.isCorrect;
 
-        await WordAttempt.saveAttempt(attempt);
+        if (result == "true" || result == "false") {
+          selectedWord = word;
+          isCorrect = result == "true";
+          log("Attempt made. Word: $word, Correct: $isCorrect");
 
-        update();
-      } else if (value != null && value.isCorrect == "notCatch") {
-        kShowDialog(word, true, context);
-      } else if (value != null && value.isCorrect == "openDialog") {
-        kShowDialog(word, false, context);
+          final attempt = WordAttempt(
+            batch: "CurrentBatchId",
+            companyId: collegeId,
+            correct: isCorrect ? 1 : 0,
+            date: DateTime.now().toIso8601String().substring(0, 10),
+            lastAttempt: DateTime.now().toIso8601String(),
+            listAtt: 0,
+            load: mianCategoryTitile,
+            pracAtt: 1,
+            time: 0,
+            timeCal: DateTime.now().millisecondsSinceEpoch,
+            title: title,
+            userId: userId,
+            word: word,
+          );
+
+          await WordAttempt.saveAttempt(attempt);
+          update();
+        } else if (result == "notCatch") {
+          await kShowDialog(word, true, context);
+        } else if (result == "openDialog") {
+          await kShowDialog(word, false, context);
+        }
       }
-    }).onError((error, stackTrace) {
-      log("Dialog error: $error");
-    });
+    } catch (e, st) {
+      log("Dialog error: $e\nStack: $st");
+    } finally {
+      dialogCount--;
+      if (dialogCount == 0) {
+        isProcessing = false;
+        update();
+        log("All dialogs closed. isProcessing is false.");
+      } else {
+        log("Dialog closed, but $dialogCount more are still active in the stack.");
+      }
+    }
   }
 
   void searchSubcategories(String query) {

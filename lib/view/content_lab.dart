@@ -998,18 +998,27 @@ class _ContentLabState extends State<ContentLab> {
 
   Widget _buildMobileVideoPlayer(ContentLabController controller, int index,
       String embedUrl, double aspectRatio) {
+    const String bundleId = "com.profluent.hotelier.app";
+    const String referrerUrl = "https://$bundleId";
     debugPrint(embedUrl);
     if (!kIsWeb) {
-      // Your existing WebView logic for Mobile ✅
+      final videoId = YoutubePlayerController.convertUrlToId(embedUrl) ?? "";
+
+      final String finalEmbedUrl = "https://www.youtube.com/embed/$videoId";
+
+      debugPrint('Loading URL: $finalEmbedUrl with Referer: $referrerUrl');
+
       if (controller.controllers[index] == null) {
         final webViewCtrl = WebViewController()
           ..setJavaScriptMode(JavaScriptMode.unrestricted)
-          ..loadHtmlString(controller.buildHtmlForUrl(embedUrl));
+          ..loadRequest(
+            Uri.parse(finalEmbedUrl),
+            headers: {'Referer': referrerUrl},
+          );
         controller.controllers[index] = webViewCtrl;
       }
       return WebViewWidget(controller: controller.controllers[index]!);
     } else {
-      // ✅ WEB FIX: SEPARATE CONTROLLER PER INDEX
       if (controller.ytControllers.length <= index ||
           controller.ytControllers[index] == null) {
         final videoId = YoutubePlayerController.convertUrlToId(embedUrl) ?? "";
@@ -1024,8 +1033,6 @@ class _ContentLabState extends State<ContentLab> {
             playsInline: true,
           ),
         );
-
-        // Expand list if needed
         if (controller.ytControllers.length <= index) {
           controller.ytControllers.add(ytCtrl);
         } else {

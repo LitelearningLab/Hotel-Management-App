@@ -44,35 +44,40 @@ class UpdateChecker {
   static void _showUpdatePopup(BuildContext context, String message) {
     showDialog(
       context: context,
-      barrierDismissible: false, // Force user to interact
-      builder: (context) => AlertDialog(
-        title: const Text('New Update Available!'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-            },
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.black),
+      barrierDismissible: false, // prevents tap outside to close
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false, // 🚫 block back button
+        child: AlertDialog(
+          title: const Text('New Update Available!'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                const androidAppId = "com.profluent.hotelier.app";
+                const iOSAppId =
+                    "https://apps.apple.com/in/app/profluent-hotelier/id6754444749";
+
+                final url = Platform.isIOS
+                    ? Uri.parse("https://apps.apple.com/app/id$iOSAppId")
+                    : Uri.parse("market://details?id=$androidAppId");
+
+                if (!await launchUrl(url,
+                    mode: LaunchMode.externalApplication)) {
+                  // fallback web link
+                  final webUrl = Platform.isIOS
+                      ? Uri.parse("https://apps.apple.com/app/id$iOSAppId")
+                      : Uri.parse(
+                          "https://play.google.com/store/apps/details?id=$androidAppId");
+                  await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: Text(
+                'Update Now',
+                style: TextStyle(color: linearColor),
+              ),
             ),
-          ),
-          TextButton(
-            onPressed: () {
-              const appId = "com.profluent.hotelier.app";
-              final url = Uri.parse("market://details?id=$appId");
-              launchUrl(
-                url,
-                mode: LaunchMode.externalApplication,
-              );
-            },
-            child: Text(
-              'Update Now',
-              style: TextStyle(color: linearColor),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -68,7 +68,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
   @override
   void initState() {
     super.initState();
-    // startTimer();
+    startTimer();
     _isShowDidNotCatch = widget.isShowDidNotCatch;
   }
 
@@ -87,10 +87,25 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
     super.dispose();
   }
 
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+      (Timer timer) {
+        _start++;
+      },
+    );
+  }
+
   @override
   void afterFirstLayout(BuildContext context) {
     _initSpeechState();
   }
+
+  // void closeDialog(String isCorrect) {
+  //   stopListening();
+  //   Navigator.pop(context, isCorrect.toString());
+  // }
 
   Future<void> _initSpeechState() async {
     bool hasSpeech = await speech.initialize(
@@ -101,6 +116,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
       _currentLocaleId = systemLocale!.localeId;
     } else {
       RecorderPermissionPopup(context);
+      // DeniedAlertDialogFunction();
       print('//////DENIED');
     }
 
@@ -116,6 +132,8 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
     String url = "baseUrl" + "endPracticeApi";
     print("url : $url");
     print("successCount:$successCount");
+    /* print("scoreeeeetypeee:${widget.score.runtimeType}");
+    print("scoreeee:${widget.score}");*/
     try {
       var response = await http.post(Uri.parse(url), body: {
         "userid": userId,
@@ -143,6 +161,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
     showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
+        // var controller = Provider.of<AuthState>(context, listen: false);
         return AlertDialog(
             insetPadding:
                 EdgeInsets.only(left: kWidth / 32.35, right: kWidth / 32.75),
@@ -154,24 +173,20 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
             title: Text(
               'Permission Required',
               textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(fontWeight: FontWeight.w600, color: Colors.white),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600, color: Colors.black87),
             ),
             content: Text(
               'Cannot proceed without permission',
               textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.black87, fontWeight: FontWeight.w500),
             ),
             actions: [
               Center(
                 child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0XFF293750)),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: primaryDark),
                     onPressed: () async {
                       print("goooooo checkeddddddddddddddddd");
                       await openAppSettings();
@@ -189,28 +204,41 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            backgroundColor: Color(0xFF61B3CA));
+            backgroundColor: Colors.white);
       },
     );
   }
+  /* DeniedAlertDialogFunction() {
+    print("alert dialog calledddddddddddd>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    return AlertDialog(
+      title: Text('Permission Required'),
+      content: Text('Cannot proceed without permission'),
+      actions: [
+        TextButton(
+          child: Text('Open App Settings'),
+          onPressed: () => {},
+        ),
+      ],
+    );
+  }*/
 
   void startListening() async {
     setState(() => _isListening = true);
-    // Timer(Duration(seconds: 13), () {
-    //   print(".......................................");
-    //   dev.log("stopssss");
-    //   // stopListening();
-    //   // // Navigator.pop(context);
-    //   _isShowDidNotCatch = true;
-    //   // setState(() {});
-    // });
+    Timer(Duration(seconds: 13), () {
+      print(".......................................");
+      dev.log("stopssss");
+      // stopListening();
+      // // Navigator.pop(context);
+      _isShowDidNotCatch = true;
+      setState(() {});
+    });
 
     lastWords = "";
     lastError = "";
     await speech.listen(
       onResult: resultListener,
-      listenFor: Duration(seconds: 15),
-      pauseFor: Duration(seconds: 3),
+      listenFor: Duration(minutes: 3),
+      pauseFor: Duration(seconds: 10),
       localeId: _currentLocaleId,
       listenOptions: SpeechListenOptions(
         partialResults: true,
@@ -218,19 +246,24 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
         listenMode: ListenMode.dictation,
       ),
       onSoundLevelChange: soundLevelListener,
+      // cancelOnError: false,
+      // partialResults: true,
+//       onDevice: true,
+      // listenMode: ListenMode.confirmation,
+      // sampleRate: 44100,
     );
 
-    // Timer(Duration(seconds: 60), () {
-    //   if (speech.isListening) {
-    //     print("speechh listeninggggg");
-    //     stopListening();
-    //     _isShowDidNotCatch = true;
-    //     if (mounted) {
-    //       print("mounttteddddd");
-    //       setState(() {});
-    //     }
-    //   }
-    // });
+    Timer(Duration(seconds: 60), () {
+      if (speech.isListening) {
+        print("speechh listeninggggg");
+        stopListening();
+        _isShowDidNotCatch = true;
+        if (mounted) {
+          print("mounttteddddd");
+          setState(() {});
+        }
+      }
+    });
 
     setState(() {});
   }
@@ -238,319 +271,6 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
   void stopListening() async {
     await speech.stop();
     level = 0.0;
-  }
-
-  void resultListener(SpeechRecognitionResult result) async {
-    if (!result.finalResult) {
-      setState(() {
-        lastWords += result.recognizedWords + " ";
-      });
-      return;
-    }
-    print('///////////////////RESULT LISTENER');
-    print("${result.recognizedWords} - ${result.finalResult}");
-    setState(() {
-      lastWords += result.recognizedWords;
-    });
-    List<Widget> formatedWords = [];
-    List<String> correct = [];
-    List<String> focusWords = [];
-    List<String> correctWords = [];
-    List<String> heard = [];
-    double correctPer = 0;
-
-    if (result.finalResult) {
-      stopListening();
-      heard = result.recognizedWords.split(" ");
-      print("heard");
-      print(heard);
-      List<String> actual = widget.word
-          .trim()
-          .split(" ")
-          .where((w) => w.trim().isNotEmpty)
-          .toList();
-
-      print("actual");
-      print(actual);
-      print("heard1 : $heard");
-      for (int i = 0; i < actual.length; i++) {
-        actual[i] = actual[i].replaceAll(RegExp(r'[^\w\s\$]+'), '');
-      }
-      print("actual");
-      print(actual);
-      var testing = compareAndAlignSegments(actual, heard);
-      print("testinggg");
-      print(testing);
-      for (int i = 0; i < actual.length; i++) {
-        String actWord = actual[i];
-        bool isFound = false;
-        for (int j = 0; j < heard.length; j++) {
-          if (actWord.trim().toLowerCase() == heard[j].trim().toLowerCase()) {
-            correct.add(actual[i]);
-            Widget wi = Padding(
-              padding: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
-              child: AutoSizeText(
-                actWord,
-                minFontSize: 15,
-                style: TextStyle(
-                    fontSize: 15,
-                    fontFamily: Keys.fontFamily,
-                    color: Colors.green),
-              ),
-            );
-            formatedWords.add(wi);
-            correctWords.add(actWord);
-            heard.removeAt(j); // Remove the matched word from heard
-            isFound = true;
-            break;
-          }
-        }
-
-        if (!isFound) {
-          print("mistake words add");
-          focusWords.add(actWord);
-          Widget wi = Container(
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
-              child: Text(
-                actWord,
-                style: TextStyle(
-                    fontSize: 15,
-                    fontFamily: Keys.fontFamily,
-                    color: Colors.white),
-              ));
-          formatedWords.add(wi);
-        } else {
-          print("its not a mistake words");
-          if (!focusWords.contains('NA')) focusWords.add('NA');
-        }
-      }
-
-      correctPer = (correct.length / actual.length) * 100;
-      print(correctPer);
-      print("correctPer:${correctPer}");
-      _isCorrect = correctPer == 100.0;
-      _isCorrect
-          ? endPractice(
-              practiceType: "Pronunciation Sound Lab Report",
-              successCount: "correct")
-          : endPractice(
-              practiceType: "Pronunciation Sound Lab Report",
-              successCount: "wrong");
-      print("iscorrecttttt:${_isCorrect}");
-    }
-
-    print("finalresulttttt : ${result.finalResult}");
-    print("_isDismissedssss : ${_isDismissed}");
-
-    if (result.finalResult && !_isDismissed) {
-      _isDismissed = true;
-      // AuthState userDatas = Provider.of<AuthState>(context, listen: false);
-
-      if (_timer.isActive) {
-        _timer.cancel();
-      } else {}
-      print(correctPer);
-      print("until go back>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-
-      CloseValue closeValue = CloseValue();
-      closeValue.correctWords = correctWords;
-      closeValue.formatedWords = formatedWords;
-      closeValue.wordPer = correctPer;
-      closeValue.heard = heard.join(' ');
-      closeValue.word = convertNumbersToText(convertSpecialChars(widget.word));
-      closeValue.isCorrect = _isCorrect.toString();
-      Get.back(result: closeValue);
-    }
-  }
-
-  void soundLevelListener(double level) {
-    minSoundLevel = min(minSoundLevel, level);
-    maxSoundLevel = max(maxSoundLevel, level);
-  }
-
-  void errorListener(SpeechRecognitionError error) {
-    print(
-        "Error Listening >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    print("Received error status: $error, listening: ${speech.isListening}");
-
-    if (!speech.isListening && mounted && !_isDismissed) {
-      setState(() {
-        _isShowDidNotCatch = true;
-      });
-    }
-  }
-
-  void statusListener(String status) {
-    print("Speech status: $status");
-    lastStatus = status;
-
-    if (status == 'done' || status == 'notListening') {
-      setState(() => _isListening = false);
-      if (!_isShowDidNotCatch && mounted) {
-        setState(() => _isShowDidNotCatch = true);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    print("build");
-    return Container(
-      decoration: new BoxDecoration(
-        borderRadius: new BorderRadius.all(Radius.circular(10.0)),
-        // color: AppColors.c262626,
-        color: Colors.white,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (!_isShowDidNotCatch)
-            Container(
-              height: 75,
-              decoration: new BoxDecoration(
-                borderRadius: new BorderRadius.only(
-                    topLeft: Radius.circular(10.0),
-                    topRight: Radius.circular(10.0)),
-                color: Color.fromARGB(255, 74, 148, 168),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Recording is ON",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: Keys.fontFamily,
-                            fontSize: globalFontSize(11, context),
-                            fontWeight: FontWeight.w600),
-                      ),
-                      SPH(7),
-                      Text(
-                        "Speak Now!",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: Keys.fontFamily,
-                          fontSize: globalFontSize(18, context),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SPW(displayWidth(context) / 46.875),
-                  SizedBox(
-                      height: displayHeight(context) / 16.24,
-                      width: displayWidth(context) / 7.5,
-                      child: Image.asset(AllAssets.speakBubble))
-                ],
-              ),
-            ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (!_isShowDidNotCatch) SizedBox(height: 10),
-
-              if (!_isShowDidNotCatch)
-                Container(
-                  alignment: Alignment.center,
-                  //height: 180,
-                  padding:
-                      EdgeInsets.only(right: 5, left: 5, top: 20, bottom: 20),
-
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Text(widget.word,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.grey,
-                                fontFamily: Keys.fontFamily,
-                                fontSize: globalFontSize(20, context),
-                                fontWeight: FontWeight.w600)),
-                      ),
-                    ],
-                  ), /* add child content here */
-                ),
-
-              if (!_isShowDidNotCatch) SizedBox(height: 15),
-
-              if (_isShowDidNotCatch)
-                Container(
-                  color: Color(0xFF61B3CA),
-                  width: 400,
-                  child: Padding(
-                    padding:
-                        EdgeInsets.only(right: 5, left: 5, top: 20, bottom: 15),
-                    child: Text("Didn't catch that.\nTry speaking again!",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: Keys.fontFamily,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600)),
-                  ),
-                ),
-              if (_isShowDidNotCatch)
-                SizedBox(
-                  height: 10,
-                ),
-              if (_isShowDidNotCatch)
-                IconButton(
-                    icon: Icon(
-                      Icons.mic,
-                      color: Colors.grey,
-                    ),
-                    onPressed: () async {
-                      await speech.cancel();
-                      await Future.delayed(const Duration(milliseconds: 300));
-                      setState(() {
-                        _isShowDidNotCatch = false;
-                      });
-                      startListening();
-                      // CloseValue closeValue = CloseValue();
-                      // closeValue.isCorrect = "openDialog";
-                      // Get.back(result: closeValue);
-
-                      // widget.closeDialog("openDialog", "", 0, null);
-                      //  Navigator.pop(widget.context, "openDialog");
-                      // if (!speech.isListening) {
-                      //   _isShowDidNotCatch = false;
-                      //   startListening();
-                      // }
-                    }),
-              if (_isShowDidNotCatch)
-                SizedBox(
-                  height: 10,
-                ),
-              if (_isShowDidNotCatch)
-                Text("Touch mic when ready",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.grey,
-                        fontFamily: Keys.fontFamily,
-                        fontSize: 12)),
-              SizedBox(
-                height: 15,
-              )
-              // SPH(15),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 
   String convertSpecialChars(String input) {
@@ -812,4 +532,429 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
   }
 
 // Helper to check if a string is numeric
+
+  void resultListener(SpeechRecognitionResult result) async {
+    if (!result.finalResult) {
+      setState(() {
+        lastWords += result.recognizedWords + " ";
+      });
+      return;
+    }
+    print('///////////////////RESULT LISTENER');
+    print("${result.recognizedWords} - ${result.finalResult}");
+    setState(() {
+      lastWords += result.recognizedWords;
+    });
+    List<Widget> formatedWords = [];
+    List<String> correct = [];
+    List<String> focusWords = [];
+    List<String> correctWords = [];
+    List<String> heard = [];
+    double correctPer = 0;
+
+    if (result.finalResult) {
+      List<String> actual =
+          widget.word.trim().split(" ").where((e) => e.isNotEmpty).toList();
+      heard = result.recognizedWords
+          .trim()
+          .split(" ")
+          .where((e) => e.isNotEmpty)
+          .toList();
+
+      print("heard");
+      print(heard);
+
+      print("actual");
+      print(actual);
+      // Clean up the heard words
+      // for (int i = 0; i < heard.length; i++) {
+      //   heard[i] = heard[i].replaceAll(RegExp(r'[^\w\s\$]+'), '');
+      // }
+      print("heard1 : $heard");
+      // print(heard);
+      // Clean up the actual words
+      for (int i = 0; i < actual.length; i++) {
+        actual[i] = actual[i].replaceAll(RegExp(r'[^\w\s\$]+'), '');
+      }
+      print("actual");
+      print(actual);
+      var testing = compareAndAlignSegments(actual, heard);
+      print("testinggg");
+      print(testing);
+      // Iterate through actual words and match with heard words
+      for (int i = 0; i < actual.length; i++) {
+        String actWord = actual[i];
+        bool isFound = false;
+        for (int j = 0; j < heard.length; j++) {
+          if (actWord.trim().toLowerCase() == heard[j].trim().toLowerCase()) {
+            correct.add(actual[i]);
+            Widget wi = Padding(
+              padding: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
+              child: AutoSizeText(
+                actWord,
+                minFontSize: 15,
+                style: TextStyle(
+                    fontSize: 15,
+                    fontFamily: Keys.fontFamily,
+                    color: Colors.green),
+              ),
+            ); /*Text(
+              actWord,
+              style: TextStyle(fontSize: isSplitScreen?12:15, fontFamily: Keys.fontFamily, color: Colors.green),
+            );*/
+            formatedWords.add(wi);
+            correctWords.add(actWord);
+            heard.removeAt(j); // Remove the matched word from heard
+            isFound = true;
+            break;
+          }
+        }
+
+        if (!isFound) {
+          print("mistake words add");
+          focusWords.add(actWord);
+          Widget wi = Container(
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
+              child: Text(
+                actWord,
+                style: TextStyle(
+                    fontSize: 15,
+                    fontFamily: Keys.fontFamily,
+                    color: Colors.white),
+              ));
+          formatedWords.add(wi);
+        } else {
+          print("its not a mistake words");
+          if (!focusWords.contains('NA')) focusWords.add('NA');
+        }
+      }
+
+      correctPer = (correct.length / actual.length) * 100;
+      print(correctPer);
+      print("correctPer:${correctPer}");
+      _isCorrect = correctPer == 100.0;
+      _isCorrect
+          ? endPractice(
+              practiceType: "Pronunciation Sound Lab Report",
+              successCount: "correct")
+          : endPractice(
+              practiceType: "Pronunciation Sound Lab Report",
+              successCount: "wrong");
+      print("iscorrecttttt:${_isCorrect}");
+    }
+
+    print("finalresulttttt : ${result.finalResult}");
+    print("_isDismissedssss : ${_isDismissed}");
+
+    if (result.finalResult && !_isDismissed) {
+      _isDismissed = true;
+      // AuthState userDatas = Provider.of<AuthState>(context, listen: false);
+
+      if (_timer.isActive) {
+        _timer.cancel();
+      }
+      // String company = await SharedPref.getSavedString("companyId");
+      // String batch = await SharedPref.getSavedString("batch");
+      // if (widget.isWord)
+      //   db.saveWordListReport(
+      //       companyId: company,
+      //       batch: batch,
+      //       time: _start,
+      //       company: userDatas.appUser?.company ?? "",
+      //       name: userDatas.appUser?.UserMname,
+      //       userID: userDatas.appUser!.id!,
+      //       word: widget.word,
+      //       isCorrect: _isCorrect,
+      //       team: userDatas.appUser?.team,
+      //       load: widget.load,
+      //       title: widget.title,
+      //       userprofile: userDatas.appUser?.profile,
+      //       city: userDatas.appUser?.city,
+      //       date: DateFormat('dd-MMM-yyyy').format(DateTime.now()));
+      else {
+        // if (widget.isCallflow) {
+        //   db.saveCallFlowReport(
+        //       company: userDatas.appUser!.company ?? "   ",
+        //       name: userDatas.appUser!.UserMname,
+        //       userID: userDatas.appUser!.id!,
+        //       sentence: widget.word,
+        //       isCorrect: _isCorrect,
+        //       team: userDatas.appUser?.team,
+        //       userprofile: userDatas.appUser?.profile,
+        //       city: userDatas.appUser?.city,
+        //       score: correctPer,
+        //       focusWords: focusWords,
+        //       correctWords: correctWords,
+        //       title: widget.title,
+        //       main: widget.main,
+        //       load: widget.load,
+        //       date: DateFormat('dd-MMM-yyyy').format(DateTime.now()));
+        // } else {
+        //   print("dli do ioud ou ffy oufou f");
+        //   db.saveSentenceListReport(
+        //       company: userDatas.appUser!.company ?? "",
+        //       name: userDatas.appUser!.UserMname,
+        //       userID: userDatas.appUser!.id!,
+        //       sentence: widget.word,
+        //       isCorrect: _isCorrect,
+        //       team: userDatas.appUser?.team,
+        //       userprofile: userDatas.appUser?.profile,
+        //       city: userDatas.appUser?.city,
+        //       score: correctPer,
+        //       focusWords: focusWords,
+        //       correctWords: correctWords,
+        //       title: widget.title,
+        //       load: widget.load,
+        //       main: widget.main,
+        //       date: DateFormat('dd-MMM-yyyy').format(DateTime.now()));
+        // }
+      }
+      print(correctPer);
+      print("until go back>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+      CloseValue closeValue = CloseValue();
+
+      closeValue.formatedWords = formatedWords;
+      closeValue.wordPer = correctPer;
+      closeValue.heard = heard.join(' ');
+      closeValue.word = convertNumbersToText(convertSpecialChars(widget.word));
+      closeValue.isCorrect = _isCorrect.toString();
+      Get.back(result: closeValue);
+    }
+  }
+
+  void soundLevelListener(double level) {
+    minSoundLevel = min(minSoundLevel, level);
+    maxSoundLevel = max(maxSoundLevel, level);
+//    print("sound level $level: $minSoundLevel - $maxSoundLevel ");
+//     setState(() {
+//       this.level = level;
+//     });
+  }
+
+  void errorListener(SpeechRecognitionError error) {
+    print(
+        "Error Listening >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    print("Received error status: $error, listening: ${speech.isListening}");
+    // print(_isShowDidNotCatch);
+    if (!speech.isListening) {
+      _isDismissed = true;
+      // _isShowDidNotCatch = true;
+      //  stopListening();
+      // print(_isShowDidNotCatch);
+      // setState(() {});
+      //print(dialogContext);
+      //_speechAnalyticsDialogState.currentState.closeDialog();
+      // Navigator.pop(context, "notCatch");
+      // widget.closeDialog("notCatch", "", 0, null);
+      CloseValue closeValue = CloseValue();
+      closeValue.isCorrect = "notCatch";
+
+      Get.back(result: closeValue);
+
+      // Navigator.pop(widget.context, "notCatch");
+    }
+
+    // setState(() {
+    //   lastError = "${error.errorMsg} - ${error.permanent}";
+    // });
+  }
+
+  void statusListener(String status) {
+    if (status == 'done' || status == 'notListening') {
+      setState(() => _isListening = false);
+      startListening();
+    }
+    print("statusListener");
+    print(
+        "Received listener status: $status, listening: ${speech.isListening}");
+
+//    print(_context);
+//     setState(() {
+//
+//     });
+
+    // CloseValue closeValue = CloseValue();
+    // closeValue.isCorrect = "notCatch";
+
+    // Get.back(result: closeValue);
+
+    lastStatus = "$status";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print("build");
+    return Container(
+      decoration: new BoxDecoration(
+        borderRadius: new BorderRadius.all(Radius.circular(10.0)),
+        // color: AppColors.c262626,
+        color: Colors.white,
+      ),
+      // height: _isShowDidNotCatch ? 170 : 400,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!_isShowDidNotCatch)
+            Container(
+              height: 75,
+              decoration: new BoxDecoration(
+                borderRadius: new BorderRadius.only(
+                    topLeft: Radius.circular(10.0),
+                    topRight: Radius.circular(10.0)),
+                color: Color.fromARGB(255, 74, 148, 168),
+                // boxShadow: [new BoxShadow(color: Colors.grey, blurRadius: 3.0, offset: new Offset(1.0, 1.0))],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Recording is ON",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: Keys.fontFamily,
+                            fontSize: globalFontSize(11, context),
+                            fontWeight: FontWeight.w600),
+                      ),
+                      SPH(7),
+                      Text(
+                        "Speak Now!",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: Keys.fontFamily,
+                          fontSize: globalFontSize(18, context),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SPW(displayWidth(context) / 46.875),
+                  SizedBox(
+                      height: displayHeight(context) / 16.24,
+                      width: displayWidth(context) / 7.5,
+                      child: Image.asset(AllAssets.speakBubble))
+                ],
+              ),
+            ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // SPH(15),
+              // if (!_isShowDidNotCatch)
+              //   Image.asset(
+              //     AllAssets.speakani,
+              //     color: Color(0xff7ab800),
+              //     width: 70,
+              //   ),
+              if (!_isShowDidNotCatch) SizedBox(height: 10),
+
+              if (!_isShowDidNotCatch)
+                Container(
+                  alignment: Alignment.center,
+                  //height: 180,
+                  padding:
+                      EdgeInsets.only(right: 5, left: 5, top: 20, bottom: 20),
+                  // decoration: BoxDecoration(
+                  //   image: DecorationImage(
+                  //     image: AssetImage(AllAssets.wordbackk),
+                  //     fit: BoxFit.cover,
+                  //   ),
+                  // ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(widget.word,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontFamily: Keys.fontFamily,
+                                fontSize: globalFontSize(20, context),
+                                fontWeight: FontWeight.w600)),
+                      ),
+                    ],
+                  ), /* add child content here */
+                ),
+              // if(!_isShowDidNotCatch)Text('PRONUNCIATION',style: TextStyle(color: AppColors.green),),
+              // if(!_isShowDidNotCatch)Text(widget.pronunciation!,style: TextStyle(color: AppColors.green),),
+              if (!_isShowDidNotCatch) SizedBox(height: 15),
+
+              // if (!_isShowDidNotCatch)
+              //   Text("Analyzing Speech for English (US)",
+              //       style: TextStyle(
+              //           color: AppColors.white,
+              //           fontFamily: Keys.fontFamily,
+              //           fontSize: 10)),
+              if (_isShowDidNotCatch)
+                Container(
+                  color: Color(0xFF61B3CA),
+                  width: 400,
+                  child: Padding(
+                    padding:
+                        EdgeInsets.only(right: 5, left: 5, top: 20, bottom: 15),
+                    child: Text("Didn't catch that.\nTry speaking again!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: Keys.fontFamily,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              if (_isShowDidNotCatch)
+                SizedBox(
+                  height: 10,
+                ),
+              if (_isShowDidNotCatch)
+                IconButton(
+                    icon: Icon(
+                      Icons.mic,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      CloseValue closeValue = CloseValue();
+                      closeValue.isCorrect = "openDialog";
+                      Get.back(result: closeValue);
+
+                      // widget.closeDialog("openDialog", "", 0, null);
+                      //  Navigator.pop(widget.context, "openDialog");
+                      // if (!speech.isListening) {
+                      //   _isShowDidNotCatch = false;
+                      //   startListening();
+                      // }
+                    }),
+              if (_isShowDidNotCatch)
+                SizedBox(
+                  height: 10,
+                ),
+              if (_isShowDidNotCatch)
+                Text("Touch mic when ready",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontFamily: Keys.fontFamily,
+                        fontSize: 12)),
+              SizedBox(
+                height: 15,
+              )
+              // SPH(15),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

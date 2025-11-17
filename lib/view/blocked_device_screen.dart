@@ -3,13 +3,25 @@ import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 
 class BlockedDeviceScreen extends StatelessWidget {
-  const BlockedDeviceScreen({super.key});
+  final String? reason; // 💡 dynamic message from outside
+
+  const BlockedDeviceScreen({super.key, this.reason});
 
   @override
   Widget build(BuildContext context) {
     kHeight = MediaQuery.of(context).size.height;
     kWidth = MediaQuery.of(context).size.width;
     kText = MediaQuery.of(context).textScaler;
+
+    // Default message
+    String message =
+        "Access restricted — please use a PC or laptop to open this website.";
+
+    // If custom reason provided → override message
+    if (reason != null && reason!.isNotEmpty) {
+      message = reason!;
+    }
+
     return MaterialApp(
       home: Scaffold(
         body: SizedBox(
@@ -20,30 +32,26 @@ class BlockedDeviceScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
-                // color: Colors.amber,
                 height: getWidgetHeight(height: 100),
                 width: getWidgetWidth(width: 100),
                 child: CircleAvatar(
                   backgroundColor: Colors.transparent,
-                  // radius: 25,
                   child: Image.asset(
                     AllAssets.splashLogo,
                     fit: BoxFit.contain,
-                    // width: getWidgetWidth(width: 200),
                     height: getWidgetHeight(height: 100),
                   ),
                 ),
               ),
-              SizedBox(
-                height: getWidgetHeight(height: 20),
-              ),
+              SizedBox(height: getWidgetHeight(height: 20)),
               Text(
-                'Access restricted — please use a PC or laptop to open this website.',
+                message,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.red),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.red,
+                ),
               ),
             ],
           ),

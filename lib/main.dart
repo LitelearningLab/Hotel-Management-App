@@ -9,18 +9,20 @@ import 'package:hotelmanagementapp/route/binding.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/route/route_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+//for web only
 import 'dart:html' as html;
 import 'package:get_storage/get_storage.dart';
 import 'package:hotelmanagementapp/view/blocked_device_screen.dart';
 
 bool isOnNoInternetPage = false;
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   final appRouterDelegate = Get.put(AppRouterDelegate(), permanent: true);
   Get.lazyPut<AppRouterDelegate>(() => AppRouterDelegate());
 
   // WebView.platform = WebWebViewPlatform();
-  WidgetsFlutterBinding.ensureInitialized();
+  // WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: FirebaseOptions(
@@ -34,6 +36,7 @@ void main() async {
             "https://hotel-management-app-d25d5-default-rtdb.firebaseio.com/",
       ),
     );
+    //for web only
     if (_isMobileOrTabletDevice()) {
       runApp(const BlockedDeviceScreen());
       return;
@@ -49,6 +52,7 @@ void main() async {
   ));
 }
 
+// for web only
 bool _isMobileOrTabletDevice() {
   try {
     final userAgent = html.window.navigator.userAgent.toLowerCase();
@@ -60,7 +64,7 @@ bool _isMobileOrTabletDevice() {
         userAgent.contains('iphone') ||
         userAgent.contains('ipad') ||
         userAgent.contains('tablet') ||
-        screenWidth < 900; // treat narrow screens as mobile/tablet
+        screenWidth < 900;
   } catch (_) {
     return false;
   }
@@ -158,6 +162,7 @@ class _MyAppState extends State<MyApp> {
             // key: Get.key,
             getPages: RouteService.getPages,
             initialBinding: InitialBinding(),
+
             title: 'Profluent Hotelier',
             theme: ThemeData(
               useMaterial3: true,
