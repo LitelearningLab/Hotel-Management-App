@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/instance_manager.dart';
 import 'package:hotelmanagementapp/model/feedback_form_model.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custom_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,6 +25,7 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
   final Map<String, String> _answers = {};
   final Map<String, TextEditingController> _commentControllers = {};
   OverlayEntry? _bottomMessageEntry;
+  bool submitted = false;
 
   String? existingDocId;
   bool isLoading = true;
@@ -47,7 +51,7 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
     // Check existing feedback by user
     final existingFeedback = await _firestore
         .collection('feedbackResponses')
-        .where('userId', isEqualTo: userId)
+        .where('_id', isEqualTo: userId)
         .limit(1)
         .get();
 
@@ -126,13 +130,29 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
   }
 
   Future<void> submit(FeedbackFormModel form) async {
-    final groupedAnswers = _buildAnswerGroupedMap(form);
-    final totalQuestions =
-        form.sections.fold<int>(0, (sum, s) => sum + s.questions.length);
-    final answeredCount =
-        groupedAnswers.values.fold<int>(0, (sum, s) => sum + s.length);
+    // NEW VALIDATION: Only MCQ questions are required
+    int requiredQuestions = 0;
+    int requiredAnswered = 0;
 
-    if (answeredCount < totalQuestions) {
+    for (var section in form.sections) {
+      for (var question in section.questions) {
+        // MCQ = question.options not empty
+        if (question.options.isNotEmpty) {
+          requiredQuestions++;
+
+          final sectionTitle = section.title ?? "";
+          final questionText = question.text ?? "";
+          final combinedKey = "$sectionTitle-$questionText";
+
+          if (_answers[combinedKey] != null &&
+              _answers[combinedKey]!.trim().isNotEmpty) {
+            requiredAnswered++;
+          }
+        }
+      }
+    }
+
+    if (requiredAnswered < requiredQuestions) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -141,7 +161,7 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
           title: const Text("Incomplete Feedback",
               style: TextStyle(fontWeight: FontWeight.bold)),
           content: const Text(
-            "Please answer all the questions or provide comments before submitting your feedback.",
+            "Please answer all multiple-choice questions before submitting your feedback.",
             style: TextStyle(fontSize: 14),
           ),
           actions: [
@@ -155,47 +175,42 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
       return;
     }
 
+    // GROUP ANSWERS
+    final groupedAnswers = _buildAnswerGroupedMap(form);
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString("userId") ?? "unknown_user";
       final userName = prefs.getString("userName") ?? "Anonymous";
+      final collegeId = prefs.getString("collegeId") ?? "empty";
+      final city = prefs.getString("city");
+      final course = prefs.getString("course");
 
       final feedbackData = {
-        "userId": userId,
+        "_id": userId,
         "userName": userName,
         "submittedAt": FieldValue.serverTimestamp(),
         "answers": groupedAnswers,
+        "collegeId": collegeId,
+        "city": city,
+        "course": course
       };
 
       if (existingDocId != null) {
-        // Update existing feedback
         await _firestore
             .collection('feedbackResponses')
             .doc(existingDocId)
             .update(feedbackData);
       } else {
-        // New feedback
         await _firestore.collection('feedbackResponses').add(feedbackData);
       }
+
       showBottomStickyMessage(
           context, "Your feedback has been submitted successfully. Thank you!");
-
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //     backgroundColor: linearColor,
-      //     content: const Text(
-      //       "Your feedback has been submitted successfully. Thank you!",
-      //     ),
-      //   ),
-      // );
+      submitted = true;
+      setState(() {});
     } catch (e) {
       showBottomStickyMessage(context, "Error while submitting feedback: $e");
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //     backgroundColor: linearColor,
-      //     content: Text("Error while submitting feedback: $e"),
-      //   ),
-      // );
     }
   }
 
@@ -266,7 +281,9 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
           forceMaterialTransparency: true,
           titleSpacing: 0,
           leading: IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => kIsWeb
+                ? Get.rootDelegate.offNamed(AppRoutes.home)
+                : Navigator.pop(context),
             icon: const Icon(Icons.arrow_back),
           ),
         ),
@@ -359,6 +376,16 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        section.subTitle != null
+                            ? Text(
+                                section.subTitle ?? '',
+                                style: TextStyle(
+                                  color: Colors.black45,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              )
+                            : SizedBox.shrink(),
                         const SizedBox(height: 6),
                         ...List.generate(section.questions.length, (qIndex) {
                           final question = section.questions[qIndex];
@@ -522,12 +549,22 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
                               child: SizedBox(
                                 width: displayWidth(context),
                                 height: 45,
-                                child: CustomButton(
-                                  onPressed: () => submit(form),
-                                  buttonText: existingDocId != null
-                                      ? "Update Feedback"
-                                      : "Submit Feedback",
-                                ),
+                                child: submitted
+                                    ? Center(
+                                        child: Text(
+                                          "Feedback Submitted",
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      )
+                                    : CustomButton(
+                                        onPressed: () => submit(form),
+                                        buttonText: existingDocId != null
+                                            ? "Update Feedback"
+                                            : "Submit Feedback",
+                                      ),
                               ),
                             ),
                           ),

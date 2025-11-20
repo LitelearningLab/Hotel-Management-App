@@ -2,18 +2,29 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:html' as html;
+
+class WebStorageHelper {
+  static String? getDeviceSessionId() {
+    return html.window.localStorage['deviceSessionId'];
+  }
+
+  static void setDeviceSessionId(String id) {
+    html.window.localStorage['deviceSessionId'] = id;
+  }
+}
 
 class SessionService {
   static Timer? _heartbeatTimer;
 
+  // ======================================================
+  // LOGIN
+  // ======================================================
   static Future<bool> loginUser(String email, String password) async {
-    print("💡 loginUser() called");
-    print("➡️ Email: $email");
-    print("➡️ Password: $password");
+    print("💡 FIXED loginUser() called");
 
     final firestore = FirebaseFirestore.instance;
 
-    // Fetch user using your snapshot method
     final snapshot = await firestore
         .collection('UserNode')
         .where('email', isEqualTo: email)
@@ -21,179 +32,142 @@ class SessionService {
         .limit(1)
         .get();
 
-    print("📥 Query executed. Docs found: ${snapshot.docs.length}");
-
     if (snapshot.docs.isEmpty) {
-      print("❌ No user found OR wrong password");
+      print("❌ Wrong credentials");
       return false;
     }
 
     final doc = snapshot.docs.first;
     final docRef = firestore.collection("UserNode").doc(doc.id);
 
-    print("✅ User document fetched: ${doc.id}");
-
-    // Handling missing lastActive safely
-    int? lastActive;
-
-    if (doc.data().containsKey("lastActive")) {
-      lastActive = doc['lastActive'];
-      print("🕒 lastActive found: $lastActive");
-    } else {
-      print("⚠️ lastActive field NOT found! It will be created.");
-    }
-
     int now = DateTime.now().millisecondsSinceEpoch;
 
-    bool isSessionExpired;
+    // 🔥 1. Check if there is an existing session
+    int? lastActive =
+        doc.data().containsKey('lastActive') ? doc['lastActive'] as int? : null;
 
-    if (lastActive == null) {
-      // No previous activity → mark as expired so login continues
-      isSessionExpired = true;
-      print("⏳ No lastActive → Treating as expired session.");
-    } else {
-      int difference = now - lastActive;
-      isSessionExpired = difference > 120000;
-      print("🕒 now: $now");
-      print("🕒 Difference: $difference");
-      print("⏳ isSessionExpired: $isSessionExpired");
+    bool isSessionExpired = true;
+
+    if (lastActive != null) {
+      int diff = now - lastActive;
+      isSessionExpired = diff > 45000; // 30 sec
     }
 
-    if (!isSessionExpired) {
-      print("❌ Session not expired → User already active");
+    // ==================================================================================
+    // FIXED: Web MULTIPLE TAB SUPPORT — use SAME deviceSessionId for all tabs
+    // ==================================================================================
+    String? existingDeviceSessionId = WebStorageHelper.getDeviceSessionId();
+    String deviceSessionId = existingDeviceSessionId ?? const Uuid().v4();
+
+    WebStorageHelper.setDeviceSessionId(deviceSessionId);
+    print("🔐 deviceSessionId in this browser: $deviceSessionId");
+
+    // ==================================================================================
+    // If server already has same sessionId → ALLOW MULTIPLE TAB LOGIN
+    // ==================================================================================
+    if (!isSessionExpired && doc['sessionId'] == deviceSessionId) {
+      print("✔ Same browser tab login → allowed");
+    } else if (!isSessionExpired && doc['sessionId'] != deviceSessionId) {
+      print("❌ Another device is active — BLOCK");
       return false;
     }
 
-    // Create new session
-    final String newSessionId = const Uuid().v4();
-    print("🆕 New sessionId generated: $newSessionId");
-
-    // Update OR create missing fields
+    // ==================================================================================
+    // UPDATE FIRESTORE SESSION (fresh login OR continuing same browser session)
+    // ==================================================================================
     await docRef.update({
-      "sessionId": newSessionId,
+      "sessionId": deviceSessionId,
       "lastActive": now,
-    }).then((_) {
-      print("📤 sessionId + lastActive updated on server");
-    }).catchError((error) {
-      print("❌ Error updating Firestore: $error");
     });
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString("sessionId", newSessionId);
+    await prefs.setString("sessionId", deviceSessionId);
+    await prefs.setString("email", email);
+    await prefs.setString("password", password);
 
-    print("💾 sessionId saved to SharedPreferences");
-    print("🎉 Login successful");
+    print("🎉 Login Success (Web multiple tabs supported)");
 
     return true;
   }
 
+  // ======================================================
+  // VALIDATE SESSION
+  // ======================================================
   static Future<bool> validateSession() async {
     print("==== VALIDATE SESSION START ====");
 
     final prefs = await SharedPreferences.getInstance();
     final email = prefs.getString("email");
-    final storedSessionId = prefs.getString("sessionId");
+    final localSessionId = prefs.getString("sessionId");
+    final browserSessionId = WebStorageHelper.getDeviceSessionId();
 
-    print("A → Local Email: ${email ?? ""}");
-    print("B → Local SessionId: ${storedSessionId ?? ""}");
-
-    // If local data missing → treat as not logged in
-    if (email == null || storedSessionId == null) {
-      print(
-          "C → Local email/session is NULL → Returning TRUE (no session to validate)");
-      return true;
+    if (email == null || localSessionId == null || browserSessionId == null) {
+      print("No session saved");
+      return false;
     }
-
-    print("D → Fetching Firestore user document…");
 
     final doc = await FirebaseFirestore.instance
         .collection("UserNode")
-        .doc(email)
+        .where("email", isEqualTo: email)
+        .limit(1)
         .get();
 
-    print("E → Firestore doc exists: ${doc.exists}");
-
-    if (!doc.exists) {
-      print("F → Firestore doc NOT found → Returning FALSE");
+    if (doc.docs.isEmpty) {
       return false;
     }
 
-    final serverSessionId = doc["sessionId"];
-    print("G → Server SessionId: $serverSessionId");
+    final serverSessionId = doc.docs.first["sessionId"];
 
-    // Compare sessions
-    if (serverSessionId != storedSessionId) {
-      print("H → SESSION MISMATCH ❌");
-      print("H1 → Local: $storedSessionId");
-      print("H2 → Server: $serverSessionId");
-      print("H3 → Logging user out…");
-
+    // ==================================================================================
+    // FIXED: Only block if serverSessionId != browserSessionId
+    // ==================================================================================
+    if (serverSessionId != browserSessionId) {
+      print("❌ Session mismatch → different device → block");
       await logoutUser();
-      print("H4 → Logout complete");
-
       return false;
     }
 
-    print("I → SESSION VALID ✔");
-    print("==== VALIDATE SESSION END ====");
-
+    print("✔ Session Valid");
     return true;
   }
 
+  // ======================================================
+  // HEARTBEAT
+  // ======================================================
   static void startHeartbeat() async {
-    print("💓 startHeartbeat() called");
+    print("💓 startHeartbeat()");
 
     stopHeartbeat();
-    print("🛑 Previous heartbeat stopped (if any)");
 
     final prefs = await SharedPreferences.getInstance();
     final email = prefs.getString("email");
     final password = prefs.getString("password");
 
-    if (email == null || password == null) {
-      print(
-          "❌ No email/password found in SharedPreferences → Heartbeat NOT started");
-      return;
-    }
-
-    print("📧 Heartbeat for: $email");
+    if (email == null || password == null) return;
 
     _heartbeatTimer = Timer.periodic(Duration(seconds: 30), (_) async {
       final now = DateTime.now().millisecondsSinceEpoch;
-      print("💓 Heartbeat tick → Updating lastActive = $now");
 
-      try {
-        // Fetch user via QUERY (because you do not use doc(email))
-        final snapshot = await FirebaseFirestore.instance
-            .collection('UserNode')
-            .where('email', isEqualTo: email)
-            .where('password', isEqualTo: password)
-            .limit(1)
-            .get();
+      final snapshot = await FirebaseFirestore.instance
+          .collection('UserNode')
+          .where('email', isEqualTo: email)
+          .where('password', isEqualTo: password)
+          .limit(1)
+          .get();
 
-        if (snapshot.docs.isEmpty) {
-          print("⚠️ No matching user found for heartbeat.");
-          return;
-        }
+      if (snapshot.docs.isEmpty) return;
 
-        // We have the correct document
-        final doc = snapshot.docs.first;
-        final docId = doc.id;
+      final doc = snapshot.docs.first;
 
-        print("📄 Heartbeat updating doc ID: $docId");
+      await FirebaseFirestore.instance
+          .collection("UserNode")
+          .doc(doc.id)
+          .update({"lastActive": now});
 
-        await FirebaseFirestore.instance
-            .collection("UserNode")
-            .doc(docId)
-            .update({"lastActive": now});
-
-        print("✅ lastActive updated successfully");
-      } catch (e) {
-        print("❌ Heartbeat update failed: $e");
-      }
+      print("💓 Heartbeat updated $now");
     });
 
-    print("🚀 Heartbeat started (every 30 seconds)");
+    print("🚀 Heartbeat started");
   }
 
   static void stopHeartbeat() {
@@ -201,6 +175,9 @@ class SessionService {
     _heartbeatTimer = null;
   }
 
+  // ======================================================
+  // LOGOUT
+  // ======================================================
   static Future<void> logoutUser() async {
     stopHeartbeat();
     final prefs = await SharedPreferences.getInstance();

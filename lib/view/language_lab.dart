@@ -348,7 +348,7 @@ class Languagelab extends StatelessWidget {
                       controller.selectedIndex == 0
                           ? SizedBox(
                               height: displayWidth(context) > 700
-                                  ? displayHeight(context) * 0.5
+                                  ? displayHeight(context) * 0.85
                                   : getWidgetHeight(height: 255),
                               child: Scrollbar(
                                 thickness: 2,

@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/controller/content_lab_controller.dart';
+import 'package:hotelmanagementapp/controller/feedback_controller.dart';
 import 'package:hotelmanagementapp/controller/front_office_controller.dart';
 import 'package:hotelmanagementapp/controller/grammer_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
@@ -140,5 +141,12 @@ class InAppWebViewBinding with Bindings {
   @override
   void dependencies() {
     Get.put(InAppWebViewGetController());
+  }
+}
+
+class FeedbackViewBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(FeedbackController());
   }
 }

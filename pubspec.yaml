@@ -2,7 +2,7 @@ name: hotelmanagementapp
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.68+76
+version: 1.0.70+78
 
 environment:
   sdk: '>=3.3.0 <4.0.0'

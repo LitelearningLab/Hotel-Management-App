@@ -60,7 +60,12 @@ class _SplashScreenState extends State<SplashScreen>
     print("D - DELAY FINISHED. Navigating now."); // Log D
 
     if (email != null && password != null) {
-      bool session = await SessionService.loginUser(email, password);
+      bool session = true; // default for mobile
+
+      if (kIsWeb) {
+        // Only run login session logic on Web
+        session = await SessionService.loginUser(email, password);
+      }
       print('E - Conditional check TRUE: Navigating to HOME'); // Log E
       if (session) {
         kIsWeb

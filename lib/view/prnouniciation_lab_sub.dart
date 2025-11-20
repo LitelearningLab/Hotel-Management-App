@@ -143,7 +143,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                 if (controller.isSearching) {
                   controller.isSearching = false;
                   controller.searchController.clear();
-                  controller.clearSearch(); // Clear filter
+                  controller.clearSearch();
                   controller.update();
                 } else {
                   if (kIsWeb) {
@@ -293,7 +293,9 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                         return Column(
                                           children: [
                                             GestureDetector(
-                                              onTap: () {
+                                              onTap: () async {
+                                                // await controller
+                                                //     .scrollToIndex(180);
                                                 controller.expandedIndex =
                                                     isExpanded ? -1 : index;
                                                 controller.update();
@@ -893,8 +895,8 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                     1 ==
                                                 index)
                                               SizedBox(
-                                                height:
-                                                    getWidgetHeight(height: 80),
+                                                height: getWidgetHeight(
+                                                    height: 180),
                                               )
                                           ],
                                         );

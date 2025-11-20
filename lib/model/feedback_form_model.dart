@@ -29,6 +29,7 @@ class FeedbackFormModel {
   FeedbackFormModel sorted() {
     final sortedSections = sections
         .map((s) => Section(
+              subTitle: s.subTitle,
               order: s.order,
               title: s.title,
               questions:
@@ -48,6 +49,7 @@ class FeedbackFormModel {
 
 class Section {
   Section({
+    required this.subTitle,
     required this.order,
     required this.title,
     required this.questions,
@@ -56,16 +58,19 @@ class Section {
   final int? order;
   final String? title;
   final List<Question> questions;
+  final String? subTitle;
 
   Section copyWith({
     int? order,
     String? title,
     List<Question>? questions,
+    String? subTitle,
   }) {
     return Section(
       order: order ?? this.order,
       title: title ?? this.title,
       questions: questions ?? this.questions,
+      subTitle: subTitle ?? this.subTitle,
     );
   }
 
@@ -73,6 +78,7 @@ class Section {
     return Section(
       order: json["order"],
       title: json["title"],
+      subTitle: json["subTitle"],
       questions: json["questions"] == null
           ? []
           : List<Question>.from(
@@ -83,6 +89,7 @@ class Section {
   Map<String, dynamic> toJson() => {
         "order": order,
         "title": title,
+        "subTitle": subTitle,
         "questions": questions.map((x) => x?.toJson()).toList(),
       };
 }

@@ -43,6 +43,10 @@ class _PETopCategoriesCardState extends State<PETopCategoriesCard> {
     final size = MediaQuery.of(context).size;
     // final textscalar = MediaQuery.of(context).textScaler;
     return InkWell(
+      hoverColor: Colors.transparent,
+      focusColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       onTap: () {
         widget.onTap();
       },
@@ -54,7 +58,7 @@ class _PETopCategoriesCardState extends State<PETopCategoriesCard> {
               top: 12,
             ),
             height: kIsWeb
-                ? getWidgetHeight(height: 230)
+                ? getWidgetHeight(height: 310)
                 : getWidgetHeight(height: 150),
             width: size.width * 0.45,
             decoration: BoxDecoration(
@@ -95,7 +99,7 @@ class _PETopCategoriesCardState extends State<PETopCategoriesCard> {
           if (widget.isUnderConstruction)
             Container(
                 height: kIsWeb
-                    ? getWidgetHeight(height: 230)
+                    ? getWidgetHeight(height: 310)
                     : getWidgetHeight(height: 150),
                 width: size.width * 0.45,
                 decoration: BoxDecoration(

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:hotelmanagementapp/model/category_model.dart';
+import 'package:hotelmanagementapp/model/sound_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -77,6 +78,41 @@ class DBHelper {
         'localPath': localPath,
         'sentenceSamples': jsonEncode(item.sentenceSamples),
         'meaningSamples': jsonEncode(item.meaningSamples), // ✅ new field
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<void> insertSoundcategory(
+      SoundPractice item, String tableId) async {
+    final db = await database;
+    await ensureTableExists(tableId);
+
+    // Check if it already exists
+    final existing = await db.query(
+      '"$tableId"',
+      where: 'file = ?',
+      whereArgs: [item.file],
+    );
+
+    String localPath = item.localPath;
+    int downloadStatus = item.downloadStatus ? 1 : 0;
+
+    if (existing.isNotEmpty) {
+      localPath = existing.first['localPath'] as String? ?? localPath;
+      downloadStatus =
+          existing.first['downloadStatus'] as int? ?? downloadStatus;
+    }
+
+    await db.insert(
+      '"$tableId"',
+      {
+        'file': item.file,
+        'syllables': item.syllables,
+        'text': item.text,
+        'pronun': item.pronun,
+        'downloadStatus': downloadStatus,
+        'localPath': localPath,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -172,6 +208,12 @@ class DBHelper {
     await ensureTableExists(id);
     final result = await db.rawQuery('SELECT * FROM "$id"');
     return result.map((e) => SubcategoryPro.fromMap(e)).toList();
+  }
+
+  static Future<List<Map<String, dynamic>>> getAllSoundcategories(
+      String table) async {
+    final db = await database;
+    return await db.query(table);
   }
 
   Future<void> toggleDownloadStatus(String id, String file, bool status) async {

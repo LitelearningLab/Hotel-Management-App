@@ -307,7 +307,7 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString('password', password);
       await prefs.setBool("loginInfo", true);
       await prefs.setString("userId", userId);
-      await prefs.setString("collegeId", userData['companyid'] ?? '');
+      await prefs.setString("collegeId", userData['collegeId'] ?? '');
       print(
           "Here im printing the user data company id ${userData['companyid']}");
       await prefs.setString("batchName", userData['batchName'] ?? '');
@@ -318,9 +318,15 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString("mobile", userData['mobile'] ?? '');
       await prefs.setString("joindate", userData['joindate'] ?? '');
       await prefs.setString("enddate", userData['subscriptionenddate'] ?? '');
+      await prefs.setString('course', userData['course'] ?? "");
 
       log("User ID saved: $userId");
-      bool session = await SessionService.loginUser(email, password);
+      bool session = true; // default for mobile
+
+      if (kIsWeb) {
+        // Only run login session logic on Web
+        session = await SessionService.loginUser(email, password);
+      }
       if (session) {
         kIsWeb
             ? Get.rootDelegate.offNamed(AppRoutes.home)
@@ -480,16 +486,16 @@ class _LoginPageState extends State<LoginPage> {
                                 // height: getWidgetHeight(height: 200),
                               ),
                             ),
-                            if (displayWidth(context) > 1200)
-                              SizedBox(
-                                  height: getWidgetHeight(height: 200),
-                                  width: getWidgetWidth(
-                                      width: kWidth > 1200 ? 100 : 375),
-                                  child: !_isLogin
-                                      ? SvgPicture.asset(
-                                          'assets/emailScreen.svg')
-                                      : SvgPicture.asset(
-                                          'assets/pasScreen.svg')),
+                            // if (displayWidth(context) > 1200)
+                            //   SizedBox(
+                            //       height: getWidgetHeight(height: 200),
+                            //       width: getWidgetWidth(
+                            //           width: kWidth > 1200 ? 100 : 375),
+                            //       child: !_isLogin
+                            //           ? SvgPicture.asset(
+                            //               'assets/emailScreen.svg')
+                            //           : SvgPicture.asset(
+                            //               'assets/pasScreen.svg')),
                             // Container(
                             //     height: 40,
                             //     width: 40,
@@ -513,17 +519,18 @@ class _LoginPageState extends State<LoginPage> {
                                 : SvgPicture.asset('assets/pasScreen.svg')),
                       ),
                     SizedBox(height: getWidgetHeight(height: 20)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
+                    if (!kIsWeb || _isLogin)
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: getWidgetHeight(height: 25),
+                        ),
+                        child: Text(
+                          _isLogin
+                              ? "Enter Your Password"
+                              : "Enter Your Email Address",
+                          style: TextStyle(color: Color(0XFFF8F8F8F)),
+                        ),
                       ),
-                      child: Text(
-                        _isLogin
-                            ? "Enter Your Password"
-                            : "Enter Your Email Address",
-                        style: TextStyle(color: Color(0XFFF8F8F8F)),
-                      ),
-                    ),
                     SizedBox(height: getWidgetHeight(height: 23)),
 
                     Padding(
@@ -678,15 +685,16 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    Text(
-                      "App version $appVersion",
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w300,
-                        height: 0.5,
-                        fontSize: 12,
-                        color: lightWhite,
+                    if (!kIsWeb)
+                      Text(
+                        "App version $appVersion",
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w300,
+                          height: 0.5,
+                          fontSize: 12,
+                          color: lightWhite,
+                        ),
                       ),
-                    ),
                     SizedBox(height: 30),
                   ],
                 ),

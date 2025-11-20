@@ -352,6 +352,7 @@ class PronunciationLabSubController extends GetxController {
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
+    update();
   }
 
   Future<void> resetState() async {

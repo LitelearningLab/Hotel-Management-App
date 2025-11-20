@@ -144,12 +144,16 @@ class SoundPractice {
   final String pronun;
   final String syllables;
   final String text;
+  bool downloadStatus;
+  String localPath;
 
   SoundPractice({
     required this.file,
     required this.pronun,
     required this.syllables,
     required this.text,
+    this.downloadStatus = false,
+    this.localPath = "",
   });
 
   factory SoundPractice.fromJson(Map<String, dynamic> json) => SoundPractice(
@@ -157,6 +161,9 @@ class SoundPractice {
         pronun: json['pronun'] ?? '',
         syllables: json['syllables'] ?? '',
         text: json['text'] ?? '',
+        localPath: json['localPath'] ?? '',
+        downloadStatus:
+            json['downloadStatus'] == 1 || json['downloadStatus'] == true,
       );
 
   Map<String, dynamic> toJson() {
@@ -166,5 +173,43 @@ class SoundPractice {
       'syllables': syllables,
       'text': text,
     };
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'file': file,
+      // 'isPriority': isPriority,
+      'syllables': syllables,
+      'text': text,
+      'pronun': pronun,
+      'downloadStatus': downloadStatus ? 1 : 0,
+      'localPath': localPath,
+      // 'sentenceSamples': jsonEncode(sentenceSamples),
+      // 'meaningSamples': jsonEncode(meaningSamples),
+    };
+  }
+
+  SoundPractice copyWith({
+    bool? downloadStatus,
+    String? localPath,
+  }) {
+    return SoundPractice(
+        file: file,
+        pronun: pronun,
+        syllables: syllables,
+        text: text,
+        downloadStatus: downloadStatus ?? this.downloadStatus,
+        localPath: localPath ?? this.localPath);
+  }
+
+  factory SoundPractice.fromMap(Map<String, dynamic> map) {
+    return SoundPractice(
+      file: map['file'] ?? '',
+      syllables: map['syllables'] ?? '',
+      text: map['text'] ?? '',
+      pronun: map['pronun'] ?? '',
+      downloadStatus: map['downloadStatus'] == 1,
+      localPath: map['localPath'] ?? "",
+    );
   }
 }

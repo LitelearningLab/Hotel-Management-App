@@ -9,6 +9,7 @@ import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/view/ar_simulation.dart';
 import 'package:hotelmanagementapp/view/content_lab.dart';
+import 'package:hotelmanagementapp/view/feedback_form_page.dart';
 import 'package:hotelmanagementapp/view/font_office.dart';
 import 'package:hotelmanagementapp/view/home.dart';
 import 'package:hotelmanagementapp/view/language_lab.dart';
@@ -121,10 +122,17 @@ class RouteService {
               binding: NoInternetBinding(),
               middlewares: [AuthMiddleware()]),
           GetPage(
-              name: AppRoutes.inAppWebView,
-              page: () => InAppWebViewPage(),
-              binding: InAppWebViewBinding(),
-              middlewares: [AuthMiddleware()]),
+            name: AppRoutes.inAppWebView,
+            page: () => InAppWebViewPage(),
+            binding: InAppWebViewBinding(),
+            middlewares: [AuthMiddleware()],
+          ),
+          GetPage(
+            name: AppRoutes.feedbackpage,
+            page: () => FeedbackFormScreen(),
+            binding: FeedbackViewBinding(),
+            middlewares: [AuthMiddleware()],
+          )
         ]
       : [
           GetPage(
@@ -239,5 +247,10 @@ class RouteService {
             binding: InAppWebViewBinding(),
             // middlewares: [AuthMiddleware()],
           ),
+          GetPage(
+            name: AppRoutes.feedbackpage,
+            page: () => FeedbackFormScreen(),
+            binding: FeedbackViewBinding(),
+          )
         ];
 }

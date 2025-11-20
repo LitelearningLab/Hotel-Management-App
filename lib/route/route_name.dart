@@ -18,4 +18,5 @@ class AppRoutes {
   static const inAppWebView = '/util-webview';
   static const login = '/auth-login';
   static const sentenceLabSubCat = '/lab-sen-cat';
+  static const feedbackpage = '/feedback-session';
 }

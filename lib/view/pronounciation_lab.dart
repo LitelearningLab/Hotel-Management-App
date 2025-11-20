@@ -764,15 +764,17 @@ class _PronounciationLabState extends State<PronounciationLab> {
                                       child: Row(
                                         children: [
                                           Container(
-                                            height: getWidgetHeight(height: 36),
+                                            height: kIsWeb
+                                                ? getWidgetHeight(height: 50)
+                                                : getWidgetHeight(height: 36),
                                             width: displayWidth(context) > 500
-                                                ? displayHeight(context) * 0.04
+                                                ? displayHeight(context) * 0.06
                                                 : getWidgetWidth(width: 36),
                                             decoration: BoxDecoration(
                                                 color: controller
                                                             .pronunciationLabList[
                                                         index]['bgColor'] ??
-                                                    Colors.white,
+                                                    Colors.yellow,
                                                 shape: BoxShape.circle),
                                             child: Padding(
                                               padding:
@@ -819,7 +821,7 @@ class _PronounciationLabState extends State<PronounciationLab> {
                               ),
                               if (controller.categories.length - 1 == index)
                                 SizedBox(
-                                  height: getWidgetHeight(height: 80),
+                                  height: getWidgetHeight(height: 180),
                                 )
                             ],
                           );

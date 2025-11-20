@@ -10,7 +10,7 @@ import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/route/route_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 //for web only
-import 'dart:html' as html;
+// import 'dart:html' as html;
 import 'package:get_storage/get_storage.dart';
 import 'package:hotelmanagementapp/view/blocked_device_screen.dart';
 
@@ -37,10 +37,10 @@ void main() async {
       ),
     );
     //for web only
-    if (_isMobileOrTabletDevice()) {
-      runApp(const BlockedDeviceScreen());
-      return;
-    }
+    // if (_isMobileOrTabletDevice()) {
+    //   runApp(const BlockedDeviceScreen());
+    //   return;
+    // }
   } else {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -53,22 +53,22 @@ void main() async {
 }
 
 // for web only
-bool _isMobileOrTabletDevice() {
-  try {
-    final userAgent = html.window.navigator.userAgent.toLowerCase();
-    final screenWidth = html.window.screen?.width ?? 0;
+// bool _isMobileOrTabletDevice() {
+//   try {
+//     final userAgent = html.window.navigator.userAgent.toLowerCase();
+//     final screenWidth = html.window.screen?.width ?? 0;
 
-    // Common mobile/tablet indicators
-    return userAgent.contains('mobile') ||
-        userAgent.contains('android') ||
-        userAgent.contains('iphone') ||
-        userAgent.contains('ipad') ||
-        userAgent.contains('tablet') ||
-        screenWidth < 900;
-  } catch (_) {
-    return false;
-  }
-}
+//     // Common mobile/tablet indicators
+//     return userAgent.contains('mobile') ||
+//         userAgent.contains('android') ||
+//         userAgent.contains('iphone') ||
+//         userAgent.contains('ipad') ||
+//         userAgent.contains('tablet') ||
+//         screenWidth < 900;
+//   } catch (_) {
+//     return false;
+//   }
+// }
 
 class MyApp extends StatefulWidget {
   final AppRouterDelegate appRouterDelegate;

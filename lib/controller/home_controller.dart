@@ -58,7 +58,9 @@ class HomeController extends GetxController {
     fetchCollegeSyllabus();
     checkSubscriptionValidity();
     _checkFirstTimeAndRequestMic();
-    SessionService.startHeartbeat();
+    if (kIsWeb && !kDebugMode) {
+      SessionService.startHeartbeat();
+    }
 
     super.onReady();
   }

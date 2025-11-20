@@ -134,289 +134,6 @@ class _HomeState extends State<Home>
     );
   }
 
-  // Future<void> uploadFeedbackForm() async {
-  //   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  //   final feedbackRef = _firestore.collection('feedbackform').doc();
-
-  //   final List<Map<String, dynamic>> sections = [
-  //     {
-  //       "order": 1,
-  //       "title": "Industry Fundamentals",
-  //       "questions": [
-  //         {
-  //           "order": 1,
-  //           "text":
-  //               "How clearly do the eLearning modules explain hospitality concepts and procedures?",
-  //           "options": [
-  //             "Extremely clear",
-  //             "Very clear",
-  //             "Moderately clear",
-  //             "Slightly clear",
-  //             "Not clear"
-  //           ]
-  //         },
-  //         {
-  //           "order": 2,
-  //           "text":
-  //               "How helpful is the real-time scenario section in understanding how hospitality concepts are applied in actual work situations?",
-  //           "options": [
-  //             "Extremely helpful",
-  //             "Very helpful",
-  //             "Moderately helpful",
-  //             "Slightly helpful",
-  //             "Not helpful"
-  //           ]
-  //         },
-  //         {
-  //           "order": 3,
-  //           "text":
-  //               "How interesting and helpful are the quizzes and image-based quizzes in supporting your learning process?",
-  //           "options": [
-  //             "Extremely helpful",
-  //             "Very helpful",
-  //             "Moderately helpful",
-  //             "Slightly helpful",
-  //             "Not helpful"
-  //           ]
-  //         },
-  //         {
-  //           "order": 4,
-  //           "text":
-  //               "How interesting and helpful are the drag & drop activities in supporting your understanding of the topic?",
-  //           "options": [
-  //             "Extremely helpful",
-  //             "Very helpful",
-  //             "Moderately helpful",
-  //             "Slightly helpful",
-  //             "Not helpful"
-  //           ]
-  //         },
-  //         {
-  //           "order": 5,
-  //           "text":
-  //               "How useful are the case studies in connecting theory with real hotel situations?",
-  //           "options": [
-  //             "Extremely useful",
-  //             "Very useful",
-  //             "Moderately useful",
-  //             "Slightly useful",
-  //             "Not useful"
-  //           ]
-  //         },
-  //         {
-  //           "order": 6,
-  //           "text":
-  //               "How helpful is the Glossary in learning new terms and understanding their real-world use?",
-  //           "options": [
-  //             "Extremely helpful",
-  //             "Very helpful",
-  //             "Moderately helpful",
-  //             "Slightly helpful",
-  //             "Not helpful"
-  //           ]
-  //         },
-  //         {
-  //           "order": 7,
-  //           "text":
-  //               "How helpful is the Audio Book option in understanding the content by listening to the narration of each page?",
-  //           "options": [
-  //             "Extremely helpful",
-  //             "Very helpful",
-  //             "Moderately helpful",
-  //             "Slightly helpful",
-  //             "Not helpful"
-  //           ]
-  //         },
-  //         {
-  //           "order": 8,
-  //           "text":
-  //               "How well does the Pronunciation Lab help you in knowing and practicing the correct pronunciation of key hospitality terms?",
-  //           "options": [
-  //             "Extremely helpful",
-  //             "Very helpful",
-  //             "Moderately helpful",
-  //             "Slightly helpful",
-  //             "Not helpful"
-  //           ]
-  //         },
-  //         {"order": 9, "text": "Suggestions for improvement in this section:"},
-  //       ],
-  //     },
-  //     {
-  //       "order": 2,
-  //       "title": "Language Lab",
-  //       "questions": [
-  //         {
-  //           "order": 1,
-  //           "text":
-  //               "How well does the English Pronunciation section help you in knowing and practicing the correct pronunciation?",
-  //           "options": [
-  //             "Extremely helpful",
-  //             "Very helpful",
-  //             "Moderately helpful",
-  //             "Slightly helpful",
-  //             "Not helpful"
-  //           ]
-  //         },
-  //         {
-  //           "order": 2,
-  //           "text":
-  //               "How well does the French Pronunciation section help you in learning and practicing the correct pronunciation of hospitality terms?",
-  //           "options": [
-  //             "Extremely helpful",
-  //             "Very helpful",
-  //             "Moderately helpful",
-  //             "Slightly helpful",
-  //             "Not helpful"
-  //           ]
-  //         },
-  //         {
-  //           "order": 3,
-  //           "text":
-  //               "How effectively does the Sentence Lab help you improve your fluency and confidence in speaking?",
-  //           "options": [
-  //             "Extremely effective",
-  //             "Very effective",
-  //             "Moderately effective",
-  //             "Slightly effective",
-  //             "Not effective"
-  //           ]
-  //         },
-  //         {
-  //           "order": 4,
-  //           "text":
-  //               "How useful is the Grammar Lab in improving your sentence formation and accuracy?",
-  //           "options": [
-  //             "Extremely effective",
-  //             "Very effective",
-  //             "Moderately effective",
-  //             "Slightly effective",
-  //             "Not effective"
-  //           ]
-  //         },
-  //         {"order": 5, "text": "Suggestions for this section:"},
-  //       ],
-  //     },
-  //     {
-  //       "order": 3,
-  //       "title": "Interactive Simulations",
-  //       "questions": [
-  //         {
-  //           "order": 1,
-  //           "text":
-  //               "How interesting and helpful are the interactive simulations in understanding how to handle real hotel situations?",
-  //           "options": [
-  //             "Extremely interesting and helpful",
-  //             "Very interesting and helpful",
-  //             "Moderately helpful",
-  //             "Slightly helpful",
-  //             "Not helpful"
-  //           ]
-  //         },
-  //         {
-  //           "order": 2,
-  //           "text": "Suggestions on scenarios you’d like to see added:"
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       "order": 4,
-  //       "title": "Content Library",
-  //       "questions": [
-  //         {
-  //           "order": 1,
-  //           "text":
-  //               "How helpful is the Content Library in helping you know more about hospitality topics?",
-  //           "options": [
-  //             "Extremely helpful",
-  //             "Very helpful",
-  //             "Moderately helpful",
-  //             "Slightly helpful",
-  //             "Not helpful"
-  //           ]
-  //         },
-  //         {
-  //           "order": 2,
-  //           "text":
-  //               "What topics/content would you like to see added in this section:"
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       "order": 5,
-  //       "title": "PMS Simulation",
-  //       "questions": [
-  //         {
-  //           "order": 1,
-  //           "text":
-  //               "How helpful is the PMS simulation in understanding front office procedures and guest handling?",
-  //           "options": [
-  //             "Extremely helpful",
-  //             "Very helpful",
-  //             "Moderately helpful",
-  //             "Slightly helpful",
-  //             "Not helpful"
-  //           ]
-  //         },
-  //         {
-  //           "order": 2,
-  //           "text":
-  //               "How comfortable do you feel performing check-in, billing, and reservation tasks in the PMS simulation?",
-  //           "options": [
-  //             "Extremely comfortable",
-  //             "Very comfortable",
-  //             "Moderately comfortable",
-  //             "Slightly comfortable",
-  //             "Not comfortable"
-  //           ]
-  //         },
-  //         {
-  //           "order": 3,
-  //           "text": "Any difficulties or suggestions for improvement:"
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       "order": 6,
-  //       "title": "Overall Experience",
-  //       "questions": [
-  //         {
-  //           "order": 1,
-  //           "text":
-  //               "How satisfied are you with your overall experience using the Profluent Hotelier App?",
-  //           "options": [
-  //             "Extremely satisfied",
-  //             "Very satisfied",
-  //             "Moderately satisfied",
-  //             "Slightly satisfied",
-  //             "Dissatisfied"
-  //           ]
-  //         },
-  //         {
-  //           "order": 2,
-  //           "text":
-  //               "How likely are you to recommend the app to your classmates or friends?",
-  //           "options": [
-  //             "Definitely",
-  //             "Most likely",
-  //             "Probably",
-  //             "Maybe",
-  //             "Unlikely"
-  //           ]
-  //         },
-  //         {"order": 3, "text": "Any other comments or suggestions:"},
-  //       ],
-  //     },
-  //   ];
-
-  //   await feedbackRef.set({
-  //     "createdAt": FieldValue.serverTimestamp(),
-  //     "sections": sections,
-  //   });
-
-  //   print("✅ Feedback form uploaded successfully (ID: ${feedbackRef.id})");
-  // }
-
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -528,12 +245,16 @@ class _HomeState extends State<Home>
                         ),*/
                             menu: "Share your feedback with us",
                             onTap: () async {
+                              kIsWeb
+                                  ? Get.rootDelegate
+                                      .offNamed(AppRoutes.feedbackpage)
+                                  : Get.toNamed(AppRoutes.feedbackpage);
                               // uploadFeedbackForm();
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          FeedbackFormScreen()));
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) =>
+                              //             FeedbackFormScreen()));
                             }),
                         _tile(
                             icon: Icon(
@@ -653,15 +374,16 @@ class _HomeState extends State<Home>
                       ),
                     ),
                   ),
-                  Text(
-                    "App version $appVersion",
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w300,
-                      height: 0.5,
-                      fontSize: 12,
-                      color: lightWhite,
+                  if (!kIsWeb)
+                    Text(
+                      "App version $appVersion",
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w300,
+                        height: 0.5,
+                        fontSize: 12,
+                        color: lightWhite,
+                      ),
                     ),
-                  ),
                   SizedBox(
                     height: getWidgetHeight(height: 30),
                   )
@@ -1064,7 +786,9 @@ class _HomeState extends State<Home>
               ),
               GetBuilder<HomeController>(builder: (homeController) {
                 return SizedBox(
-                  height: getWidgetHeight(height: 300),
+                  height: kIsWeb
+                      ? getWidgetHeight(height: 400)
+                      : getWidgetHeight(height: 300),
                   child: TabBarView(
                     controller: _tabController,
                     physics: const BouncingScrollPhysics(),
