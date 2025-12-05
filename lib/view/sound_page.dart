@@ -188,159 +188,203 @@ class _SoundPageState extends State<SoundPage> {
                                                           ),
                                                         ],
                                                       ))
-                                                : Stack(
-                                                    children: [
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          controller
-                                                              .toggleControllerVisibility();
-                                                        },
-                                                        child: VideoPlayer(
-                                                            controller
-                                                                .videoPlayerController),
-                                                      ),
-                                                      if (controller
-                                                          .isControllerVisible)
-                                                        Positioned(
-                                                          bottom: 0,
-                                                          left: 0,
-                                                          right: 0,
-                                                          child:
-                                                              GestureDetector(
-                                                            onTap: () {
+                                                : MouseRegion(
+                                                    onEnter: (_) {
+                                                      controller
+                                                          .hideControllerTimer
+                                                          ?.cancel();
+                                                      // setState(() {
+                                                      controller
+                                                              .isControllerVisible =
+                                                          true;
+                                                      // });
+                                                      controller.update();
+                                                    },
+                                                    onExit: (_) {
+                                                      // setState(() {
+                                                      controller
+                                                              .isControllerVisible =
+                                                          false;
+                                                      // });
+                                                    },
+                                                    child: Stack(
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap: controller
+                                                              .toggleControllerVisibility,
+                                                          child: VideoPlayer(
                                                               controller
-                                                                  .togglePlayPauseControllerVisibility();
-                                                            },
-                                                            child: Container(
-                                                              color: Colors
-                                                                  .black
-                                                                  .withOpacity(
-                                                                      0.4),
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .symmetric(
-                                                                      vertical:
-                                                                          8.0),
-                                                              child: Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .start,
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  ValueListenableBuilder(
-                                                                      valueListenable:
-                                                                          controller
-                                                                              .videoPlayerController,
-                                                                      builder: (context,
-                                                                          VideoPlayerValue
+                                                                  .videoPlayerController),
+                                                        ),
+
+                                                        // Modern Controls Overlay (Fade in/out)
+                                                        AnimatedOpacity(
+                                                          opacity: controller
+                                                                  .isControllerVisible
+                                                              ? 1.0
+                                                              : 0.0,
+                                                          duration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      300),
+                                                          child: Stack(
+                                                            children: [
+                                                              // --- 2. Bottom Control Bar (Timeline, Duration, and Play/Pause Button) ---
+                                                              Positioned(
+                                                                bottom: 0,
+                                                                left: 0,
+                                                                right: 0,
+                                                                child:
+                                                                    Container(
+                                                                  // Gradient for a smoother, modern look
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    gradient:
+                                                                        LinearGradient(
+                                                                      begin: Alignment
+                                                                          .bottomCenter,
+                                                                      end: Alignment
+                                                                          .topCenter,
+                                                                      colors: [
+                                                                        Colors
+                                                                            .black
+                                                                            .withOpacity(0.7),
+                                                                        Colors
+                                                                            .transparent,
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .fromLTRB(
+                                                                          16,
+                                                                          32,
+                                                                          16,
+                                                                          8),
+                                                                  child: Row(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      // --- A. Play/Pause Button (NEW POSITION) ---
+                                                                      ValueListenableBuilder<
+                                                                          VideoPlayerValue>(
+                                                                        valueListenable:
+                                                                            controller.videoPlayerController,
+                                                                        builder: (context,
+                                                                            value,
+                                                                            child) {
+                                                                          return IconButton(
+                                                                            icon:
+                                                                                Icon(
+                                                                              value.isPlaying ? Icons.pause_circle_filled_rounded : Icons.play_circle_fill_rounded,
+                                                                              color: Colors.white,
+                                                                              size: 36, // Adjust size for bottom row
+                                                                            ),
+                                                                            onPressed:
+                                                                                () {
+                                                                              if (controller.videoPlayerController.value.isPlaying) {
+                                                                                controller.videoPlayerController.pause();
+                                                                              } else {
+                                                                                controller.videoPlayerController.play();
+                                                                              }
+                                                                              // Reset hide timer
+                                                                              // Assuming togglePlayPauseControllerVisibility is available
+                                                                              // togglePlayPauseControllerVisibility();
+                                                                              controller.toggleControllerVisibility(); // Assuming this function is available to reset the hide timer
+                                                                            },
+                                                                          );
+                                                                        },
+                                                                      ),
+
+                                                                      const SizedBox(
+                                                                          width:
+                                                                              8),
+
+                                                                      // --- B. Current Position Time ---
+                                                                      ValueListenableBuilder<
+                                                                          VideoPlayerValue>(
+                                                                        valueListenable:
+                                                                            controller.videoPlayerController,
+                                                                        builder: (context,
+                                                                            value,
+                                                                            child) {
+                                                                          return Text(
+                                                                            controller.formatDuration(value.position),
+                                                                            style:
+                                                                                const TextStyle(color: Colors.white, fontSize: 14),
+                                                                          );
+                                                                        },
+                                                                      ),
+
+                                                                      const SizedBox(
+                                                                          width:
+                                                                              8),
+
+                                                                      // --- C. Timeline Slider ---
+                                                                      Expanded(
+                                                                        child: ValueListenableBuilder<
+                                                                            VideoPlayerValue>(
+                                                                          valueListenable:
+                                                                              controller.videoPlayerController,
+                                                                          builder: (context,
                                                                               value,
-                                                                          child) {
-                                                                        return IconButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            if (controller.videoPlayerController.value.isPlaying) {
-                                                                              controller.videoPlayerController.pause();
-                                                                            } else {
-                                                                              controller.videoPlayerController.play();
-                                                                            }
-                                                                          },
-                                                                          icon:
-                                                                              Icon(
-                                                                            controller.videoPlayerController.value.isPlaying
-                                                                                ? Icons.pause
-                                                                                : Icons.play_arrow,
-                                                                            color:
-                                                                                Colors.white,
-                                                                            size:
-                                                                                30,
-                                                                          ),
-                                                                        );
-                                                                      }),
-                                                                  ValueListenableBuilder(
-                                                                    valueListenable:
-                                                                        controller
-                                                                            .videoPlayerController,
-                                                                    builder: (context,
-                                                                        VideoPlayerValue
-                                                                            value,
-                                                                        child) {
-                                                                      return Text(
-                                                                        controller
-                                                                            .formatDuration(value.position),
-                                                                        style: const TextStyle(
-                                                                            color:
-                                                                                Colors.white),
-                                                                      );
-                                                                    },
-                                                                  ),
-                                                                  Text(
-                                                                    " / ",
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .white),
-                                                                  ),
-                                                                  ValueListenableBuilder(
-                                                                    valueListenable:
-                                                                        controller
-                                                                            .videoPlayerController,
-                                                                    builder: (context,
-                                                                        VideoPlayerValue
-                                                                            value,
-                                                                        child) {
-                                                                      return Text(
-                                                                        controller
-                                                                            .formatDuration(value.duration),
-                                                                        style: const TextStyle(
-                                                                            color:
-                                                                                Colors.white),
-                                                                      );
-                                                                    },
-                                                                  ),
-                                                                  ValueListenableBuilder(
-                                                                    valueListenable:
-                                                                        controller
-                                                                            .videoPlayerController,
-                                                                    builder: (context,
-                                                                        VideoPlayerValue
-                                                                            value,
-                                                                        child) {
-                                                                      return Expanded(
-                                                                        child:
-                                                                            Slider(
-                                                                          value: value
-                                                                              .position
-                                                                              .inMilliseconds
-                                                                              .toDouble(),
-                                                                          min:
-                                                                              0,
-                                                                          max: value
-                                                                              .duration
-                                                                              .inMilliseconds
-                                                                              .toDouble(),
-                                                                          onChanged:
-                                                                              (newValue) {
-                                                                            controller.videoPlayerController.seekTo(
-                                                                              Duration(milliseconds: newValue.toInt()),
+                                                                              child) {
+                                                                            return SliderTheme(
+                                                                              data: SliderTheme.of(context).copyWith(
+                                                                                thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.0),
+                                                                                overlayShape: RoundSliderOverlayShape(overlayRadius: 12.0),
+                                                                                trackHeight: 3.0,
+                                                                                activeTrackColor: Colors.white,
+                                                                                inactiveTrackColor: Colors.white54,
+                                                                                thumbColor: Colors.blue, // Highlight color
+                                                                                overlayColor: Colors.blue.withOpacity(0.3),
+                                                                              ),
+                                                                              child: Slider(
+                                                                                value: value.position.inMilliseconds.toDouble().clamp(0.0, value.duration.inMilliseconds.toDouble()),
+                                                                                min: 0,
+                                                                                max: value.duration.inMilliseconds.toDouble(),
+                                                                                onChanged: (newValue) {
+                                                                                  controller.videoPlayerController.seekTo(
+                                                                                    Duration(milliseconds: newValue.toInt()),
+                                                                                  );
+                                                                                  // Keep controls visible while seeking
+                                                                                  controller.toggleControllerVisibility(); // Assuming this function is available
+                                                                                },
+                                                                              ),
                                                                             );
                                                                           },
-                                                                          activeColor:
-                                                                              Colors.white,
-                                                                          inactiveColor:
-                                                                              Colors.grey,
                                                                         ),
-                                                                      );
-                                                                    },
+                                                                      ),
+
+                                                                      const SizedBox(
+                                                                          width:
+                                                                              8),
+
+                                                                      // --- D. Total Duration Time ---
+                                                                      ValueListenableBuilder<
+                                                                          VideoPlayerValue>(
+                                                                        valueListenable:
+                                                                            controller.videoPlayerController,
+                                                                        builder: (context,
+                                                                            value,
+                                                                            child) {
+                                                                          return Text(
+                                                                            controller.formatDuration(value.duration),
+                                                                            style:
+                                                                                const TextStyle(color: Colors.white, fontSize: 14),
+                                                                          );
+                                                                        },
+                                                                      ),
+                                                                    ],
                                                                   ),
-                                                                  // **Current Time**
-                                                                ],
+                                                                ),
                                                               ),
-                                                            ),
+                                                            ],
                                                           ),
                                                         ),
-                                                    ],
-                                                  ),
+                                                      ],
+                                                    )),
                                           ),
                                         ),
                                         Padding(
@@ -575,42 +619,65 @@ class _SoundPageState extends State<SoundPage> {
                                 : Stack(
                                     children: [
                                       GestureDetector(
-                                          onTap: () {
-                                            controller
-                                                .toggleControllerVisibility();
-                                          },
-                                          child: VideoPlayer(controller
-                                              .videoPlayerController)),
-                                      if (controller.isControllerVisible)
-                                        Positioned(
-                                          bottom: 0,
-                                          left: 0,
-                                          right: 0,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              controller
-                                                  .togglePlayPauseControllerVisibility();
-                                            },
-                                            child: Container(
-                                              color:
-                                                  Colors.black.withOpacity(0.4),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 8.0),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  ValueListenableBuilder(
+                                        onTap: controller
+                                            .toggleControllerVisibility,
+                                        child: VideoPlayer(
+                                            controller.videoPlayerController),
+                                      ),
+
+                                      // Modern Controls Overlay (Fade in/out)
+                                      AnimatedOpacity(
+                                        opacity: controller.isControllerVisible
+                                            ? 1.0
+                                            : 0.0,
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        child: Stack(
+                                          children: [
+                                            // --- 2. Bottom Control Bar (Timeline, Duration, and Play/Pause Button) ---
+                                            Positioned(
+                                              bottom: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: Container(
+                                                // Gradient for a smoother, modern look
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    begin:
+                                                        Alignment.bottomCenter,
+                                                    end: Alignment.topCenter,
+                                                    colors: [
+                                                      Colors.black
+                                                          .withOpacity(0.7),
+                                                      Colors.transparent,
+                                                    ],
+                                                  ),
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        16, 32, 16, 8),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    // --- A. Play/Pause Button (NEW POSITION) ---
+                                                    ValueListenableBuilder<
+                                                        VideoPlayerValue>(
                                                       valueListenable: controller
                                                           .videoPlayerController,
-                                                      builder: (context,
-                                                          VideoPlayerValue
-                                                              value,
+                                                      builder: (context, value,
                                                           child) {
                                                         return IconButton(
+                                                          icon: Icon(
+                                                            value.isPlaying
+                                                                ? Icons
+                                                                    .pause_circle_filled_rounded
+                                                                : Icons
+                                                                    .play_circle_fill_rounded,
+                                                            color: Colors.white,
+                                                            size:
+                                                                36, // Adjust size for bottom row
+                                                          ),
                                                           onPressed: () {
                                                             if (controller
                                                                 .videoPlayerController
@@ -624,97 +691,141 @@ class _SoundPageState extends State<SoundPage> {
                                                                   .videoPlayerController
                                                                   .play();
                                                             }
-                                                          },
-                                                          icon: Icon(
+                                                            // Reset hide timer
+                                                            // Assuming togglePlayPauseControllerVisibility is available
+                                                            // togglePlayPauseControllerVisibility();
                                                             controller
-                                                                    .videoPlayerController
-                                                                    .value
-                                                                    .isPlaying
-                                                                ? Icons.pause
-                                                                : Icons
-                                                                    .play_arrow,
-                                                            color: Colors.white,
-                                                            size: 30,
-                                                          ),
+                                                                .toggleControllerVisibility(); // Assuming this function is available to reset the hide timer
+                                                          },
                                                         );
-                                                      }),
-                                                  ValueListenableBuilder(
-                                                    valueListenable: controller
-                                                        .videoPlayerController,
-                                                    builder: (context,
-                                                        VideoPlayerValue value,
-                                                        child) {
-                                                      return Text(
-                                                        controller
-                                                            .formatDuration(
-                                                                value.position),
-                                                        style: const TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      );
-                                                    },
-                                                  ),
-                                                  Text(
-                                                    " / ",
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                  ValueListenableBuilder(
-                                                    valueListenable: controller
-                                                        .videoPlayerController,
-                                                    builder: (context,
-                                                        VideoPlayerValue value,
-                                                        child) {
-                                                      return Text(
-                                                        controller
-                                                            .formatDuration(
-                                                                value.duration),
-                                                        style: const TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      );
-                                                    },
-                                                  ),
-                                                  ValueListenableBuilder(
-                                                    valueListenable: controller
-                                                        .videoPlayerController,
-                                                    builder: (context,
-                                                        VideoPlayerValue value,
-                                                        child) {
-                                                      return Expanded(
-                                                        child: Slider(
-                                                          value: value.position
-                                                              .inMilliseconds
-                                                              .toDouble(),
-                                                          min: 0,
-                                                          max: value.duration
-                                                              .inMilliseconds
-                                                              .toDouble(),
-                                                          onChanged:
-                                                              (newValue) {
-                                                            controller
-                                                                .videoPlayerController
-                                                                .seekTo(
-                                                              Duration(
-                                                                  milliseconds:
-                                                                      newValue
-                                                                          .toInt()),
-                                                            );
-                                                          },
-                                                          activeColor:
-                                                              Colors.white,
-                                                          inactiveColor:
-                                                              Colors.grey,
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                  // **Current Time**
-                                                ],
+                                                      },
+                                                    ),
+
+                                                    const SizedBox(width: 8),
+
+                                                    // --- B. Current Position Time ---
+                                                    ValueListenableBuilder<
+                                                        VideoPlayerValue>(
+                                                      valueListenable: controller
+                                                          .videoPlayerController,
+                                                      builder: (context, value,
+                                                          child) {
+                                                        return Text(
+                                                          controller
+                                                              .formatDuration(
+                                                                  value
+                                                                      .position),
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 14),
+                                                        );
+                                                      },
+                                                    ),
+
+                                                    const SizedBox(width: 8),
+
+                                                    // --- C. Timeline Slider ---
+                                                    Expanded(
+                                                      child:
+                                                          ValueListenableBuilder<
+                                                              VideoPlayerValue>(
+                                                        valueListenable: controller
+                                                            .videoPlayerController,
+                                                        builder: (context,
+                                                            value, child) {
+                                                          return SliderTheme(
+                                                            data:
+                                                                SliderTheme.of(
+                                                                        context)
+                                                                    .copyWith(
+                                                              thumbShape:
+                                                                  RoundSliderThumbShape(
+                                                                      enabledThumbRadius:
+                                                                          6.0),
+                                                              overlayShape:
+                                                                  RoundSliderOverlayShape(
+                                                                      overlayRadius:
+                                                                          12.0),
+                                                              trackHeight: 3.0,
+                                                              activeTrackColor:
+                                                                  Colors.white,
+                                                              inactiveTrackColor:
+                                                                  Colors
+                                                                      .white54,
+                                                              thumbColor: Colors
+                                                                  .blue, // Highlight color
+                                                              overlayColor: Colors
+                                                                  .blue
+                                                                  .withOpacity(
+                                                                      0.3),
+                                                            ),
+                                                            child: Slider(
+                                                              value: value
+                                                                  .position
+                                                                  .inMilliseconds
+                                                                  .toDouble()
+                                                                  .clamp(
+                                                                      0.0,
+                                                                      value
+                                                                          .duration
+                                                                          .inMilliseconds
+                                                                          .toDouble()),
+                                                              min: 0,
+                                                              max: value
+                                                                  .duration
+                                                                  .inMilliseconds
+                                                                  .toDouble(),
+                                                              onChanged:
+                                                                  (newValue) {
+                                                                controller
+                                                                    .videoPlayerController
+                                                                    .seekTo(
+                                                                  Duration(
+                                                                      milliseconds:
+                                                                          newValue
+                                                                              .toInt()),
+                                                                );
+                                                                // Keep controls visible while seeking
+                                                                controller
+                                                                    .toggleControllerVisibility(); // Assuming this function is available
+                                                              },
+                                                            ),
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+
+                                                    const SizedBox(width: 8),
+
+                                                    // --- D. Total Duration Time ---
+                                                    ValueListenableBuilder<
+                                                        VideoPlayerValue>(
+                                                      valueListenable: controller
+                                                          .videoPlayerController,
+                                                      builder: (context, value,
+                                                          child) {
+                                                        return Text(
+                                                          controller
+                                                              .formatDuration(
+                                                                  value
+                                                                      .duration),
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 14),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          ),
+                                          ],
                                         ),
+                                      ),
                                     ],
                                   )),
                         Padding(

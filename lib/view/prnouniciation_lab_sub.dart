@@ -182,10 +182,12 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                   onSelected: (value) {
                     controller.selectedMenuOption = value;
 
-                    if (value == 'priority') {
+                    if (value == 'Filter Priority') {
+                      controller.subTitle = "Filter Priority";
                       controller.applyDownloadedFilter(true);
-                    } else if (value == 'all_priority') {
+                    } else if (value == 'clear') {
                       controller.applyDownloadedFilter(false);
+                      controller.subTitle = null;
                     } else if (value == 'search') {
                       controller.isSearching = true;
                     }
@@ -209,7 +211,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                     ),
                     if (!kIsWeb)
                       PopupMenuItem<String>(
-                        value: 'priority',
+                        value: 'Filter Priority',
                         child: Text(
                           'Filter Priority',
                           style: TextStyle(
@@ -225,7 +227,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                       ),
                     if (!kIsWeb)
                       PopupMenuItem<String>(
-                        value: 'all_priority',
+                        value: 'clear',
                         child: Text(
                           'Clear Filter',
                           style: TextStyle(
@@ -248,22 +250,61 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
               : Stack(
                   children: [
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (controller.searchController.text.isNotEmpty)
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: getWidgetWidth(width: 12)),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                "Search Results for: ${controller.searchTerm}",
-                                style: TextStyle(
-                                  fontSize: kText.scale(13),
-                                  fontWeight: FontWeight.w600,
+                        if (controller.subTitle != null ||
+                            controller.searchController.text.isNotEmpty)
+                          Column(
+                            children: [
+                              SizedBox(
+                                height: getWidgetHeight(height: 10),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: getWidgetWidth(width: 12)),
+                                child: RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: "Results for: ",
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: kText.scale(10),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: controller.searchController.text
+                                                .isNotEmpty
+                                            ? controller.searchController.text
+                                            : controller.subTitle,
+                                        style: TextStyle(
+                                          color: linearColor,
+                                          fontSize: kText.scale(11),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
+                        // if (controller.searchController.text.isNotEmpty)
+                        //   Padding(
+                        //     padding: EdgeInsets.symmetric(
+                        //         horizontal: getWidgetWidth(width: 12)),
+                        //     child: Align(
+                        //       alignment: Alignment.centerLeft,
+                        //       child: Text(
+                        //         "Search Results for: ${controller.searchController.text}",
+                        //         style: TextStyle(
+                        //           fontSize: kText.scale(13),
+                        //           fontWeight: FontWeight.w600,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
                         controller.subcategories.isEmpty
                             ? SizedBox(
                                 height: getWidgetHeight(height: 550),
@@ -550,29 +591,47 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                                 .start,
                                                         children: [
                                                           Text(
-                                                            "IPA",
+                                                            "PRONUNCIATION",
                                                             style: GoogleFonts.inter(
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .w400,
                                                                 fontSize: 12,
                                                                 color:
-                                                                    lightWhite),
+                                                                    linearColor),
                                                           ),
                                                           SizedBox(
                                                             height:
                                                                 getWidgetHeight(
                                                                     height: 6),
                                                           ),
-                                                          RichText(
-                                                            textAlign: TextAlign
-                                                                .justify,
-                                                            text: TextSpan(
-                                                              children: buildTextSpans(
-                                                                  controller
+                                                          SizedBox(
+                                                            width:
+                                                                getWidgetWidth(
+                                                                    width: 180),
+                                                            child: Text(
+                                                              controller
+                                                                          .subcategories[
+                                                                              index]
+                                                                          .pronun
+                                                                          .trim() ==
+                                                                      ""
+                                                                  ? "no data"
+                                                                  : controller
                                                                       .subcategories[
                                                                           index]
-                                                                      .syllables),
+                                                                      .pronun
+                                                                      .replaceAll(
+                                                                          "/",
+                                                                          ""),
+                                                              maxLines: 2,
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 20,
+                                                                fontFamily: Keys
+                                                                    .lucidaFontFamily,
+                                                              ),
                                                             ),
                                                           ),
                                                           SizedBox(
@@ -591,7 +650,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                                         .start,
                                                                 children: [
                                                                   Text(
-                                                                    "PRONUNCIATION",
+                                                                    "IPA",
                                                                     style: GoogleFonts.inter(
                                                                         fontWeight:
                                                                             FontWeight
@@ -599,38 +658,25 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                                                         fontSize:
                                                                             12,
                                                                         color:
-                                                                            linearColor),
+                                                                            lightWhite),
                                                                   ),
                                                                   SizedBox(
                                                                     height: getWidgetHeight(
                                                                         height:
                                                                             6),
                                                                   ),
-                                                                  SizedBox(
-                                                                    width: getWidgetWidth(
-                                                                        width:
-                                                                            180),
-                                                                    child: Text(
-                                                                      controller.subcategories[index].pronun.trim() ==
-                                                                              ""
-                                                                          ? "no data"
-                                                                          : controller
-                                                                              .subcategories[index]
-                                                                              .pronun
-                                                                              .replaceAll("/", ""),
-                                                                      maxLines:
-                                                                          2,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontSize:
-                                                                            20,
-                                                                        fontFamily:
-                                                                            Keys.lucidaFontFamily,
-                                                                      ),
+                                                                  RichText(
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .justify,
+                                                                    text:
+                                                                        TextSpan(
+                                                                      children: buildTextSpans(controller
+                                                                          .subcategories[
+                                                                              index]
+                                                                          .syllables),
                                                                     ),
-                                                                  )
+                                                                  ),
                                                                 ],
                                                               ),
                                                               if (!kIsWeb)

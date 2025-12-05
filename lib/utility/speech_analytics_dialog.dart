@@ -111,13 +111,11 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
     bool hasSpeech = await speech.initialize(
         onError: errorListener, onStatus: statusListener);
     if (hasSpeech) {
-      print("ojudsoudududuhdudu badhusha");
       var systemLocale = await speech.systemLocale();
       _currentLocaleId = systemLocale!.localeId;
     } else {
       RecorderPermissionPopup(context);
       // DeniedAlertDialogFunction();
-      print('//////DENIED');
     }
 
     if (!mounted) return;
@@ -125,15 +123,9 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
   }
 
   endPractice({required practiceType, required successCount}) async {
-    print("practice Type: $practiceType");
-    print("end practice Tappeddd");
     String userId = await SharedPref.getSavedString('userId');
-    print("userIddd:$userId");
     String url = "baseUrl" + "endPracticeApi";
-    print("url : $url");
-    print("successCount:$successCount");
-    /* print("scoreeeeetypeee:${widget.score.runtimeType}");
-    print("scoreeee:${widget.score}");*/
+
     try {
       var response = await http.post(Uri.parse(url), body: {
         "userid": userId,
@@ -142,8 +134,6 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
         "action": "practice",
         "successCount": successCount
       });
-
-      print("response end practice : ${response.body}");
     } catch (e) {
       print("error login : $e");
     }
@@ -188,7 +178,6 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
                     style:
                         ElevatedButton.styleFrom(backgroundColor: primaryDark),
                     onPressed: () async {
-                      print("goooooo checkeddddddddddddddddd");
                       await openAppSettings();
                       //Navigator.pop(context);
                     },
@@ -208,24 +197,10 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
       },
     );
   }
-  /* DeniedAlertDialogFunction() {
-    print("alert dialog calledddddddddddd>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    return AlertDialog(
-      title: Text('Permission Required'),
-      content: Text('Cannot proceed without permission'),
-      actions: [
-        TextButton(
-          child: Text('Open App Settings'),
-          onPressed: () => {},
-        ),
-      ],
-    );
-  }*/
 
   void startListening() async {
     setState(() => _isListening = true);
     Timer(Duration(seconds: 13), () {
-      print(".......................................");
       dev.log("stopssss");
       // stopListening();
       // // Navigator.pop(context);
@@ -255,11 +230,9 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
 
     Timer(Duration(seconds: 60), () {
       if (speech.isListening) {
-        print("speechh listeninggggg");
         stopListening();
         _isShowDidNotCatch = true;
         if (mounted) {
-          print("mounttteddddd");
           setState(() {});
         }
       }
@@ -465,8 +438,6 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
         resultBuffer.write(parts[i]);
         if (i == 1 && number % 100 != 0) {
           resultBuffer.write(' and');
-          print("and added>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-          print(resultBuffer.toString());
         }
         if (i < parts.length - 1) {
           resultBuffer.write(' ');
@@ -540,8 +511,6 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
       });
       return;
     }
-    print('///////////////////RESULT LISTENER');
-    print("${result.recognizedWords} - ${result.finalResult}");
     setState(() {
       lastWords += result.recognizedWords;
     });
@@ -561,26 +530,17 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
           .where((e) => e.isNotEmpty)
           .toList();
 
-      print("heard");
-      print(heard);
-
-      print("actual");
-      print(actual);
       // Clean up the heard words
       // for (int i = 0; i < heard.length; i++) {
       //   heard[i] = heard[i].replaceAll(RegExp(r'[^\w\s\$]+'), '');
       // }
-      print("heard1 : $heard");
-      // print(heard);
+
       // Clean up the actual words
       for (int i = 0; i < actual.length; i++) {
         actual[i] = actual[i].replaceAll(RegExp(r'[^\w\s\$]+'), '');
       }
-      print("actual");
-      print(actual);
       var testing = compareAndAlignSegments(actual, heard);
-      print("testinggg");
-      print(testing);
+
       // Iterate through actual words and match with heard words
       for (int i = 0; i < actual.length; i++) {
         String actWord = actual[i];
@@ -611,7 +571,6 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
         }
 
         if (!isFound) {
-          print("mistake words add");
           focusWords.add(actWord);
           Widget wi = Container(
               decoration: BoxDecoration(
@@ -628,14 +587,12 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
               ));
           formatedWords.add(wi);
         } else {
-          print("its not a mistake words");
           if (!focusWords.contains('NA')) focusWords.add('NA');
         }
       }
 
       correctPer = (correct.length / actual.length) * 100;
-      print(correctPer);
-      print("correctPer:${correctPer}");
+
       _isCorrect = correctPer == 100.0;
       _isCorrect
           ? endPractice(
@@ -644,11 +601,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
           : endPractice(
               practiceType: "Pronunciation Sound Lab Report",
               successCount: "wrong");
-      print("iscorrecttttt:${_isCorrect}");
     }
-
-    print("finalresulttttt : ${result.finalResult}");
-    print("_isDismissedssss : ${_isDismissed}");
 
     if (result.finalResult && !_isDismissed) {
       _isDismissed = true;
@@ -656,65 +609,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
 
       if (_timer.isActive) {
         _timer.cancel();
-      }
-      // String company = await SharedPref.getSavedString("companyId");
-      // String batch = await SharedPref.getSavedString("batch");
-      // if (widget.isWord)
-      //   db.saveWordListReport(
-      //       companyId: company,
-      //       batch: batch,
-      //       time: _start,
-      //       company: userDatas.appUser?.company ?? "",
-      //       name: userDatas.appUser?.UserMname,
-      //       userID: userDatas.appUser!.id!,
-      //       word: widget.word,
-      //       isCorrect: _isCorrect,
-      //       team: userDatas.appUser?.team,
-      //       load: widget.load,
-      //       title: widget.title,
-      //       userprofile: userDatas.appUser?.profile,
-      //       city: userDatas.appUser?.city,
-      //       date: DateFormat('dd-MMM-yyyy').format(DateTime.now()));
-      else {
-        // if (widget.isCallflow) {
-        //   db.saveCallFlowReport(
-        //       company: userDatas.appUser!.company ?? "   ",
-        //       name: userDatas.appUser!.UserMname,
-        //       userID: userDatas.appUser!.id!,
-        //       sentence: widget.word,
-        //       isCorrect: _isCorrect,
-        //       team: userDatas.appUser?.team,
-        //       userprofile: userDatas.appUser?.profile,
-        //       city: userDatas.appUser?.city,
-        //       score: correctPer,
-        //       focusWords: focusWords,
-        //       correctWords: correctWords,
-        //       title: widget.title,
-        //       main: widget.main,
-        //       load: widget.load,
-        //       date: DateFormat('dd-MMM-yyyy').format(DateTime.now()));
-        // } else {
-        //   print("dli do ioud ou ffy oufou f");
-        //   db.saveSentenceListReport(
-        //       company: userDatas.appUser!.company ?? "",
-        //       name: userDatas.appUser!.UserMname,
-        //       userID: userDatas.appUser!.id!,
-        //       sentence: widget.word,
-        //       isCorrect: _isCorrect,
-        //       team: userDatas.appUser?.team,
-        //       userprofile: userDatas.appUser?.profile,
-        //       city: userDatas.appUser?.city,
-        //       score: correctPer,
-        //       focusWords: focusWords,
-        //       correctWords: correctWords,
-        //       title: widget.title,
-        //       load: widget.load,
-        //       main: widget.main,
-        //       date: DateFormat('dd-MMM-yyyy').format(DateTime.now()));
-        // }
-      }
-      print(correctPer);
-      print("until go back>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+      } else {}
 
       CloseValue closeValue = CloseValue();
 
@@ -730,17 +625,9 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
   void soundLevelListener(double level) {
     minSoundLevel = min(minSoundLevel, level);
     maxSoundLevel = max(maxSoundLevel, level);
-//    print("sound level $level: $minSoundLevel - $maxSoundLevel ");
-//     setState(() {
-//       this.level = level;
-//     });
   }
 
   void errorListener(SpeechRecognitionError error) {
-    print(
-        "Error Listening >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    print("Received error status: $error, listening: ${speech.isListening}");
-    // print(_isShowDidNotCatch);
     if (!speech.isListening) {
       _isDismissed = true;
       // _isShowDidNotCatch = true;

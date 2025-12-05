@@ -76,6 +76,8 @@ class PronunciationLabSubController extends GetxController {
   int expandedIndex = -1;
   bool isProcessing = false;
   int dialogCount = 0;
+  String? subTitle;
+
   @override
   void onInit() {
     readyFirs();

@@ -138,55 +138,56 @@ class ARCallSimulation extends StatelessWidget {
                             padding: EdgeInsets.symmetric(
                                 horizontal: getWidgetHeight(height: 20)),
                             child: kIsWeb
-                                ? SizedBox(
-                                    height: getWidgetHeight(height: 52),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          height: getWidgetHeight(height: 52),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                'Indulge in Lifelike Immersive Learning!',
-                                                style: TextStyle(
-                                                  fontFamily: 'Roboto',
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.black,
-                                                  letterSpacing: 0,
-                                                  fontSize: kText.scale(16),
-                                                ),
-                                              ),
-                                              Text(
-                                                'Be Ready & Confident To Handle Challenging Situations!',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.black,
-                                                  fontSize: kText.scale(15),
-                                                  fontFamily: 'Roboto',
-                                                  letterSpacing: 0,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        // SizedBox(
-                                        //     height: getWidgetHeight(height: 10)),
-                                        Text(
-                                          'Practice Fearlessly...',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              color: Color(0xFF808080),
-                                              fontSize: kText.scale(31),
-                                              fontFamily: 'Kaushan',
-                                              letterSpacing: 0),
-                                        ),
-                                      ],
-                                    ),
-                                  )
+                                ? SizedBox.shrink()
+                                // ? SizedBox(
+                                //     height: getWidgetHeight(height: 52),
+                                //     child: Row(
+                                //       mainAxisAlignment:
+                                //           MainAxisAlignment.center,
+                                //       crossAxisAlignment:
+                                //           CrossAxisAlignment.start,
+                                //       children: [
+                                //         SizedBox(
+                                //           height: getWidgetHeight(height: 52),
+                                //           child: Row(
+                                //             children: [
+                                //               Text(
+                                //                 'Indulge in Lifelike Immersive Learning!',
+                                //                 style: TextStyle(
+                                //                   fontFamily: 'Roboto',
+                                //                   fontWeight: FontWeight.w500,
+                                //                   color: Colors.black,
+                                //                   letterSpacing: 0,
+                                //                   fontSize: kText.scale(16),
+                                //                 ),
+                                //               ),
+                                //               Text(
+                                //                 'Be Ready & Confident To Handle Challenging Situations!',
+                                //                 style: TextStyle(
+                                //                   fontWeight: FontWeight.w500,
+                                //                   color: Colors.black,
+                                //                   fontSize: kText.scale(15),
+                                //                   fontFamily: 'Roboto',
+                                //                   letterSpacing: 0,
+                                //                 ),
+                                //               ),
+                                //             ],
+                                //           ),
+                                //         ),
+                                //         // SizedBox(
+                                //         //     height: getWidgetHeight(height: 10)),
+                                //         Text(
+                                //           'Practice Fearlessly...',
+                                //           style: TextStyle(
+                                //               fontWeight: FontWeight.w400,
+                                //               color: Color(0xFF808080),
+                                //               fontSize: kText.scale(31),
+                                //               fontFamily: 'Kaushan',
+                                //               letterSpacing: 0),
+                                //         ),
+                                //       ],
+                                //     ),
+                                //   )
                                 : Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:

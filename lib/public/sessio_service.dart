@@ -2,15 +2,15 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:html' as html;
+// import 'dart:html' as html;
 
 class WebStorageHelper {
   static String? getDeviceSessionId() {
-    return html.window.localStorage['deviceSessionId'];
+    // return html.window.localStorage['deviceSessionId'];
   }
 
   static void setDeviceSessionId(String id) {
-    html.window.localStorage['deviceSessionId'] = id;
+    // html.window.localStorage['deviceSessionId'] = id;
   }
 }
 

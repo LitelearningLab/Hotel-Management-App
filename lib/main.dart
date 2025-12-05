@@ -36,7 +36,7 @@ void main() async {
             "https://hotel-management-app-d25d5-default-rtdb.firebaseio.com/",
       ),
     );
-    //for web only
+    // // for web only
     // if (_isMobileOrTabletDevice()) {
     //   runApp(const BlockedDeviceScreen());
     //   return;
@@ -52,7 +52,7 @@ void main() async {
   ));
 }
 
-// for web only
+// // for web only
 // bool _isMobileOrTabletDevice() {
 //   try {
 //     final userAgent = html.window.navigator.userAgent.toLowerCase();

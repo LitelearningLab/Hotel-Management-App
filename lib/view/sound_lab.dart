@@ -462,20 +462,28 @@ class _SoundLabState extends State<SoundLab> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "IPA",
+                                          "PRONUNCIATION",
                                           style: GoogleFonts.inter(
                                               fontWeight: FontWeight.w400,
                                               fontSize: 12,
-                                              color: lightWhite),
+                                              color: linearColor),
                                         ),
                                         SizedBox(
                                           height: getWidgetHeight(height: 6),
                                         ),
-                                        RichText(
-                                          textAlign: TextAlign.justify,
-                                          text: TextSpan(
-                                            children: buildTextSpans(
-                                                soundPractice.syllables),
+                                        SizedBox(
+                                          width: getWidgetWidth(width: 180),
+                                          child: Text(
+                                            soundPractice.pronun == ""
+                                                ? "no data"
+                                                : soundPractice.pronun
+                                                    .replaceAll("/", ""),
+                                            maxLines: 2,
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 20,
+                                              fontFamily: Keys.fontFamily,
+                                            ),
                                           ),
                                         ),
                                         SizedBox(
@@ -490,7 +498,7 @@ class _SoundLabState extends State<SoundLab> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  "PRONUNCIATION",
+                                                  "IPA",
                                                   style: GoogleFonts.inter(
                                                       fontWeight:
                                                           FontWeight.w400,
@@ -501,24 +509,14 @@ class _SoundLabState extends State<SoundLab> {
                                                   height: getWidgetHeight(
                                                       height: 6),
                                                 ),
-                                                SizedBox(
-                                                  width: getWidgetWidth(
-                                                      width: 180),
-                                                  child: Text(
-                                                    soundPractice.pronun == ""
-                                                        ? "no data"
-                                                        : soundPractice.pronun
-                                                            .replaceAll(
-                                                                "/", ""),
-                                                    maxLines: 2,
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 20,
-                                                      fontFamily:
-                                                          Keys.fontFamily,
-                                                    ),
+                                                RichText(
+                                                  textAlign: TextAlign.justify,
+                                                  text: TextSpan(
+                                                    children: buildTextSpans(
+                                                        soundPractice
+                                                            .syllables),
                                                   ),
-                                                )
+                                                ),
                                               ],
                                             ),
                                             if (!kIsWeb)
