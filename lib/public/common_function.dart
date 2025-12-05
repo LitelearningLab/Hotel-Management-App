@@ -127,11 +127,68 @@ Future<void> stopTimerMainCategory() async {
       topicNames: [],
       // sessionName: sessionName
     );
+    await updateUserTotalTimeSpent(finalDuration);
     activityName = "";
     sessionName = "";
 
     log("printing the timing is working or not $finalDuration ${mianCategoryTitile}");
   }
+}
+
+Future<void> updateUserTotalTimeSpent(Duration duration) async {
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getString("userId") ?? "";
+  final userEmail = prefs.getString("userEmail") ?? "";
+
+  if (userId.isEmpty && userEmail.isEmpty) {
+    throw Exception("❌ No userId or email found in SharedPreferences.");
+  }
+
+  final firestore = FirebaseFirestore.instance;
+
+  // ---------- 1. Query UserNode ----------
+  QuerySnapshot query = await firestore
+      .collection("UserNode")
+      .where("_id", isEqualTo: userId)
+      .limit(1)
+      .get();
+
+  if (query.docs.isEmpty && userEmail.isNotEmpty) {
+    query = await firestore
+        .collection("UserNode")
+        .where("email", isEqualTo: userEmail)
+        .limit(1)
+        .get();
+  }
+
+  if (query.docs.isEmpty) {
+    throw Exception("❌ No matching user found in UserNode.");
+  }
+
+  final docRef = query.docs.first.reference;
+
+  // ---------- 2. Get existing field ----------
+  final existingData = query.docs.first.data() as Map<String, dynamic>;
+  final existingTime = existingData["timeSpent"];
+
+  final int newSeconds = duration.inSeconds;
+
+  int updatedTimeSpent = 0;
+
+  if (existingTime == null) {
+    // First time entry
+    updatedTimeSpent = newSeconds;
+  } else {
+    updatedTimeSpent = existingTime + newSeconds;
+  }
+
+  // ---------- 3. Update Firestore ----------
+  await docRef.update({
+    "timeSpent": updatedTimeSpent,
+    "lastUpdated": FieldValue.serverTimestamp(),
+  });
+
+  print("⏱️ User total timeSpent updated: $updatedTimeSpent seconds");
 }
 
 // double getFullWidgetHeight({required double height}) {

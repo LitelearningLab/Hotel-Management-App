@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/instance_manager.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/model/feedback_form_model.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
@@ -24,11 +25,18 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
   final Map<String, String> _selectedAnswers = {};
   final Map<String, String> _answers = {};
   final Map<String, TextEditingController> _commentControllers = {};
-  OverlayEntry? _bottomMessageEntry;
-  bool submitted = false;
 
+  OverlayEntry? _bottomMessageEntry;
+
+  bool submitted = false;
   String? existingDocId;
   bool isLoading = true;
+  var form;
+
+  // ------------- NEW YEAR FIELD ---------------
+  String? selectedYear;
+
+  // --------------------------------------------
 
   @override
   void initState() {
@@ -40,15 +48,17 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString("userId") ?? "unknown_user";
 
-    // Load feedback form
+    // Get form
     final formSnap = await _firestore.collection('feedbackform').limit(1).get();
+
     if (formSnap.docs.isEmpty) {
       throw Exception("No feedback form found");
     }
-    final formData = formSnap.docs.first.data() as Map<String, dynamic>;
-    final form = FeedbackFormModel.fromJson(formData).sorted();
 
-    // Check existing feedback by user
+    final formData = formSnap.docs.first.data() as Map<String, dynamic>;
+    form = FeedbackFormModel.fromJson(formData).sorted();
+
+    // Load existing response
     final existingFeedback = await _firestore
         .collection('feedbackResponses')
         .where('_id', isEqualTo: userId)
@@ -60,36 +70,38 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
       final existingData =
           existingFeedback.docs.first.data() as Map<String, dynamic>;
 
+      // Load saved year
+      if (existingData["year"] != null) {
+        selectedYear = existingData["year"];
+      }
+
       if (existingData['answers'] != null) {
-        final Map<String, dynamic> previousAnswers =
+        final previousAnswers =
             Map<String, dynamic>.from(existingData['answers']);
 
-        // Populate local answer maps
         for (var sectionEntry in previousAnswers.entries) {
           final sectionTitle = sectionEntry.key;
           final questions = List<Map<String, dynamic>>.from(sectionEntry.value);
 
           for (var q in questions) {
-            final questionText = q['question'] ?? 'Untitled Question';
-            final answer = q['answer'] ?? '';
-            final combinedKey = "$sectionTitle-$questionText";
+            final questionText = q['question'];
+            final answer = q['answer'];
 
+            final combinedKey = "$sectionTitle-$questionText";
             _answers[combinedKey] = answer;
 
-            // Refill comment fields
-            if (!_commentControllers.containsKey(combinedKey)) {
-              _commentControllers[combinedKey] =
-                  TextEditingController(text: answer);
-            }
+            // refill comment controllers
+            _commentControllers[combinedKey] =
+                TextEditingController(text: answer);
 
-            // Refill multiple-choice
+            // refill mcq selected options
             for (var section in form.sections) {
               for (var question in section.questions) {
                 if (question.text == questionText &&
                     question.options.contains(answer)) {
-                  final qKey =
-                      "${form.sections.indexOf(section)}-${section.questions.indexOf(question)}";
-                  _selectedAnswers[qKey] = answer;
+                  _selectedAnswers[
+                          "${form.sections.indexOf(section)}-${section.questions.indexOf(question)}"] =
+                      answer;
                 }
               }
             }
@@ -100,9 +112,11 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
 
     isLoading = false;
     setState(() {});
+
     return form;
   }
 
+  // ------------------- GROUP ANSWERS ---------------------
   Map<String, List<Map<String, String>>> _buildAnswerGroupedMap(
       FeedbackFormModel form) {
     final Map<String, List<Map<String, String>>> groupedAnswers = {};
@@ -113,66 +127,50 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
       for (var question in section.questions) {
         final key = "${section.title}-${question.text}";
         final answer = _answers[key];
+
         if (answer != null && answer.trim().isNotEmpty) {
           sectionList.add({
-            "question": question.text ?? 'Untitled Question',
+            "question": question.text ?? "Untitled Question",
             "answer": answer,
           });
         }
       }
 
       if (sectionList.isNotEmpty) {
-        groupedAnswers[section.title ?? 'Untitled Section'] = sectionList;
+        groupedAnswers[section.title ?? "Untitled Section"] = sectionList;
       }
     }
-
     return groupedAnswers;
   }
 
+  // ------------------- NEW ORDERED VALIDATION --------------------
   Future<void> submit(FeedbackFormModel form) async {
-    // NEW VALIDATION: Only MCQ questions are required
-    int requiredQuestions = 0;
-    int requiredAnswered = 0;
-
-    for (var section in form.sections) {
-      for (var question in section.questions) {
-        // MCQ = question.options not empty
-        if (question.options.isNotEmpty) {
-          requiredQuestions++;
-
-          final sectionTitle = section.title ?? "";
-          final questionText = question.text ?? "";
-          final combinedKey = "$sectionTitle-$questionText";
-
-          if (_answers[combinedKey] != null &&
-              _answers[combinedKey]!.trim().isNotEmpty) {
-            requiredAnswered++;
-          }
-        }
-      }
+    // YEAR REQUIRED
+    if (selectedYear == null) {
+      showBottomStickyMessage(context, "Please select your year.");
+      return;
     }
 
-    if (requiredAnswered < requiredQuestions) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: const Text("Incomplete Feedback",
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          content: const Text(
-            "Please answer all multiple-choice questions before submitting your feedback.",
-            style: TextStyle(fontSize: 14),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK", style: TextStyle(color: Colors.blue)),
-            ),
-          ],
-        ),
-      );
-      return;
+    // ORDERED VALIDATION FOR MCQ QUESTIONS
+    for (var section in form.sections) {
+      for (var question in section.questions) {
+        // comments are optional → skip
+        if (question.options.isEmpty) continue;
+
+        final sectionTitle = section.title ?? "";
+        final questionText = question.text ?? "";
+        final combinedKey = "$sectionTitle-$questionText";
+
+        final answer = _answers[combinedKey];
+
+        if (answer == null || answer.trim().isEmpty) {
+          showBottomStickyMessage(
+            context,
+            "\"${question.text}\" is required.",
+          );
+          return;
+        }
+      }
     }
 
     // GROUP ANSWERS
@@ -183,6 +181,7 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
       final userId = prefs.getString("userId") ?? "unknown_user";
       final userName = prefs.getString("userName") ?? "Anonymous";
       final collegeId = prefs.getString("collegeId") ?? "empty";
+
       final city = prefs.getString("city");
       final course = prefs.getString("course");
 
@@ -193,7 +192,8 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
         "answers": groupedAnswers,
         "collegeId": collegeId,
         "city": city,
-        "course": course
+        "course": course,
+        "year": selectedYear, // NEW FIELD
       };
 
       if (existingDocId != null) {
@@ -206,62 +206,48 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
       }
 
       showBottomStickyMessage(
-          context, "Your feedback has been submitted successfully. Thank you!");
+          context, "Your feedback has been submitted successfully.");
       submitted = true;
       setState(() {});
     } catch (e) {
-      showBottomStickyMessage(context, "Error while submitting feedback: $e");
+      showBottomStickyMessage(context, "Error submitting feedback: $e");
     }
   }
 
+  // ------------------- BOTTOM STICKY MESSAGE --------------------
   void showBottomStickyMessage(BuildContext context, String message) {
-    // If a message is already showing, remove it first
     _bottomMessageEntry?.remove();
 
     _bottomMessageEntry = OverlayEntry(
       builder: (context) => Positioned(
         left: 0,
         right: 0,
-        // bottom: 0,
         top: 40,
         child: Material(
           color: Colors.transparent,
-          child: AnimatedSlide(
-            duration: const Duration(milliseconds: 300),
-            offset: const Offset(0, 0),
-            child: Container(
-              // height: 120,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              margin: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: primaryDark,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, -2),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            margin: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: primaryDark,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(color: Colors.white, fontSize: 15),
                   ),
-                ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      message,
-                      style: const TextStyle(color: Colors.white, fontSize: 15),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      _bottomMessageEntry?.remove();
-                      _bottomMessageEntry = null;
-                    },
-                    child: const Icon(Icons.close, color: Colors.white),
-                  ),
-                ],
-              ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _bottomMessageEntry?.remove();
+                    _bottomMessageEntry = null;
+                  },
+                  child: const Icon(Icons.close, color: Colors.white),
+                ),
+              ],
             ),
           ),
         ),
@@ -271,142 +257,162 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
     Overlay.of(context).insert(_bottomMessageEntry!);
   }
 
+  // --------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          forceMaterialTransparency: true,
-          titleSpacing: 0,
-          leading: IconButton(
-            onPressed: () => kIsWeb
-                ? Get.rootDelegate.offNamed(AppRoutes.home)
-                : Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Feedback Form",
+          textAlign: TextAlign.left,
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            color: Colors.black,
           ),
         ),
-        body: FutureBuilder<FeedbackFormModel>(
-          future: _feedbackFormFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                  child: CircularProgressIndicator(
-                color: linearColor,
-              ));
-            }
-            if (snapshot.hasError) {
-              return Center(
-                child: Text("Error: ${snapshot.error}",
-                    style: const TextStyle(color: Colors.red)),
-              );
-            }
-            if (!snapshot.hasData) {
-              return const Center(child: Text("No feedback form found"));
-            }
+        backgroundColor: Colors.white,
+        forceMaterialTransparency: true,
+        leading: IconButton(
+          onPressed: () => kIsWeb
+              ? Get.rootDelegate.offNamed(AppRoutes.home)
+              : Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back),
+        ),
+      ),
+      body: FutureBuilder<FeedbackFormModel>(
+        future: _feedbackFormFuture,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator(color: linearColor));
+          }
 
-            final form = snapshot.data!;
+          final form = snapshot.data!;
 
-            return ListView(
+          return GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 18),
               children: [
-                // 🧾 Intro Header
-                Padding(
-                  padding: kIsWeb
-                      ? const EdgeInsets.symmetric(horizontal: 40)
-                      : const EdgeInsets.all(5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Profluent Hotelier – Feedback Form",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                const SizedBox(height: 10),
+                const Text(
+                  "Profluent Hotelier – Feedback Form",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 6),
+                Divider(),
+
+                // ----------------- YEAR SELECTION -----------------
+                const SizedBox(height: 10),
+                // ----------------- YEAR SELECTION -----------------
+                const SizedBox(height: 10),
+                Text(
+                  "Select Your Year",
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: ["1st Year", "2nd Year", "3rd Year"].map((year) {
+                    final isSelected = selectedYear == year;
+
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          selectedYear = year;
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(6),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(6),
+                          color:
+                              isSelected ? Colors.blue.shade50 : Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.15),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            )
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      RichText(
-                        text: TextSpan(
-                          style: const TextStyle(
-                              fontSize: 14, color: Colors.black87, height: 1.5),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            const TextSpan(
-                              text:
-                                  "We’d love to know your thoughts about your ongoing experience with the ",
+                            Icon(
+                              isSelected
+                                  ? Icons.check_box
+                                  : Icons.check_box_outline_blank,
+                              color: isSelected ? Colors.blue : Colors.grey,
+                              size: 18,
                             ),
-                            TextSpan(
-                              text: "Profluent Hotelier App. ",
+                            const SizedBox(width: 6),
+                            Text(
+                              year,
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: linearColor,
+                                fontSize: 12,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                color: isSelected
+                                    ? Colors.blue.shade900
+                                    : Colors.black87,
                               ),
-                            ),
-                            const TextSpan(
-                              text:
-                                  "Please share your honest feedback to help us enhance your learning journey.",
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      Divider(color: Colors.grey.shade400, thickness: 0.8),
-                    ],
-                  ),
+                    );
+                  }).toList(),
                 ),
+                Divider(color: Colors.grey.shade400, thickness: 0.8),
 
-                // 🧩 Feedback Sections
+                // --------------- FEEDBACK SECTIONS ----------------
                 ...List.generate(form.sections.length, (sectionIndex) {
                   final section = form.sections[sectionIndex];
-                  return Padding(
-                    padding: kIsWeb
-                        ? const EdgeInsets.symmetric(horizontal: 40)
-                        : const EdgeInsets.all(5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // const SizedBox(height: 10),
-                        Text(
-                          section.title ?? '',
-                          style: TextStyle(
-                            color: primaryDark,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        section.subTitle != null
-                            ? Text(
-                                section.subTitle ?? '',
-                                style: TextStyle(
-                                  color: Colors.black45,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              )
-                            : SizedBox.shrink(),
-                        const SizedBox(height: 6),
-                        ...List.generate(section.questions.length, (qIndex) {
-                          final question = section.questions[qIndex];
-                          final key = "$sectionIndex-$qIndex";
-                          final selectedOption = _selectedAnswers[key];
 
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: Column(
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 12),
+                      Text(section.title ?? "",
+                          style: TextStyle(
+                              color: primaryDark,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold)),
+                      if (section.subTitle != null)
+                        Text(section.subTitle ?? "",
+                            style: TextStyle(
+                                fontSize: 14, color: Colors.grey[700])),
+                      const SizedBox(height: 6),
+
+                      // -------- Questions Loop --------
+                      ...List.generate(section.questions.length, (qIndex) {
+                        final question = section.questions[qIndex];
+                        final key = "$sectionIndex-$qIndex";
+                        final selectedOption = _selectedAnswers[key];
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "${question.order}. ${question.text}",
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                                Text("${question.order}. ${question.text}",
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600)),
                                 const SizedBox(height: 8),
 
-                                // 🎯 Options or Comment Box
+                                // ---------- MCQ ----------
                                 if (question.options.isNotEmpty)
                                   Wrap(
                                     spacing: 8,
@@ -414,23 +420,17 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
                                     children: question.options.map((option) {
                                       final isSelected =
                                           selectedOption == option;
+
                                       return InkWell(
                                         onTap: () {
                                           setState(() {
                                             _selectedAnswers[key] = option;
 
-                                            final sectionTitle =
-                                                section.title ??
-                                                    'Untitled Section';
-                                            final questionText =
-                                                question.text ??
-                                                    'Untitled Question';
                                             final combinedKey =
-                                                "$sectionTitle-$questionText";
+                                                "${section.title}-${question.text}";
                                             _answers[combinedKey] = option;
                                           });
                                         },
-                                        borderRadius: BorderRadius.circular(6),
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 12, vertical: 8),
@@ -449,46 +449,30 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
                                                     ? Icons.check_box
                                                     : Icons
                                                         .check_box_outline_blank,
+                                                size: 18,
                                                 color: isSelected
                                                     ? Colors.blue
                                                     : Colors.grey,
-                                                size: 18,
                                               ),
                                               const SizedBox(width: 6),
-                                              Text(
-                                                option,
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: isSelected
-                                                      ? Colors.blue.shade900
-                                                      : Colors.black87,
-                                                  fontWeight: isSelected
-                                                      ? FontWeight.w600
-                                                      : FontWeight.w400,
-                                                ),
-                                              ),
+                                              Text(option),
                                             ],
                                           ),
                                         ),
                                       );
                                     }).toList(),
                                   )
+
+                                // ---------- COMMENT ----------
                                 else
                                   Builder(builder: (context) {
-                                    final sectionTitle =
-                                        section.title ?? 'Untitled Section';
-                                    final questionText =
-                                        question.text ?? 'Untitled Question';
                                     final combinedKey =
-                                        "$sectionTitle-$questionText";
+                                        "${section.title}-${question.text}";
 
-                                    if (!_commentControllers
-                                        .containsKey(combinedKey)) {
-                                      _commentControllers[combinedKey] =
-                                          TextEditingController(
-                                              text:
-                                                  _answers[combinedKey] ?? '');
-                                    }
+                                    _commentControllers.putIfAbsent(
+                                        combinedKey,
+                                        () => TextEditingController(
+                                            text: _answers[combinedKey] ?? ""));
 
                                     final controller =
                                         _commentControllers[combinedKey]!;
@@ -499,82 +483,97 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
                                         borderRadius: BorderRadius.circular(10),
                                         boxShadow: [
                                           BoxShadow(
-                                            color:
-                                                Colors.grey.withOpacity(0.25),
-                                            spreadRadius: 1,
                                             blurRadius: 5,
-                                            offset: const Offset(0, 2),
-                                          ),
+                                            color: Colors.black26,
+                                          )
                                         ],
                                       ),
                                       child: TextField(
-                                        controller: controller,
                                         cursorColor: Colors.black,
-                                        cursorWidth: 1.3,
+                                        controller: controller,
+                                        maxLines: 3,
+                                        onChanged: (value) =>
+                                            _answers[combinedKey] = value,
                                         decoration: InputDecoration(
                                           hintText: "Enter your comments...",
                                           hintStyle: TextStyle(
-                                              color: Colors.grey.shade500,
-                                              fontSize: 13),
-                                          filled: true,
-                                          fillColor: Colors.white,
+                                              color: Colors.grey.shade400,
+                                              fontSize: 14),
+                                          border: InputBorder.none,
                                           contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 14, vertical: 12),
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            borderSide: BorderSide.none,
-                                          ),
+                                              const EdgeInsets.all(12),
                                         ),
-                                        maxLines: 3,
-                                        style: const TextStyle(
-                                            fontSize: 13, color: Colors.black),
-                                        onChanged: (value) {
-                                          _answers[combinedKey] = value;
-                                        },
                                       ),
                                     );
                                   }),
-                              ],
-                            ),
-                          );
-                        }),
-                        Divider(color: Colors.grey.shade400, thickness: 0.8),
-                        if (form.sections.length - 1 == sectionIndex)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 25),
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: SizedBox(
-                                width: displayWidth(context),
-                                height: 45,
-                                child: submitted
-                                    ? Center(
-                                        child: Text(
-                                          "Feedback Submitted",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      )
-                                    : CustomButton(
-                                        onPressed: () => submit(form),
-                                        buttonText: existingDocId != null
-                                            ? "Update Feedback"
-                                            : "Submit Feedback",
-                                      ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+                              ]),
+                        );
+                      }),
+
+                      Divider(),
+
+                      // if (form.sections.length - 1 == sectionIndex)
+                      //   Padding(
+                      //     padding: const EdgeInsets.only(bottom: 25),
+                      //     child: SizedBox(
+                      //       height: 45,
+                      //       width: displayWidth(context),
+                      //       child: submitted
+                      //           ? const Center(
+                      //               child: Text("Feedback Submitted",
+                      //                   style: TextStyle(
+                      //                       color: Colors.black,
+                      //                       fontSize: 16,
+                      //                       fontWeight: FontWeight.w500)),
+                      //             )
+                      //           : CustomButton(
+                      //               onPressed: () => submit(form),
+                      //               buttonText: existingDocId != null
+                      //                   ? "Update Feedback"
+                      //                   : "Submit Feedback",
+                      //             ),
+                      //     ),
+                      //   )
+                    ],
                   );
                 }),
               ],
-            );
-          },
+            ),
+          );
+        },
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0, -2),
+              blurRadius: 6,
+            )
+          ],
+        ),
+        child: SizedBox(
+          height: 45,
+          width: double.infinity,
+          child: submitted
+              ? const Center(
+                  child: Text(
+                    "Feedback Submitted",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                )
+              : CustomButton(
+                  onPressed: () => submit(form),
+                  buttonText: existingDocId != null
+                      ? "Update Feedback"
+                      : "Submit Feedback",
+                ),
         ),
       ),
     );
