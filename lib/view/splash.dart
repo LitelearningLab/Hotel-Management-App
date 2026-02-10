@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,6 +25,16 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+    // Delay until build completes
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final results = await Connectivity().checkConnectivity();
+      bool isConnected = results.any((e) => e != ConnectivityResult.none);
+
+      if (!isConnected) {
+        Get.toNamed(AppRoutes.noInternet);
+        return;
+      }
+    });
     // FirebaseUploader firebaseUploader = FirebaseUploader();
     // firebaseUploader.uploadJsonData(
     //     'assets/EnglishLab.json', 'FrenchLabCollection');
@@ -42,46 +53,49 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> startTimer() async {
-    print("A - STARTING startTimer function."); // Log A
+    // Check internet at app launch
+    final connectivity = await Connectivity().checkConnectivity();
+    bool hasInternet = connectivity.any((e) => e != ConnectivityResult.none);
 
-    // Fetch SharedPreferences early
+    if (!hasInternet) {
+      // Go to No Internet screen immediately
+      Get.offAllNamed(AppRoutes.noInternet);
+      return; // Stop further navigation
+    }
+
+    print("A - STARTING startTimer function.");
+
     final prefs = await SharedPreferences.getInstance();
     final email = prefs.getString('email');
     final password = prefs.getString('password');
 
-    // CRITICAL: Log the state immediately after fetching data
-    print(
-        'B - SharedPreferences Check: Email is: ${email != null ? 'SET (${email.length} chars) $email' : 'NULL'}'); // Log B
-    print(
-        'C - SharedPreferences Check: Password is: ${password != null ? 'SET (${password.length} chars) $password' : 'NULL'}'); // Log C
+    print('B - Email: $email');
+    print('C - Password: $password');
 
-    await Future.delayed(Duration(seconds: 2)); // Wait for the splash animation
-
-    print("D - DELAY FINISHED. Navigating now."); // Log D
+    await Future.delayed(Duration(seconds: 2));
 
     if (email != null && password != null) {
-      bool session = true; // default for mobile
+      bool session = true;
 
       if (kIsWeb) {
-        // Only run login session logic on Web
         session = await SessionService.loginUser(email, password);
       }
-      print('E - Conditional check TRUE: Navigating to HOME'); // Log E
+
       if (session) {
         kIsWeb
             ? Get.rootDelegate.offNamed(AppRoutes.home)
             : Get.offAllNamed(AppRoutes.home);
       } else {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => BlockedDeviceScreen(
-                      reason:
-                          "Your account is already active on another device.",
-                    )));
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlockedDeviceScreen(
+              reason: "Your account is already active on another device.",
+            ),
+          ),
+        );
       }
     } else {
-      print("F - Conditional check FALSE: Navigating to LOGIN"); // Log F
       kIsWeb
           ? Get.rootDelegate.offNamed(AppRoutes.login)
           : Get.offAllNamed(AppRoutes.login);

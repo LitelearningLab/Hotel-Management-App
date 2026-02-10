@@ -32,6 +32,7 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
   String? existingDocId;
   bool isLoading = true;
   var form;
+  final Set<String> missingFields = {};
 
   // ------------- NEW YEAR FIELD ---------------
   String? selectedYear;
@@ -151,10 +152,13 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
       return;
     }
 
-    // ORDERED VALIDATION FOR MCQ QUESTIONS
+    missingFields.clear(); // reset
+
+    bool hasError = false;
+
     for (var section in form.sections) {
       for (var question in section.questions) {
-        // comments are optional → skip
+        // skip comment-only questions
         if (question.options.isEmpty) continue;
 
         final sectionTitle = section.title ?? "";
@@ -164,13 +168,22 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
         final answer = _answers[combinedKey];
 
         if (answer == null || answer.trim().isEmpty) {
-          showBottomStickyMessage(
-            context,
-            "\"${question.text}\" is required.",
-          );
-          return;
+          missingFields.add(questionText); // store missing question
+          hasError = true;
         }
       }
+    }
+
+// YEAR CHECK
+    if (selectedYear == null) {
+      missingFields.add("Select Your Year");
+      hasError = true;
+    }
+
+    if (hasError) {
+      _showMissingFieldsPopup(); // new popup method
+      setState(() {}); // refresh UI to show red marks
+      return;
     }
 
     // GROUP ANSWERS
@@ -212,6 +225,49 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
     } catch (e) {
       showBottomStickyMessage(context, "Error submitting feedback: $e");
     }
+  }
+
+  void _showMissingFieldsPopup() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Required Fields Missing"),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView(
+              shrinkWrap: true,
+              children: missingFields.map((item) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error, color: Colors.red, size: 18),
+                      SizedBox(width: 8),
+                      Expanded(
+                          child: Text(
+                        item,
+                        style: TextStyle(fontWeight: FontWeight.w400),
+                      )),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actionsPadding: EdgeInsets.all(8),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                "OK",
+                style: TextStyle(color: linearColor),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // ------------------- BOTTOM STICKY MESSAGE --------------------
@@ -327,6 +383,7 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
                       onTap: () {
                         setState(() {
                           selectedYear = year;
+                          missingFields.remove("Select Your Year");
                         });
                       },
                       borderRadius: BorderRadius.circular(6),
@@ -406,10 +463,25 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("${question.order}. ${question.text}",
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600)),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "${question.order}. ${question.text}",
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+
+                                    // RED ! INDICATOR
+                                    if (missingFields.contains(question.text))
+                                      Icon(Icons.error,
+                                          color: Colors.red, size: 22),
+                                  ],
+                                ),
                                 const SizedBox(height: 8),
 
                                 // ---------- MCQ ----------
@@ -429,6 +501,9 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
                                             final combinedKey =
                                                 "${section.title}-${question.text}";
                                             _answers[combinedKey] = option;
+
+                                            // REMOVE ERROR WHEN ANSWERED
+                                            missingFields.remove(question.text);
                                           });
                                         },
                                         child: Container(
@@ -492,8 +567,14 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
                                         cursorColor: Colors.black,
                                         controller: controller,
                                         maxLines: 3,
-                                        onChanged: (value) =>
-                                            _answers[combinedKey] = value,
+                                        onChanged: (value) {
+                                          _answers[combinedKey] = value;
+
+                                          if (value.trim().isNotEmpty) {
+                                            missingFields.remove(question.text);
+                                          }
+                                          setState(() {});
+                                        },
                                         decoration: InputDecoration(
                                           hintText: "Enter your comments...",
                                           hintStyle: TextStyle(

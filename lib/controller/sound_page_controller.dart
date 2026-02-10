@@ -25,6 +25,9 @@ class SoundPageController extends GetxController {
   int selected = 0;
   bool pageLoading = true;
   late SoundSubcategory soundModel;
+  RxInt currentPlayingIndex = (-1).obs; // -1 means nothing is playing
+  RxBool isPlay = false.obs;
+  RxBool isPlayAllRunning = false.obs;
 
   @override
   void onInit() {
@@ -63,6 +66,134 @@ class SoundPageController extends GetxController {
     super.onClose();
   }
 
+  Future<void> playItem(int index) async {
+    isLoading = true;
+    update();
+
+    currentPlayingIndex.value = index;
+    isPlay.value = true;
+
+    String url = index == 0
+        ? soundModel.links.v1
+        : index == 1
+            ? soundModel.links.v2
+            : index == 2
+                ? soundModel.links.v3
+                : index == 3
+                    ? soundModel.links.v4
+                    : soundModel.links.v5;
+
+    // Dispose previous controller
+    if (videoPlayerController.value.isInitialized) {
+      await videoPlayerController.pause();
+      await videoPlayerController.dispose();
+    }
+
+    // Load new video
+    if (kIsWeb) {
+      videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url));
+    } else {
+      final file = await DefaultCacheManager().getSingleFile(url);
+      videoPlayerController = VideoPlayerController.file(file);
+    }
+
+    await videoPlayerController.initialize();
+    await videoPlayerController.setLooping(false);
+    await videoPlayerController.setVolume(1.0);
+    await videoPlayerController.play();
+
+    // Detect video end
+    videoPlayerController.addListener(() {
+      if (videoPlayerController.value.position >=
+          videoPlayerController.value.duration) {
+        isPlay.value = false;
+        currentPlayingIndex.value = -1;
+        update();
+      }
+    });
+
+    isLoading = false;
+    update();
+  }
+
+  Future<void> playAllSequentially() async {
+    isPlayAllRunning.value = true;
+    update();
+
+    for (int i = 0; i < 5; i++) {
+      if (!isPlayAllRunning.value) {
+        // User pressed STOP
+        stopAll();
+        return;
+      }
+
+      await playItem(i);
+
+      await _waitUntilVideoEnds();
+
+      if (!isPlayAllRunning.value) {
+        // User pressed STOP during playback
+        stopAll();
+        return;
+      }
+    }
+
+    // Finished all videos automatically
+    stopAll();
+  }
+
+  void togglePlayPause(int index) async {
+    // If the same item is playing → toggle play/pause
+    if (currentPlayingIndex.value == index) {
+      if (isPlay.value) {
+        await videoPlayerController.pause();
+        isPlay.value = false;
+      } else {
+        await videoPlayerController.play();
+        isPlay.value = true;
+      }
+      update();
+      return;
+    }
+
+    // If switching to a new item
+    isLoading = true;
+    update();
+
+    await playItem(index);
+
+    isLoading = false;
+    update();
+  }
+
+  Future<void> _waitUntilVideoEnds() async {
+    Completer completer = Completer();
+
+    void listener() {
+      if (!videoPlayerController.value.isPlaying &&
+          videoPlayerController.value.position >=
+              videoPlayerController.value.duration) {
+        completer.complete();
+        videoPlayerController.removeListener(listener);
+      }
+    }
+
+    videoPlayerController.addListener(listener);
+    return completer.future;
+  }
+
+  void stopAll() async {
+    isPlayAllRunning.value = false;
+    isPlay.value = false;
+    currentPlayingIndex.value = -1;
+
+    if (videoPlayerController.value.isInitialized) {
+      await videoPlayerController.pause();
+    }
+
+    update();
+  }
+
   void showPopupAtTap(Offset tapPosition) {
     final overlay = Get.overlayContext!;
     late OverlayEntry entry;
@@ -78,7 +209,7 @@ class SoundPageController extends GetxController {
     Overlay.of(overlay).insert(entry);
   }
 
-  void onClick(int index, Offset tapPosition) async {
+  void onClick(int index) async {
     isLoading = true;
     isPlaying = false;
     selected = index;
@@ -87,7 +218,8 @@ class SoundPageController extends GetxController {
       await videoPlayerController.pause();
       await videoPlayerController.dispose();
     }
-
+    print(
+        "index clicked on clikc $index --------------------------------------------------------------- ${index >= 0 && index <= 4}  ");
     // Handle based on index
     String? url;
     if (index >= 0 && index <= 4) {
@@ -136,7 +268,8 @@ class SoundPageController extends GetxController {
       refreshScreen(selected);
       return;
     }
-
+    isPlaying = true;
+    isLoading = false;
     update();
   }
 
@@ -185,6 +318,7 @@ class SoundPageController extends GetxController {
     isControllerInitializing = false;
     isLoading = false;
     pageLoading = false;
+    // isPlaying = false;
     update();
 
     return videoPlayerController;

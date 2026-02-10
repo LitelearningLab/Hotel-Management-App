@@ -372,7 +372,7 @@ class SentenceLabSubCatController extends GetxController {
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: getWidgetWidth(width: 4)),
           child: SizedBox(
-            width: getWidgetWidth(width: 18),
+            width: kIsWeb ? 18 : getWidgetWidth(width: 18),
             height: getWidgetHeight(height: 18),
             child:
                 CircularProgressIndicator(strokeWidth: 2, color: linearColor),

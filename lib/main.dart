@@ -82,40 +82,21 @@ class _MyAppState extends State<MyApp> {
   final Connectivity _connectivity = Connectivity();
   String? lastRoute;
 
-  // void checkAuth() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final email = prefs.getString('email');
-  //   final password = prefs.getString('password');
-
-  //   if (email != null && password != null) {
-  //     Get.rootDelegate.offNamed(AppRoutes.home);
-  //   } else {
-  //     Get.rootDelegate.offNamed(AppRoutes.login);
-  //   }
-  // }
-
   @override
   void initState() {
     super.initState();
 
-    _connectivity.onConnectivityChanged
-        .listen((List<ConnectivityResult> results) {
+    _connectivity.onConnectivityChanged.listen((results) {
       bool isConnected =
           results.any((result) => result != ConnectivityResult.none);
 
       if (!isConnected) {
-        lastRoute = Get.currentRoute;
-        if (lastRoute == AppRoutes.inAppWebView) return;
-        if (lastRoute == AppRoutes.noInternet) return;
-
-        isOnNoInternetPage = true;
-        // Get.toNamed(AppRoutes.noInternet);
+        if (Get.currentRoute != AppRoutes.noInternet) {
+          Get.toNamed(AppRoutes.noInternet);
+        }
       } else {
-        if (isOnNoInternetPage) {
-          isOnNoInternetPage = false;
-          if (Get.currentRoute == AppRoutes.noInternet) {
-            Get.back();
-          }
+        if (Get.currentRoute == AppRoutes.noInternet) {
+          Get.back();
         }
       }
     });

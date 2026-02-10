@@ -25,6 +25,19 @@ class HomeController extends GetxController {
   late String userName;
   List<Map<String, dynamic>> homeRecentHistory = [];
   bool recentHistoryLoaded = true;
+  OverlayEntry? _bottomMessageEntry;
+  Set<String> missingFields = {};
+  bool feedbackFormLoading = false;
+
+  final Map<String, String> practiceCollections = {
+    "FrontOfficeTimeStamp": "Front Office",
+    "FoodAndBeverageTimeStamp": "Food & Beverage Service",
+    "FoodProductionTimeStamp": "Food Production",
+    "HouseKeepingTimeStamp": "Housekeeping",
+    "InteractiveSimulationTimeStamp": "Interactive Simulations",
+    "LanguageLabTimeStamp": "Language Lab",
+    "ContentLabTimeStamp": "Content Lab",
+  };
 
   List<String> cardNames = [
     "Front Office Management",
@@ -388,4 +401,279 @@ class HomeController extends GetxController {
       print("Unsupported platform");
     }
   }
+
+  Future<int> getUserTotalTimeSpent() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString("userId") ?? "";
+    final userEmail = prefs.getString("userEmail") ?? "";
+
+    if (userId.isEmpty && userEmail.isEmpty) {
+      throw Exception("User ID or Email missing in SharedPreferences.");
+    }
+
+    final firestore = FirebaseFirestore.instance;
+
+    QuerySnapshot query = await firestore
+        .collection("UserNode")
+        .where("_id", isEqualTo: userId)
+        .limit(1)
+        .get();
+
+    if (query.docs.isEmpty && userEmail.isNotEmpty) {
+      query = await firestore
+          .collection("UserNode")
+          .where("email", isEqualTo: userEmail)
+          .limit(1)
+          .get();
+    }
+
+    if (query.docs.isEmpty) return 0;
+
+    final data = query.docs.first.data() as Map<String, dynamic>;
+    return data["timeSpent"] is int ? data["timeSpent"] : 0;
+  }
+
+  void showBottomStickyMessage(BuildContext context, String message) {
+    // Remove previous message if already showing
+    _bottomMessageEntry?.remove();
+
+    _bottomMessageEntry = OverlayEntry(
+      builder: (context) {
+        return Positioned(
+          left: 0,
+          right: 0,
+          // top:, // you can change to bottom: 0 if needed
+          bottom: 50,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.85),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.25),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  )
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      message,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          height: 1.4,
+                          fontWeight: FontWeight.w400),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _bottomMessageEntry?.remove();
+                      _bottomMessageEntry = null;
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.only(left: 8),
+                      child: Icon(Icons.close, size: 18, color: Colors.white),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    Overlay.of(context).insert(_bottomMessageEntry!);
+
+    // // Auto dismiss after 3 seconds
+    // Future.delayed(const Duration(seconds: 3), () {
+    //   if (_bottomMessageEntry != null) {
+    //     _bottomMessageEntry?.remove();
+    //     _bottomMessageEntry = null;
+    //   }
+    // });
+  }
+
+  Future<List<PracticeIssue>> getIncompletePracticeSections() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString("userId") ?? "";
+
+    if (userId.isEmpty) {
+      throw Exception("User ID missing in SharedPreferences.");
+    }
+
+    final firestore = FirebaseFirestore.instance;
+    List<PracticeIssue> missing = [];
+
+    for (var entry in practiceCollections.entries) {
+      final collectionName = entry.key;
+      final moduleName = entry.value;
+
+      final query = await firestore
+          .collection(collectionName)
+          .where("userId", isEqualTo: userId)
+          .get();
+
+      if (query.docs.isEmpty) {
+        missing.add(PracticeIssue(moduleName, 0));
+        continue;
+      }
+
+      int total = 0;
+
+      for (var doc in query.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final int time = (data["totalPracticeTime"] ?? 0);
+        total += time;
+      }
+
+      if (total < 900) {
+        missing.add(PracticeIssue(moduleName, total));
+      }
+    }
+
+    return missing;
+  }
+
+  void showMissingFieldsPopup(
+      BuildContext context, List<PracticeIssue> issues) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("More Practice Needed"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RichText(
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                    height: 1.3,
+                  ),
+                  children: [
+                    const TextSpan(
+                      text:
+                          "To give meaningful feedback, please use each module for at least ",
+                    ),
+                    TextSpan(
+                      text: "15 minutes",
+                      style: TextStyle(
+                        color: linearColor,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const TextSpan(
+                      text:
+                          ". This helps us understand your real experience and improve the app better for you.",
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: issues.length,
+                  itemBuilder: (context, index) {
+                    final issue = issues[index];
+
+                    final usedFormatted = formatDuration(issue.timeSpent);
+                    const int requiredSeconds = 900;
+                    final remainingSeconds =
+                        (requiredSeconds - issue.timeSpent).clamp(0, 60000);
+                    final remainingFormatted = formatDuration(remainingSeconds);
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.error, color: Colors.red, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: RichText(
+                              text: TextSpan(
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    height: 1.3),
+                                children: [
+                                  TextSpan(
+                                    text: "${issue.moduleName}\n",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  const TextSpan(text: "Used: "),
+                                  TextSpan(
+                                    text: "$usedFormatted ",
+                                    style: TextStyle(
+                                      color: linearColor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const TextSpan(text: "• Remaining: "),
+                                  TextSpan(
+                                    text: "$remainingFormatted",
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+          actionsPadding: EdgeInsets.all(8),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("OK", style: TextStyle(color: linearColor)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String formatDuration(int seconds) {
+    final d = Duration(seconds: seconds);
+    String mm = d.inMinutes.toString().padLeft(2, '0');
+    String ss = (d.inSeconds % 60).toString().padLeft(2, '0');
+    return "$mm:$ss";
+  }
+
+  String formatTime(int seconds) {
+    final minutes = seconds ~/ 60;
+    final secs = seconds % 60;
+    return "${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}";
+  }
+}
+
+class PracticeIssue {
+  final String moduleName;
+  final int timeSpent;
+
+  PracticeIssue(this.moduleName, this.timeSpent);
 }
