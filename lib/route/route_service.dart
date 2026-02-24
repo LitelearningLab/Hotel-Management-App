@@ -38,8 +38,8 @@ class RouteService {
           ),
           GetPage(
               name: AppRoutes.home,
-              page: () => const Home(),
-              binding: InitialBinding(),
+              page: () =>  Home(),
+              binding: HomeBinding(),
               middlewares: [AuthMiddleware()]),
           GetPage(
             name: AppRoutes.login,
@@ -142,8 +142,8 @@ class RouteService {
           ),
           GetPage(
             name: AppRoutes.home,
-            page: () => const Home(),
-            binding: InitialBinding(),
+            page: () =>  Home(),
+            binding: HomeBinding(),
             // middlewares: [AuthMiddleware()],
           ),
           GetPage(

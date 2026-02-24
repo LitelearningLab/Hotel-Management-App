@@ -22,7 +22,7 @@ import 'package:url_launcher/url_launcher.dart';
 class HomeController extends GetxController {
   List<dynamic> categories = [];
   late UniversityModel universityModel;
-  late String userName;
+   String userName='';
   List<Map<String, dynamic>> homeRecentHistory = [];
   bool recentHistoryLoaded = true;
   OverlayEntry? _bottomMessageEntry;
@@ -198,7 +198,7 @@ class HomeController extends GetxController {
   }
 
   Future<void> fetchCollegeSyllabus() async {
-    await loadRecentHistory();
+     loadRecentHistory();
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString("userId") ?? "";
     userName = prefs.getString("userName") ?? "";
@@ -214,7 +214,7 @@ class HomeController extends GetxController {
           FirebaseFirestore.instance.collection('UserNode').doc(userId);
       final userSnapshot = await userRef.get();
       final userData = userSnapshot.data() ?? {};
-      final String collegeId = userData['collegeId'] ?? '';
+      final String collegeId = userData['companyid'] ?? userData['collegeId'] ??'';
       log("College ID: $collegeId");
       if (collegeId.isNotEmpty) {
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -312,6 +312,7 @@ class HomeController extends GetxController {
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.clear();
                     debugPrint("printing the clickings");
+                    SessionService.logoutUser();
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       kIsWeb
                           ? Get.rootDelegate.offNamed(AppRoutes.login)

@@ -1,22 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:flutter_launcher_icons/xml_templates.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+
 import 'package:hotelmanagementapp/controller/sentence_lab_sub_cat_controller.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
-import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
-import 'package:intl/intl.dart';
 
 class SentenceLabSubCat extends StatefulWidget {
-  SentenceLabSubCat({super.key});
+  const SentenceLabSubCat({super.key});
 
   @override
   State<SentenceLabSubCat> createState() => _SentenceLabSubCatState();
@@ -33,412 +31,353 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<SentenceLabSubCatController>(builder: (controller) {
-      return PopScope(
-        onPopInvoked: (didPop) {
-          stopTimerMainCategory();
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            forceMaterialTransparency: true,
-            surfaceTintColor: Colors.white,
-            shadowColor: Colors.white,
-            backgroundColor: Colors.white,
-            titleSpacing: 0,
-            title: controller.isSearching
-                ? TextField(
-                    cursorColor: Colors.grey,
-                    controller: controller.searchController,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      hintText: 'Search...',
-                      border: InputBorder.none,
-                      hintStyle: TextStyle(color: Colors.grey),
-                    ),
-                    onChanged: (value) {
-                      controller.searchSentences(value);
-                    },
-                  )
-                : Padding(
-                    padding: EdgeInsets.only(right: getWidgetWidth(width: 12)),
-                    child: Text(
-                      controller.title,
-                      maxLines: 2,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-            leading: IconButton(
-              onPressed: () {
-                if (controller.isSearching) {
-                  controller.clearSearch();
-                } else {
-                  if (kIsWeb) {
-                    final box = GetStorage();
-                    final saved = box.read(AppRoutes.sentenceLabSub) ?? {};
-                    Get.rootDelegate.offNamed(
-                      AppRoutes.sentenceLabSub,
-                      arguments: {
-                        "title": saved['title'] ?? "",
-                        "subcategories": saved['subcategories'] ?? [],
-                      },
-                    );
-                  } else {
-                    Navigator.pop(context);
-                  }
-                }
-              },
-              icon:
-                  Icon(controller.isSearching ? Icons.close : Icons.arrow_back),
-            ),
-            actions: [
-              PopupMenuButton<String>(
-                color: Colors.white,
-                onSelected: (value) {
-                  controller.selectedMenuOption = value;
+    return GetBuilder<SentenceLabSubCatController>(
+      builder: (controller) {
+        return PopScope(
+          onPopInvoked: (_) => stopTimerMainCategory(),
+          child: Scaffold(
+            backgroundColor: const Color(0xFFF8FAFC),
 
-                  if (value == 'priority') {
-                    controller.filterByDownloadStatus("downloaded");
-                  } else if (value == 'all_priority') {
-                    controller.clearFilter();
-                    // controller.applyDownloadedFilter(false);
-                  } else if (value == 'search') {
-                    controller.isSearching = true;
-                  }
+            // ===================== APP BAR =====================
+            appBar: _buildAppBar(controller),
 
-                  controller.update();
-                },
-                itemBuilder: (BuildContext context) => [
-                  PopupMenuItem<String>(
-                    value: 'search',
-                    child: Text(
-                      'Search',
-                      style: TextStyle(
-                        fontWeight: controller.selectedMenuOption == 'search'
-                            ? FontWeight.w600
-                            : FontWeight.normal,
-                        color: controller.selectedMenuOption == 'search'
-                            ? Colors.black
-                            : Colors.grey[800],
-                      ),
-                    ),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'priority',
-                    child: Text(
-                      'Filter Priority',
-                      style: TextStyle(
-                        fontWeight: controller.selectedMenuOption == 'priority'
-                            ? FontWeight.w600
-                            : FontWeight.normal,
-                        color: controller.selectedMenuOption == 'priority'
-                            ? Colors.black
-                            : Colors.grey[800],
-                      ),
-                    ),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'all_priority',
-                    child: Text(
-                      'Clear Filter',
-                      style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          body: controller.isLoading
-              ? CircularProgressIndicator()
-              : Column(
-                  children: [
-                    if (controller.searchController.text.isNotEmpty)
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: getWidgetWidth(width: 12)),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Search Results for: ${controller.searchTerm}",
-                            style: TextStyle(
-                              fontSize: kText.scale(13),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+            // ===================== BODY =====================
+            body: controller.isLoading
+                ? const Center(
+                    child:
+                        SizedBox(width: 14, child: CircularProgressIndicator()))
+                : Column(
+                    children: [
+                      if (controller.searchController.text.isNotEmpty &&
+                          controller.searchController.text.trim() != "")
+                        _searchResultLabel(controller),
+                      Expanded(
+                        child: Center(
+                          child: _buildContent(controller),
                         ),
                       ),
-                    controller.subcategories.isEmpty
-                        ? SizedBox(
-                            height: getWidgetHeight(height: 550),
-                            child: Center(
-                              child: Text(
-                                  controller.searchController.text.isNotEmpty
-                                      ? "No Search Result Found"
-                                      : "No Data Found"),
-                            ),
-                          )
-                        : Expanded(
-                            child: ListView.builder(
-                              padding: EdgeInsets.symmetric(
-                                vertical: getWidgetHeight(height: 10),
-                                horizontal: getWidgetWidth(width: 10),
-                              ),
-                              itemCount: controller.subcategories.length,
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                SubCategoryModel subCategory =
-                                    controller.subcategories[index];
-                                String? subname = subCategory.id;
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      toBeginningOfSentenceCase(subname) ?? "",
-                                      style: GoogleFonts.poppins(
-                                        color: linearColor,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: NeverScrollableScrollPhysics(),
-                                      itemCount: subCategory.sentence.length,
-                                      itemBuilder: (context, subIndex) {
-                                        final sentence =
-                                            subCategory.sentence[subIndex];
-                                        final isExpanded = expandedIndex ==
-                                            index * 1000 + subIndex;
+                    ],
+                  ),
+          ),
+        );
+      },
+    );
+  }
 
-                                        return GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              expandedIndex = isExpanded
-                                                  ? -1
-                                                  : index * 1000 + subIndex;
-                                            });
-                                          },
-                                          child: Container(
-                                            margin: EdgeInsets.symmetric(
-                                                vertical:
-                                                    getWidgetHeight(height: 6)),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.1),
-                                                  offset: const Offset(0, 4),
-                                                  blurRadius: 10,
+  // ==========================================================
+  // APP BAR
+  // ==========================================================
+  AppBar _buildAppBar(SentenceLabSubCatController controller) {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      titleSpacing: 0,
+      title: controller.isSearching
+          ? TextField(
+              controller: controller.searchController,
+              autofocus: true,
+              cursorColor: Colors.black,
+              decoration: const InputDecoration(
+                hintText: "Search...",
+                border: InputBorder.none,
+              ),
+              onChanged: controller.searchSentences,
+            )
+          : Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Text(
+                controller.title,
+                maxLines: 2,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+      leading: IconButton(
+        icon: Icon(
+          controller.isSearching ? Icons.close : Icons.arrow_back,
+        ),
+        onPressed: () {
+          if (controller.isSearching) {
+            controller.clearSearch();
+          } else {
+            mianCategoryTitile = controller.mainCategoryTitle;
+            subCategoryTitle = controller.title;
+            activityName = "Sentence Lab";
+            timestampIndex = controller.index;
+            sessionName = controller.title;
+            if (kDebugMode) {
+              print("Session Name Set To: $sessionName");
+              print(
+                  "Main Category: $mianCategoryTitile, Sub Category: $subCategoryTitle, Index: $timestampIndex");
+            }
+            stopTimerMainCategory();
+            if (kIsWeb) {
+              final saved = GetStorage().read(AppRoutes.sentenceLabSub) ?? {};
+              Get.rootDelegate.offNamed(
+                AppRoutes.sentenceLabSub,
+                arguments: {
+                  "title": saved['title'] ?? "",
+                  "subcategories": saved['subcategories'] ?? [],
+                },
+              );
+            } else {
+              Navigator.pop(Get.context!);
+            }
+          }
+        },
+      ),
+      actions: [
+        PopupMenuButton<String>(
+          color: Colors.white,
+          onSelected: (value) {
+            controller.selectedMenuOption = value;
+            if (value == 'priority') {
+              controller.filterByDownloadStatus("downloaded");
+            } else if (value == 'all_priority') {
+              controller.clearFilter();
+            } else if (value == 'search') {
+              controller.isSearching = true;
+            }
+            controller.update();
+          },
+          itemBuilder: (_) => const [
+            PopupMenuItem(value: 'search', child: Text('Search')),
+            PopupMenuItem(value: 'priority', child: Text('Filter Priority')),
+            PopupMenuItem(value: 'all_priority', child: Text('Clear Filter')),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ==========================================================
+  // CONTENT
+  // ==========================================================
+  Widget _buildContent(SentenceLabSubCatController controller) {
+    if (controller.subcategories.isEmpty) {
+      return const Center(child: Text("No Data Found"));
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+      itemCount: controller.subcategories.length,
+      itemBuilder: (context, index) {
+        final subCategory = controller.subcategories[index];
+        final title = toBeginningOfSentenceCase(subCategory.id ?? "") ?? "";
+
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 140),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.poppins(
+                  color: linearColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: subCategory.sentence.length,
+                itemBuilder: (context, subIndex) {
+                  final sentence = subCategory.sentence[subIndex];
+                  final id = index * 1000 + subIndex;
+                  final isExpanded = expandedIndex == id;
+
+                  return _HoverSentenceCard(
+                    expanded: isExpanded,
+                    child: InkWell(
+                      focusColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () {
+                        setState(() {
+                          expandedIndex = isExpanded ? -1 : id;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: const Color(0xFFE5E7EB),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    sentence.text,
+                                    style: TextStyle(
+                                      fontFamily: Keys.fontFamily,
+                                    ),
+                                  ),
+                                ),
+                                if (!kIsWeb)
+                                  IconButton(
+                                    onPressed: () =>
+                                        controller.saveUpdate(index, subIndex),
+                                    icon: controller.buildDownloadIcon(
+                                        index, subIndex),
+                                  ),
+                              ],
+                            ),
+
+                            // ================= EXPAND =================
+                            AnimatedSize(
+                              duration: const Duration(milliseconds: 250),
+                              curve: Curves.easeOut,
+                              child: isExpanded
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(top: 12),
+                                      child: Column(
+                                        children: [
+                                          const Divider(height: 16),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              InkWell(
+                                                focusColor: Colors.transparent,
+                                                onTap: () {
+                                                  controller.handlePlayPause(
+                                                      index, subIndex);
+                                                },
+                                                child: Row(
+                                                  children: [
+                                                    controller.buildAudioIcon(
+                                                        index, subIndex),
+                                                    const SizedBox(width: 6),
+                                                    const Text(
+                                                      "Native Speaker",
+                                                      style: TextStyle(
+                                                          fontSize: 13),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                    top: displayWidth(context) >
-                                                            500
-                                                        ? displayWidth(
-                                                                context) *
-                                                            0.008
-                                                        : getWidgetHeight(
-                                                            height: 8),
-                                                    bottom:
-                                                        displayWidth(context) >
-                                                                500
-                                                            ? displayWidth(
-                                                                    context) *
-                                                                0.008
-                                                            : getWidgetHeight(
-                                                                height: 8),
-                                                    left:
-                                                        displayWidth(context) >
-                                                                500
-                                                            ? displayWidth(
-                                                                    context) *
-                                                                0.008
-                                                            : getWidgetWidth(
-                                                                width: 10),
-                                                    // right: getWidgetWidth(width: 15)
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
+                                              ),
+                                              if (!kIsWeb) ...[
+                                                const SizedBox(width: 24),
+                                                InkWell(
+                                                  onTap: () {
+                                                    controller.kShowDialog(
+                                                      subCategory.id,
+                                                      sentence.text,
+                                                      false,
+                                                      context,
+                                                    );
+                                                  },
+                                                  child: const Row(
                                                     children: [
-                                                      Expanded(
-                                                        child: Text(
-                                                          sentence.text,
+                                                      Icon(Icons.mic),
+                                                      SizedBox(width: 6),
+                                                      Text("Practice",
                                                           style: TextStyle(
-                                                            fontFamily:
-                                                                Keys.fontFamily,
-                                                            letterSpacing: 0,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      if (!kIsWeb)
-                                                        IconButton(
-                                                            onPressed: () {
-                                                              controller
-                                                                  .saveUpdate(
-                                                                      index,
-                                                                      subIndex);
-                                                            },
-                                                            icon: controller
-                                                                .buildDownloadIcon(
-                                                                    index,
-                                                                    subIndex))
+                                                              fontSize: 13)),
                                                     ],
                                                   ),
                                                 ),
-                                                AnimatedContainer(
-                                                  duration: const Duration(
-                                                      milliseconds: 300),
-                                                  curve: Curves.fastOutSlowIn,
-                                                  height: isExpanded
-                                                      ? getWidgetHeight(
-                                                          height: 65)
-                                                      : 0,
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: getWidgetWidth(
-                                                        width: kIsWeb ? 0 : 15),
-                                                  ),
-                                                  child: isExpanded
-                                                      ? Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Padding(
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                horizontal:
-                                                                    getWidgetWidth(
-                                                                        width: !kIsWeb
-                                                                            ? 0
-                                                                            : 15),
-                                                              ),
-                                                              child:
-                                                                  const Divider(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        255,
-                                                                        107,
-                                                                        107,
-                                                                        107),
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                                height:
-                                                                    getWidgetHeight(
-                                                                        height:
-                                                                            6)),
-                                                            Row(
-                                                              mainAxisAlignment: kIsWeb
-                                                                  ? MainAxisAlignment
-                                                                      .start
-                                                                  : MainAxisAlignment
-                                                                      .spaceAround,
-                                                              children: [
-                                                                if (kIsWeb)
-                                                                  SizedBox(
-                                                                    width: getWidgetWidth(
-                                                                        width:
-                                                                            3),
-                                                                  ),
-                                                                InkWell(
-                                                                  onTap:
-                                                                      () async {
-                                                                    controller.handlePlayPause(
-                                                                        index,
-                                                                        subIndex);
-                                                                  },
-                                                                  child: Row(
-                                                                    children: [
-                                                                      controller.buildAudioIcon(
-                                                                          index,
-                                                                          subIndex),
-                                                                      // Icon(
-                                                                      //   controller.isLoadingMapPlay["$index-$subIndex"] ==
-                                                                      //           true
-                                                                      //       ? Icons.pause_circle_outline
-                                                                      //       : Icons.play_circle_outline,
-                                                                      //   color: Colors
-                                                                      //       .black,
-                                                                      // ),
-                                                                      SizedBox(
-                                                                          width:
-                                                                              getWidgetWidth(width: kIsWeb ? 2 : 5)),
-                                                                      const Text(
-                                                                          "Native Speaker",
-                                                                          style:
-                                                                              TextStyle(fontSize: 13)),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                                if (!kIsWeb)
-                                                                  InkWell(
-                                                                    onTap: () {
-                                                                      controller.kShowDialog(
-                                                                          subname,
-                                                                          sentence
-                                                                              .text,
-                                                                          false,
-                                                                          context);
-                                                                      // Add dialog or recording functionality
-                                                                    },
-                                                                    child: Row(
-                                                                      children: [
-                                                                        const Icon(
-                                                                            Icons.mic),
-                                                                        SizedBox(
-                                                                            width:
-                                                                                getWidgetWidth(width: 5)),
-                                                                        const Text(
-                                                                            "Practice",
-                                                                            style:
-                                                                                TextStyle(fontSize: 13)),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        )
-                                                      : const SizedBox.shrink(),
-                                                ),
-                                              ],
-                                            ),
+                                              ]
+                                            ],
                                           ),
-                                        );
-                                      },
-                                    ),
-                                    controller.subcategories.length - 1 != index
-                                        ? Divider(
-                                            color: Colors.grey[300],
-                                            thickness: 1,
-                                            height: getWidgetHeight(height: 20),
-                                          )
-                                        : SizedBox(
-                                            height: getWidgetHeight(height: 20),
-                                          ),
-                                  ],
-                                );
-                              },
+                                        ],
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
                             ),
-                          ),
-                  ],
-                ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ==========================================================
+  // SEARCH LABEL
+  // ==========================================================
+  Widget _searchResultLabel(SentenceLabSubCatController controller) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          "Search Results for: ${controller.searchTerm}",
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      );
-    });
+      ),
+    );
+  }
+}
+
+// ============================================================
+// HOVER EFFECT WRAPPER
+// ============================================================
+class _HoverSentenceCard extends StatefulWidget {
+  final Widget child;
+  final bool expanded;
+
+  const _HoverSentenceCard({
+    required this.child,
+    required this.expanded,
+  });
+
+  @override
+  State<_HoverSentenceCard> createState() => _HoverSentenceCardState();
+}
+
+class _HoverSentenceCardState extends State<_HoverSentenceCard> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) {
+        if (kIsWeb) setState(() => _hovered = true);
+      },
+      onExit: (_) {
+        if (kIsWeb) setState(() => _hovered = false);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: _hovered && !widget.expanded
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 3,
+                    offset: const Offset(0, 0),
+                  ),
+                ]
+              : [],
+        ),
+        child: widget.child,
+      ),
+    );
   }
 }

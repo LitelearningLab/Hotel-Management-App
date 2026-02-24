@@ -304,8 +304,8 @@ class PronunciationLabController extends GetxController {
       // 🔁 If no search, show all subcategories from all categories
       subcategories = base.expand((cat) => cat.subcategories).toList();
     }
-    print(
-        "jhere im printing the search length after searching ${subcategories.length}");
+    // print(
+    //     "jhere im printing the search length after searching ${subcategories.length}");
 
     isPriorityList =
         subcategories.map((e) => e.downloadStatus == true).toList();
@@ -373,11 +373,11 @@ class PronunciationLabController extends GetxController {
       currentlyPlayingIndex = null;
       update();
     } on PlayerException catch (e) {
-      print("❌ Audio player error: ${e.message} ${subcategories[index].file}");
+      // print("❌ Audio player error: ${e.message} ${subcategories[index].file}");
       errorPlaying = index;
       currentlyPlayingIndex = null;
     } on Exception catch (e) {
-      print("❌ General audio error: $e");
+      // print("❌ General audio error: $e");
       errorPlaying = index;
       currentlyPlayingIndex = null;
     } finally {

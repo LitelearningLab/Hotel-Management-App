@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hotelmanagementapp/controller/pronunciation_lab_controller.dart';
 // import 'package:hotelmanagementapp/model/english_lab_model';
 import 'package:hotelmanagementapp/model/user_mode.dart';
@@ -15,9 +16,11 @@ abstract class Jsonable {
     //   return null;
     // }
 
-    print("json['type']");
-    print(json);
-    print(t);
+    if (kDebugMode) {
+      print("json['type']");
+      print(json);
+      print(t);
+    }
     switch (t) {
       case UserM:
         return UserM.fromJson(json);

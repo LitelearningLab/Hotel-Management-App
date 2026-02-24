@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class SentenceAttempt {
   String batch;
@@ -91,9 +92,11 @@ class SentenceAttempt {
         FirebaseFirestore.instance.collection('SentenceLabReports');
 
     try {
-      print(
-          "🔎 [SAVE_ATTEMPT] Checking existing reports for userId=${newAttempt.userId}, "
-          "companyId=${newAttempt.companyId}, title=${newAttempt.title}, sentence=${newAttempt.sentence}");
+      if (kDebugMode) {
+        print(
+            "🔎 [SAVE_ATTEMPT] Checking existing reports for userId=${newAttempt.userId}, "
+            "companyId=${newAttempt.companyId}, title=${newAttempt.title}, sentence=${newAttempt.sentence}");
+      }
 
       final query = await collection
           .where('userId', isEqualTo: newAttempt.userId)
@@ -107,8 +110,10 @@ class SentenceAttempt {
         final docId = query.docs.first.id;
         final existing = query.docs.first.data();
 
-        print("📄 Existing document found with id=$docId");
-        print("📄 Existing data: $existing");
+        if (kDebugMode) {
+          print("📄 Existing document found with id=$docId");
+          print("📄 Existing data: $existing");
+        }
 
         // 🔹 Existing focusWord list
         final List<Map<String, dynamic>> existingFocus =
@@ -120,7 +125,9 @@ class SentenceAttempt {
           ...newAttempt.focusWord,
         ];
 
-        print("✏ Updating document $docId with new values...");
+        if (kDebugMode) {
+          print("🔄 Updated focusWord list: $updatedFocus");
+        }
         if (newAttempt.listAtt == 1) {
           await collection.doc(docId).update({
             'listatt': (existing['listatt'] ?? 0) + newAttempt.listAtt,
@@ -139,18 +146,28 @@ class SentenceAttempt {
           });
         }
 
-        print("✅ Document $docId successfully updated!");
+        if (kDebugMode) {
+          print("✅ Document $docId successfully updated!");
+        }
       } else {
-        print("🆕 No existing document found. Creating a new one...");
+        if (kDebugMode) {
+          print("📄 No existing document found. Creating new one.");
+        }
         newAttempt.lastAttempt = now;
         newAttempt.dateTime = now;
 
         final newDoc = await collection.add(newAttempt.toJson());
-        print("✅ New document created with id=${newDoc.id}");
+        if (kDebugMode) {
+          print("✅ New document created with id=${newDoc.id}");
+        }
       }
     } catch (e, stack) {
-      print("❌ Error while saving attempt: $e");
-      print("❌ StackTrace: $stack");
+      if (kDebugMode) {
+        print("❌ Error while saving attempt: $e");
+        print("❌ StackTrace: $stack");
+      } else {
+        print("❌ Error while saving attempt: $e");
+      }
     }
   }
 }

@@ -14,6 +14,8 @@ class LanguageLabController extends GetxController {
   bool isExpanded = false;
   int expandedIndex = -1;
   int subSelectedIndex = -1;
+int expandedVowelIndex = -1;
+int expandedConsonantIndex = -1;
 
   List<SoundModel> soundPageModel = [];
   SoundModel? importantSound;

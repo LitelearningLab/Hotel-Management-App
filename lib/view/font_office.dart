@@ -1,920 +1,490 @@
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'package:hotelmanagementapp/controller/front_office_controller.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
-import 'package:hotelmanagementapp/model/category_model.dart';
+import 'package:hotelmanagementapp/model/subcategoryPro_hive_model.freezed.dart'
+    show SubcategoryPro;
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
-import 'package:hotelmanagementapp/route/app_router_delegate.dart';
+import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
-import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/utility/web_view_page.dart';
 
-class FrontOfficeHotelReception extends StatefulWidget {
+class FrontOfficeHotelReception extends StatelessWidget {
   const FrontOfficeHotelReception({super.key});
 
   @override
-  State<FrontOfficeHotelReception> createState() =>
-      _FrontOfficeHotelReceptionState();
+  Widget build(BuildContext context) {
+    final homeController = Get.put(HomeController());
+
+    return PopScope(
+      onPopInvoked: (_) => homeController.loadRecentHistory(),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF9FAFB),
+        body: SafeArea(
+          child: GetBuilder<FrontOfficeController>(
+            builder: (controller) {
+              final width = MediaQuery.of(context).size.width;
+
+              return Column(
+                children: [
+                  _HeaderSection(
+                    controller: controller,
+                    width: width,
+                    homeController: homeController, // ✅ passed
+                  ),
+                  const Divider(height: 1),
+                  Expanded(
+                    child: controller.loading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: linearColor,
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 20),
+                            itemCount: controller.frontOfficeData.length,
+                            itemBuilder: (context, index) {
+                              final isExpanded =
+                                  controller.expandedIndex == index;
+                              mianCategoryTitile = controller.title;
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: _ExpandableCard(
+                                  controller: controller,
+                                  index: index,
+                                  isExpanded: isExpanded,
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
-  HomeController homeController = Get.put<HomeController>(HomeController());
+/* ============================================================
+   HEADER
+============================================================ */
+
+class _HeaderSection extends StatelessWidget {
+  final FrontOfficeController controller;
+  final HomeController homeController; // ✅ added
+  final double width;
+
+  const _HeaderSection({
+    required this.controller,
+    required this.width,
+    required this.homeController,
+  });
+
   @override
   Widget build(BuildContext context) {
-    double isKwidth = MediaQuery.of(context).size.width;
-    return PopScope(
-      onPopInvoked: ((didPop) => homeController.loadRecentHistory()),
-      child: Scaffold(body: SafeArea(
-        child: GetBuilder<FrontOfficeController>(builder: (controller) {
-          return Column(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
+      child: Row(
+        children: [
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                final HomeController homeController =
+                    Get.isRegistered<HomeController>()
+                        ? Get.find<HomeController>()
+                        : Get.put(HomeController());
+
+                homeController.loadRecentHistory();
+
+                kIsWeb ? Get.rootDelegate.offNamed(AppRoutes.home) : Get.back();
+              },
+            ),
+          ),
+          const SizedBox(width: 12),
+          SvgPicture.asset(
+            controller.image,
+            width: 160,
+            height: 160,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(width: 24),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  controller.title,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                    fontFamily: Keys.fontFamily,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: controller.searchController,
+                  cursorColor: Colors.black,
+                  decoration: InputDecoration(
+                    hintText: "Search topic...",
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.black),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          const BorderSide(color: Colors.black, width: 1.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: controller.clearSearch,
+                    ),
+                  ),
+                  onChanged: controller.searchByCategory,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/* ============================================================
+   EXPANDABLE CARD
+============================================================ */
+
+class _ExpandableCard extends StatefulWidget {
+  final FrontOfficeController controller;
+  final int index;
+  final bool isExpanded;
+
+  const _ExpandableCard({
+    required this.controller,
+    required this.index,
+    required this.isExpanded,
+  });
+
+  @override
+  State<_ExpandableCard> createState() => _ExpandableCardState();
+}
+
+class _ExpandableCardState extends State<_ExpandableCard> {
+  bool hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final item = widget.controller.frontOfficeData[widget.index];
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => hover = true),
+      onExit: (_) => setState(() => hover = false),
+      child: GestureDetector(
+        onTap: () {
+          widget.controller.expandedIndex =
+              widget.isExpanded ? -1 : widget.index;
+          widget.controller.update();
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+            boxShadow: hover
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              displayWidth(context) > 800
-                  ? Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: getWidgetWidth(width: 12)),
-                      child: SizedBox(
-                        // color: Colors.amber,
-                        width: getWidgetWidth(width: 375),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      item.category,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                        fontFamily: Keys.fontFamily,
+                      ),
+                    ),
+                  ),
+                  Icon(widget.isExpanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down),
+                ],
+              ),
+              if (widget.isExpanded) ...[
+                const Divider(),
+                const SizedBox(height: 14),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _IconWithLabel(
+                      label: "E-Learning",
+                      asset: AllAssets.interaction,
+                      enabled: item.subcategory[0].link.isNotEmpty,
+                      onTap: () {
+                        activityName = "E-Learning";
+                        subCategoryTitle = item.category;
+                        addToRecentHistory(
+                            path:
+                                "Core Department > ${widget.controller.title} ",
+                            category: subCategoryTitle,
+                            section: activityName,
+                            link: item.subcategory[0].link,
+                            proLabTitle: "");
+                        _openWeb(
+                            context, item.subcategory[0].link, item.category);
+                      },
+                    ),
+                    const SizedBox(width: 28),
+                    _IconWithLabel(
+                      label: "Glossary",
+                      asset: AllAssets.bookIcon,
+                      enabled: item.subcategory[1].link.isNotEmpty,
+                      onTap: () {
+                        activityName = "Glossary";
+                        subCategoryTitle = item.category;
+                        addToRecentHistory(
+                            path:
+                                "Core Department > ${widget.controller.title} ",
+                            category: subCategoryTitle,
+                            section: activityName,
+                            link: item.subcategory[1].link,
+                            proLabTitle: "");
+                        _openWeb(
+                            context, item.subcategory[1].link, item.category);
+                      },
+                    ),
+                    const SizedBox(width: 28),
+                    _IconWithLabel(
+                        label: "Pronunciation",
+                        icon: Icons.mic,
+                        enabled: item.pronunID.isNotEmpty,
+                        onTap: () {
+                          widget.controller.loading = true;
+                          widget.controller.update();
+                          if (kDebugMode) {
+                            print("pronunID: ${item.pronunID}");
+                          }
+
+                          activityName = "Prounciation Lab";
+                          debugPrint(
+                              "pronunCollectionName: ${widget.controller.pronunCollectionName}");
+
+                          subCategoryTitle = item.category;
+                          GetStorage().write(AppRoutes.pronunciationLabSub, {
+                            'title': item.category,
+                            'subcategories': <SubcategoryPro>[],
+                            "id": item.pronunID,
+                            "pronunCollectionName":
+                                widget.controller.pronunCollectionName,
+                            'index': widget.controller.index,
+                            'mainCategoryTitle': widget.controller.title,
+                          });
+                          addToRecentHistory(
+                              path:
+                                  "Core Department > ${widget.controller.title}",
+                              category: subCategoryTitle,
+                              section: "Pronunciation Lab",
+                              link: "",
+                              proLabTitle: "");
+                          widget.controller.loading = false;
+                          widget.controller.update();
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            kIsWeb
+                                ? Get.rootDelegate.offNamed(
+                                    AppRoutes.pronunciationLabSub,
+                                    arguments: {
+                                        'title': item.category,
+                                        'subcategories': <SubcategoryPro>[],
+                                        "id": item.pronunID,
+                                        "pronunCollectionName": widget
+                                            .controller.pronunCollectionName,
+                                        'index': widget.controller.index,
+                                        'mainCategoryTitle':
+                                            widget.controller.title,
+                                      })
+                                : Get.toNamed(AppRoutes.pronunciationLabSub,
+                                    arguments: {
+                                        'title': item.category,
+                                        'subcategories': <SubcategoryPro>[],
+                                        "id": item.pronunID,
+                                        "pronunCollectionName": widget
+                                            .controller.pronunCollectionName,
+                                        'index': widget.controller.index,
+                                        'mainCategoryTitle':
+                                            widget.controller.title,
+                                      });
+                          });
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder:
+                          //             (context) =>
+                          //                 AudioListPage()));
+                        }
+                        // _openPronunciation(item);
+
+                        ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Divider(
+                  height: 1,
+                  thickness: 0.6,
+                  color: Colors.black.withOpacity(0.12),
+                ),
+                const SizedBox(height: 10),
+                ...item.subcategory[2].linkList.map((e) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: MouseRegion(
+                      cursor: e['link']!.isNotEmpty
+                          ? SystemMouseCursors.click
+                          : SystemMouseCursors.basic,
+                      child: GestureDetector(
+                        onTap: e['link']!.isEmpty
+                            ? null
+                            : () {
+                                subCategoryTitle = item.category;
+                                activityName = "Quiz";
+                                _openWeb(context, e['link']!, item.category);
+                              },
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Image with back button
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(top: 20, left: 25),
-                                  // top: getWidgetHeight(height: 15),
-                                  // left: getWidgetWidth(width: 5),
-                                  child: IconButton(
-                                    focusColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    splashColor: Colors.transparent,
-                                    onPressed: () {
-                                      kIsWeb
-                                          ? Get.rootDelegate
-                                              .offNamed(AppRoutes.home)
-                                          : Get.back();
-                                    },
-                                    icon: Container(
-                                      width: getWidgetWidth(width: 10),
-                                      height: getWidgetHeight(height: 40),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.black.withOpacity(0.3),
-                                      ),
-                                      child: const Icon(
-                                        Icons.arrow_back,
-                                        color: Colors.white,
-                                        size: 30,
-                                      ),
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: getWidgetWidth(width: 2),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 10),
-                                  child: ClipPath(
-                                    // clipper: CustomShape(),
-                                    child: SvgPicture.asset(
-                                      width: getWidgetWidth(width: 60),
-                                      height: getWidgetHeight(height: 200),
-                                      controller.image,
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              "›",
+                              style: GoogleFonts.inter(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: e['link']!.isEmpty
+                                    ? Colors.grey
+                                    : linearColor,
+                              ),
                             ),
-
-                            // Space between image and column
-                            // SizedBox(width: getWidgetWidth(width: 10)),
-
-                            // Headline + Search TextField
+                            const SizedBox(width: 6),
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(height: getWidgetHeight(height: 15)),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: getWidgetWidth(width: 10),
-                                        vertical: getWidgetHeight(height: 20)),
-                                    child: Text(
-                                      controller.title,
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: kText
-                                            .scale(isKwidth > 700 ? 25 : 20),
-                                        color: Colors.black,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                    ),
-                                  ),
-                                  SizedBox(height: getWidgetHeight(height: 5)),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: getWidgetWidth(width: 10)),
-                                    child: TextField(
-                                      cursorColor: Colors.grey,
-                                      controller: controller.searchController,
-                                      autofocus: true,
-                                      decoration: InputDecoration(
-                                        hintText: 'Search Title...',
-                                        hintStyle:
-                                            const TextStyle(color: Colors.grey),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                horizontal: 12, vertical: 8),
-                                        suffixIcon: IconButton(
-                                          icon: const Icon(Icons.clear,
-                                              color: Colors.grey),
-                                          onPressed: () {
-                                            controller.clearSearch();
-                                          },
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          borderSide: const BorderSide(
-                                              color: Colors.grey),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          borderSide: const BorderSide(
-                                              color: Colors.grey, width: 0.2),
-                                        ),
-                                      ),
-                                      onChanged: (value) {
-                                        controller.searchByCategory(value);
-                                      },
-                                    ),
-                                  ),
-                                ],
+                              child: Text(
+                                e['name']!,
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: e['link']!.isEmpty
+                                      ? Colors.grey
+                                      : linearColor,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    )
-                  : SizedBox(
-                      child: Column(
-                        children: [
-                          Stack(
-                            children: [
-                              ClipPath(
-                                // clipper: CustomShape(),
-                                child: SizedBox(
-                                  width: getWidgetWidth(width: 375),
-                                  height: getWidgetHeight(
-                                      height: isKwidth > 700 ? 400 : 270),
-                                  child: SvgPicture.asset(
-                                    controller.image,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              ),
-                              // if (!kIsWeb)
-                              Positioned(
-                                  top: getWidgetHeight(height: 15),
-                                  left: getWidgetWidth(
-                                      width: isKwidth > 700 ? 0 : 5),
-                                  child: IconButton(
-                                    focusColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    splashColor: Colors.transparent,
-                                    color: Colors.transparent,
-                                    onPressed: () {
-                                      kIsWeb
-                                          ? Get.rootDelegate
-                                              .offNamed(AppRoutes.home)
-                                          : Get.back();
-                                    },
-                                    icon: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Container(
-                                          width: getWidgetWidth(
-                                              width: isKwidth > 700 ? 56 : 36),
-                                          height: getWidgetHeight(
-                                              height: isKwidth > 700 ? 56 : 36),
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color:
-                                                Colors.black.withOpacity(0.3),
-                                            //   boxShadow: [
-                                            //     BoxShadow(
-                                            //       color: Colors.black.withOpacity(0.3),
-                                            //       blurRadius: 5,
-                                            //       spreadRadius: 0,
-                                            //     ),
-                                            //   ],
-                                          ),
-                                        ),
-                                        // Icon with shadow
-                                        const Icon(
-                                          Icons.arrow_back,
-                                          color: Colors.white,
-                                          // shadows: [
-                                          //   Shadow(
-                                          //     color: Colors.black.withOpacity(0.5),
-                                          //     blurRadius: 4,
-                                          //     offset: Offset(2, 2),
-                                          //   ),
-                                          // ],
-                                        ),
-                                      ],
-                                    ),
-                                    iconSize: isKwidth > 700 ? 50 : 30,
-                                    padding: EdgeInsets.zero,
-                                  )),
-                            ],
-                          ),
-                          SizedBox(
-                            height: getWidgetHeight(height: 10),
-                          ),
-                          controller.isSearching
-                              ? Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: getWidgetWidth(width: 20),
-                                  ),
-                                  child: TextField(
-                                    cursorColor: Colors.grey,
-                                    controller: controller.searchController,
-                                    autofocus: true,
-                                    decoration: InputDecoration(
-                                      hintText: 'Search...',
-                                      hintStyle: TextStyle(color: Colors.grey),
-                                      contentPadding: EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 8),
-                                      suffixIcon: IconButton(
-                                        icon: Icon(Icons.clear,
-                                            color: Colors.grey),
-                                        onPressed: () {
-                                          controller.clearSearch();
-                                        },
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide:
-                                            BorderSide(color: Colors.grey),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: BorderSide(
-                                            color: Colors.grey, width: 0.2),
-                                      ),
-                                    ),
-                                    onChanged: (value) {
-                                      controller.searchByCategory(value);
-                                    },
-                                  ),
-                                )
-                              : Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: getWidgetWidth(width: 20),
-                                        ),
-                                        child: Text(
-                                          controller.title,
-                                          style: GoogleFonts.inter(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: kText.scale(
-                                                isKwidth > 700 ? 25 : 20),
-                                            color: Colors.black,
-                                          ),
-                                          overflow: TextOverflow
-                                              .ellipsis, // Prevent overflow
-                                          maxLines: 2,
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        right: getWidgetWidth(
-                                            width: isKwidth > 700 ? 20 : 10),
-                                        top: getWidgetHeight(height: 4),
-                                      ),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          controller.isSearching = true;
-                                          controller.update();
-                                        },
-                                        icon: Icon(
-                                          Icons.search,
-                                          color: Colors.black.withOpacity(0.9),
-                                          size: isKwidth > 700 ? 36 : 26,
-                                          weight: 800,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                        ],
-                      ),
                     ),
-              // SizedBox(
-              //   height: getWidgetHeight(height: 6),
-              // ),
-              Expanded(
-                child: controller.loading
-                    ? Center(
-                        child: SizedBox(
-                          width:
-                              getWidgetWidth(width: isKwidth > 700 ? 10 : 40),
-                          // height:
-                          //     getWidgetHeight(height: isKwidth > 700 ? 40 : 40),
-                          child: CircularProgressIndicator(
-                            strokeWidth: isKwidth > 700 ? 6 : 4,
-                            color: linearColor,
-                          ),
-                        ),
-                      )
-                    : controller.frontOfficeData.isEmpty
-                        ? Center(
-                            child: Text(
-                            controller.searchController.text.isNotEmpty
-                                ? "No Search Result Found"
-                                : "No data",
-                            textAlign: TextAlign.left,
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w600,
-                              fontSize: kText.scale(16),
-                              color: Colors.black,
-                            ),
-                          ))
-                        : ListView.builder(
-                            padding: EdgeInsets.symmetric(
-                                vertical: getWidgetHeight(height: 10),
-                                horizontal: getWidgetWidth(width: 20)),
-                            itemCount: controller.frontOfficeData.length,
-                            itemBuilder: (context, index) {
-                              final glossaryIndex =
-                                  controller.glossaryIndex == index;
-                              final isExpanded =
-                                  controller.expandedIndex == index;
-                              final linkAvailable = ((controller
-                                      .frontOfficeData[index]
-                                      .subcategory[0]
-                                      .link
-                                      .isNotEmpty ||
-                                  controller.frontOfficeData[index]
-                                          .subcategory[0].link !=
-                                      ""));
-                              final linkAvailable1 = ((controller
-                                      .frontOfficeData[index]
-                                      .subcategory[1]
-                                      .link
-                                      .isNotEmpty ||
-                                  controller.frontOfficeData[index]
-                                          .subcategory[1].link !=
-                                      ""));
-
-                              final subcat = controller.frontOfficeData[index]
-                                  .subcategory[2]; // Knowledge Check
-
-                              final linksToShow = subcat.linkList;
-                              // .isNotEmpty
-                              //     ? subcat.linkList
-                              //     : [
-                              //         {'name': subcat.name, 'link': subcat.link}
-                              //       ]; // fallback to single link
-                              final linkAvailable2 = linksToShow.isNotEmpty;
-                              // final linkAvailable2 =
-                              //  ((controller
-                              //                                 .frontOfficeData[index]
-                              //                                 .subcategory[2]
-                              //                                 .link
-                              //                                 .isEmpty)
-                              //                             //  &&
-                              //                             // accessLinks.toLowerCase().contains(
-                              //                             //     "knowledge check".toLowerCase())
-                              //                             );
-                              return Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: getWidgetHeight(height: 5)),
-                                    child: GestureDetector(
-                                        onTap: () {
-                                          controller.expandedIndex =
-                                              isExpanded ? -1 : index;
-                                          controller.glossaryIndex =
-                                              glossaryIndex ? -1 : -1;
-
-                                          controller.update();
-                                        },
-                                        child: AnimatedSize(
-                                          duration:
-                                              const Duration(milliseconds: 200),
-                                          curve: Curves.fastOutSlowIn,
-                                          child: Container(
-                                            width: double.infinity,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              color: Colors.white,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.1),
-                                                  offset: const Offset(0, 4),
-                                                  blurRadius: 10,
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                    vertical: getWidgetHeight(
-                                                        height: isKwidth > 700
-                                                            ? 22
-                                                            : 12),
-                                                    horizontal: getWidgetWidth(
-                                                        width: isKwidth > 700
-                                                            ? 5
-                                                            : 20),
-                                                  ),
-                                                  child: RichText(
-                                                    text: TextSpan(
-                                                      children: controller
-                                                          .highlightOccurrences(
-                                                              controller
-                                                                  .frontOfficeData[
-                                                                      index]
-                                                                  .category,
-                                                              controller
-                                                                  .searchTerm),
-                                                      style: GoogleFonts.inter(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        // fontSize: kText.scale(
-                                                        //     isKwidth > 700
-                                                        //         ? 16
-                                                        //         : 14)
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                if (isExpanded)
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                      horizontal:
-                                                          getWidgetWidth(
-                                                              width: 10),
-                                                    ),
-                                                    child: const Divider(
-                                                      color: Color.fromARGB(
-                                                          255, 107, 107, 107),
-                                                    ),
-                                                  ),
-                                                if (isExpanded)
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                      horizontal:
-                                                          getWidgetWidth(
-                                                              width: 15),
-                                                      vertical: getWidgetHeight(
-                                                          height: 8),
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        GestureDetector(
-                                                          onTap: linkAvailable
-                                                              ? () {
-                                                                  activityName =
-                                                                      "E-Learning";
-                                                                  subCategoryTitle = controller
-                                                                      .frontOfficeData[
-                                                                          index]
-                                                                      .category;
-                                                                  addToRecentHistory(
-                                                                      path:
-                                                                          "Core Department > ${controller.title} ",
-                                                                      category:
-                                                                          subCategoryTitle,
-                                                                      section:
-                                                                          activityName,
-                                                                      link: controller
-                                                                          .frontOfficeData[
-                                                                              index]
-                                                                          .subcategory[
-                                                                              0]
-                                                                          .link,
-                                                                      proLabTitle:
-                                                                          "");
-                                                                  log("$kIsWeb printing im clicking the correct");
-                                                                  if (kIsWeb) {
-                                                                    Navigator.push(
-                                                                        context,
-                                                                        MaterialPageRoute(
-                                                                            builder: (context) =>
-                                                                                WebContentPage(title: controller.frontOfficeData[index].category, url: controller.frontOfficeData[index].subcategory[0].link)));
-                                                                  } else {
-                                                                    Get.toNamed(
-                                                                        AppRoutes
-                                                                            .inAppWebView,
-                                                                        arguments: {
-                                                                          "url": controller
-                                                                              .frontOfficeData[index]
-                                                                              .subcategory[0]
-                                                                              .link
-                                                                        });
-                                                                  }
-                                                                }
-                                                              : null,
-                                                          child: Image.asset(
-                                                            AllAssets
-                                                                .interaction,
-                                                            color: linkAvailable
-                                                                ? Colors.black
-                                                                : Colors.grey,
-                                                            width:
-                                                                getWidgetWidth(
-                                                                    width: 28),
-                                                            height:
-                                                                getWidgetHeight(
-                                                                    height: 28),
-                                                          ),
-                                                        ),
-                                                        GestureDetector(
-                                                          onTap: linkAvailable1
-                                                              ? () {
-                                                                  activityName =
-                                                                      'Glossary';
-                                                                  subCategoryTitle = controller
-                                                                      .frontOfficeData[
-                                                                          index]
-                                                                      .category;
-                                                                  addToRecentHistory(
-                                                                      path:
-                                                                          "Core Department > ${controller.title} ",
-                                                                      category:
-                                                                          subCategoryTitle,
-                                                                      section:
-                                                                          activityName,
-                                                                      link: controller
-                                                                          .frontOfficeData[
-                                                                              index]
-                                                                          .subcategory[
-                                                                              1]
-                                                                          .link,
-                                                                      proLabTitle:
-                                                                          "");
-                                                                  if (kIsWeb) {
-                                                                    Navigator.push(
-                                                                        context,
-                                                                        MaterialPageRoute(
-                                                                            builder: (context) =>
-                                                                                WebContentPage(title: controller.frontOfficeData[index].category, url: controller.frontOfficeData[index].subcategory[1].link)));
-                                                                  } else {
-                                                                    Get.toNamed(
-                                                                        AppRoutes
-                                                                            .inAppWebView,
-                                                                        arguments: {
-                                                                          "url": controller
-                                                                              .frontOfficeData[index]
-                                                                              .subcategory[1]
-                                                                              .link
-                                                                        });
-                                                                  }
-                                                                }
-                                                              : null,
-                                                          child: Image.asset(
-                                                            AllAssets.bookIcon,
-                                                            color:
-                                                                linkAvailable1
-                                                                    ? Colors
-                                                                        .black
-                                                                    : Colors
-                                                                        .grey,
-                                                            width:
-                                                                getWidgetWidth(
-                                                                    width: 28),
-                                                            height:
-                                                                getWidgetHeight(
-                                                                    height: 26),
-                                                          ),
-                                                        ),
-                                                        GestureDetector(
-                                                          // onTapDown:
-                                                          //     (TapDownDetails
-                                                          //         details) {
-                                                          //   final tapPosition =
-                                                          //       details
-                                                          //           .globalPosition;
-                                                          //   controller
-                                                          //       .showPopupAtTap(
-                                                          //           tapPosition);
-                                                          // },
-                                                          onTap: controller
-                                                                  .frontOfficeData[
-                                                                      index]
-                                                                  .pronunID
-                                                                  .isNotEmpty
-                                                              ? () {
-                                                                  print(
-                                                                      "pronunID: ${controller.frontOfficeData[index].pronunID}");
-                                                                  controller
-                                                                      .glossaryIndex = -1;
-
-                                                                  controller
-                                                                      .update();
-                                                                  activityName =
-                                                                      "Prounciation Lab";
-                                                                  debugPrint(
-                                                                      "pronunCollectionName: ${controller.pronunCollectionName}");
-
-                                                                  subCategoryTitle = controller
-                                                                      .frontOfficeData[
-                                                                          index]
-                                                                      .category;
-                                                                  GetStorage().write(
-                                                                      AppRoutes
-                                                                          .pronunciationLabSub,
-                                                                      {
-                                                                        'title': controller
-                                                                            .frontOfficeData[index]
-                                                                            .category,
-                                                                        'subcategories':
-                                                                            <SubcategoryPro>[],
-                                                                        "id": controller
-                                                                            .frontOfficeData[index]
-                                                                            .pronunID,
-                                                                        "pronunCollectionName":
-                                                                            controller.pronunCollectionName,
-                                                                      });
-                                                                  addToRecentHistory(
-                                                                      path:
-                                                                          "Core Department > ${controller.title}",
-                                                                      category:
-                                                                          subCategoryTitle,
-                                                                      section:
-                                                                          "proLab",
-                                                                      link: "",
-                                                                      proLabTitle:
-                                                                          "");
-                                                                  WidgetsBinding
-                                                                      .instance
-                                                                      .addPostFrameCallback(
-                                                                          (_) {
-                                                                    kIsWeb
-                                                                        ? Get.rootDelegate.offNamed(
-                                                                            AppRoutes
-                                                                                .pronunciationLabSub,
-                                                                            arguments: {
-                                                                                'title': controller.frontOfficeData[index].category,
-                                                                                'subcategories': <SubcategoryPro>[],
-                                                                                "id": controller.frontOfficeData[index].pronunID,
-                                                                                "pronunCollectionName": controller.pronunCollectionName,
-                                                                              })
-                                                                        : Get.toNamed(
-                                                                            AppRoutes.pronunciationLabSub,
-                                                                            arguments: {
-                                                                                'title': controller.frontOfficeData[index].category,
-                                                                                'subcategories': <SubcategoryPro>[],
-                                                                                "id": controller.frontOfficeData[index].pronunID,
-                                                                                "pronunCollectionName": controller.pronunCollectionName,
-                                                                              });
-                                                                  });
-                                                                  // Navigator.push(
-                                                                  //     context,
-                                                                  //     MaterialPageRoute(
-                                                                  //         builder:
-                                                                  //             (context) =>
-                                                                  //                 AudioListPage()));
-                                                                }
-                                                              : null,
-                                                          child: SizedBox(
-                                                            width:
-                                                                getWidgetWidth(
-                                                                    width: 32),
-                                                            height:
-                                                                getWidgetHeight(
-                                                                    height: 28),
-                                                            child: Icon(
-                                                              Icons.mic,
-                                                              size: 30,
-                                                              color: controller
-                                                                      .frontOfficeData[
-                                                                          index]
-                                                                      .pronunID
-                                                                      .isNotEmpty
-                                                                  ? Colors.black
-                                                                  : Colors.grey,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        GestureDetector(
-                                                          onTap: linkAvailable2
-                                                              ? () {
-                                                                  controller
-                                                                          .glossaryIndex =
-                                                                      glossaryIndex
-                                                                          ? -1
-                                                                          : index;
-                                                                  controller
-                                                                      .update();
-
-                                                                  // if (kIsWeb) {
-                                                                  //   Navigator.push(
-                                                                  //       context,
-                                                                  //       MaterialPageRoute(
-                                                                  //           builder: (context) =>
-                                                                  //               WebContentPage(title: controller.frontOfficeData[index].category, url: controller.frontOfficeData[index].subcategory[2].link)));
-                                                                  // } else {
-                                                                  //   Get.toNamed(
-                                                                  //       AppRoutes
-                                                                  //           .inAppWebView,
-                                                                  //       arguments: {
-                                                                  //         "url": controller
-                                                                  //             .frontOfficeData[index]
-                                                                  //             .subcategory[2]
-                                                                  //             .link
-                                                                  //       });
-                                                                  // }
-                                                                }
-                                                              : null,
-                                                          child: Image.asset(
-                                                            AllAssets.approval,
-                                                            color: (isExpanded)
-                                                                ? linearColor
-                                                                : linkAvailable2
-                                                                    ? Colors
-                                                                        .black
-                                                                    : Colors
-                                                                        .grey,
-                                                            width:
-                                                                getWidgetWidth(
-                                                                    width: 22),
-                                                            height:
-                                                                getWidgetHeight(
-                                                                    height: 26),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                if (isExpanded)
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        left: getWidgetWidth(
-                                                            width: 10),
-                                                        right: getWidgetWidth(
-                                                            width: 80)),
-                                                    child: const Divider(
-                                                      color: Color.fromARGB(
-                                                          255, 107, 107, 107),
-                                                    ),
-                                                  ),
-                                                if (isExpanded)
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                      horizontal:
-                                                          getWidgetWidth(
-                                                              width: 15),
-                                                      vertical: getWidgetHeight(
-                                                          height: 8),
-                                                    ),
-                                                    child: ListView.builder(
-                                                      shrinkWrap: true,
-                                                      itemCount:
-                                                          linksToShow.length,
-                                                      physics:
-                                                          NeverScrollableScrollPhysics(),
-                                                      itemBuilder: (context,
-                                                          glossaryIndex) {
-                                                        final linkItem =
-                                                            linksToShow[
-                                                                glossaryIndex];
-                                                        return Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            GestureDetector(
-                                                              onTap: linksToShow[
-                                                                              glossaryIndex]
-                                                                          [
-                                                                          'link']!
-                                                                      .isEmpty
-                                                                  ? null
-                                                                  : () {
-                                                                      activityName =
-                                                                          "Knowledge Check";
-
-                                                                      subCategoryTitle = controller
-                                                                          .frontOfficeData[
-                                                                              index]
-                                                                          .category;
-                                                                      addToRecentHistory(
-                                                                          path:
-                                                                              "Core Department > ${controller.title} ",
-                                                                          category:
-                                                                              subCategoryTitle,
-                                                                          section:
-                                                                              activityName,
-                                                                          link: linksToShow[glossaryIndex]
-                                                                              [
-                                                                              'link']!,
-                                                                          proLabTitle:
-                                                                              "");
-                                                                      log("printing the link here ${linksToShow[glossaryIndex]['link']!}");
-                                                                      if (kIsWeb) {
-                                                                        Navigator.push(
-                                                                            context,
-                                                                            MaterialPageRoute(builder: (context) => WebContentPage(title: controller.frontOfficeData[index].category, url: linksToShow[glossaryIndex]['link']!)));
-                                                                      } else {
-                                                                        Get.toNamed(
-                                                                            AppRoutes.inAppWebView,
-                                                                            arguments: {
-                                                                              "url": linksToShow[glossaryIndex]['link']!
-                                                                            });
-                                                                      }
-                                                                      // ✅ Launch link here
-                                                                      // launchUrl(Uri.parse(linkItem['link']!)); → use url_launcher plugin
-                                                                    },
-                                                              child: Text(
-                                                                "> ${linkItem['name']!.isEmpty ? 'Open check' : linkItem['name']}",
-                                                                style: TextStyle(
-                                                                    color: linksToShow[glossaryIndex]['link']!
-                                                                            .isEmpty
-                                                                        ? Colors
-                                                                            .grey
-                                                                        : linearColor),
-                                                              ),
-                                                            ),
-                                                            Padding(
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                horizontal: kIsWeb
-                                                                    ? 15
-                                                                    : getWidgetWidth(
-                                                                        width:
-                                                                            10),
-                                                              ),
-                                                              child:
-                                                                  const Divider(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        57,
-                                                                        107,
-                                                                        107,
-                                                                        107),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        );
-                                                      },
-                                                    ),
-                                                  )
-                                              ],
-                                            ),
-                                          ),
-                                        )),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-              ),
+                  );
+                }).toList(),
+              ],
             ],
-          );
-        }),
-      )),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openWeb(BuildContext context, String url, String title) {
+    if (kIsWeb) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => WebContentPage(title: title, url: url),
+        ),
+      );
+    } else {
+      Get.toNamed(AppRoutes.inAppWebView, arguments: {"url": url});
+    }
+  }
+
+  void _openPronunciation(item) {
+    GetStorage().write(AppRoutes.pronunciationLabSub, {
+      "title": item.category,
+      "id": item.pronunID,
+    });
+    Get.rootDelegate.offNamed(AppRoutes.pronunciationLabSub);
+  }
+}
+
+/* ============================================================
+   ICON + LABEL
+============================================================ */
+
+class _IconWithLabel extends StatelessWidget {
+  final String label;
+  final String? asset;
+  final IconData? icon;
+  final VoidCallback onTap;
+  final bool enabled;
+
+  const _IconWithLabel({
+    required this.label,
+    this.asset,
+    this.icon,
+    required this.onTap,
+    required this.enabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: GestureDetector(
+        onTap: enabled ? onTap : null,
+        child: Opacity(
+          opacity: enabled ? 1 : 0.35,
+          child: Row(
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 6),
+              asset != null
+                  ? Image.asset(asset!, width: 28, height: 28)
+                  : Icon(icon, size: 30),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

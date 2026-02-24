@@ -99,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context) => Positioned(
         left: 0,
         right: 0,
-        bottom: displayHeight(context) / 6,
+        bottom: 40,
         // top: displayHeight(context) / 18,
         child: Material(
           color: Colors.transparent,
@@ -307,7 +307,7 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString('password', password);
       await prefs.setBool("loginInfo", true);
       await prefs.setString("userId", userId);
-      await prefs.setString("collegeId", userData['collegeId'] ?? '');
+      await prefs.setString("collegeId", userData['companyid'] ?? '');
       print(
           "Here im printing the user data company id ${userData['companyid']}");
       await prefs.setString("batchName", userData['batchName'] ?? '');
@@ -434,269 +434,247 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
   }
 
-  @override
   Widget build(BuildContext context) {
+    final isWeb = kIsWeb;
+    final width = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF7F8FA),
       body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: SizedBox(
-          height: kHeight,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 25),
-            child: Form(
-              key: _formKey,
-              child: Container(
-                padding: EdgeInsets.only(
-                    top:
-                        //  isSplitScreen
-                        //     ? getFullWidgetHeight(height: 30)
-                        //     :
-                        getWidgetHeight(height: 20),
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                width: kWidth,
-                decoration: BoxDecoration(color: Colors.white),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      height: getWidgetHeight(height: 35),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Form(
+                key: _formKey,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 28,
+                    vertical: 32,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 24,
+                        offset: const Offset(0, 12),
                       ),
-                      child: SizedBox(
-                        width: getWidgetWidth(width: kWidth > 500 ? 200 : 375),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            SizedBox(
-                              // height: getWidgetHeight(height: 140),
-                              width: getWidgetWidth(
-                                  width: kWidth > 1200 ? 80 : 200),
-                              child: Image.asset(
-                                AllAssets.splashLogo,
-                                fit: BoxFit.contain,
-                                // width: getWidgetWidth(width: 200),
-                                // height: getWidgetHeight(height: 200),
-                              ),
-                            ),
-                            // if (displayWidth(context) > 1200)
-                            //   SizedBox(
-                            //       height: getWidgetHeight(height: 200),
-                            //       width: getWidgetWidth(
-                            //           width: kWidth > 1200 ? 100 : 375),
-                            //       child: !_isLogin
-                            //           ? SvgPicture.asset(
-                            //               'assets/emailScreen.svg')
-                            //           : SvgPicture.asset(
-                            //               'assets/pasScreen.svg')),
-                            // Container(
-                            //     height: 40,
-                            //     width: 40,
-                            //     child: Image.asset(
-                            //         "assets/images/profluent_ar_icon.png"))
-                          ],
-                        ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      /// LOGO
+                      Image.asset(
+                        AllAssets.splashLogo,
+                        height: 70,
+                        fit: BoxFit.contain,
                       ),
-                    ),
-                    SizedBox(height: getWidgetHeight(height: 30)),
 
-                    if (displayWidth(context) < 1200)
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: getWidgetHeight(height: 25),
-                        ),
-                        child: SizedBox(
-                            height: getWidgetHeight(height: 200),
-                            child: !_isLogin
-                                ? SvgPicture.asset('assets/emailScreen.svg')
-                                : SvgPicture.asset('assets/pasScreen.svg')),
-                      ),
-                    SizedBox(height: getWidgetHeight(height: 20)),
-                    if (!kIsWeb || _isLogin)
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: getWidgetHeight(height: 25),
-                        ),
-                        child: Text(
-                          _isLogin
-                              ? "Enter Your Password"
-                              : "Enter Your Email Address",
-                          style: TextStyle(color: Color(0XFFF8F8F8F)),
-                        ),
-                      ),
-                    SizedBox(height: getWidgetHeight(height: 23)),
+                      const SizedBox(height: 24),
 
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
+                      /// TITLE
+                      /// HEADER (Back + Title)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (_isLogin)
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back_ios_new,
+                                  size: 18),
+                              onPressed: () {
+                                passwordController.clear();
+                                setState(() {
+                                  _isLogin = false;
+                                  error = false;
+                                });
+                              },
+                            )
+                          else
+                            const SizedBox(
+                                width: 40), // keeps alignment balanced
+
+                          Expanded(
+                            child: Column(
+                              children: [
+                                Text(
+                                  _isLogin
+                                      ? "Welcome back"
+                                      : "Login to continue",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  _isLogin
+                                      ? "Enter your password"
+                                      : "Enter your registered email address",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(width: 40), // balance space on right
+                        ],
                       ),
-                      child: SizedBox(
-                        width: getWidgetWidth(width: kWidth > 500 ? 200 : 375),
-                        // height: getWidgetHeight(height: kWidth > 500 ? 75 : 50),
-                        child: TextFormField(
-                          cursorColor: Colors.black,
-                          controller:
-                              _isLogin ? passwordController : emailController,
-                          keyboardType: _isLogin
-                              ? TextInputType.text
-                              : TextInputType.emailAddress,
-                          obscureText: _isLogin ? _obscurePassword : false,
-                          textInputAction: TextInputAction.done,
-                          onFieldSubmitted: (value) {
-                            _bottomMessageEntry?.remove();
-                            _bottomMessageEntry = null;
-                            if (_isLogin) {
-                              isLoading = false;
-                              setState(() {});
-                            }
-                            login();
-                          },
-                          validator: (val) {
-                            if (!_isLogin) {
-                              return validateEmail(val);
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            counterText: "",
-                            hintText: _isLogin ? "Password" : "Email Address",
-                            hintStyle: TextStyle(color: Colors.grey[600]),
-                            fillColor: Color(0XFFE8E8E8),
-                            filled: true,
-                            prefixIcon: Icon(
-                              _isLogin ? Icons.lock : Icons.email,
-                              color: Colors.grey,
-                            ),
-                            suffixIcon: _isLogin
-                                ? IconButton(
-                                    icon: Icon(
-                                      _obscurePassword
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                      color: Colors.grey,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _obscurePassword = !_obscurePassword;
-                                      });
 
-                                      if (!_obscurePassword) {
-                                        _hideTimer?.cancel();
+                      const SizedBox(height: 6),
 
-                                        _hideTimer =
-                                            Timer(Duration(seconds: 1), () {
-                                          if (mounted) {
-                                            setState(() {
-                                              _obscurePassword = true;
-                                            });
-                                          }
-                                        });
-                                      }
-                                    },
-                                  )
-                                : null,
-                            contentPadding: EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 10,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0XFFE8E8E8)),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0XFFE8E8E8)),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
+                      // Text(
+                      //   _isLogin
+                      //       ? "Enter your password"
+                      //       : "Enter your registered email address",
+                      //   style: GoogleFonts.inter(
+                      //     fontSize: 14,
+                      //     color: Colors.grey.shade600,
+                      //   ),
+                      //   textAlign: TextAlign.center,
+                      // ),
+
+                      const SizedBox(height: 28),
+
+                      /// SVG ILLUSTRATION
+                      if (!isWeb)
+                        SizedBox(
+                          height: 160,
+                          child: SvgPicture.asset(
+                            _isLogin
+                                ? 'assets/pasScreen.svg'
+                                : 'assets/emailScreen.svg',
+                          ),
+                        ),
+
+                      if (!isWeb) const SizedBox(height: 24),
+
+                      /// INPUT FIELD
+                      TextFormField(
+                        controller:
+                            _isLogin ? passwordController : emailController,
+                        obscureText: _isLogin ? _obscurePassword : false,
+                        keyboardType: _isLogin
+                            ? TextInputType.text
+                            : TextInputType.emailAddress,
+                        cursorColor: Colors.black,
+                        validator: (val) {
+                          if (!_isLogin) return validateEmail(val);
+                          return null;
+                        },
+                        onFieldSubmitted: (_) => login(),
+                        decoration: InputDecoration(
+                          hintText: _isLogin ? "Password" : "Email address",
+                          prefixIcon: Icon(
+                            _isLogin
+                                ? Icons.lock_outline
+                                : Icons.email_outlined,
+                          ),
+                          suffixIcon: _isLogin
+                              ? IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                    // if (!_obscurePassword) {
+                                    //   _hideTimer?.cancel();
+                                    //   _hideTimer =
+                                    //       Timer(const Duration(seconds: 1), () {
+                                    //     if (mounted) {
+                                    //       setState(() {
+                                    //         _obscurePassword = true;
+                                    //       });
+                                    //     }
+                                    //   });
+                                    // }
+                                  },
+                                )
+                              : null,
+                          filled: true,
+                          fillColor: const Color(0xFFF1F1F1),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
                           ),
                         ),
                       ),
-                    ),
 
-                    SizedBox(height: 23),
-                    // if (!_isLoading)
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
-                      ),
-                      child: _isLoading
-                          ? CircularProgressIndicator(
-                              color: linearColor,
-                            )
+                      const SizedBox(height: 24),
+
+                      /// BUTTON
+                      _isLoading
+                          ? CircularProgressIndicator(color: linearColor)
                           : SizedBox(
-                              width: getWidgetWidth(
-                                  width: kWidth > 500 ? 200 : 375),
-                              height: getWidgetHeight(
-                                  height: kWidth > 500 ? 40 : 50),
+                              width: double.infinity,
+                              height: 48,
                               child: CustomButton(
                                 buttonText: _isLogin
                                     ? "Verify Login"
                                     : "Verify & Login",
-                                onPressed: () async {
-                                  _bottomMessageEntry?.remove();
-                                  _bottomMessageEntry = null;
-                                  if (_isLogin) {
-                                    isLoading = false;
-                                    setState(() {});
-                                  }
-                                  login();
-                                },
+                                onPressed: login,
                               ),
                             ),
-                    ),
-                    if (_isLogin && isLoading)
-                      TextButton(
-                        onPressed: () {
-                          passwordController.clear();
-                          _isLogin = false;
-                          setState(() {});
-                        },
-                        child: const Text(
-                          "<< Back",
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ),
-                    Spacer(),
 
-                    TextButton(
-                      onPressed: () async {
-                        kIsWeb
-                            ? Get.rootDelegate
-                                .offNamed(AppRoutes.inAppWebView, arguments: {
-                                "url": ApiRoutes.privacyPolicy,
-                              })
-                            : Get.to(() => InAppWebViewPage(), arguments: {
-                                "url": ApiRoutes.privacyPolicy,
-                              });
-                      },
-                      child: Text(
-                        "Privacy & Policy",
-                        style: GoogleFonts.inter(
-                          height: 0.5,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: lightWhite,
+                      if (_isLogin && isLoading)
+                        TextButton(
+                          onPressed: () {
+                            passwordController.clear();
+                            _isLogin = false;
+                            setState(() {});
+                          },
+                          child: const Text("← Back"),
                         ),
+
+                      const SizedBox(height: 24),
+
+                      /// FOOTER
+                      Column(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              isWeb
+                                  ? Get.rootDelegate.offNamed(
+                                      AppRoutes.inAppWebView,
+                                      arguments: {
+                                        "url": ApiRoutes.privacyPolicy,
+                                      },
+                                    )
+                                  : Get.to(() => InAppWebViewPage(),
+                                      arguments: {
+                                          "url": ApiRoutes.privacyPolicy,
+                                        });
+                            },
+                            child: const Text(
+                              "Privacy & Policy",
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          if (!isWeb && appVersion != null)
+                            Text(
+                              "App version $appVersion",
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey,
+                              ),
+                            ),
+                        ],
                       ),
-                    ),
-                    if (!kIsWeb)
-                      Text(
-                        "App version $appVersion",
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w300,
-                          height: 0.5,
-                          fontSize: 12,
-                          color: lightWhite,
-                        ),
-                      ),
-                    SizedBox(height: 30),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

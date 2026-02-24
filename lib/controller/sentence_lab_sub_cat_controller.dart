@@ -49,8 +49,12 @@ class SentenceLabSubCatController extends GetxController {
   String batchName = "";
   String? currentKey;
   Map<String, AudioStatus> audioStatusMap = {};
+  int _playbackRequestId = 0;
 
   Map<String, DownloadStatus> downloadStatusMap = {};
+  String mainCategoryTitle = "";
+  String subCategoryTitle = "";
+  int index = 0;
 
   @override
   void onInit() {
@@ -63,6 +67,10 @@ class SentenceLabSubCatController extends GetxController {
       final saved = box.read(AppRoutes.sentenceLabSubCat) ?? {};
       title = saved['title'] ?? "";
     }
+    final ssaved = box.read(AppRoutes.sentenceLabSub) ?? {};
+    subCategoryTitle = ssaved['subCategoryTitle'] ?? "";
+    mainCategoryTitle = ssaved['mainCategoryTitle'] ?? "";
+    index = ssaved['index'] ?? 0;
 
     audioPlayer.playerStateStream.listen((state) async {
       if (state.processingState == ProcessingState.completed ||
@@ -71,15 +79,6 @@ class SentenceLabSubCatController extends GetxController {
           audioStatusMap[currentKey!] = AudioStatus.idle;
           update();
           currentKey = null;
-        }
-      }
-
-      // Optional: handle player stopped manually
-      if (state.playing == false &&
-          state.processingState == ProcessingState.ready) {
-        if (currentKey != null) {
-          audioStatusMap[currentKey!] = AudioStatus.idle;
-          update();
         }
       }
     });
@@ -290,7 +289,16 @@ class SentenceLabSubCatController extends GetxController {
 
   // track currently playing audio
 
+  bool _isRemoteUrl(String path) {
+    return path.startsWith('http://') || path.startsWith('https://');
+  }
+
+  bool _isFileUri(String path) {
+    return path.startsWith('file://');
+  }
+
   void handlePlayPause(int index, int subIndex) async {
+    final requestId = ++_playbackRequestId;
     final newKey = "$index-$subIndex";
 
     // If tapped same item
@@ -299,13 +307,17 @@ class SentenceLabSubCatController extends GetxController {
         await audioPlayer.pause();
         audioStatusMap[newKey] = AudioStatus.idle;
       } else {
+        if (audioStatusMap[newKey] == AudioStatus.loading) return;
         audioStatusMap[newKey] = AudioStatus.loading;
         update();
 
         try {
+          if (requestId != _playbackRequestId) return;
           await audioPlayer.play();
+          if (requestId != _playbackRequestId) return;
           audioStatusMap[newKey] = AudioStatus.playing;
         } catch (e) {
+          if (requestId != _playbackRequestId) return;
           audioStatusMap[newKey] = AudioStatus.error;
         }
       }
@@ -317,6 +329,7 @@ class SentenceLabSubCatController extends GetxController {
     if (currentKey != null) {
       audioStatusMap[currentKey!] = AudioStatus.idle;
       await audioPlayer.stop();
+      if (requestId != _playbackRequestId) return;
       currentKey = null;
     }
 
@@ -332,30 +345,39 @@ class SentenceLabSubCatController extends GetxController {
       if (sentence.localPath != null && sentence.localPath!.isNotEmpty) {
         final localFile = File(sentence.localPath!);
         if (await localFile.exists()) {
+          final outputName =
+              sentence.localPath!.split('/').last.split('.enc').first;
           filePathToPlay = await AudioCryptoHelper.decryptFile(
             sentence.localPath!,
-            sentence.text
-                .replaceAll(' ', '_')
-                .replaceAll(RegExp(r'[<>:"/\\|?*]'), ''),
+            outputName,
           );
         }
       }
 
       filePathToPlay ??= sentence.file;
-      print("$filePathToPlay attempting to play this file");
-      // Set URL and wait until ready
-      await audioPlayer.setUrl(filePathToPlay);
-      // await audioPlayer.load(); // <- ensures it's fully buffered before play
+      if (kDebugMode) {
+        print("$filePathToPlay attempting to play this file");
+      }
+      if (requestId != _playbackRequestId) return;
 
-      // Start playing immediately after loaded
+      if (_isRemoteUrl(filePathToPlay) || _isFileUri(filePathToPlay)) {
+        await audioPlayer.setUrl(filePathToPlay);
+      } else {
+        await audioPlayer.setFilePath(filePathToPlay);
+      }
+      if (requestId != _playbackRequestId) return;
+
       audioStatusMap[newKey] = AudioStatus.playing;
       update();
-      await audioPlayer.play();
+      audioPlayer.play();
 
       // ✅ Mark as playing here
 
-      print("▶️ Playing: $filePathToPlay");
+      if (kDebugMode) {
+        print("▶️ Playing: $filePathToPlay");
+      }
     } catch (e) {
+      if (requestId != _playbackRequestId) return;
       log("❌ Audio load error: $e");
       audioStatusMap[newKey] = AudioStatus.error;
       update();
@@ -369,14 +391,10 @@ class SentenceLabSubCatController extends GetxController {
 
     switch (status) {
       case AudioStatus.loading:
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: getWidgetWidth(width: 4)),
-          child: SizedBox(
-            width: kIsWeb ? 18 : getWidgetWidth(width: 18),
-            height: getWidgetHeight(height: 18),
-            child:
-                CircularProgressIndicator(strokeWidth: 2, color: linearColor),
-          ),
+        return SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(strokeWidth: 2, color: linearColor),
         );
       case AudioStatus.playing:
         return Icon(Icons.pause_circle_outline, color: Colors.black);
@@ -485,5 +503,32 @@ class SentenceLabSubCatController extends GetxController {
         kShowDialog(main, word, false, context);
       }
     });
+  }
+
+  @override
+  void onClose() async {
+    try {
+      // Stop audio if playing
+      if (audioPlayer.playing) {
+        await audioPlayer.stop();
+      }
+
+      // Dispose audio player
+      await audioPlayer.dispose();
+    } catch (e) {
+      log("Error disposing audio player: $e");
+    }
+
+    // Dispose text controller
+    searchController.dispose();
+
+    // Clear maps (optional but clean)
+    audioStatusMap.clear();
+    downloadStatusMap.clear();
+
+    // Reset current playing key
+    currentKey = null;
+
+    super.onClose();
   }
 }

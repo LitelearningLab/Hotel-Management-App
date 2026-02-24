@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -91,7 +92,7 @@ class FrontOfficeController extends GetxController {
                   : index == 3
                       ? CollectionNames.houseKeeping
                       : "";
-
+      timestampIndex = index;
       log("Collection Name: $collectionName");
 
       frontOfficeData =
@@ -170,11 +171,12 @@ class FrontOfficeController extends GetxController {
         .where(
             (item) => item.category.toLowerCase().contains(query.toLowerCase()))
         .toList();
-
-    // Debug
-    for (var item in frontOfficeData) {
-      print(
-          "Filtered Item Category: ${item.category}"); // Should print the original casing
+// Debug
+    if (kDebugMode) {
+      for (var item in frontOfficeData) {
+        print(
+            "Filtered Item Category: ${item.category}"); // Should print the original casing
+      }
     }
 
     update();

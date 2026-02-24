@@ -22,7 +22,15 @@ import 'package:hotelmanagementapp/controller/splash_controller.dart';
 class InitialBinding with Bindings {
   @override
   void dependencies() {
-    // Get.put(HomeController(), permanent: true);
+    Get.put(HomeController(), permanent: true);
+    // Get.put(LanguageDropDownController(), permanent: true);
+  }
+}
+
+class HomeBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(HomeController());
     // Get.put(LanguageDropDownController(), permanent: true);
   }
 }

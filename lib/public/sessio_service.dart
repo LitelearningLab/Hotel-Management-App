@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 // import 'dart:html' as html;
@@ -21,7 +22,10 @@ class SessionService {
   // LOGIN
   // ======================================================
   static Future<bool> loginUser(String email, String password) async {
-    print("💡 FIXED loginUser() called");
+    if (kDebugMode) {
+      print("==== LOGIN START ====");
+      print("Email: $email");
+    }
 
     final firestore = FirebaseFirestore.instance;
 
@@ -33,7 +37,9 @@ class SessionService {
         .get();
 
     if (snapshot.docs.isEmpty) {
-      print("❌ Wrong credentials");
+      if (kDebugMode) {
+        print("❌ No user found with email=$email");
+      }
       return false;
     }
 
@@ -60,15 +66,23 @@ class SessionService {
     String deviceSessionId = existingDeviceSessionId ?? const Uuid().v4();
 
     WebStorageHelper.setDeviceSessionId(deviceSessionId);
-    print("🔐 deviceSessionId in this browser: $deviceSessionId");
+    if (kDebugMode) {
+      print("Device Session ID: $deviceSessionId");
+      print("Server Session ID: ${doc['sessionId']}");
+      print("Is session expired? $isSessionExpired");
+    }
 
     // ==================================================================================
     // If server already has same sessionId → ALLOW MULTIPLE TAB LOGIN
     // ==================================================================================
     if (!isSessionExpired && doc['sessionId'] == deviceSessionId) {
-      print("✔ Same browser tab login → allowed");
+      if (kDebugMode) {
+        print("✔ Same device session active — ALLOW");
+      }
     } else if (!isSessionExpired && doc['sessionId'] != deviceSessionId) {
-      print("❌ Another device is active — BLOCK");
+      if (kDebugMode) {
+        print("❌ Another device is active — BLOCK");
+      }
       return false;
     }
 
@@ -94,7 +108,9 @@ class SessionService {
   // VALIDATE SESSION
   // ======================================================
   static Future<bool> validateSession() async {
-    print("==== VALIDATE SESSION START ====");
+    if (kDebugMode) {
+      print("==== VALIDATE SESSION START ====");
+    }
 
     final prefs = await SharedPreferences.getInstance();
     final email = prefs.getString("email");
@@ -102,7 +118,9 @@ class SessionService {
     final browserSessionId = WebStorageHelper.getDeviceSessionId();
 
     if (email == null || localSessionId == null || browserSessionId == null) {
-      print("No session saved");
+      if (kDebugMode) {
+        print("❌ Missing session data in local storage");
+      }
       return false;
     }
 
@@ -122,12 +140,16 @@ class SessionService {
     // FIXED: Only block if serverSessionId != browserSessionId
     // ==================================================================================
     if (serverSessionId != browserSessionId) {
-      print("❌ Session mismatch → different device → block");
+      if (kDebugMode) {
+        print("❌ Session mismatch → different device → block");
+      }
       await logoutUser();
       return false;
     }
 
-    print("✔ Session Valid");
+    if (kDebugMode) {
+      print("✔ Session Valid");
+    }
     return true;
   }
 
@@ -135,7 +157,9 @@ class SessionService {
   // HEARTBEAT
   // ======================================================
   static void startHeartbeat() async {
-    print("💓 startHeartbeat()");
+    if (kDebugMode) {
+      print("==== START HEARTBEAT ====");
+    }
 
     stopHeartbeat();
 
@@ -164,10 +188,14 @@ class SessionService {
           .doc(doc.id)
           .update({"lastActive": now});
 
-      print("💓 Heartbeat updated $now");
+      if (kDebugMode) {
+        print("💓 Heartbeat sent at ${DateTime.now()}");
+      }
     });
 
-    print("🚀 Heartbeat started");
+    if (kDebugMode) {
+      print("🚀 Heartbeat started");
+    }
   }
 
   static void stopHeartbeat() {
@@ -180,7 +208,16 @@ class SessionService {
   // ======================================================
   static Future<void> logoutUser() async {
     stopHeartbeat();
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+
+    if (kIsWeb) {
+      // Clear browser localStorage
+      html.window.localStorage.clear();
+
+      // Clear sessionStorage (if used anywhere)
+      html.window.sessionStorage.clear();
+    }
   }
 }
