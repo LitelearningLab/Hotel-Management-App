@@ -245,7 +245,7 @@ Future<void> startPracticeTime({
         mainCategory == "French Pronunciation" ||
         mainCategory == "Sentence Lab") {
       activityName = "Pronunciation Lab";
-      type = "null";
+      // type = "null";
     } else if (mianCategoryTitile == "Grammer Lab") {
       activityName = "Grammer Lab";
       type = "null";

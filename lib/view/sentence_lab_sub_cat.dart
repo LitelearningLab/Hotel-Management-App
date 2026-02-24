@@ -102,16 +102,12 @@ class _SentenceLabSubCatState extends State<SentenceLabSubCat> {
           if (controller.isSearching) {
             controller.clearSearch();
           } else {
-            mianCategoryTitile = controller.mainCategoryTitle;
-            subCategoryTitle = controller.title;
-            activityName = "Sentence Lab";
-            timestampIndex = controller.index;
-            sessionName = controller.title;
-            if (kDebugMode) {
-              print("Session Name Set To: $sessionName");
-              print(
-                  "Main Category: $mianCategoryTitile, Sub Category: $subCategoryTitle, Index: $timestampIndex");
-            }
+            // mianCategoryTitile = controller.mainCategoryTitle;
+            // subCategoryTitle = controller.title;
+            // activityName = "Sentence Lab";
+            // timestampIndex = controller.index;
+            // sessionName = controller.title;
+
             stopTimerMainCategory();
             if (kIsWeb) {
               final saved = GetStorage().read(AppRoutes.sentenceLabSub) ?? {};
