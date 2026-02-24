@@ -214,7 +214,7 @@ class HomeController extends GetxController {
           FirebaseFirestore.instance.collection('UserNode').doc(userId);
       final userSnapshot = await userRef.get();
       final userData = userSnapshot.data() ?? {};
-      final String collegeId = userData['collegeId'] ?? '';
+      final String collegeId = userData['companyid'] ?? '';
       log("College ID: $collegeId");
       if (collegeId.isNotEmpty) {
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance

@@ -64,6 +64,8 @@ class SentenceLabSubCatController extends GetxController {
       title = saved['title'] ?? "";
     }
 
+    activityName = "";
+    sessionName = title;
     audioPlayer.playerStateStream.listen((state) async {
       if (state.processingState == ProcessingState.completed ||
           state.processingState == ProcessingState.idle) {
