@@ -211,26 +211,44 @@ class _PronounciationLabState extends State<PronounciationLab> {
                                               //         ),
                                               //       )
                                               //     :
-                                              (controller.currentlyPlayingIndex ==
-                                                      index
-                                                  //      &&
-                                                  // controller.isPlaying
-                                                  )
-                                                  ? InkWell(
-                                                      onTap: () {
-                                                        controller
-                                                            .handlePlayPause(
-                                                                index);
-                                                      },
-                                                      child: Icon(
-                                                        Icons
-                                                            .pause_circle_outline,
+                                              (controller.playingIs == index)
+                                                  ? SizedBox(
+                                                      height: getWidgetHeight(
+                                                          height: displayWidth(
+                                                                      context) >
+                                                                  500
+                                                              ? 20
+                                                              : 20),
+                                                      width: getWidgetWidth(
+                                                          width: displayWidth(
+                                                                      context) >
+                                                                  500
+                                                              ? 5
+                                                              : 22),
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        strokeWidth: 2.0,
                                                         color: linearColor,
-                                                        size: 26,
                                                       ),
                                                     )
-                                                  : controller.errorPlaying ==
-                                                          index
+                                                  : (controller
+                                                              .currentlyPlayingIndex ==
+                                                          index)
+                                                      ? InkWell(
+                                                          onTap: () {
+                                                            controller
+                                                                .handlePlayPause(
+                                                                    index);
+                                                          },
+                                                          child: Icon(
+                                                            Icons
+                                                                .pause_circle_outline,
+                                                            color: linearColor,
+                                                            size: 26,
+                                                          ),
+                                                        )
+                                                      : controller.errorPlaying ==
+                                                              index
                                                       ? GestureDetector(
                                                           onTap: () {
                                                             controller
@@ -249,35 +267,12 @@ class _PronounciationLabState extends State<PronounciationLab> {
                                                                 .handlePlayPause(
                                                                     index);
                                                           },
-                                                          child: controller
-                                                                      .playingIs ==
-                                                                  index
-                                                              ? SizedBox(
-                                                                  height: getWidgetHeight(
-                                                                      height: displayWidth(context) >
-                                                                              500
-                                                                          ? 20
-                                                                          : 20),
-                                                                  width: getWidgetWidth(
-                                                                      width: displayWidth(context) >
-                                                                              500
-                                                                          ? 5
-                                                                          : 22),
-                                                                  child:
-                                                                      CircularProgressIndicator(
-                                                                    strokeWidth:
-                                                                        2.0,
-                                                                    color:
-                                                                        linearColor,
-                                                                  ),
-                                                                )
-                                                              : ImageIcon(
-                                                                  const AssetImage(
-                                                                      AllAssets
-                                                                          .roundPlay),
-                                                                  color:
-                                                                      linearColor,
-                                                                ),
+                                                          child: ImageIcon(
+                                                            const AssetImage(
+                                                                AllAssets
+                                                                    .roundPlay),
+                                                            color: linearColor,
+                                                          ),
                                                         ),
                                               SizedBox(
                                                 width: getWidgetWidth(

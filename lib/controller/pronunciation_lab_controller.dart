@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -44,6 +45,21 @@ class PronunciationLabController extends GetxController {
   String selectedWord = "";
   bool isCorrect = false;
   List<bool> isPriorityList = [];
+
+  String _sanitizeLocalPath(String path) {
+    final trimmed = path.trim();
+    if (trimmed.startsWith('file://')) {
+      return trimmed.replaceFirst('file://', '');
+    }
+    return trimmed;
+  }
+
+  String _normalizeRemoteUrl(String url) {
+    final trimmed = url.trim();
+    final parsed = Uri.tryParse(trimmed);
+    if (parsed == null) return trimmed;
+    return parsed.toString();
+  }
 
   List<Map<String, dynamic>> pronunciationLabList = [
     {
@@ -188,13 +204,21 @@ class PronunciationLabController extends GetxController {
     debugPrint("PronunciationLabController title: ${title.value}");
 
     audioPlayer = AudioPlayer();
-
-    audioPlayer.setUrl(
-        "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Hotel%20Management%2FWhatsApp%20Audio%202025-09-09%20at%203.41.09%20PM.mp4?alt=media&token=b99d9096-211b-45cc-b157-4582c7fc3312");
-    audioPlayer.play();
-    databaseRef = FirebaseDatabase.instance.ref(title == "English Pronunciation"
-        ? "EnglishLabCollection"
-        : "FrenchLabCollection");
+    audioPlayer.playerStateStream.listen((state) {
+      if (state.playing && state.processingState == ProcessingState.ready) {
+        playingIs = -1;
+        update();
+      }
+      if (state.processingState == ProcessingState.completed) {
+        currentlyPlayingIndex = null;
+        playingIs = -1;
+        update();
+      }
+    });
+    databaseRef = FirebaseDatabase.instance.ref(
+        title.value == "English Pronunciation"
+            ? "EnglishLabCollection"
+            : "FrenchLabCollection");
     _fetchData();
     log("PronunciationLabController initialized with title: ${title.value}");
 
@@ -328,24 +352,58 @@ class PronunciationLabController extends GetxController {
         await audioPlayer.stop();
         currentlyPlayingIndex = index;
 
-        String? playPath;
-        if (subcategories[index].localPath.isNotEmpty &&
-            await File(subcategories[index].localPath).exists()) {
+        final tableName =
+            title.value.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
+        if (subcategories[index].localPath.isEmpty && !kIsWeb) {
+          final localData = await DBHelper.getAllSubcategoriesValidated(
+            tableName,
+          );
+          final matched = localData
+              .where(
+                (e) =>
+                    e.file == subcategories[index].file ||
+                    e.text.toLowerCase() ==
+                    subcategories[index].text.toLowerCase(),
+              )
+              .toList();
+          if (matched.isNotEmpty && matched.first.localPath.isNotEmpty) {
+            subcategories[index] = subcategories[index].copyWith(
+              localPath: _sanitizeLocalPath(matched.first.localPath),
+            );
+          }
+        }
+
+        bool isLocalSource = false;
+        late String playPath;
+        final localPath = _sanitizeLocalPath(subcategories[index].localPath);
+        final hasLocalFile =
+            localPath.isNotEmpty && await File(localPath).exists();
+
+        if (hasLocalFile) {
+
           log("🔐 Decrypting local file before playing...");
           playPath = await AudioCryptoHelper.decryptFile(
-            subcategories[index].localPath,
+            localPath,
             subcategories[index]
                 .text
                 .replaceAll(' ', '_')
                 .replaceAll(RegExp(r'[<>:"/\\|?*]'), ''),
           );
+          isLocalSource = true;
           log("Decrypted to temp file: $playPath");
         } else {
-          playPath = subcategories[index].file; // URL
+          playPath = _normalizeRemoteUrl(subcategories[index].file);
+          if (localPath.isNotEmpty && !hasLocalFile) {
+            log("⚠️ Local path missing, fallback to remote URL: $localPath");
+          }
           log("Playing from URL: $playPath");
         }
 
-        await audioPlayer.setUrl(playPath);
+        if (isLocalSource) {
+          await audioPlayer.setFilePath(playPath);
+        } else {
+          await audioPlayer.setUrl(playPath);
+        }
         playingIs = -1;
 
         update();
@@ -370,16 +428,18 @@ class PronunciationLabController extends GetxController {
         await WordAttempt.saveAttempt(attempt);
       }
       errorPlaying = -1;
-      currentlyPlayingIndex = null;
       update();
     } on PlayerException catch (e) {
-      print("❌ Audio player error: ${e.message} ${subcategories[index].file}");
+      print(
+          "❌ Audio player error: ${e.message} | file=${subcategories[index].file} | localPath=${subcategories[index].localPath}");
       errorPlaying = index;
       currentlyPlayingIndex = null;
+      playingIs = -1;
     } on Exception catch (e) {
       print("❌ General audio error: $e");
       errorPlaying = index;
       currentlyPlayingIndex = null;
+      playingIs = -1;
     } finally {
       // loadingIndex = null;
       isPlaying = false;
@@ -389,7 +449,8 @@ class PronunciationLabController extends GetxController {
 
   void saveUpdate(int index) async {
     isSaving = index;
-    String tableName = title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
+    String tableName =
+        title.value.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
     String fileKey = subcategories[index].file; // Use exact file key
     String fileName = subcategories[index]
         .text
@@ -400,7 +461,7 @@ class PronunciationLabController extends GetxController {
     // Toggle current UI state first
     bool newValue = !isPriorityList[index];
     isPriorityList[index] = newValue;
-    subcategories[index].downloadStatus = !subcategories[index].downloadStatus;
+    subcategories[index].downloadStatus = newValue;
     try {
       update();
 
@@ -418,8 +479,9 @@ class PronunciationLabController extends GetxController {
         log("✅ Downloaded & saved local path: $encryptedPath");
       } else {
         final localPath = subcategories[index].localPath;
-        if (localPath.isNotEmpty && await File(localPath).exists()) {
-          await File(localPath).delete();
+        final sanitized = _sanitizeLocalPath(localPath);
+        if (sanitized.isNotEmpty && await File(sanitized).exists()) {
+          await File(sanitized).delete();
           log("🗑 Deleted local file: $localPath");
         }
 
