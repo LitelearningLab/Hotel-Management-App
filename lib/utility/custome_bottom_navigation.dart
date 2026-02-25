@@ -7,8 +7,6 @@ import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
-import 'package:hotelmanagementapp/view/home.dart';
-import 'package:hotelmanagementapp/view/search_screen.dart';
 
 class CustomeBottomNavigation extends StatefulWidget {
   const CustomeBottomNavigation({
@@ -21,8 +19,49 @@ class CustomeBottomNavigation extends StatefulWidget {
 }
 
 class _CustomeBottomNavigationState extends State<CustomeBottomNavigation> {
+  int _tabIndexForRoute(String route) {
+    if (route == AppRoutes.searchScreen) {
+      return 1;
+    }
+
+    if (route == AppRoutes.simulation || route == AppRoutes.simulationSub) {
+      return 2;
+    }
+
+    if (route == AppRoutes.languageLab ||
+        route == AppRoutes.pronunciationLab ||
+        route == AppRoutes.sentenceLab ||
+        route == AppRoutes.pronunciationLabSub ||
+        route == AppRoutes.grmmaerLab ||
+        route == AppRoutes.soundPage ||
+        route == AppRoutes.soundLab ||
+        route == AppRoutes.sentenceLabSub ||
+        route == AppRoutes.sentenceLabSubCat) {
+      return 3;
+    }
+
+    return 0;
+  }
+
+  String _routeForTab(int index) {
+    switch (index) {
+      case 0:
+        return AppRoutes.home;
+      case 1:
+        return AppRoutes.searchScreen;
+      case 2:
+        return AppRoutes.simulation;
+      case 3:
+        return AppRoutes.languageLab;
+      default:
+        return AppRoutes.home;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final currentRoute = Get.currentRoute;
+    final selectedIndex = _tabIndexForRoute(currentRoute);
     return Padding(
       padding: EdgeInsets.only(
           left: getWidgetWidth(width: 20),
@@ -45,12 +84,17 @@ class _CustomeBottomNavigationState extends State<CustomeBottomNavigation> {
           child: BottomNavigationBar(
             backgroundColor: Colors.white,
             type: BottomNavigationBarType.fixed,
-            currentIndex: currentIndex,
+            currentIndex: selectedIndex,
             onTap: (index) {
+              final targetRoute = _routeForTab(index);
+              // Keep current page state when the user taps the same page tab.
+              if (currentRoute == targetRoute) {
+                return;
+              }
+
               stopTimerMainCategory();
               log('BottomNavigationBar tapped: $index');
               if (index == 0) {
-                currentIndex = index;
                 kIsWeb
                     ? Get.rootDelegate.offNamed(AppRoutes.home)
                     : Get.offAndToNamed(AppRoutes.home);
@@ -71,15 +115,11 @@ class _CustomeBottomNavigationState extends State<CustomeBottomNavigation> {
                 kIsWeb
                     ? Get.rootDelegate.toNamed(AppRoutes.simulation)
                     : Get.toNamed(AppRoutes.simulation);
-                currentIndex = index;
               } else if (index == 3) {
                 kIsWeb
                     ? Get.rootDelegate.toNamed(AppRoutes.languageLab)
                     : Get.toNamed(AppRoutes.languageLab);
-                currentIndex = index;
               }
-
-              setState(() {});
             },
             selectedItemColor: linearColor, // Your linearColor highlight
             unselectedItemColor: Colors.grey,
