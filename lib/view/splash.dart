@@ -25,16 +25,6 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    // Delay until build completes
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final results = await Connectivity().checkConnectivity();
-      bool isConnected = results.any((e) => e != ConnectivityResult.none);
-
-      if (!isConnected) {
-        Get.toNamed(AppRoutes.noInternet);
-        return;
-      }
-    });
     // FirebaseUploader firebaseUploader = FirebaseUploader();
     // firebaseUploader.uploadJsonData(
     //     'assets/EnglishLab.json', 'FrenchLabCollection');
@@ -53,9 +43,14 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> startTimer() async {
-    // Check internet at app launch
-    final connectivity = await Connectivity().checkConnectivity();
-    bool hasInternet = connectivity.any((e) => e != ConnectivityResult.none);
+    // Check internet at app launch with retry to avoid transient iOS false offline.
+    bool hasInternet = false;
+    for (int attempt = 0; attempt < 3; attempt++) {
+      final connectivity = await Connectivity().checkConnectivity();
+      hasInternet = connectivity.any((e) => e != ConnectivityResult.none);
+      if (hasInternet) break;
+      await Future.delayed(const Duration(milliseconds: 700));
+    }
 
     if (!hasInternet) {
       // Go to No Internet screen immediately
