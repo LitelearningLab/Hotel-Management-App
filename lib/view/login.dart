@@ -55,6 +55,12 @@ class _LoginPageState extends State<LoginPage> {
   Timer? _hideTimer;
 
   Future<void> _loadAppVersion() async {
+    if (kIsWeb) {
+      setState(() {
+        appVersion = "Web";
+      });
+      return;
+    }
     if (Platform.isIOS) {
       setState(() {
         appVersion = "1.0.0";

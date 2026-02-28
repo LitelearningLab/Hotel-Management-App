@@ -22,7 +22,7 @@ import 'package:url_launcher/url_launcher.dart';
 class HomeController extends GetxController {
   List<dynamic> categories = [];
   late UniversityModel universityModel;
-   String userName='';
+  String userName = '';
   List<Map<String, dynamic>> homeRecentHistory = [];
   bool recentHistoryLoaded = true;
   OverlayEntry? _bottomMessageEntry;
@@ -198,7 +198,7 @@ class HomeController extends GetxController {
   }
 
   Future<void> fetchCollegeSyllabus() async {
-     loadRecentHistory();
+    loadRecentHistory();
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString("userId") ?? "";
     userName = prefs.getString("userName") ?? "";
@@ -214,7 +214,8 @@ class HomeController extends GetxController {
           FirebaseFirestore.instance.collection('UserNode').doc(userId);
       final userSnapshot = await userRef.get();
       final userData = userSnapshot.data() ?? {};
-      final String collegeId = userData['companyid'] ?? userData['collegeId'] ??'';
+      final String collegeId =
+          userData['companyid'] ?? userData['collegeId'] ?? '';
       log("College ID: $collegeId");
       if (collegeId.isNotEmpty) {
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -385,6 +386,8 @@ class HomeController extends GetxController {
     const androidAppId = "com.profluent.hotelier.app";
     const iosAppUrl =
         "https://apps.apple.com/in/app/profluent-hotelier/id6754444749";
+
+    if (kIsWeb) return;
 
     if (Platform.isAndroid) {
       final url = Uri.parse("market://details?id=$androidAppId");

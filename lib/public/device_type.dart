@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class DeviceScreenInfo {
   static String getDevicePlatform() {
+    if (kIsWeb) return "Web";
     if (Platform.isAndroid) {
       return Keys.android;
     } else if (Platform.isIOS) {
@@ -15,6 +17,7 @@ class DeviceScreenInfo {
   }
 
   static Future<String> osVersion() async {
+    if (kIsWeb) return "Web Browser";
     if (Platform.isAndroid) {
       var androidInfo = await DeviceInfoPlugin().androidInfo;
       var release = androidInfo.version.release;
@@ -30,6 +33,7 @@ class DeviceScreenInfo {
   }
 
   static Future<String> getModelName() async {
+    if (kIsWeb) return "Web Browser";
     if (Platform.isAndroid) {
       try {
         var androidInfo = await DeviceInfoPlugin().androidInfo;

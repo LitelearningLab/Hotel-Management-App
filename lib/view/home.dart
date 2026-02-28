@@ -703,8 +703,15 @@ class _CourseCardState extends State<_CourseCard> {
                   child: ClipRRect(
                     borderRadius:
                         const BorderRadius.vertical(top: Radius.circular(18)),
-                    child: index == 4
-                        ? Image.network(c.cardImages[index], fit: BoxFit.cover)
+                    child: index >= 4
+                        ? Image.network(c.cardImages[index],
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
+                                  color: Colors.grey[200],
+                                  child: const Icon(Icons.broken_image,
+                                      color: Colors.grey),
+                                ))
                         : SvgPicture.asset(
                             c.cardImages[index],
                             fit: BoxFit.cover,

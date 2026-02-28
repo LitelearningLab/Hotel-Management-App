@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -9,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart'; // Example using Firestore
 
 class UpdateChecker {
   static Future<void> checkForUpdate(BuildContext context) async {
+    if (kIsWeb) return;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String currentVersion = packageInfo.version;
 
