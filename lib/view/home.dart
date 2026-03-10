@@ -650,8 +650,9 @@ class _CourseCardState extends State<_CourseCard> {
                               "Accommodation\nManagement - Housekeeping"
                           ? "Accommodation Management - Housekeeping"
                           : c.cardNames[index];
+              setPathTitle(title);
 
-              GetStorage().write(AppRoutes.frontOffice, {
+              GetStorage().write(AppRoutes.frontOfficeStoreKey, {
                 'title': title,
                 'image': c.cardImages[index],
                 'index': index,
@@ -798,6 +799,7 @@ class _SmartTileState extends State<_SmartTile> {
                   ? Get.rootDelegate.toNamed(AppRoutes.simulation)
                   : Get.toNamed(AppRoutes.simulation);
             } else if (widget.index == 1) {
+              setPathTitle('language-lab');
               kIsWeb
                   ? Get.rootDelegate.toNamed(AppRoutes.languageLab)
                   : Get.toNamed(AppRoutes.languageLab);

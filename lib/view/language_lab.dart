@@ -21,6 +21,7 @@ class Languagelab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    setPathTitle('language-lab');
     final homeController = Get.put(HomeController());
 
     return PopScope(

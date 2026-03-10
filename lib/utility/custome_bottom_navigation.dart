@@ -171,6 +171,7 @@ class _CustomeBottomNavigationState extends State<CustomeBottomNavigation> {
           : Get.toNamed(AppRoutes.simulation);
     } else if (index == 3) {
       currentIndex = index;
+      setPathTitle('language-lab');
       kIsWeb
           ? Get.rootDelegate.toNamed(AppRoutes.languageLab)
           : Get.toNamed(AppRoutes.languageLab);

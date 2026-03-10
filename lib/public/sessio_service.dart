@@ -7,16 +7,47 @@ import 'dart:html' as html;
 
 class WebStorageHelper {
   static String? getDeviceSessionId() {
-    // return html.window.localStorage['deviceSessionId'];
+    return html.window.localStorage['deviceSessionId'];
   }
 
   static void setDeviceSessionId(String id) {
-    // html.window.localStorage['deviceSessionId'] = id;
+    html.window.localStorage['deviceSessionId'] = id;
   }
 }
 
 class SessionService {
+  static const int _sessionExpiryMs = 60000;
+  static const Duration _sessionGuardInterval = Duration(seconds: 8);
+  static Timer? _sessionGuardTimer;
   static Timer? _heartbeatTimer;
+  static StreamSubscription<html.Event>? _onFocusSub;
+  static StreamSubscription<html.Event>? _onVisibilitySub;
+  static void Function()? _onSessionBlocked;
+
+  static Future<bool> _hasLocalLoginData() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString("email") != null &&
+        prefs.getString("password") != null &&
+        prefs.getString("sessionId") != null;
+  }
+
+  static Future<void> _validateAndHandleBlock() async {
+    final hasLoginData = await _hasLocalLoginData();
+    if (!hasLoginData) {
+      stopHeartbeat();
+      return;
+    }
+
+    if (_heartbeatTimer == null) {
+      startHeartbeat();
+    }
+
+    final valid = await validateSession();
+    if (!valid) {
+      stopWebSessionGuard();
+      _onSessionBlocked?.call();
+    }
+  }
 
   // ======================================================
   // LOGIN
@@ -56,7 +87,7 @@ class SessionService {
 
     if (lastActive != null) {
       int diff = now - lastActive;
-      isSessionExpired = diff > 45000; // 30 sec
+      isSessionExpired = diff > _sessionExpiryMs;
     }
 
     // ==================================================================================
@@ -102,6 +133,43 @@ class SessionService {
     print("🎉 Login Success (Web multiple tabs supported)");
 
     return true;
+  }
+
+  // ======================================================
+  // SESSION GUARD (WEB)
+  // ======================================================
+  static Future<void> startWebSessionGuard({
+    void Function()? onSessionBlocked,
+  }) async {
+    if (!kIsWeb) return;
+
+    _onSessionBlocked = onSessionBlocked;
+    stopWebSessionGuard();
+
+    await _validateAndHandleBlock();
+
+    _sessionGuardTimer = Timer.periodic(_sessionGuardInterval, (_) {
+      _validateAndHandleBlock();
+    });
+
+    _onFocusSub = html.window.onFocus.listen((_) {
+      _validateAndHandleBlock();
+    });
+
+    _onVisibilitySub = html.document.onVisibilityChange.listen((_) {
+      if (html.document.visibilityState == 'visible') {
+        _validateAndHandleBlock();
+      }
+    });
+  }
+
+  static void stopWebSessionGuard() {
+    _sessionGuardTimer?.cancel();
+    _sessionGuardTimer = null;
+    _onFocusSub?.cancel();
+    _onFocusSub = null;
+    _onVisibilitySub?.cancel();
+    _onVisibilitySub = null;
   }
 
   // ======================================================
@@ -207,6 +275,7 @@ class SessionService {
   // LOGOUT
   // ======================================================
   static Future<void> logoutUser() async {
+    stopWebSessionGuard();
     stopHeartbeat();
 
     final prefs = await SharedPreferences.getInstance();

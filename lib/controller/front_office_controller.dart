@@ -52,6 +52,11 @@ class FrontOfficeController extends GetxController {
       loading = true;
       update();
 
+      final routePathTitle = Get.parameters['pathTitle'];
+      if (routePathTitle != null && routePathTitle.isNotEmpty) {
+        setPathTitle(routePathTitle);
+      }
+
       final args = Get.arguments;
       final box = GetStorage();
 
@@ -65,7 +70,7 @@ class FrontOfficeController extends GetxController {
         box.write('pageData', args);
       } else {
         // Web refresh fallback ✅
-        final saved = box.read(AppRoutes.frontOffice) ?? {};
+        final saved = box.read(AppRoutes.frontOfficeStoreKey) ?? {};
         title = saved['title'] ?? "";
         image = saved['image'] ?? "";
         index = saved['index'] ?? "";

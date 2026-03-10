@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/firebase_options.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/sessio_service.dart';
 import 'package:hotelmanagementapp/route/app_router_delegate.dart';
 import 'package:hotelmanagementapp/route/binding.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
@@ -85,6 +86,13 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    if (kIsWeb && !kDebugMode) {
+      SessionService.startWebSessionGuard(onSessionBlocked: () {
+        if (Get.currentRoute != AppRoutes.login) {
+          Get.rootDelegate.offNamed(AppRoutes.login);
+        }
+      });
+    }
 
     _connectivity.onConnectivityChanged.listen((results) {
       bool isConnected =
@@ -100,6 +108,14 @@ class _MyAppState extends State<MyApp> {
         }
       }
     });
+  }
+
+  @override
+  void dispose() {
+    if (kIsWeb) {
+      SessionService.stopWebSessionGuard();
+    }
+    super.dispose();
   }
 
   @override

@@ -89,6 +89,10 @@ class PronunciationLabSubController extends GetxController {
 
   void readyFirs() async {
     audioPlayer = AudioPlayer();
+    final routePathTitle = Get.parameters['pathTitle'];
+    if (routePathTitle != null && routePathTitle.isNotEmpty) {
+      setPathTitle(routePathTitle);
+    }
     final args = Get.arguments;
     final box = GetStorage();
     var argList = [];
@@ -100,7 +104,7 @@ class PronunciationLabSubController extends GetxController {
       id = args['id'] ?? "";
       index = args['index'] ?? 0;
     } else {
-      final saved = box.read(AppRoutes.pronunciationLabSub) ?? {};
+      final saved = box.read(AppRoutes.pronunciationLabSubStoreKey) ?? {};
       title = saved['title'] ?? "";
       final subList = saved['subcategories'] ?? [];
       argList = subList

@@ -780,7 +780,8 @@ class _PronounciationLabState extends State<PronounciationLab> {
                                           );
 
                                           GetStorage().write(
-                                            AppRoutes.pronunciationLabSub,
+                                            AppRoutes
+                                                .pronunciationLabSubStoreKey,
                                             {
                                               'title': controller
                                                   .categories[index].category,

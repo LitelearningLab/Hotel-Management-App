@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
+import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart' show linearColor;
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/view/home.dart';
@@ -50,6 +51,7 @@ class WebTopNavigation extends StatelessWidget {
         } else if (index == 2) {
           Get.rootDelegate.toNamed(AppRoutes.simulation);
         } else if (index == 3) {
+          setPathTitle('language-lab');
           Get.rootDelegate.toNamed(AppRoutes.languageLab);
         }
       },
@@ -191,6 +193,9 @@ class WebHeaderWithNav extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(10),
       onTap: () {
+        if (index == 3) {
+          setPathTitle('language-lab');
+        }
         currentIndex = index;
         Get.rootDelegate.offNamed(route);
       },

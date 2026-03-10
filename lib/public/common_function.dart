@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:hotelmanagementapp/model/grammer_lab_model.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/model/sound_model.dart';
@@ -18,6 +19,8 @@ import 'package:uuid/uuid.dart';
 
 double kHeight = 0.0;
 double kWidth = 0.0;
+String pathTitle = '';
+const String _pathTitleStorageKey = 'path_title';
 DateTime startTime = DateTime.now();
 List<Map<String, DateTime>> timings = [];
 DateTime startTimings = DateTime.now();
@@ -42,6 +45,37 @@ final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 Size displaySize(BuildContext context) {
   //debugPrint('Size = ' + MediaQuery.of(context).size.toString());
   return MediaQuery.of(context).size;
+}
+
+String normalizePathTitle(String value) {
+  return value
+      .trim()
+      .toLowerCase()
+      .replaceAll('&', '-')
+      .replaceAll(RegExp(r'\s+'), '-')
+      .replaceAll(RegExp(r'-+'), '-')
+      .replaceAll(RegExp(r'^-|-$'), '');
+}
+
+void setPathTitle(String value) {
+  pathTitle = normalizePathTitle(value);
+  if (pathTitle.isNotEmpty) {
+    GetStorage().write(_pathTitleStorageKey, pathTitle);
+  }
+}
+
+String getCurrentPathTitle() {
+  if (pathTitle.trim().isNotEmpty) {
+    return normalizePathTitle(pathTitle);
+  }
+
+  final stored = GetStorage().read(_pathTitleStorageKey);
+  if (stored is String && stored.trim().isNotEmpty) {
+    pathTitle = normalizePathTitle(stored);
+    return pathTitle;
+  }
+
+  return '';
 }
 
 double getWidgetHeight({required double height}) {

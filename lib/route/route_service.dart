@@ -47,11 +47,6 @@ class RouteService {
             preventDuplicates: true,
           ),
           GetPage(
-              name: AppRoutes.frontOffice,
-              page: () => const FrontOfficeHotelReception(),
-              binding: FrontOfficeBinding(),
-              middlewares: [AuthMiddleware()]),
-          GetPage(
               name: AppRoutes.simulation,
               page: () => ARCallSimulation(),
               binding: SimulationBinding(),
@@ -75,11 +70,6 @@ class RouteService {
               name: AppRoutes.sentenceLab,
               page: () => SentenceLab(),
               binding: SentenceLabBinding(),
-              middlewares: [AuthMiddleware()]),
-          GetPage(
-              name: AppRoutes.pronunciationLabSub,
-              page: () => PronunciationLabSub(),
-              binding: PronunciationLabSubBinding(),
               middlewares: [AuthMiddleware()]),
           GetPage(
               name: AppRoutes.grmmaerLab,
@@ -132,7 +122,17 @@ class RouteService {
             page: () => FeedbackFormScreen(),
             binding: FeedbackViewBinding(),
             middlewares: [AuthMiddleware()],
-          )
+          ),
+          GetPage(
+              name: AppRoutes.pronunciationLabSubPattern,
+              page: () => PronunciationLabSub(),
+              binding: PronunciationLabSubBinding(),
+              middlewares: [AuthMiddleware()]),
+          GetPage(
+              name: AppRoutes.frontOfficePattern,
+              page: () => const FrontOfficeHotelReception(),
+              binding: FrontOfficeBinding(),
+              middlewares: [AuthMiddleware()]),
         ]
       : [
           GetPage(
@@ -150,12 +150,6 @@ class RouteService {
             name: AppRoutes.login,
             page: () => LoginPage(),
             preventDuplicates: true,
-          ),
-          GetPage(
-            name: AppRoutes.frontOffice,
-            page: () => const FrontOfficeHotelReception(),
-            binding: FrontOfficeBinding(),
-            // middlewares: [AuthMiddleware()],
           ),
           GetPage(
             name: AppRoutes.simulation,
@@ -185,12 +179,6 @@ class RouteService {
             name: AppRoutes.sentenceLab,
             page: () => SentenceLab(),
             binding: SentenceLabBinding(),
-            // middlewares: [AuthMiddleware()],
-          ),
-          GetPage(
-            name: AppRoutes.pronunciationLabSub,
-            page: () => PronunciationLabSub(),
-            binding: PronunciationLabSubBinding(),
             // middlewares: [AuthMiddleware()],
           ),
           GetPage(
@@ -251,6 +239,18 @@ class RouteService {
             name: AppRoutes.feedbackpage,
             page: () => FeedbackFormScreen(),
             binding: FeedbackViewBinding(),
-          )
+          ),
+          GetPage(
+            name: AppRoutes.pronunciationLabSubPattern,
+            page: () => PronunciationLabSub(),
+            binding: PronunciationLabSubBinding(),
+            // middlewares: [AuthMiddleware()],
+          ),
+          GetPage(
+            name: AppRoutes.frontOfficePattern,
+            page: () => const FrontOfficeHotelReception(),
+            binding: FrontOfficeBinding(),
+            // middlewares: [AuthMiddleware()],
+          ),
         ];
 }

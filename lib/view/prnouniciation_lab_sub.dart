@@ -162,8 +162,9 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                 final box = GetStorage();
 
                                 if (controller.id != "") {
-                                  final saved =
-                                      box.read(AppRoutes.frontOffice) ?? {};
+                                  final saved = box
+                                          .read(AppRoutes.frontOfficeStoreKey) ??
+                                      {};
                                   Get.rootDelegate.offNamed(
                                     AppRoutes.frontOffice,
                                     arguments: {

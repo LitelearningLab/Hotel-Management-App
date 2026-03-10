@@ -302,7 +302,8 @@ class _ExpandableCardState extends State<_ExpandableCard> {
                               "pronunCollectionName: ${widget.controller.pronunCollectionName}");
 
                           subCategoryTitle = item.category;
-                          GetStorage().write(AppRoutes.pronunciationLabSub, {
+                          GetStorage().write(
+                              AppRoutes.pronunciationLabSubStoreKey, {
                             'title': item.category,
                             'subcategories': <SubcategoryPro>[],
                             "id": item.pronunID,
@@ -433,7 +434,7 @@ class _ExpandableCardState extends State<_ExpandableCard> {
   }
 
   void _openPronunciation(item) {
-    GetStorage().write(AppRoutes.pronunciationLabSub, {
+    GetStorage().write(AppRoutes.pronunciationLabSubStoreKey, {
       "title": item.category,
       "id": item.pronunID,
     });
