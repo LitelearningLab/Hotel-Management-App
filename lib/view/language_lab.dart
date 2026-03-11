@@ -201,14 +201,12 @@ class Languagelab extends StatelessWidget {
           return;
         }
 
-        mianCategoryTitile = title;
+        mainCategoryTitle = title;
         GetStorage().write(route, {"title": title});
         kIsWeb
             ? Get.rootDelegate.offNamed(route, arguments: {"title": title})
             : Get.toNamed(route, arguments: {"title": title});
       },
-      height: null,
-      width: null,
     );
   }
 

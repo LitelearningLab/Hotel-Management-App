@@ -37,7 +37,7 @@ class FrontOfficeHotelReception extends StatelessWidget {
                   _HeaderSection(
                     controller: controller,
                     width: width,
-                    homeController: homeController, // ✅ passed
+                    homeController: homeController,
                   ),
                   const Divider(height: 1),
                   Expanded(
@@ -54,7 +54,7 @@ class FrontOfficeHotelReception extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final isExpanded =
                                   controller.expandedIndex == index;
-                              mianCategoryTitile = controller.title;
+                              mainCategoryTitle = controller.title;
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 10),
@@ -83,7 +83,7 @@ class FrontOfficeHotelReception extends StatelessWidget {
 
 class _HeaderSection extends StatelessWidget {
   final FrontOfficeController controller;
-  final HomeController homeController; // ✅ added
+  final HomeController homeController;
   final double width;
 
   const _HeaderSection({
@@ -103,24 +103,26 @@ class _HeaderSection extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                final HomeController homeController =
-                    Get.isRegistered<HomeController>()
-                        ? Get.find<HomeController>()
-                        : Get.put(HomeController());
-
                 homeController.loadRecentHistory();
 
-                kIsWeb ? Get.rootDelegate.offNamed(AppRoutes.home) : Get.back();
+                if (kIsWeb) {
+                  Get.rootDelegate.offNamed(AppRoutes.home);
+                } else {
+                  Get.back();
+                }
               },
             ),
           ),
           const SizedBox(width: 12),
-          SvgPicture.asset(
-            controller.image,
-            width: 160,
-            height: 160,
-            fit: BoxFit.contain,
-          ),
+          if (controller.image.isNotEmpty)
+            SvgPicture.asset(
+              controller.image,
+              width: 160,
+              height: 160,
+              fit: BoxFit.contain,
+            )
+          else
+            const SizedBox(width: 160, height: 160),
           const SizedBox(width: 24),
           Expanded(
             child: Column(
@@ -302,8 +304,9 @@ class _ExpandableCardState extends State<_ExpandableCard> {
                               "pronunCollectionName: ${widget.controller.pronunCollectionName}");
 
                           subCategoryTitle = item.category;
-                          GetStorage().write(
-                              AppRoutes.pronunciationLabSubStoreKey, {
+                          mainCategoryTitle = widget.controller.title;
+                          GetStorage()
+                              .write(AppRoutes.pronunciationLabSubStoreKey, {
                             'title': item.category,
                             'subcategories': <SubcategoryPro>[],
                             "id": item.pronunID,
@@ -347,16 +350,7 @@ class _ExpandableCardState extends State<_ExpandableCard> {
                                             widget.controller.title,
                                       });
                           });
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder:
-                          //             (context) =>
-                          //                 AudioListPage()));
-                        }
-                        // _openPronunciation(item);
-
-                        ),
+                        }),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -366,52 +360,53 @@ class _ExpandableCardState extends State<_ExpandableCard> {
                   color: Colors.black.withOpacity(0.12),
                 ),
                 const SizedBox(height: 10),
-                ...item.subcategory[2].linkList.map((e) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: MouseRegion(
-                      cursor: e['link']!.isNotEmpty
-                          ? SystemMouseCursors.click
-                          : SystemMouseCursors.basic,
-                      child: GestureDetector(
-                        onTap: e['link']!.isEmpty
-                            ? null
-                            : () {
-                                subCategoryTitle = item.category;
-                                activityName = "Quiz";
-                                _openWeb(context, e['link']!, item.category);
-                              },
-                        child: Row(
-                          children: [
-                            Text(
-                              "›",
-                              style: GoogleFonts.inter(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: e['link']!.isEmpty
-                                    ? Colors.grey
-                                    : linearColor,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                e['name']!,
+                if (item.subcategory.length > 2)
+                  ...item.subcategory[2].linkList.map((e) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: MouseRegion(
+                        cursor: e['link']!.isNotEmpty
+                            ? SystemMouseCursors.click
+                            : SystemMouseCursors.basic,
+                        child: GestureDetector(
+                          onTap: e['link']!.isEmpty
+                              ? null
+                              : () {
+                                  subCategoryTitle = item.category;
+                                  activityName = "Quiz";
+                                  _openWeb(context, e['link']!, item.category);
+                                },
+                          child: Row(
+                            children: [
+                              Text(
+                                "›",
                                 style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                   color: e['link']!.isEmpty
                                       ? Colors.grey
                                       : linearColor,
                                 ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  e['name']!,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: e['link']!.isEmpty
+                                        ? Colors.grey
+                                        : linearColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
               ],
             ],
           ),
@@ -431,14 +426,6 @@ class _ExpandableCardState extends State<_ExpandableCard> {
     } else {
       Get.toNamed(AppRoutes.inAppWebView, arguments: {"url": url});
     }
-  }
-
-  void _openPronunciation(item) {
-    GetStorage().write(AppRoutes.pronunciationLabSubStoreKey, {
-      "title": item.category,
-      "id": item.pronunID,
-    });
-    Get.rootDelegate.offNamed(AppRoutes.pronunciationLabSub);
   }
 }
 

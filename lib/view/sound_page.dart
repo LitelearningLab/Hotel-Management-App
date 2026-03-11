@@ -39,7 +39,7 @@ class _SoundPageState extends State<SoundPage> {
               WebHeaderWithNav(
                 title: controller.title,
                 onBack: () {
-                  mianCategoryTitile = "Sounds";
+                  mainCategoryTitle = "Sounds";
                   timestampIndex = 6;
                   subCategoryTitle = controller.title;
                   sessionName = "";

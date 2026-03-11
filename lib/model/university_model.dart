@@ -19,7 +19,7 @@ class UniversityModel {
               ?.map((item) => UniversityCategory.fromMap(item))
               .toList() ??
           [],
-      photo: map['photo'],
+      photo: map['photo'] ?? '',
     );
   }
 }

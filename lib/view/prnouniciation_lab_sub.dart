@@ -47,7 +47,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
         onPopInvoked: (didPop) {
           subCategoryTitle = controller.title;
           activityName = "Pronunciation Lab";
-          mianCategoryTitile = controller.mainCategoryTitle;
+          mainCategoryTitle = controller.mainCategoryTitle;
           timestampIndex = controller.index;
           stopTimerMainCategory();
         },
@@ -154,7 +154,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                             } else {
                               subCategoryTitle = controller.title;
                               activityName = "Pronunciation Lab";
-                              mianCategoryTitile = controller.mainCategoryTitle;
+                              mainCategoryTitle = controller.mainCategoryTitle;
                               timestampIndex = controller.index;
 
                               stopTimerMainCategory();
@@ -162,9 +162,9 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
                                 final box = GetStorage();
 
                                 if (controller.id != "") {
-                                  final saved = box
-                                          .read(AppRoutes.frontOfficeStoreKey) ??
-                                      {};
+                                  final saved =
+                                      box.read(AppRoutes.frontOfficeStoreKey) ??
+                                          {};
                                   Get.rootDelegate.offNamed(
                                     AppRoutes.frontOffice,
                                     arguments: {

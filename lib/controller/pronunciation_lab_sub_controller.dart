@@ -121,9 +121,6 @@ class PronunciationLabSubController extends GetxController {
       mainCategoryTitle = saved['mainCategoryTitle'] ?? '';
       index = _parseSafeIndex(saved['index']);
     }
-    debugPrint("collection name is $collectionName");
-    debugPrint("argument list is $argList");
-    debugPrint("title is $title");
 
     audioPlayer.setUrl(
         "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Hotel%20Management%2FWhatsApp%20Audio%202025-09-09%20at%203.41.09%20PM.mp4?alt=media&token=b99d9096-211b-45cc-b157-4582c7fc3312");
@@ -198,7 +195,7 @@ class PronunciationLabSubController extends GetxController {
             isShowDidNotCatch: notCatch,
             word: word,
             title: title,
-            load: mianCategoryTitile,
+            load: mainCategoryTitle,
           ),
         ),
       );
@@ -218,7 +215,7 @@ class PronunciationLabSubController extends GetxController {
             date: DateTime.now().toIso8601String().substring(0, 10),
             lastAttempt: DateTime.now().toIso8601String(),
             listAtt: 0,
-            load: mianCategoryTitile,
+            load: mainCategoryTitle,
             pracAtt: 1,
             time: 0,
             timeCal: DateTime.now().millisecondsSinceEpoch,
@@ -552,7 +549,7 @@ class PronunciationLabSubController extends GetxController {
           date: "",
           lastAttempt: "",
           listAtt: 1,
-          load: mianCategoryTitile,
+          load: mainCategoryTitle,
           pracAtt: 0,
           time: 0,
           timeCal: DateTime.now().millisecondsSinceEpoch,

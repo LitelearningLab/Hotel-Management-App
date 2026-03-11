@@ -59,6 +59,12 @@ class SentenceLabSubCatController extends GetxController {
     return fallback;
   }
 
+  late String subCategoryTitle;
+  late String mainCategoryTitle;
+  late int timestampIndex;
+  late String activityName;
+  late String sessionName;
+
   @override
   void onInit() {
     audioPlayer = AudioPlayer();
@@ -72,18 +78,10 @@ class SentenceLabSubCatController extends GetxController {
     }
     final ssaved = box.read(AppRoutes.sentenceLabSub) ?? {};
     subCategoryTitle = ssaved['subCategoryTitle'] ?? "";
-    mianCategoryTitile = ssaved['mainCategoryTitle'] ?? "";
+    mainCategoryTitle = ssaved['mainCategoryTitle'] ?? "";
     timestampIndex = _parseSafeIndex(ssaved['index']);
     activityName = "";
     sessionName = title;
-    if (kDebugMode) {
-      print("Title received in controller: $title");
-      print("Main Category Title: $mianCategoryTitile");
-      print("Sub Category Title: $subCategoryTitle");
-      print("Timestamp Index: $timestampIndex");
-      print("Activity Name: $activityName");
-      print("Session Name: $sessionName");
-    }
 
     audioPlayer.playerStateStream.listen((state) async {
       if (state.processingState == ProcessingState.completed ||
