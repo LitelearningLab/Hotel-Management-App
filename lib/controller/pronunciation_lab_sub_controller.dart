@@ -80,6 +80,12 @@ class PronunciationLabSubController extends GetxController {
   int index = 0;
   String? subTitle;
 
+  int _parseSafeIndex(dynamic value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? fallback;
+    return fallback;
+  }
+
   @override
   void onInit() {
     readyFirs();
@@ -102,7 +108,7 @@ class PronunciationLabSubController extends GetxController {
       collectionName = args['pronunCollectionName'] ?? '';
       mainCategoryTitle = args['mainCategoryTitle'] ?? '';
       id = args['id'] ?? "";
-      index = args['index'] ?? 0;
+      index = _parseSafeIndex(args['index']);
     } else {
       final saved = box.read(AppRoutes.pronunciationLabSubStoreKey) ?? {};
       title = saved['title'] ?? "";
@@ -113,7 +119,7 @@ class PronunciationLabSubController extends GetxController {
       collectionName = saved['pronunCollectionName'] ?? '';
       id = saved['id'] ?? "";
       mainCategoryTitle = saved['mainCategoryTitle'] ?? '';
-      index = saved['index'] ?? 0;
+      index = _parseSafeIndex(saved['index']);
     }
     debugPrint("collection name is $collectionName");
     debugPrint("argument list is $argList");

@@ -38,6 +38,12 @@ class FrontOfficeController extends GetxController {
   double particularPercentage = 0;
   Map<String, ProgressModel> progressData = {};
 
+  int _parseSafeIndex(dynamic value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? fallback;
+    return fallback;
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -64,7 +70,7 @@ class FrontOfficeController extends GetxController {
         // Mobile navigation ✅
         title = args['title'] ?? "";
         image = args['image'] ?? "";
-        index = args['index'] ?? "";
+        index = _parseSafeIndex(args['index']);
 
         // Store for web refresh
         box.write('pageData', args);
@@ -73,7 +79,7 @@ class FrontOfficeController extends GetxController {
         final saved = box.read(AppRoutes.frontOfficeStoreKey) ?? {};
         title = saved['title'] ?? "";
         image = saved['image'] ?? "";
-        index = saved['index'] ?? "";
+        index = _parseSafeIndex(saved['index']);
       }
 
       isExpanded = List.generate(itemCount, (_) => false);

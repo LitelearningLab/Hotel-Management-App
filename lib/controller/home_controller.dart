@@ -102,11 +102,25 @@ class HomeController extends GetxController {
     final jsonString = prefs.getString('recentHistory');
 
     if (jsonString != null) {
-      final List<dynamic> decoded = jsonDecode(jsonString);
-      recentHistory = decoded
-          .map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e))
-          .toList();
-      homeRecentHistory = recentHistory;
+      try {
+        final decoded = jsonDecode(jsonString);
+        if (decoded is List) {
+          recentHistory = decoded
+              .whereType<Map>()
+              .map<Map<String, dynamic>>(
+                  (e) => Map<String, dynamic>.from(e))
+              .toList();
+          homeRecentHistory = recentHistory;
+        } else {
+          recentHistory = [];
+          homeRecentHistory = [];
+        }
+      } catch (e) {
+        log("Invalid recentHistory payload. Clearing local cache: $e");
+        recentHistory = [];
+        homeRecentHistory = [];
+        await prefs.remove('recentHistory');
+      }
     }
 
     recentHistoryLoaded = false;

@@ -53,6 +53,12 @@ class SentenceLabSubCatController extends GetxController {
 
   Map<String, DownloadStatus> downloadStatusMap = {};
 
+  int _parseSafeIndex(dynamic value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? fallback;
+    return fallback;
+  }
+
   @override
   void onInit() {
     audioPlayer = AudioPlayer();
@@ -67,7 +73,7 @@ class SentenceLabSubCatController extends GetxController {
     final ssaved = box.read(AppRoutes.sentenceLabSub) ?? {};
     subCategoryTitle = ssaved['subCategoryTitle'] ?? "";
     mianCategoryTitile = ssaved['mainCategoryTitle'] ?? "";
-    timestampIndex = ssaved['index'] ?? 0;
+    timestampIndex = _parseSafeIndex(ssaved['index']);
     activityName = "";
     sessionName = title;
     if (kDebugMode) {
