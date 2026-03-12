@@ -107,8 +107,7 @@ class HomeController extends GetxController {
         if (decoded is List) {
           recentHistory = decoded
               .whereType<Map>()
-              .map<Map<String, dynamic>>(
-                  (e) => Map<String, dynamic>.from(e))
+              .map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e))
               .toList();
           homeRecentHistory = recentHistory;
         } else {

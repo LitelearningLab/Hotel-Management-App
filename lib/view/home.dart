@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
@@ -18,6 +18,11 @@ import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/public/update_checker.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/web_top_nav.dart';
+
+import 'package:hotelmanagementapp/model/grammer_lab_model.dart';
+import 'package:hotelmanagementapp/model/sound_model.dart';
+import 'package:hotelmanagementapp/view/grammer_lab_sub.dart';
+import 'package:hotelmanagementapp/utility/web_view_page.dart';
 
 int currentIndex = 0;
 
@@ -471,7 +476,86 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
               return InkWell(
                 borderRadius: BorderRadius.circular(10),
                 onTap: () {
-                  // 🔒 keep existing logic if you add navigation later
+                  final section = item['section'] ?? '';
+                  final path = item['path'] ?? '';
+                  final link = item['link'] ?? '';
+                  final category = item['category'] ?? '';
+                  final proLabTitle = item['proLabTitle'] ?? '';
+
+                  if (section == 'E-Learning' ||
+                      section == 'Glossary' ||
+                      section == 'Quiz') {
+                    if (kIsWeb) {
+                      Get.to(() => WebContentPage(title: category, url: link));
+                    } else {
+                      Get.toNamed(AppRoutes.inAppWebView,
+                          arguments: {"url": link});
+                    }
+                  } else if (section == 'Pronunciation Lab' ||
+                      section == 'Prounciation Lab') {
+                    if (proLabTitle.isNotEmpty) {
+                      // From Language Lab
+                      Get.toNamed(AppRoutes.pronunciationLab, arguments: {
+                        "title": proLabTitle,
+                      });
+                    } else {
+                      // From Front Office
+                      String pronunCollectionName = "";
+                      int index = -1;
+                      String mainCategoryTitle = "";
+
+                      if (path.contains("Front Office")) {
+                        pronunCollectionName =
+                            CollectionNames.frontOfficePronun;
+                        index = 0;
+                        mainCategoryTitle = "Front Office Reception";
+                      } else if (path.contains("Food & Beverage")) {
+                        pronunCollectionName =
+                            CollectionNames.foodAndBeveragePronun;
+                        index = 1;
+                        mainCategoryTitle = "Food & Beverage";
+                      } else if (path.contains("Food Production")) {
+                        pronunCollectionName =
+                            CollectionNames.foodProductionPronun;
+                        index = 2;
+                        mainCategoryTitle = "Food Production";
+                      } else if (path.contains("House Keeping")) {
+                        pronunCollectionName =
+                            CollectionNames.houseKeepingPronun;
+                        index = 3;
+                        mainCategoryTitle = "House Keeping";
+                      }
+
+                      final storageData = {
+                        'title': category,
+                        'subcategories': <SubcategoryPro>[],
+                        "id": link,
+                        "pronunCollectionName": pronunCollectionName,
+                        'index': index,
+                        'mainCategoryTitle': mainCategoryTitle,
+                      };
+
+                      GetStorage().write(
+                          AppRoutes.pronunciationLabSubStoreKey, storageData);
+
+                      Get.toNamed(AppRoutes.pronunciationLabSub,
+                          arguments: storageData);
+                    }
+                  } else if (section == 'Grammer Lab') {
+                    if (item['grammarDocs'] != null) {
+                      final doc = GrammarDoc.fromJson(item['grammarDocs']);
+                      Get.to(() => GrammerLabSub(title: category, doc: doc));
+                    }
+                  } else if (section == 'Sound Lab') {
+                    if (item['soundSub'] != null) {
+                      final soundSub =
+                          SoundSubcategory.fromJson(item['soundSub']);
+                      Get.toNamed(AppRoutes.soundPage, arguments: {
+                        'title': category,
+                        'soundModel': soundSub,
+                      });
+                    }
+                  }
                 },
                 child: Padding(
                   padding:

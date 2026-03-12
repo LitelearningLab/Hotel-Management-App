@@ -86,7 +86,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    if (kIsWeb && !kDebugMode) {
+    if (kIsWeb) {
       SessionService.startWebSessionGuard(onSessionBlocked: () {
         if (Get.currentRoute != AppRoutes.login) {
           Get.rootDelegate.offNamed(AppRoutes.login);

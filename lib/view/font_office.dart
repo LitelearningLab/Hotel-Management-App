@@ -320,7 +320,7 @@ class _ExpandableCardState extends State<_ExpandableCard> {
                                   "Core Department > ${widget.controller.title}",
                               category: subCategoryTitle,
                               section: "Pronunciation Lab",
-                              link: "",
+                              link: item.pronunID,
                               proLabTitle: "");
                           widget.controller.loading = false;
                           widget.controller.update();
@@ -374,6 +374,13 @@ class _ExpandableCardState extends State<_ExpandableCard> {
                               : () {
                                   subCategoryTitle = item.category;
                                   activityName = "Quiz";
+                                  addToRecentHistory(
+                                      path:
+                                          "Core Department > ${widget.controller.title}",
+                                      category: subCategoryTitle,
+                                      section: activityName,
+                                      link: e['link']!,
+                                      proLabTitle: "");
                                   _openWeb(context, e['link']!, item.category);
                                 },
                           child: Row(

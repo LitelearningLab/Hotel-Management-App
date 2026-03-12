@@ -75,13 +75,22 @@ class SessionService {
     }
 
     final doc = snapshot.docs.first;
+    final data = doc.data();
     final docRef = firestore.collection("UserNode").doc(doc.id);
 
     int now = DateTime.now().millisecondsSinceEpoch;
 
     // 🔥 1. Check if there is an existing session
-    int? lastActive =
-        doc.data().containsKey('lastActive') ? doc['lastActive'] as int? : null;
+    int? lastActive;
+    final dynamic rawLastActive = data['lastActive'];
+    if (rawLastActive is int) {
+      lastActive = rawLastActive;
+    } else if (rawLastActive is String) {
+      lastActive = int.tryParse(rawLastActive);
+    }
+
+    final String? serverSessionId =
+        data.containsKey('sessionId') ? data['sessionId'] as String? : null;
 
     bool isSessionExpired = true;
 
@@ -99,18 +108,20 @@ class SessionService {
     WebStorageHelper.setDeviceSessionId(deviceSessionId);
     if (kDebugMode) {
       print("Device Session ID: $deviceSessionId");
-      print("Server Session ID: ${doc['sessionId']}");
+      print("Server Session ID: $serverSessionId");
       print("Is session expired? $isSessionExpired");
     }
 
     // ==================================================================================
     // If server already has same sessionId → ALLOW MULTIPLE TAB LOGIN
     // ==================================================================================
-    if (!isSessionExpired && doc['sessionId'] == deviceSessionId) {
+    if (!isSessionExpired && serverSessionId == deviceSessionId) {
       if (kDebugMode) {
         print("✔ Same device session active — ALLOW");
       }
-    } else if (!isSessionExpired && doc['sessionId'] != deviceSessionId) {
+    } else if (!isSessionExpired &&
+        serverSessionId != null &&
+        serverSessionId != deviceSessionId) {
       if (kDebugMode) {
         print("❌ Another device is active — BLOCK");
       }
@@ -129,6 +140,7 @@ class SessionService {
     await prefs.setString("sessionId", deviceSessionId);
     await prefs.setString("email", email);
     await prefs.setString("password", password);
+    startHeartbeat();
 
     print("🎉 Login Success (Web multiple tabs supported)");
 
@@ -202,12 +214,12 @@ class SessionService {
       return false;
     }
 
-    final serverSessionId = doc.docs.first["sessionId"];
+    final serverSessionId = doc.docs.first.data()["sessionId"] as String?;
 
     // ==================================================================================
     // FIXED: Only block if serverSessionId != browserSessionId
     // ==================================================================================
-    if (serverSessionId != browserSessionId) {
+    if (serverSessionId == null || serverSessionId != browserSessionId) {
       if (kDebugMode) {
         print("❌ Session mismatch → different device → block");
       }
