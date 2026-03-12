@@ -769,6 +769,18 @@ class _PronounciationLabState extends State<PronounciationLab> {
                                         onTap: () {
                                           subCategoryTitle = controller
                                               .categories[index].category;
+                                          final storageData = {
+                                            'title': controller
+                                                .categories[index].category,
+                                            'subcategories': controller
+                                                .categories[index].subcategories
+                                                .map((e) => e.toMap())
+                                                .toList(),
+                                            'mainCategoryTitle':
+                                                controller.title.value,
+                                            'index': 6,
+                                          };
+
                                           addToRecentHistory(
                                             path:
                                                 "Language Lab > ${controller.title.value} > ${controller.categories[index].category}",
@@ -777,6 +789,7 @@ class _PronounciationLabState extends State<PronounciationLab> {
                                             section: "Pronunciation Lab",
                                             link: "",
                                             proLabTitle: "",
+                                            extraStorageData: storageData,
                                           );
 
                                           GetStorage().write(

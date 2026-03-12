@@ -508,10 +508,11 @@ void addToRecentHistory({
   required String category,
   required String section,
   required String link,
-  required String proLabTitle,
+  String proLabTitle = "",
   List<SubCategoryModel>? subCategories,
   GrammarDoc? grammarDocs,
   SoundSubcategory? soundSubcategory,
+  Map<String, dynamic>? extraStorageData,
 }) async {
   final newEntry = {
     'path': path,
@@ -522,6 +523,7 @@ void addToRecentHistory({
     'subCategories': subCategories?.map((e) => e.toJson()).toList() ?? [],
     'grammarDocs': grammarDocs != null ? grammarDocs.toJson() : {},
     'soundSub': soundSubcategory != null ? soundSubcategory.toJson() : {},
+    if (extraStorageData != null) 'extraStorageData': extraStorageData,
   };
 
   // Safe remove

@@ -20,6 +20,7 @@ import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/web_top_nav.dart';
 
 import 'package:hotelmanagementapp/model/grammer_lab_model.dart';
+import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/model/sound_model.dart';
 import 'package:hotelmanagementapp/view/grammer_lab_sub.dart';
 import 'package:hotelmanagementapp/utility/web_view_page.dart';
@@ -409,7 +410,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
               padding: EdgeInsets.only(right: index == 4 ? 0 : 20),
               child: SizedBox(
                 width: cardWidth,
-                child: _CourseCard(index),
+                child: _CourseCard(index, c),
               ),
             );
           }),
@@ -476,28 +477,85 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
               return InkWell(
                 borderRadius: BorderRadius.circular(10),
                 onTap: () {
-                  final section = item['section'] ?? '';
-                  final path = item['path'] ?? '';
-                  final link = item['link'] ?? '';
-                  final category = item['category'] ?? '';
-                  final proLabTitle = item['proLabTitle'] ?? '';
+                  final section = (item['section'] ?? '').toString();
+                  final path = (item['path'] ?? '').toString();
+                  final link = (item['link'] ?? '').toString();
+                  final category = (item['category'] ?? '').toString();
+                  final proLabTitle = (item['proLabTitle'] ?? '').toString();
+                  final sectionLower = section.toLowerCase().trim();
 
-                  if (section == 'E-Learning' ||
-                      section == 'Glossary' ||
-                      section == 'Quiz') {
+                  final isWebContentSection = sectionLower == 'e-learning' ||
+                      sectionLower == 'glossary' ||
+                      sectionLower == 'quiz' ||
+                      sectionLower == 'interactive simulation' ||
+                      sectionLower == 'interactive simulations';
+
+                  if (isWebContentSection) {
+                    if (link.trim().isEmpty) return;
                     if (kIsWeb) {
-                      Get.to(() => WebContentPage(title: category, url: link));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => WebContentPage(
+                            title: category,
+                            url: link,
+                          ),
+                        ),
+                      );
                     } else {
                       Get.toNamed(AppRoutes.inAppWebView,
                           arguments: {"url": link});
                     }
-                  } else if (section == 'Pronunciation Lab' ||
-                      section == 'Prounciation Lab') {
-                    if (proLabTitle.isNotEmpty) {
+                  } else if (sectionLower.contains('pronunciation') ||
+                      sectionLower.contains('prounciation')) {
+                    if (item['extraStorageData'] != null &&
+                        (item['extraStorageData'] as Map).isNotEmpty) {
+                      GetStorage().write(AppRoutes.pronunciationLabSubStoreKey,
+                          item['extraStorageData']);
+                      if (kIsWeb) {
+                        Get.rootDelegate.toNamed(
+                          AppRoutes.pronunciationLabSub,
+                          arguments: item['extraStorageData'],
+                        );
+                      } else {
+                        Get.toNamed(AppRoutes.pronunciationLabSub,
+                            arguments: item['extraStorageData']);
+                      }
+                    } else if (proLabTitle.isNotEmpty) {
                       // From Language Lab
-                      Get.toNamed(AppRoutes.pronunciationLab, arguments: {
-                        "title": proLabTitle,
-                      });
+                      GetStorage().write(
+                          AppRoutes.pronunciationLab, {"title": proLabTitle});
+                      if (kIsWeb) {
+                        Get.rootDelegate.toNamed(
+                          AppRoutes.pronunciationLab,
+                          arguments: {"title": proLabTitle},
+                        );
+                      } else {
+                        Get.toNamed(AppRoutes.pronunciationLab, arguments: {
+                          "title": proLabTitle,
+                        });
+                      }
+                    } else if (path.toLowerCase().contains('language lab')) {
+                      final parts = path
+                          .split('>')
+                          .map((e) => e.trim())
+                          .where((e) => e.isNotEmpty)
+                          .toList();
+                      final derivedTitle = parts.length > 1 ? parts[1] : '';
+                      final titleToOpen = derivedTitle.isNotEmpty
+                          ? derivedTitle
+                          : "English Pronunciation";
+                      GetStorage().write(
+                          AppRoutes.pronunciationLab, {"title": titleToOpen});
+                      if (kIsWeb) {
+                        Get.rootDelegate.toNamed(
+                          AppRoutes.pronunciationLab,
+                          arguments: {"title": titleToOpen},
+                        );
+                      } else {
+                        Get.toNamed(AppRoutes.pronunciationLab,
+                            arguments: {"title": titleToOpen});
+                      }
                     } else {
                       // From Front Office
                       String pronunCollectionName = "";
@@ -519,7 +577,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                             CollectionNames.foodProductionPronun;
                         index = 2;
                         mainCategoryTitle = "Food Production";
-                      } else if (path.contains("House Keeping")) {
+                      } else if (path.contains("House Keeping") ||
+                          path.contains("Housekeeping") ||
+                          path.contains("Accommodation")) {
                         pronunCollectionName =
                             CollectionNames.houseKeepingPronun;
                         index = 3;
@@ -538,22 +598,74 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                       GetStorage().write(
                           AppRoutes.pronunciationLabSubStoreKey, storageData);
 
-                      Get.toNamed(AppRoutes.pronunciationLabSub,
-                          arguments: storageData);
+                      if (kIsWeb) {
+                        Get.rootDelegate.toNamed(
+                          AppRoutes.pronunciationLabSub,
+                          arguments: storageData,
+                        );
+                      } else {
+                        Get.toNamed(AppRoutes.pronunciationLabSub,
+                            arguments: storageData);
+                      }
                     }
-                  } else if (section == 'Grammer Lab') {
-                    if (item['grammarDocs'] != null) {
-                      final doc = GrammarDoc.fromJson(item['grammarDocs']);
+                  } else if (sectionLower.contains('grammer') ||
+                      sectionLower.contains('grammar')) {
+                    final rawDoc = item['grammarDocs'];
+                    if (rawDoc is Map &&
+                        rawDoc.isNotEmpty &&
+                        rawDoc['subcategory'] is List) {
+                      final doc = GrammarDoc.fromJson(
+                          Map<String, dynamic>.from(rawDoc));
                       Get.to(() => GrammerLabSub(title: category, doc: doc));
                     }
-                  } else if (section == 'Sound Lab') {
-                    if (item['soundSub'] != null) {
-                      final soundSub =
-                          SoundSubcategory.fromJson(item['soundSub']);
-                      Get.toNamed(AppRoutes.soundPage, arguments: {
-                        'title': category,
-                        'soundModel': soundSub,
-                      });
+                  } else if (sectionLower == 'sound lab') {
+                    final rawSound = item['soundSub'];
+                    if (rawSound is Map && rawSound.isNotEmpty) {
+                      final soundSub = SoundSubcategory.fromJson(
+                          Map<String, dynamic>.from(rawSound));
+                      if (kIsWeb) {
+                        Get.rootDelegate.toNamed(
+                          AppRoutes.soundPage,
+                          arguments: {
+                            'title': category,
+                            'soundModel': soundSub,
+                          },
+                        );
+                      } else {
+                        Get.toNamed(AppRoutes.soundPage, arguments: {
+                          'title': category,
+                          'soundModel': soundSub,
+                        });
+                      }
+                    }
+                  } else if (sectionLower == 'sentence lab') {
+                    final rawSubCategories = item['subCategories'];
+                    List<SubCategoryModel> categoryModel = [];
+                    if (rawSubCategories is List) {
+                      categoryModel = rawSubCategories
+                          .map((entry) {
+                            if (entry is SubCategoryModel) return entry;
+                            if (entry is Map) {
+                              return SubCategoryModel.fromJson(
+                                  Map<String, dynamic>.from(entry));
+                            }
+                            return null;
+                          })
+                          .whereType<SubCategoryModel>()
+                          .toList();
+                    }
+                    final args = {
+                      "title": category,
+                      "CategoryModel": categoryModel,
+                    };
+                    GetStorage().write(AppRoutes.sentenceLabSubCat, args);
+                    if (kIsWeb) {
+                      Get.rootDelegate.toNamed(
+                        AppRoutes.sentenceLabSubCat,
+                        arguments: args,
+                      );
+                    } else {
+                      Get.toNamed(AppRoutes.sentenceLabSubCat, arguments: args);
                     }
                   }
                 },
@@ -693,7 +805,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 // ==================================================
 class _CourseCard extends StatefulWidget {
   final int index;
-  const _CourseCard(this.index);
+  final HomeController c;
+  const _CourseCard(this.index, this.c);
 
   @override
   State<_CourseCard> createState() => _CourseCardState();
@@ -705,147 +818,146 @@ class _CourseCardState extends State<_CourseCard> {
   @override
   Widget build(BuildContext context) {
     final index = widget.index;
+    final c = widget.c;
 
-    return GetBuilder<HomeController>(builder: (c) {
-      return MouseRegion(
-        onEnter: (_) => setState(() => hovered = true),
-        onExit: (_) => setState(() => hovered = false),
-        cursor: SystemMouseCursors.click,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(18),
-          splashColor: Colors.transparent,
-          hoverColor: Colors.transparent,
-          onTap: () {
-            if (index == 4) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => UniversityLab(
-                    universityModel: c.universityModel,
-                  ),
+    return MouseRegion(
+      onEnter: (_) => setState(() => hovered = true),
+      onExit: (_) => setState(() => hovered = false),
+      cursor: SystemMouseCursors.click,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        splashColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        onTap: () {
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UniversityLab(
+                  universityModel: c.universityModel,
                 ),
-              );
-            } else {
-              final title = c.cardNames[index] == "Front Office\nManagement"
-                  ? "Front Office Management"
-                  : c.cardNames[index] == "Food & Beverage Service\nManagement"
-                      ? "Food & Beverage Service Management"
-                      : c.cardNames[index] ==
-                              "Accommodation\nManagement - Housekeeping"
-                          ? "Accommodation Management - Housekeeping"
-                          : c.cardNames[index];
-              setPathTitle(title);
+              ),
+            );
+          } else {
+            final title = c.cardNames[index] == "Front Office\nManagement"
+                ? "Front Office Management"
+                : c.cardNames[index] == "Food & Beverage Service\nManagement"
+                    ? "Food & Beverage Service Management"
+                    : c.cardNames[index] ==
+                            "Accommodation\nManagement - Housekeeping"
+                        ? "Accommodation Management - Housekeeping"
+                        : c.cardNames[index];
+            setPathTitle(title);
 
-              GetStorage().write(AppRoutes.frontOfficeStoreKey, {
-                'title': title,
-                'image': c.cardImages[index],
-                'index': index,
-              });
-              // mianCategoryTitile = title;
-              kIsWeb
-                  ? Get.rootDelegate.offNamed(
-                      AppRoutes.frontOffice,
-                      arguments: {
-                        'title': title,
-                        'image': c.cardImages[index],
-                        'index': index,
-                      },
-                    )
-                  : Get.toNamed(
-                      AppRoutes.frontOffice,
-                      arguments: {
-                        'title': title,
-                        'image': c.cardImages[index],
-                        'index': index,
-                      },
-                    );
-            }
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            height: 380,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18), // 👈 smoother
-              border: Border.all(color: const Color(0xFFEDEDED)),
-              boxShadow: hovered
-                  ? [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        blurRadius: 28, // 👈 softer
-                        spreadRadius: 1, // 👈 removes hard edge
-                        offset: const Offset(0, 12),
-                      ),
-                    ]
-                  : [],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 220,
-                  width: double.infinity,
-                  child: ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(18)),
-                    child: index >= 4
-                        ? Image.network(c.cardImages[index],
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                                  color: Colors.grey[200],
-                                  child: const Icon(Icons.broken_image,
-                                      color: Colors.grey),
-                                ))
-                        : SvgPicture.asset(
-                            c.cardImages[index],
-                            fit: BoxFit.cover,
-                          ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          index == 4
-                              ? 'Institute Specific Content'
-                              : 'Hotel Management',
-                          style: TextStyle(fontSize: 11, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 6),
-                        Expanded(
-                          child: Text(
-                            c.cardNames[index],
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: Keys.fontFamily,
-                            ),
-                          ),
-                        ),
-                        const Text(
-                          "View Details",
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+            GetStorage().write(AppRoutes.frontOfficeStoreKey, {
+              'title': title,
+              'image': c.cardImages[index],
+              'index': index,
+            });
+            // mianCategoryTitile = title;
+            kIsWeb
+                ? Get.rootDelegate.offNamed(
+                    AppRoutes.frontOffice,
+                    arguments: {
+                      'title': title,
+                      'image': c.cardImages[index],
+                      'index': index,
+                    },
+                  )
+                : Get.toNamed(
+                    AppRoutes.frontOffice,
+                    arguments: {
+                      'title': title,
+                      'image': c.cardImages[index],
+                      'index': index,
+                    },
+                  );
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          height: 380,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18), // 👈 smoother
+            border: Border.all(color: const Color(0xFFEDEDED)),
+            boxShadow: hovered
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 28, // 👈 softer
+                      spreadRadius: 1, // 👈 removes hard edge
+                      offset: const Offset(0, 12),
                     ),
+                  ]
+                : [],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 220,
+                width: double.infinity,
+                child: ClipRRect(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(18)),
+                  child: index >= 4
+                      ? Image.network(c.cardImages[index],
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                color: Colors.grey[200],
+                                child: const Icon(Icons.broken_image,
+                                    color: Colors.grey),
+                              ))
+                      : SvgPicture.asset(
+                          c.cardImages[index],
+                          fit: BoxFit.cover,
+                        ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        index == 4
+                            ? 'Institute Specific Content'
+                            : 'Hotel Management',
+                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 6),
+                      Expanded(
+                        child: Text(
+                          c.cardNames[index],
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: Keys.fontFamily,
+                          ),
+                        ),
+                      ),
+                      const Text(
+                        "View Details",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                )
-              ],
-            ),
+                ),
+              )
+            ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
