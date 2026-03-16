@@ -14,6 +14,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hotelmanagementapp/controller/bottom_navigation_controller.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
 import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:hotelmanagementapp/model/grammer_lab_model.dart';
@@ -44,8 +45,6 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-int currentIndex = 0;
-
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -57,13 +56,15 @@ class _HomeState extends State<Home>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabController;
   HomeController historyController = Get.put(HomeController());
+  BottomNavigationController bottomNavController =
+      Get.find<BottomNavigationController>();
   String? appVersion;
 
   @override
   void initState() {
     super.initState();
     _loadAppVersion();
-    currentIndex = 0;
+    bottomNavController.setIndex(0);
     UpdateChecker.checkForUpdate(context);
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 3, vsync: this);
