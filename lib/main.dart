@@ -12,6 +12,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 //for web only
 // import 'dart:html' as html;
 import 'package:get_storage/get_storage.dart';
+import 'package:hotelmanagementapp/controller/bottom_navigation_controller.dart';
 import 'package:hotelmanagementapp/view/blocked_device_screen.dart';
 
 bool isOnNoInternetPage = false;
@@ -169,6 +170,7 @@ class _MyAppState extends State<MyApp> {
               ),
             ),
             initialRoute: AppRoutes.splashScreen,
+            navigatorObservers: [BottomNavObserver()],
           );
   }
 }

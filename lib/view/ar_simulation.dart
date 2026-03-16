@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hotelmanagementapp/controller/bottom_navigation_controller.dart';
 import 'package:hotelmanagementapp/controller/home_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_controller.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
