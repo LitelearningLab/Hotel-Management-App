@@ -1186,22 +1186,22 @@ class _HomeState extends State<Home>
                                                       !kIsWeb
                                                           ? Get.toNamed(
                                                               AppRoutes
-                                                                  .sentenceLabSub,
+                                                                  .sentenceLabSubCat,
                                                               arguments: {
                                                                 "title": item[
                                                                     'category'],
-                                                                "subcategories":
+                                                                "CategoryModel":
                                                                     subCategories,
                                                               },
                                                             )
                                                           : Get.rootDelegate
                                                               .offNamed(
                                                               AppRoutes
-                                                                  .sentenceLabSub,
+                                                                  .sentenceLabSubCat,
                                                               arguments: {
                                                                 "title": item[
                                                                     'category'],
-                                                                "subcategories":
+                                                                "CategoryModel":
                                                                     subCategories,
                                                               },
                                                             );
