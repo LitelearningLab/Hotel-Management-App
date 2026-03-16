@@ -1190,7 +1190,7 @@ class _HomeState extends State<Home>
                                                               arguments: {
                                                                 "title": item[
                                                                     'category'],
-                                                                "CategoryModel":
+                                                                "subcategories":
                                                                     subCategories,
                                                               },
                                                             )
@@ -1201,14 +1201,25 @@ class _HomeState extends State<Home>
                                                               arguments: {
                                                                 "title": item[
                                                                     'category'],
-                                                                "CategoryModel":
+                                                                "subcategories":
                                                                     subCategories,
                                                               },
                                                             );
                                                     });
                                                   } else if (item['section'] ==
-                                                      'proLab') {
+                                                      'Pronunciation Lab') {
                                                     log("proLab tapped");
+                                                    final proSubcategories = (item[
+                                                                    'proSubcategories']
+                                                                as List<
+                                                                    dynamic>?)
+                                                            ?.map((e) => SubcategoryPro
+                                                                .fromJson(e
+                                                                    as Map<
+                                                                        String,
+                                                                        dynamic>))
+                                                            .toList() ??
+                                                        <SubcategoryPro>[];
                                                     Get.toNamed(
                                                         AppRoutes
                                                             .pronunciationLabSub,
@@ -1216,7 +1227,12 @@ class _HomeState extends State<Home>
                                                           'title':
                                                               item['category'],
                                                           'subcategories':
-                                                              <SubcategoryPro>[],
+                                                              proSubcategories,
+                                                          'pronunCollectionName':
+                                                              item['pronunCollectionName'] ??
+                                                                  '',
+                                                          'id': item['proId'] ??
+                                                              '',
                                                         });
                                                   } else {
                                                     if (kIsWeb) {

@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:hotelmanagementapp/model/grammer_lab_model.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/model/sound_model.dart';
@@ -451,6 +452,9 @@ void addToRecentHistory({
   List<SubCategoryModel>? subCategories,
   GrammarDoc? grammarDocs,
   SoundSubcategory? soundSubcategory,
+  List<dynamic>? proSubcategories,
+  String? pronunCollectionName,
+  String? proId,
 }) async {
   final newEntry = {
     'path': path,
@@ -461,6 +465,12 @@ void addToRecentHistory({
     'subCategories': subCategories?.map((e) => e.toJson()).toList() ?? [],
     'grammarDocs': grammarDocs != null ? grammarDocs.toJson() : {},
     'soundSub': soundSubcategory != null ? soundSubcategory.toJson() : {},
+    'proSubcategories': proSubcategories
+            ?.map((e) => e is SubcategoryPro ? e.toJson() : e)
+            .toList() ??
+        [],
+    'pronunCollectionName': pronunCollectionName ?? '',
+    'proId': proId ?? '',
   };
 
   // Safe remove

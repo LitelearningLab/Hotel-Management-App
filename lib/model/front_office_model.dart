@@ -37,6 +37,8 @@ class FrontOfficeDocument {
       'pronunID': pronunID,
     };
   }
+
+  List<SubCategory> get subcategories => subcategory;
 }
 
 class SubCategory {

@@ -694,9 +694,15 @@ class _PronounciationLabState extends State<PronounciationLab> {
                                           "Language Lab > ${controller.title.value} > ${controller.categories[index].category}",
                                       category:
                                           controller.categories[index].category,
-                                      section: "proLab",
+                                      section: "Pronunciation Lab",
                                       link: "",
-                                      proLabTitle: "");
+                                      proLabTitle: "",
+                                      proSubcategories: controller
+                                          .categories[index].subcategories,
+                                      pronunCollectionName:
+                                          controller.collectionName,
+                                      proId: controller
+                                          .categories[index].category);
                                   GetStorage()
                                       .write(AppRoutes.pronunciationLabSub, {
                                     'title':

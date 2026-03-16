@@ -30,6 +30,7 @@ class PronunciationLabController extends GetxController {
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
   RxString title = "Pronunciation Lab".obs;
+  String collectionName = "";
   bool isSearching = false;
   TextEditingController searchController = TextEditingController();
   int? currentlyPlayingIndex;
@@ -185,6 +186,9 @@ class PronunciationLabController extends GetxController {
       final saved = box.read(AppRoutes.pronunciationLab) ?? {};
       title.value = saved['title'] ?? "";
     }
+    collectionName = title.value == "English Pronunciation"
+        ? "EnglishLabCollection"
+        : "FrenchLabCollection";
     debugPrint("PronunciationLabController title: ${title.value}");
 
     audioPlayer = AudioPlayer();

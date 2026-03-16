@@ -682,10 +682,18 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                       category:
                                                                           subCategoryTitle,
                                                                       section:
-                                                                          "proLab",
+                                                                          "Pronunciation Lab",
                                                                       link: "",
                                                                       proLabTitle:
-                                                                          "");
+                                                                          "",
+                                                                      proSubcategories: <SubcategoryPro>[],
+                                                                      pronunCollectionName:
+                                                                          controller
+                                                                              .pronunCollectionName,
+                                                                      proId: controller
+                                                                          .frontOfficeData[
+                                                                              index]
+                                                                          .pronunID);
                                                                   WidgetsBinding
                                                                       .instance
                                                                       .addPostFrameCallback(
