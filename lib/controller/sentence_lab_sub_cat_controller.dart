@@ -488,4 +488,11 @@ class SentenceLabSubCatController extends GetxController {
       }
     });
   }
+
+  @override
+  void onClose() {
+    audioPlayer.stop();
+    audioPlayer.dispose();
+    super.onClose();
+  }
 }
