@@ -650,8 +650,7 @@ class _SoundLabState extends State<SoundLab> {
                                       )
                                     : const SizedBox.shrink(),
                               ),
-                              if (controller.soundSubcategory.soundsPractice
-                                      ?.length ==
+                              if ((controller.soundsPractice?.length ?? 0) ==
                                   index + 1)
                                 SizedBox(
                                   height: getWidgetHeight(height: 180),
