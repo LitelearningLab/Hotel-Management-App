@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_launcher_icons/xml_templates.dart';
 // import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -98,8 +99,8 @@ class _HomeState extends State<Home>
     }
   }
 
-  exitPop() async {
-    showDialog(
+  Future<void> exitPop() async {
+    await showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
@@ -127,7 +128,7 @@ class _HomeState extends State<Home>
             ),
             onPressed: () async {
               Navigator.pop(context);
-              Navigator.pop(context); // Close dialog
+              await SystemNavigator.pop();
             },
           ),
         ],
@@ -165,7 +166,9 @@ class _HomeState extends State<Home>
     }
 
     return PopScope(
+      canPop: false,
       onPopInvoked: (didPop) async {
+        if (didPop) return;
         await exitPop();
       },
       child: GetBuilder<HomeController>(builder: (hController) {
