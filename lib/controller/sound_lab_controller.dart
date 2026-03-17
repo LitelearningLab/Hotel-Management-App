@@ -160,6 +160,13 @@ class SoundLabController extends GetxController {
     } catch (e, stack) {
       log("🔥 FATAL ERROR inside fetchLocalOrSave(): $e");
       log(stack.toString());
+      // Fallback to in-memory payload so UI does not stay in loading state.
+      soundsPractice = List<SoundPractice>.from(soundSubcategory.soundsPractice ?? []);
+      isPriorityList =
+          soundsPractice!.map((item) => item.downloadStatus == true).toList();
+      masterList = List<SoundPractice>.from(soundsPractice!);
+      isLoading = false;
+      update();
     }
   }
 
