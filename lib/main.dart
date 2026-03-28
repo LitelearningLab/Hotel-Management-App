@@ -39,19 +39,21 @@ void main() async {
       ),
     );
     // // for web only
-    // if (_isMobileOrTabletDevice()) {
-    runApp(const BlockedDeviceScreen());
-    return;
-    // }
+    if (_isMobileOrTabletDevice()) {
+      runApp(const BlockedDeviceScreen(
+        reason: "Your account is already active on another device.",
+      ));
+      return;
+    }
   } else {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
 
-  // runApp(MyApp(
-  //   appRouterDelegate: appRouterDelegate,
-  // ));
+  runApp(MyApp(
+    appRouterDelegate: appRouterDelegate,
+  ));
 }
 
 // // for web only

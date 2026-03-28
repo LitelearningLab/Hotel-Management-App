@@ -35,7 +35,7 @@ class BlockedDeviceScreen extends StatelessWidget {
     if (hasCustomReason) {
       message = reason!;
     }
-
+    print("BlockedDeviceScreen reason: $hasCustomReason, message: $message");
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -84,21 +84,27 @@ class BlockedDeviceScreen extends StatelessWidget {
                           ),
                         ),
                         hasCustomReason
-                            ? Text(
-                                message,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  height: 1.5,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF344054),
-                                ),
+                            ? Column(
+                                children: [
+                                  SizedBox(height: getWidgetHeight(height: 10)),
+                                  Text(
+                                    message,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        height: 1.5,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color.fromARGB(232, 244, 67, 54)
+                                        // color: Color(0xFF344054),
+                                        ),
+                                  ),
+                                ],
                               )
                             : RichText(
                                 textAlign: TextAlign.center,
                                 text: const TextSpan(
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 14,
                                     height: 1.5,
                                     fontWeight: FontWeight.w500,
                                     color: Color(0xFF344054),
@@ -121,45 +127,46 @@ class BlockedDeviceScreen extends StatelessWidget {
                                 ),
                               ),
                         // const SizedBox(height: 16),
-                        Column(
-                          children: [
-                            SizedBox(
-                              width: getWidgetWidth(width: 200),
-                              child: ElevatedButton.icon(
-                                onPressed: () => _openStore(_playStoreUri),
-                                icon: const Icon(Icons.android_rounded),
-                                label: const Text("Play Store"),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF129F52),
-                                  foregroundColor: Colors.white,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                        if (!hasCustomReason)
+                          Column(
+                            children: [
+                              SizedBox(
+                                width: getWidgetWidth(width: 200),
+                                child: ElevatedButton.icon(
+                                  onPressed: () => _openStore(_playStoreUri),
+                                  icon: const Icon(Icons.android_rounded),
+                                  label: const Text("Play Store"),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF129F52),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 20),
-                            SizedBox(
-                              width: getWidgetWidth(width: 200),
-                              child: ElevatedButton.icon(
-                                onPressed: () => _openStore(_appStoreUri),
-                                icon: const Icon(Icons.apple_rounded),
-                                label: const Text("App Store"),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF111827),
-                                  foregroundColor: Colors.white,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                              SizedBox(height: 20),
+                              SizedBox(
+                                width: getWidgetWidth(width: 200),
+                                child: ElevatedButton.icon(
+                                  onPressed: () => _openStore(_appStoreUri),
+                                  icon: const Icon(Icons.apple_rounded),
+                                  label: const Text("App Store"),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF111827),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                       ],
                     ),
                   ),
