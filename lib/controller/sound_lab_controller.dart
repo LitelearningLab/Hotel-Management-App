@@ -92,7 +92,18 @@ class SoundLabController extends GetxController {
         update();
       }
     });
+
+    _initIds();
     super.onInit();
+  }
+
+  Future<void> _initIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString("userId") ?? "";
+    collegeId = prefs.getString("collegeId") ?? "";
+    batchName = prefs.getString("batchName") ?? "";
+    mainCategoryTitle = soundSubcategory.name;
+    update();
   }
 
   Future<void> fetchLocalOrSave() async {
@@ -391,7 +402,7 @@ class SoundLabController extends GetxController {
           date: "",
           lastAttempt: "",
           listAtt: 1,
-          load: mianCategoryTitile,
+          load: mainCategoryTitle,
           pracAtt: 0,
           time: 0,
           timeCal: DateTime.now().millisecondsSinceEpoch,

@@ -200,9 +200,19 @@ class PronunciationLabController extends GetxController {
         ? "EnglishLabCollection"
         : "FrenchLabCollection");
     _fetchData();
+    _initIds();
     log("PronunciationLabController initialized with title: ${title.value}");
 
     super.onInit();
+  }
+
+  Future<void> _initIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString("userId") ?? "";
+    collegeId = prefs.getString("collegeId") ?? "";
+    batchName = prefs.getString("batchName") ?? "";
+    mainCategoryTitle = title.value;
+    update();
   }
 
   Future<void> _fetchData() async {
@@ -362,7 +372,7 @@ class PronunciationLabController extends GetxController {
           date: "",
           lastAttempt: "",
           listAtt: 1,
-          load: mianCategoryTitile,
+          load: mainCategoryTitle,
           pracAtt: 0,
           time: 0,
           timeCal: DateTime.now().millisecondsSinceEpoch,
@@ -482,7 +492,7 @@ class PronunciationLabController extends GetxController {
           date: "",
           lastAttempt: "",
           listAtt: 0,
-          load: mianCategoryTitile,
+          load: mainCategoryTitle,
           pracAtt: 1,
           time: 0,
           timeCal: DateTime.now().millisecondsSinceEpoch,

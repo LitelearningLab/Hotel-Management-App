@@ -90,6 +90,11 @@ class PronunciationLabSubController extends GetxController {
     final args = Get.arguments;
     final box = GetStorage();
     var argList = [];
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString("userId") ?? "";
+    collegeId = prefs.getString("collegeId") ?? "";
+    batchName = prefs.getString("batchName") ?? "";
+
     if (args != null) {
       title = args['title'];
       argList = args['subcategories'] as List;
@@ -142,7 +147,7 @@ class PronunciationLabSubController extends GetxController {
     } else {
       fetchPronunById(id);
     }
-    final prefs = await SharedPreferences.getInstance();
+    // final prefs = await SharedPreferences.getInstance();
     userId = prefs.getString("userId") ?? "";
     collegeId = prefs.getString("collegeId") ?? "";
     batchName = prefs.getString("batchName") ?? "";
@@ -181,7 +186,7 @@ class PronunciationLabSubController extends GetxController {
             isShowDidNotCatch: notCatch,
             word: word,
             title: title,
-            load: mianCategoryTitile,
+            load: mainCategoryTitle,
           ),
         ),
       );
@@ -201,7 +206,7 @@ class PronunciationLabSubController extends GetxController {
             date: DateTime.now().toIso8601String().substring(0, 10),
             lastAttempt: DateTime.now().toIso8601String(),
             listAtt: 0,
-            load: mianCategoryTitile,
+            load: mainCategoryTitle,
             pracAtt: 1,
             time: 0,
             timeCal: DateTime.now().millisecondsSinceEpoch,
@@ -526,7 +531,7 @@ class PronunciationLabSubController extends GetxController {
           date: "",
           lastAttempt: "",
           listAtt: 1,
-          load: mianCategoryTitile,
+          load: mainCategoryTitle,
           pracAtt: 0,
           time: 0,
           timeCal: DateTime.now().millisecondsSinceEpoch,

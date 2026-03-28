@@ -537,7 +537,7 @@ class _HomeState extends State<Home>
                                     splashColor: Colors.transparent,
                                     onTap: () {
                                       timestampIndex = index;
-                                      mianCategoryTitile =
+                                      mainCategoryTitle =
                                           hController.cardNames[index];
                                       if (index != 4) {
                                         debugPrint(

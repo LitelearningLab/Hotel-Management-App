@@ -105,7 +105,7 @@ class Languagelab extends StatelessWidget {
                                   controller.showReviewPopup(context);
                                   return;
                                 }
-                                mianCategoryTitile = 'English Pronunciation';
+                                mainCategoryTitle = 'English Pronunciation';
                                 WidgetsBinding.instance
                                     .addPostFrameCallback((_) {
                                   GetStorage().write(AppRoutes.pronunciationLab,
@@ -139,7 +139,7 @@ class Languagelab extends StatelessWidget {
                                   controller.showReviewPopup(context);
                                   return;
                                 }
-                                mianCategoryTitile = 'French Pronunciation';
+                                mainCategoryTitle = 'French Pronunciation';
                                 WidgetsBinding.instance
                                     .addPostFrameCallback((_) {
                                   GetStorage().write(AppRoutes.pronunciationLab,
@@ -173,7 +173,7 @@ class Languagelab extends StatelessWidget {
                                   controller.showReviewPopup(context);
                                   return;
                                 }
-                                mianCategoryTitile = 'Sentence Lab';
+                                mainCategoryTitle = 'Sentence Lab';
                                 WidgetsBinding.instance
                                     .addPostFrameCallback((_) {
                                   GetStorage().write(AppRoutes.sentenceLab,
@@ -203,7 +203,7 @@ class Languagelab extends StatelessWidget {
                                   controller.showReviewPopup(context);
                                   return;
                                 }
-                                mianCategoryTitile = 'Grammer Lab';
+                                mainCategoryTitle = 'Grammer Lab';
                                 WidgetsBinding.instance
                                     .addPostFrameCallback((_) {
                                   GetStorage().write(AppRoutes.grmmaerLab,
@@ -290,7 +290,7 @@ class Languagelab extends StatelessWidget {
                                     indicatorPadding:
                                         EdgeInsets.symmetric(vertical: 5),
                                     onTap: (index) {
-                                      mianCategoryTitile = index == 0
+                                      mainCategoryTitle = index == 0
                                           ? "Important Sounds"
                                           : index == 1
                                               ? "Vowels"
@@ -391,7 +391,7 @@ class Languagelab extends StatelessWidget {
                                                     getWidgetWidth(width: 15)),
                                             child: InkWell(
                                               onTap: () {
-                                                mianCategoryTitile =
+                                                mainCategoryTitle =
                                                     "Important Sounds";
                                                 activityName = 'Sound Lab';
                                                 subCategoryTitle = controller
@@ -731,7 +731,7 @@ class Languagelab extends StatelessWidget {
                                                                 log("${sessionName} session name is printing here");
                                                                 addToRecentHistory(
                                                                   path:
-                                                                      "Language Lab > $mianCategoryTitile > $subCategoryTitle",
+                                                                      "Language Lab > $mainCategoryTitle > $subCategoryTitle",
                                                                   category:
                                                                       sessionName,
                                                                   section:

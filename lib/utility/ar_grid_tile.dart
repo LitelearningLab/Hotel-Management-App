@@ -35,7 +35,7 @@ class ARGridTile extends StatelessWidget {
 
       onTap: () {
         if (!isUnderConstruction) {
-          mianCategoryTitile = title;
+          mainCategoryTitle = title;
         }
         onTap();
       },

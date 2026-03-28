@@ -29,7 +29,7 @@ bool isTimerActive = false;
 Timer? mainCatTimer;
 Duration _timeSpent = Duration.zero;
 Duration finalDuration = Duration.zero;
-String mianCategoryTitile = "";
+String mainCategoryTitle = "";
 String sessionName2 = "";
 String sessionName = "";
 String subCategoryTitle = "";
@@ -90,7 +90,7 @@ void recordTiming(String state) {
 
 void startTimerMainCategory(String name) {
   log("entering to the start timer main category");
-  // mianCategoryTitile = name;
+  // mainCategoryTitle = name;
   if (!isTimerActive) {
     count = 1;
     startTimings = DateTime.now();
@@ -122,7 +122,7 @@ Future<void> stopTimerMainCategory() async {
     await startPracticeTime(
       index: timestampIndex,
       duration: finalDuration,
-      mainCategory: mianCategoryTitile,
+      mainCategory: mainCategoryTitle,
       subCategory: subCategoryTitle, type: sessionName,
       activityName: activityName,
       topicNames: [],
@@ -132,7 +132,7 @@ Future<void> stopTimerMainCategory() async {
     activityName = "";
     sessionName = "";
 
-    log("printing the timing is working or not $finalDuration ${mianCategoryTitile}");
+    log("printing the timing is working or not $finalDuration ${mainCategoryTitle}");
   }
 }
 
@@ -242,7 +242,7 @@ Future<void> startPracticeTime({
         mainCategory == "Sentence Lab") {
       activityName = "Pronunciation Lab";
       // type = "null";
-    } else if (mianCategoryTitile == "Grammer Lab") {
+    } else if (mainCategoryTitle == "Grammer Lab") {
       activityName = "Grammer Lab";
       type = "null";
     }

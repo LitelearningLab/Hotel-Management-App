@@ -121,7 +121,7 @@ class ContentLabController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    mianCategoryTitile = "Content Library";
+    mainCategoryTitle = "Content Library";
     subCategoryTitle = "";
     activityName = "";
     sessionName = "";
