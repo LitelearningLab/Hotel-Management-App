@@ -86,8 +86,17 @@ class SentenceLabSubCatController extends GetxController {
       }
     });
 
+    _initIds();
     reloadFromDB(title);
     super.onInit();
+  }
+
+  Future<void> _initIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString("userId") ?? "";
+    collegeId = prefs.getString("collegeId") ?? "";
+    batchName = prefs.getString("batchName") ?? "";
+    update();
   }
 
   Future<void> reloadFromDB(String categoryName) async {
@@ -131,10 +140,6 @@ class SentenceLabSubCatController extends GetxController {
       }
       allSubcategories = List.from(subcategories);
     }
-    final prefs = await SharedPreferences.getInstance();
-    userId = prefs.getString("userId") ?? "";
-    collegeId = prefs.getString("collegeId") ?? "";
-    batchName = prefs.getString("batchName") ?? "";
     isLoading = false;
     update();
   }
@@ -357,6 +362,28 @@ class SentenceLabSubCatController extends GetxController {
       // ✅ Mark as playing here
 
       print("▶️ Playing: $filePathToPlay");
+
+      // ✅ Log listening attempt
+      final attempt = SentenceAttempt(
+        batch: batchName,
+        companyId: collegeId,
+        correct: 0,
+        dateTime: DateTime.now().toString(),
+        focusWord: [],
+        lastAttempt: DateTime.now().toString(),
+        lastScore: 0,
+        listAtt: 1,
+        load: title,
+        main: subcategories[index].id,
+        pracAtt: 0,
+        score: 0,
+        sentence: sentence.text,
+        time: 1,
+        timeCal: DateTime.now().millisecondsSinceEpoch,
+        title: title,
+        userId: userId,
+      );
+      await SentenceAttempt.saveAttempt(attempt);
     } catch (e) {
       log("❌ Audio load error: $e");
       audioStatusMap[newKey] = AudioStatus.error;
@@ -436,30 +463,28 @@ class SentenceLabSubCatController extends GetxController {
     ).then((value) async {
       if (value != null &&
           (value.isCorrect == "true" || value.isCorrect == "false")) {
+        subCategoryTitle = main; // Set global subCategoryTitle
         final attempt = SentenceAttempt(
-          batch: "Your-Batch",
+          batch: batchName,
           companyId: collegeId,
           correct: value.isCorrect == "true" ? 1 : 0,
           dateTime: DateTime.now().toString(),
           focusWord: [
             {
-              DateTime.now().toIso8601String(): [
-                ...(value.correctWords ?? []),
-                value.wordPer,
-              ],
+              DateTime.now().toIso8601String(): value.correctWords ?? [],
             }
           ],
           lastAttempt: DateTime.now().toString(),
           lastScore: value.wordPer,
           listAtt: 0,
           load: title,
-          main: subCategoryTitle,
+          main: main, // subname (e.g. Airport)
           pracAtt: 1,
           score: value.wordPer,
           sentence: word,
           time: 1,
           timeCal: DateTime.now().millisecondsSinceEpoch,
-          title: main,
+          title: title, // Category title (e.g. Sentence Construction Lab)
           userId: userId,
         );
 

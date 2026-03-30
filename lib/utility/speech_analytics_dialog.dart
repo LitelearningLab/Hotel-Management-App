@@ -614,6 +614,7 @@ class SpeechAnalyticsDialogState extends State<SpeechAnalyticsDialog>
       CloseValue closeValue = CloseValue();
 
       closeValue.formatedWords = formatedWords;
+      closeValue.correctWords = correctWords; // ✅ Added this line
       closeValue.wordPer = correctPer;
       closeValue.heard = heard.join(' ');
       closeValue.word = convertNumbersToText(convertSpecialChars(widget.word));
