@@ -366,7 +366,7 @@ class PronunciationLabController extends GetxController {
         await audioPlayer.play();
 
         final attempt = WordAttempt(
-          batch: "yourBatch",
+          batch: batchName,
           companyId: collegeId,
           correct: 0,
           date: "",
@@ -486,7 +486,7 @@ class PronunciationLabController extends GetxController {
         log("is correct or not $isCorrect");
 
         final attempt = WordAttempt(
-          batch: "yourBatch",
+          batch: batchName,
           companyId: collegeId,
           correct: isCorrect ? 1 : 0,
           date: "",

@@ -16,6 +16,7 @@ import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class SoundLabController extends GetxController {
@@ -174,7 +175,8 @@ class SoundLabController extends GetxController {
       log("🔥 FATAL ERROR inside fetchLocalOrSave(): $e");
       log(stack.toString());
       // Fallback to in-memory payload so UI does not stay in loading state.
-      soundsPractice = List<SoundPractice>.from(soundSubcategory.soundsPractice ?? []);
+      soundsPractice =
+          List<SoundPractice>.from(soundSubcategory.soundsPractice ?? []);
       isPriorityList =
           soundsPractice!.map((item) => item.downloadStatus == true).toList();
       masterList = List<SoundPractice>.from(soundsPractice!);
@@ -396,7 +398,7 @@ class SoundLabController extends GetxController {
         await audioPlayer.play();
 
         final attempt = WordAttempt(
-          batch: "yourBatch",
+          batch: batchName,
           companyId: collegeId,
           correct: 0,
           date: "",
