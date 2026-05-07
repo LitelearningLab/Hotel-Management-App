@@ -102,6 +102,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  String _formatDateRange(String start, String end) {
+    if (start.isEmpty || end.isEmpty) return "Active period not set";
+    try {
+      final startDate = DateTime.tryParse(start);
+      final endDate = DateTime.tryParse(end);
+      if (startDate == null || endDate == null) return "Invalid date format";
+
+      final formatter = DateFormat('dd-MM-yyyy');
+      return "Active from ${formatter.format(startDate)} to ${formatter.format(endDate)}";
+    } catch (e) {
+      return "Error formatting dates";
+    }
+  }
+
   // --------------------------------------------------
   // BUILD
   // --------------------------------------------------
@@ -181,9 +195,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _infoTile(
                       icon: Icons.calendar_today,
                       color: Colors.redAccent,
-                      value:
-                          "Active from ${DateFormat('dd-MM-yyyy').format(DateTime.parse(joinDate))} "
-                          "to ${DateFormat('dd-MM-yyyy').format(DateTime.parse(endDate))}",
+                      value: _formatDateRange(joinDate, endDate),
                     ),
 
                     const SizedBox(height: 24),

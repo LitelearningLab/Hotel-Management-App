@@ -22,10 +22,6 @@ class BlockedDeviceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    kHeight = MediaQuery.of(context).size.height;
-    kWidth = MediaQuery.of(context).size.width;
-    kText = MediaQuery.of(context).textScaler;
-
     // Default message
     String message =
         "This website is optimized for desktop use only.\nMobile users: please use the Profluent Hotelier app.";
@@ -35,146 +31,149 @@ class BlockedDeviceScreen extends StatelessWidget {
     if (hasCustomReason) {
       message = reason!;
     }
-    print("BlockedDeviceScreen reason: $hasCustomReason, message: $message");
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: Container(
-          height: kHeight,
-          width: kWidth,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFFF4F7FC), Color(0xFFE8EEF9)],
+        body: LayoutBuilder(builder: (context, constraints) {
+          kHeight = constraints.maxHeight;
+          kWidth = constraints.maxWidth;
+          kText = MediaQuery.of(context).textScaler;
+
+          return Container(
+            height: kHeight,
+            width: kWidth,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFFF4F7FC), Color(0xFFE8EEF9)],
+              ),
             ),
-          ),
-          child: SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 24,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 18,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
+            child: SafeArea(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 520),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 24,
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          height: getWidgetHeight(height: 122),
-                          width: getWidgetWidth(width: 122),
-                          child: Image.asset(
-                            AllAssets.splashLogo,
-                            fit: BoxFit.contain,
-                            height: getWidgetHeight(height: 58),
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 18,
+                            offset: const Offset(0, 8),
                           ),
-                        ),
-                        hasCustomReason
-                            ? Column(
-                                children: [
-                                  SizedBox(height: getWidgetHeight(height: 10)),
-                                  Text(
-                                    message,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        height: 1.5,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color.fromARGB(232, 244, 67, 54)
-                                        // color: Color(0xFF344054),
-                                        ),
-                                  ),
-                                ],
-                              )
-                            : RichText(
-                                textAlign: TextAlign.center,
-                                text: const TextSpan(
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    height: 1.5,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF344054),
-                                  ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            height: getWidgetHeight(height: 122),
+                            width: getWidgetWidth(width: 122),
+                            child: Image.asset(
+                              AllAssets.splashLogo,
+                              fit: BoxFit.contain,
+                              height: getWidgetHeight(height: 58),
+                            ),
+                          ),
+                          hasCustomReason
+                              ? Column(
                                   children: [
-                                    TextSpan(
-                                      text:
-                                          "This website is optimized for desktop use only.\n",
-                                    ),
-                                    TextSpan(
-                                      text: "Mobile users: ",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                    TextSpan(
-                                      text:
-                                          "please use the Profluent Hotelier app. \n",
+                                    SizedBox(height: getWidgetHeight(height: 10)),
+                                    Text(
+                                      message,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          height: 1.5,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color.fromARGB(232, 244, 67, 54)),
                                     ),
                                   ],
+                                )
+                              : RichText(
+                                  textAlign: TextAlign.center,
+                                  text: const TextSpan(
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      height: 1.5,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFF344054),
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text:
+                                            "This website is optimized for desktop use only.\n",
+                                      ),
+                                      TextSpan(
+                                        text: "Mobile users: ",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                      TextSpan(
+                                        text:
+                                            "please use the Profluent Hotelier app. \n",
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                        // const SizedBox(height: 16),
-                        if (!hasCustomReason)
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: getWidgetWidth(width: 200),
-                                child: ElevatedButton.icon(
-                                  onPressed: () => _openStore(_playStoreUri),
-                                  icon: const Icon(Icons.android_rounded),
-                                  label: const Text("Play Store"),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF129F52),
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                          if (!hasCustomReason)
+                            Column(
+                              children: [
+                                SizedBox(
+                                  width: getWidgetWidth(width: 200),
+                                  child: ElevatedButton.icon(
+                                    onPressed: () => _openStore(_playStoreUri),
+                                    icon: const Icon(Icons.android_rounded),
+                                    label: const Text("Play Store"),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF129F52),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(height: 20),
-                              SizedBox(
-                                width: getWidgetWidth(width: 200),
-                                child: ElevatedButton.icon(
-                                  onPressed: () => _openStore(_appStoreUri),
-                                  icon: const Icon(Icons.apple_rounded),
-                                  label: const Text("App Store"),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF111827),
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                                SizedBox(height: 20),
+                                SizedBox(
+                                  width: getWidgetWidth(width: 200),
+                                  child: ElevatedButton.icon(
+                                    onPressed: () => _openStore(_appStoreUri),
+                                    icon: const Icon(Icons.apple_rounded),
+                                    label: const Text("App Store"),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF111827),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                      ],
+                              ],
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }
