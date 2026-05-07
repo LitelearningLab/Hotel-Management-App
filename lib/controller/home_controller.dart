@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
+import 'dart:io' show Platform; // Use specific import
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -396,26 +396,26 @@ class HomeController extends GetxController {
   }
 
   Future<void> openAppStore() async {
+    if (kIsWeb) return;
+
     const androidAppId = "com.profluent.hotelier.app";
     const iosAppUrl =
         "https://apps.apple.com/in/app/profluent-hotelier/id6754444749";
 
-    if (kIsWeb) return;
-
-    if (Platform.isAndroid) {
-      final url = Uri.parse("market://details?id=$androidAppId");
-      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-        // Fallback to web Play Store if Play Store not found
-        final webUrl = Uri.parse(
-            "https://play.google.com/store/apps/details?id=$androidAppId");
-        await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+    try {
+      if (Platform.isAndroid) {
+        final url = Uri.parse("market://details?id=$androidAppId");
+        if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+          final webUrl = Uri.parse(
+              "https://play.google.com/store/apps/details?id=$androidAppId");
+          await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+        }
+      } else if (Platform.isIOS) {
+        final url = Uri.parse(iosAppUrl);
+        await launchUrl(url, mode: LaunchMode.externalApplication);
       }
-    } else if (Platform.isIOS) {
-      final url = Uri.parse(iosAppUrl);
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
-      // optional fallback for other platforms
-      print("Unsupported platform");
+    } catch (e) {
+      debugPrint("Store link error: $e");
     }
   }
 

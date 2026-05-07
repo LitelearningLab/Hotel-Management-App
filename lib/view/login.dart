@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
+import 'dart:io' show Platform;
 
 import 'package:android_id/android_id.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,7 +30,6 @@ import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/view/blocked_device_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-// import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -44,7 +43,6 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
   final emailAuth = EmailAuthService();
   OverlayEntry? _bottomMessageEntry;
-  // final googleAuth = GoogleAuthService();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   bool _isLogin = false;
@@ -61,15 +59,20 @@ class _LoginPageState extends State<LoginPage> {
       });
       return;
     }
-    if (Platform.isIOS) {
+    try {
+      if (Platform.isIOS) {
+        setState(() {
+          appVersion = "1.0.0";
+        });
+      } else {
+        PackageInfo packageInfo = await PackageInfo.fromPlatform();
+        setState(() {
+          appVersion = packageInfo.version;
+        });
+      }
+    } catch (_) {
       setState(() {
         appVersion = "1.0.0";
-      });
-    } else {
-      // For Android and others, fetch from package info
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      setState(() {
-        appVersion = packageInfo.version; // e.g. "1.0.3"
       });
     }
   }
@@ -98,7 +101,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void showBottomStickyMessage(BuildContext context, String message) {
-    // If a message is already showing, remove it first
     _bottomMessageEntry?.remove();
 
     _bottomMessageEntry = OverlayEntry(
@@ -106,14 +108,12 @@ class _LoginPageState extends State<LoginPage> {
         left: 0,
         right: 0,
         bottom: 40,
-        // top: displayHeight(context) / 18,
         child: Material(
           color: Colors.transparent,
           child: AnimatedSlide(
             duration: const Duration(milliseconds: 300),
             offset: const Offset(0, 0),
             child: Container(
-              // height: 120,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               margin: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -162,9 +162,6 @@ class _LoginPageState extends State<LoginPage> {
         await isUserRegistered(emailController.text.toLowerCase());
       } else {
         showBottomStickyMessage(context, "Please enter a valid email address.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text('Please enter a valid email')),
-        // );
       }
       return;
     }
@@ -184,12 +181,7 @@ class _LoginPageState extends State<LoginPage> {
           .get();
 
       if (snapshot.docs.isEmpty) {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red, content: Text("Invalid password.")),
-        // );
         showBottomStickyMessage(context, "Invalid password.");
-        // showCenterToast("Invalid password.");
         _isLoading = false;
         isLoading = true;
         setState(() {});
@@ -200,15 +192,9 @@ class _LoginPageState extends State<LoginPage> {
       final userData = doc.data();
       final userId = doc.id;
 
-      // 🔹 Step 1: Fetch Company Data
       final companyId = userData['companyid'];
       if (companyId == null || companyId.toString().isEmpty) {
         showBottomStickyMessage(context, "Company information missing.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red,
-        //       content: Text("Company information missing.")),
-        // );
         _isLoading = false;
         isLoading = true;
         setState(() {});
@@ -223,10 +209,6 @@ class _LoginPageState extends State<LoginPage> {
 
       if (companySnapshot.docs.isEmpty) {
         showBottomStickyMessage(context, "Company not found.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red, content: Text("Company not found.")),
-        // );
         _isLoading = false;
         isLoading = true;
         setState(() {});
@@ -234,29 +216,20 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       final companyData = companySnapshot.docs.first.data();
-      log("${companyData['status']} make printing the company status here and here im printing the imei ${userData["imei"]}");
 
-      // 🔹 Step 2: Check company status
       if (companyData['status'] != "1") {
         showBottomStickyMessage(context, "Company status is invalid.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red,
-        //       content: Text("Company status is invalid.")),
-        // );
         _isLoading = false;
         isLoading = true;
         setState(() {});
         return;
       }
 
-      // 🔹 Step 3: Check subscription dates
       final userSubDate =
           DateTime.tryParse(userData['subscriptionenddate'] ?? '');
       final companySubDate =
           DateTime.tryParse(companyData['subscriptionenddate'] ?? '');
       final now = DateTime.now();
-      log("user sub date $userSubDate company sub date $companySubDate  now $now");
 
       bool isUserActive = userSubDate != null && userSubDate.isAfter(now);
       bool isCompanyActive =
@@ -265,57 +238,43 @@ class _LoginPageState extends State<LoginPage> {
       if (!isUserActive && !isCompanyActive) {
         showBottomStickyMessage(
             context, "Subscription date has been finished.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red,
-        //       content: Text("Subscription date has been finished.")),
-        // );
         _isLoading = false;
         isLoading = true;
         setState(() {});
         return;
       }
 
-      // 🔹 Step 4: Device verification (same as before)
       final prefs = await SharedPreferences.getInstance();
       if (!kIsWeb) {
-        final deviceId = Platform.isAndroid
-            ? await const AndroidId().getId()
-            : await getPermanentDeviceId();
-        final deviceName = await DeviceScreenInfo.getModelName();
+        try {
+          final deviceId = Platform.isAndroid
+              ? await const AndroidId().getId()
+              : await getPermanentDeviceId();
+          final deviceName = await DeviceScreenInfo.getModelName();
 
-        if (userData.containsKey('imei')) {
-          if (userData['imei'] != deviceId) {
-            showBottomStickyMessage(context,
-                "Your account is linked to another mobile device. Contact your administrator to register a new device.");
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(
-            //       backgroundColor: Colors.red,
-            //       content: Text("Login denied: Device not recognized.")),
-            // );
-            _isLoading = false;
-            isLoading = true;
-            setState(() {});
-            return;
+          if (userData.containsKey('imei')) {
+            if (userData['imei'] != deviceId) {
+              showBottomStickyMessage(context,
+                  "Your account is linked to another mobile device. Contact your administrator to register a new device.");
+              _isLoading = false;
+              isLoading = true;
+              setState(() {});
+              return;
+            }
+          } else {
+            await doc.reference.update({
+              'imei': deviceId,
+              'model': deviceName,
+            });
           }
-        } else {
-          log("checking whether is going now");
-          await doc.reference.update({
-            'imei': deviceId,
-            'model': deviceName,
-            // 'firstTImeLogin': DateFormat('yyyy-MM-dd').format(DateTime.now()),
-          });
-        }
+        } catch (_) {}
       }
 
-      // 🔹 Step 5: Save prefs
       await prefs.setString('email', email);
       await prefs.setString('password', password);
       await prefs.setBool("loginInfo", true);
       await prefs.setString("userId", userId);
       await prefs.setString("collegeId", userData['companyid'] ?? '');
-      print(
-          "Here im printing the user data company id ${userData['companyid']}");
       await prefs.setString("batchName", userData['batchName'] ?? '');
       await prefs.setString("userName", userData['username'] ?? '');
       await prefs.setString("collegeName", userData['college'] ?? '');
@@ -326,11 +285,9 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString("enddate", userData['subscriptionenddate'] ?? '');
       await prefs.setString('course', userData['course'] ?? "");
 
-      log("User ID saved: $userId");
-      bool session = true; // default for mobile
+      bool session = true;
 
       if (kIsWeb) {
-        // Only run login session logic on Web
         session = await SessionService.loginUser(email, password);
       }
       if (session) {
@@ -346,19 +303,11 @@ class _LoginPageState extends State<LoginPage> {
                           "Your account is already active on another device.",
                     )));
       }
-
-      // Get.offAllNamed(AppRoutes.home);
     } catch (e) {
-      print("Login error: $e");
       log("Login error: $e");
       isLoading = true;
       setState(() {});
       showBottomStickyMessage(context, "Login failed. Please try again.");
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //       backgroundColor: Colors.red,
-      //       content: Text("Login failed. Please try again.")),
-      // );
     }
 
     _isLoading = false;
@@ -368,7 +317,6 @@ class _LoginPageState extends State<LoginPage> {
   Future<bool> isUserRegistered(String email) async {
     _isLoading = true;
     setState(() {});
-    log("Checking email: $email");
 
     try {
       final snapshot = await FirebaseFirestore.instance
@@ -384,14 +332,9 @@ class _LoginPageState extends State<LoginPage> {
         _isLogin = true;
         _isLoading = false;
         setState(() {});
-        log("User exists in database");
         return true;
       } else {
-        log("User not found in database");
         showBottomStickyMessage(context, "User not registered.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text("User not registered.")),
-        // );
         return false;
       }
     } catch (e) {
@@ -418,7 +361,6 @@ class _LoginPageState extends State<LoginPage> {
       final prefs = await SharedPreferences.getInstance();
       final lastRoute = prefs.getString('lastFailedRoute');
       if (lastRoute != null && lastRoute.isNotEmpty) {
-        debugPrint("printing where it is coming here or not");
         Get.snackbar(
           'Load Failed',
           'Please log in first.',
@@ -442,7 +384,6 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget build(BuildContext context) {
     final isWeb = kIsWeb;
-    final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FA),
@@ -474,17 +415,12 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      /// LOGO
                       Image.asset(
                         AllAssets.splashLogo,
                         height: 70,
                         fit: BoxFit.contain,
                       ),
-
                       const SizedBox(height: 24),
-
-                      /// TITLE
-                      /// HEADER (Back + Title)
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -501,9 +437,7 @@ class _LoginPageState extends State<LoginPage> {
                               },
                             )
                           else
-                            const SizedBox(
-                                width: 40), // keeps alignment balanced
-
+                            const SizedBox(width: 40),
                           Expanded(
                             child: Column(
                               children: [
@@ -531,27 +465,10 @@ class _LoginPageState extends State<LoginPage> {
                               ],
                             ),
                           ),
-
-                          const SizedBox(width: 40), // balance space on right
+                          const SizedBox(width: 40),
                         ],
                       ),
-
-                      const SizedBox(height: 6),
-
-                      // Text(
-                      //   _isLogin
-                      //       ? "Enter your password"
-                      //       : "Enter your registered email address",
-                      //   style: GoogleFonts.inter(
-                      //     fontSize: 14,
-                      //     color: Colors.grey.shade600,
-                      //   ),
-                      //   textAlign: TextAlign.center,
-                      // ),
-
                       const SizedBox(height: 28),
-
-                      /// SVG ILLUSTRATION
                       if (!isWeb)
                         SizedBox(
                           height: 160,
@@ -561,10 +478,7 @@ class _LoginPageState extends State<LoginPage> {
                                 : 'assets/emailScreen.svg',
                           ),
                         ),
-
                       if (!isWeb) const SizedBox(height: 24),
-
-                      /// INPUT FIELD
                       TextFormField(
                         controller:
                             _isLogin ? passwordController : emailController,
@@ -596,17 +510,6 @@ class _LoginPageState extends State<LoginPage> {
                                     setState(() {
                                       _obscurePassword = !_obscurePassword;
                                     });
-                                    // if (!_obscurePassword) {
-                                    //   _hideTimer?.cancel();
-                                    //   _hideTimer =
-                                    //       Timer(const Duration(seconds: 1), () {
-                                    //     if (mounted) {
-                                    //       setState(() {
-                                    //         _obscurePassword = true;
-                                    //       });
-                                    //     }
-                                    //   });
-                                    // }
                                   },
                                 )
                               : null,
@@ -618,10 +521,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 24),
-
-                      /// BUTTON
                       _isLoading
                           ? CircularProgressIndicator(color: linearColor)
                           : SizedBox(
@@ -634,7 +534,6 @@ class _LoginPageState extends State<LoginPage> {
                                 onPressed: login,
                               ),
                             ),
-
                       if (_isLogin && isLoading)
                         TextButton(
                           onPressed: () {
@@ -644,10 +543,7 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: const Text("← Back"),
                         ),
-
                       const SizedBox(height: 24),
-
-                      /// FOOTER
                       Column(
                         children: [
                           TextButton(
