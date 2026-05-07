@@ -83,16 +83,7 @@ class SentenceLabSubCatController extends GetxController {
     activityName = "";
     sessionName = title;
 
-    audioPlayer.playerStateStream.listen((state) async {
-      if (state.processingState == ProcessingState.completed ||
-          state.processingState == ProcessingState.idle) {
-        if (currentKey != null) {
-          audioStatusMap[currentKey!] = AudioStatus.idle;
-          update();
-          currentKey = null;
-        }
-      }
-    });
+    _attachPlayerListener();
 
     reloadFromDB(title);
     super.onInit();
@@ -308,11 +299,39 @@ class SentenceLabSubCatController extends GetxController {
     return path.startsWith('file://');
   }
 
+  /// Dispose the current player, create a fresh one, and re-attach the
+  /// stream listener. This guarantees the web HTML5 audio element is fully
+  /// replaced — the only reliable way to switch sources in release builds.
+  Future<void> _resetAudioPlayer() async {
+    try {
+      if (audioPlayer.playing) {
+        await audioPlayer.stop();
+      }
+      await audioPlayer.dispose();
+    } catch (_) {}
+
+    audioPlayer = AudioPlayer();
+    _attachPlayerListener();
+  }
+
+  /// Attach the completion listener to the current audioPlayer instance.
+  void _attachPlayerListener() {
+    audioPlayer.playerStateStream.listen((state) {
+      if (state.processingState == ProcessingState.completed) {
+        if (currentKey != null) {
+          audioStatusMap[currentKey!] = AudioStatus.idle;
+          currentKey = null;
+          update();
+        }
+      }
+    });
+  }
+
   void handlePlayPause(int index, int subIndex) async {
     final requestId = ++_playbackRequestId;
     final newKey = "$index-$subIndex";
 
-    // If tapped same item
+    // If tapped same item — toggle pause/resume
     if (currentKey == newKey) {
       if (audioPlayer.playing) {
         await audioPlayer.pause();
@@ -336,13 +355,19 @@ class SentenceLabSubCatController extends GetxController {
       return;
     }
 
-    // Stop previous playback
+    // ── Switching to a different audio ──
+    // Mark old key idle
     if (currentKey != null) {
       audioStatusMap[currentKey!] = AudioStatus.idle;
-      await audioPlayer.stop();
-      if (requestId != _playbackRequestId) return;
-      currentKey = null;
     }
+    currentKey = null;
+    update();
+
+    // Dispose + recreate the player so the web audio element is fully reset.
+    // This fixes the release-mode bug where stop()+setUrl() still plays the
+    // previously loaded source.
+    await _resetAudioPlayer();
+    if (requestId != _playbackRequestId) return;
 
     // Set loading state for new audio
     currentKey = newKey;
@@ -353,7 +378,9 @@ class SentenceLabSubCatController extends GetxController {
       final sentence = subcategories[index].sentence[subIndex];
       String? filePathToPlay;
 
-      if (sentence.localPath != null && sentence.localPath!.isNotEmpty) {
+      if (!kIsWeb &&
+          sentence.localPath != null &&
+          sentence.localPath!.isNotEmpty) {
         final localFile = File(sentence.localPath!);
         if (await localFile.exists()) {
           final outputName =
@@ -371,6 +398,7 @@ class SentenceLabSubCatController extends GetxController {
       }
       if (requestId != _playbackRequestId) return;
 
+      // Set the audio source
       if (_isRemoteUrl(filePathToPlay) || _isFileUri(filePathToPlay)) {
         await audioPlayer.setUrl(filePathToPlay);
       } else {
@@ -378,11 +406,13 @@ class SentenceLabSubCatController extends GetxController {
       }
       if (requestId != _playbackRequestId) return;
 
+      // Ensure we start from the beginning
+      await audioPlayer.seek(Duration.zero);
+      if (requestId != _playbackRequestId) return;
+
       audioStatusMap[newKey] = AudioStatus.playing;
       update();
-      audioPlayer.play();
-
-      // ✅ Mark as playing here
+      await audioPlayer.play();
 
       if (kDebugMode) {
         print("▶️ Playing: $filePathToPlay");
