@@ -89,7 +89,7 @@ class _HomeState extends State<Home>
   Future<void> _loadAppVersion() async {
     if (Platform.isIOS) {
       setState(() {
-        appVersion = "1.0.1";
+        appVersion = "1.0.3";
       });
     } else {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
