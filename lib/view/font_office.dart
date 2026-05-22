@@ -30,6 +30,34 @@ class FrontOfficeHotelReception extends StatefulWidget {
 
 class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
   HomeController homeController = Get.put<HomeController>(HomeController());
+
+  Widget _actionItem({
+    required Widget icon,
+    required String label,
+    Color? labelColor,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          icon,
+          const SizedBox(height: 6),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 8.5,
+              fontWeight: FontWeight.w500,
+              color: labelColor ?? Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double isKwidth = MediaQuery.of(context).size.width;
@@ -511,7 +539,8 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                           MainAxisAlignment
                                                               .spaceBetween,
                                                       children: [
-                                                        GestureDetector(
+                                                        _actionItem(
+                                                          label: "E-Learning",
                                                           onTap: linkAvailable
                                                               ? () {
                                                                   activityName =
@@ -555,7 +584,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                   }
                                                                 }
                                                               : null,
-                                                          child: Image.asset(
+                                                          icon: Image.asset(
                                                             AllAssets
                                                                 .interaction,
                                                             color: linkAvailable
@@ -569,7 +598,8 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                     height: 28),
                                                           ),
                                                         ),
-                                                        GestureDetector(
+                                                        _actionItem(
+                                                          label: "Glossary",
                                                           onTap: linkAvailable1
                                                               ? () {
                                                                   activityName =
@@ -612,7 +642,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                   }
                                                                 }
                                                               : null,
-                                                          child: Image.asset(
+                                                          icon: Image.asset(
                                                             AllAssets.bookIcon,
                                                             color:
                                                                 linkAvailable1
@@ -628,17 +658,9 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                     height: 26),
                                                           ),
                                                         ),
-                                                        GestureDetector(
-                                                          // onTapDown:
-                                                          //     (TapDownDetails
-                                                          //         details) {
-                                                          //   final tapPosition =
-                                                          //       details
-                                                          //           .globalPosition;
-                                                          //   controller
-                                                          //       .showPopupAtTap(
-                                                          //           tapPosition);
-                                                          // },
+                                                        _actionItem(
+                                                          label:
+                                                              "Pronunciation",
                                                           onTap: controller
                                                                   .frontOfficeData[
                                                                       index]
@@ -717,15 +739,9 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                                 "pronunCollectionName": controller.pronunCollectionName,
                                                                               });
                                                                   });
-                                                                  // Navigator.push(
-                                                                  //     context,
-                                                                  //     MaterialPageRoute(
-                                                                  //         builder:
-                                                                  //             (context) =>
-                                                                  //                 AudioListPage()));
                                                                 }
                                                               : null,
-                                                          child: SizedBox(
+                                                          icon: SizedBox(
                                                             width:
                                                                 getWidgetWidth(
                                                                     width: 32),
@@ -745,7 +761,14 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                             ),
                                                           ),
                                                         ),
-                                                        GestureDetector(
+                                                        _actionItem(
+                                                          label:
+                                                              "Knowledge Check",
+                                                          labelColor: (isExpanded)
+                                                              ? linearColor
+                                                              : linkAvailable2
+                                                                  ? Colors.black
+                                                                  : Colors.grey,
                                                           onTap: linkAvailable2
                                                               ? () {
                                                                   controller
@@ -755,27 +778,9 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                           : index;
                                                                   controller
                                                                       .update();
-
-                                                                  // if (kIsWeb) {
-                                                                  //   Navigator.push(
-                                                                  //       context,
-                                                                  //       MaterialPageRoute(
-                                                                  //           builder: (context) =>
-                                                                  //               WebContentPage(title: controller.frontOfficeData[index].category, url: controller.frontOfficeData[index].subcategory[2].link)));
-                                                                  // } else {
-                                                                  //   Get.toNamed(
-                                                                  //       AppRoutes
-                                                                  //           .inAppWebView,
-                                                                  //       arguments: {
-                                                                  //         "url": controller
-                                                                  //             .frontOfficeData[index]
-                                                                  //             .subcategory[2]
-                                                                  //             .link
-                                                                  //       });
-                                                                  // }
                                                                 }
                                                               : null,
-                                                          child: Image.asset(
+                                                          icon: Image.asset(
                                                             AllAssets.approval,
                                                             color: (isExpanded)
                                                                 ? linearColor
@@ -803,6 +808,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                         right: getWidgetWidth(
                                                             width: 80)),
                                                     child: const Divider(
+                                                      // height: 1,
                                                       color: Color.fromARGB(
                                                           255, 107, 107, 107),
                                                     ),
@@ -894,15 +900,19 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                                         width:
                                                                             10),
                                                               ),
-                                                              child:
-                                                                  const Divider(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        57,
-                                                                        107,
-                                                                        107,
-                                                                        107),
-                                                              ),
+                                                              child: glossaryIndex ==
+                                                                      linksToShow
+                                                                              .length -
+                                                                          1
+                                                                  ? const SizedBox
+                                                                      .shrink()
+                                                                  : const Divider(
+                                                                      color: Color.fromARGB(
+                                                                          57,
+                                                                          107,
+                                                                          107,
+                                                                          107),
+                                                                    ),
                                                             ),
                                                           ],
                                                         );
