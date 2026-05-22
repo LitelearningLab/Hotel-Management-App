@@ -89,7 +89,7 @@ class _HomeState extends State<Home>
   Future<void> _loadAppVersion() async {
     if (Platform.isIOS) {
       setState(() {
-        appVersion = "1.0.0";
+        appVersion = "1.0.1";
       });
     } else {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -504,327 +504,337 @@ class _HomeState extends State<Home>
                     init: HomeController(),
                     builder: (hController) {
                       return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                              right: getWidgetWidth(width: 20),
-                              left: getWidgetWidth(
-                                  width: isKwidth > 700 ? 18 : 0)),
-                          child: Row(
-                            children: List.generate(
-                                hController.cardNames.length, (index) {
-                              return Padding(
-                                padding: EdgeInsets.only(
-                                    left: getWidgetWidth(
-                                        width: isKwidth > 700 ? 5 : 20),
-                                    bottom: getWidgetHeight(height: 20),
-                                    top: getWidgetHeight(height: 10)),
-                                child: AnimatedContainer(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  height: displayWidth(context) > 800
-                                      ? 340
-                                      : getWidgetHeight(height: 300),
-                                  width: isKwidth > 800
-                                      ? 240
-                                      : getWidgetWidth(width: 218),
-                                  duration: const Duration(milliseconds: 300),
-                                  child: InkWell(
-                                    highlightColor: Colors.transparent,
-                                    focusColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    splashColor: Colors.transparent,
-                                    onTap: () {
-                                      timestampIndex = index;
-                                      mainCategoryTitle =
-                                          hController.cardNames[index];
-                                      if (index != 4) {
-                                        debugPrint(
-                                            "Card name is and the click is happening or not ${hController.cardNames[index]}");
-                                        GetStorage()
-                                            .write(AppRoutes.frontOffice, {
-                                          'title': hController
-                                                      .cardNames[index] ==
-                                                  "Front Office\nManagement"
-                                              ? "Front Office Management"
-                                              : hController.cardNames[index] ==
-                                                      "Food & Beverage Service\nManagement"
-                                                  ? "Food & Beverage Service Management"
-                                                  : hController.cardNames[
-                                                              index] ==
-                                                          "Accommodation\nManagement - Housekeeping"
-                                                      ? "Accommodation Management - Housekeeping"
-                                                      : hController
-                                                          .cardNames[index],
-                                          'image':
-                                              hController.cardImages[index],
-                                          'index': index,
-                                        });
-                                        WidgetsBinding.instance
-                                            .addPostFrameCallback((_) {
-                                          if (kIsWeb) {
-                                            Get.rootDelegate.offNamed(
-                                                AppRoutes.frontOffice,
-                                                arguments: {
-                                                  'title': hController
-                                                                  .cardNames[
-                                                              index] ==
-                                                          "Front Office\nManagement"
-                                                      ? "Front Office Management"
-                                                      : hController.cardNames[
-                                                                  index] ==
-                                                              "Food & Beverage Service\nManagement"
-                                                          ? "Food & Beverage Service Management"
-                                                          : hController.cardNames[
-                                                                      index] ==
-                                                                  "Accommodation\nManagement - Housekeeping"
-                                                              ? "Accommodation Management - Housekeeping"
-                                                              : hController
-                                                                      .cardNames[
-                                                                  index],
-                                                  'image': hController
-                                                      .cardImages[index],
-                                                  'index': index,
-                                                });
-                                          } else {
-                                            Get.toNamed(AppRoutes.frontOffice,
-                                                arguments: {
-                                                  'title': hController
-                                                                  .cardNames[
-                                                              index] ==
-                                                          "Front Office\nManagement"
-                                                      ? "Front Office Management"
-                                                      : hController.cardNames[
-                                                                  index] ==
-                                                              "Food & Beverage Service\nManagement"
-                                                          ? "Food & Beverage Service Management"
-                                                          : hController.cardNames[
-                                                                      index] ==
-                                                                  "Accommodation\nManagement - Housekeeping"
-                                                              ? "Accommodation Management - Housekeeping"
-                                                              : hController
-                                                                      .cardNames[
-                                                                  index],
-                                                  'image': hController
-                                                      .cardImages[index],
-                                                  'index': index,
-                                                });
-                                          }
-                                        });
-                                      } else {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => UniversityLab(
-                                              universityModel:
-                                                  hController.universityModel,
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    child: AnimatedContainer(
-                                      duration: Duration(milliseconds: 300),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        color: Colors.white,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.1),
-                                            offset: const Offset(0, 4),
-                                            blurRadius: 10,
-                                          ),
-                                        ],
-                                      ),
-                                      child: GetBuilder<HomeController>(
-                                          builder: (ctr) {
-                                        return Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            AnimatedContainer(
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
+                          scrollDirection: Axis.horizontal,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                right: getWidgetWidth(width: 20),
+                                left: getWidgetWidth(
+                                    width: isKwidth > 700 ? 18 : 0)),
+                            child: Row(
+                              children: List.generate(
+                                  hController.cardNames.length, (index) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      left: getWidgetWidth(
+                                          width: isKwidth > 700 ? 5 : 20),
+                                      bottom: getWidgetHeight(height: 20),
+                                      top: getWidgetHeight(height: 10)),
+                                  child: AnimatedContainer(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    height: displayWidth(context) > 800
+                                        ? 340
+                                        : getWidgetHeight(height: 300),
+                                    width: isKwidth > 800
+                                        ? 240
+                                        : getWidgetWidth(width: 218),
+                                    duration: const Duration(milliseconds: 300),
+                                    child: InkWell(
+                                      highlightColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      splashColor: Colors.transparent,
+                                      onTap: () {
+                                        timestampIndex = index;
+                                        mainCategoryTitle =
+                                            hController.cardNames[index];
+                                        if (index != 4) {
+                                          debugPrint(
+                                              "Card name is and the click is happening or not ${hController.cardNames[index]}");
+                                          GetStorage()
+                                              .write(AppRoutes.frontOffice, {
+                                            'title': hController
+                                                        .cardNames[index] ==
+                                                    "Front Office\nManagement"
+                                                ? "Front Office Management"
+                                                : hController
+                                                            .cardNames[index] ==
+                                                        "Food & Beverage Service\nManagement"
+                                                    ? "Food & Beverage Service Management"
+                                                    : hController.cardNames[
+                                                                index] ==
+                                                            "Accommodation\nManagement - Housekeeping"
+                                                        ? "Accommodation Management - Housekeeping"
+                                                        : hController
+                                                            .cardNames[index],
+                                            'image':
+                                                hController.cardImages[index],
+                                            'index': index,
+                                          });
+                                          WidgetsBinding.instance
+                                              .addPostFrameCallback((_) {
+                                            if (kIsWeb) {
+                                              Get.rootDelegate.offNamed(
+                                                  AppRoutes.frontOffice,
+                                                  arguments: {
+                                                    'title': hController
+                                                                    .cardNames[
+                                                                index] ==
+                                                            "Front Office\nManagement"
+                                                        ? "Front Office Management"
+                                                        : hController.cardNames[
+                                                                    index] ==
+                                                                "Food & Beverage Service\nManagement"
+                                                            ? "Food & Beverage Service Management"
+                                                            : hController.cardNames[
+                                                                        index] ==
+                                                                    "Accommodation\nManagement - Housekeeping"
+                                                                ? "Accommodation Management - Housekeeping"
+                                                                : hController
+                                                                        .cardNames[
+                                                                    index],
+                                                    'image': hController
+                                                        .cardImages[index],
+                                                    'index': index,
+                                                  });
+                                            } else {
+                                              Get.toNamed(AppRoutes.frontOffice,
+                                                  arguments: {
+                                                    'title': hController
+                                                                    .cardNames[
+                                                                index] ==
+                                                            "Front Office\nManagement"
+                                                        ? "Front Office Management"
+                                                        : hController.cardNames[
+                                                                    index] ==
+                                                                "Food & Beverage Service\nManagement"
+                                                            ? "Food & Beverage Service Management"
+                                                            : hController.cardNames[
+                                                                        index] ==
+                                                                    "Accommodation\nManagement - Housekeeping"
+                                                                ? "Accommodation Management - Housekeeping"
+                                                                : hController
+                                                                        .cardNames[
+                                                                    index],
+                                                    'image': hController
+                                                        .cardImages[index],
+                                                    'index': index,
+                                                  });
+                                            }
+                                          });
+                                        } else {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  UniversityLab(
+                                                universityModel:
+                                                    hController.universityModel,
                                               ),
-                                              duration:
-                                                  Duration(microseconds: 300),
-                                              width: isKwidth > 800
-                                                  ? 240
-                                                  : getWidgetWidth(width: 218),
-                                              height:
-                                                  displayWidth(context) > 800
-                                                      ? 180
-                                                      : getWidgetHeight(
-                                                          height: 157),
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    const BorderRadius.only(
-                                                  topLeft: Radius.circular(16),
-                                                  topRight: Radius.circular(16),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: AnimatedContainer(
+                                        duration: Duration(milliseconds: 300),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              offset: const Offset(0, 4),
+                                              blurRadius: 10,
+                                            ),
+                                          ],
+                                        ),
+                                        child: GetBuilder<HomeController>(
+                                            builder: (ctr) {
+                                          return Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              AnimatedContainer(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
                                                 ),
-                                                child: index == 4
-                                                    ? Image.network(
-                                                        hController
-                                                            .cardImages[index],
-                                                        fit: BoxFit.fill,
-                                                      )
-                                                    : SvgPicture.asset(
-                                                        hController
-                                                            .cardImages[index],
-                                                        fit: isKwidth > 800
-                                                            ? BoxFit.fill
-                                                            : BoxFit.fitWidth,
-                                                      ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                                height: isKwidth > 700
-                                                    ? 5
-                                                    : getWidgetHeight(
-                                                        height: 8)),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: isKwidth > 700
-                                                      ? 10
-                                                      : getWidgetWidth(
-                                                          width: 10)),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    index == 4
-                                                        ? "Institute Specific Content"
-                                                        : "Hotel Management",
-                                                    style: TextStyle(
-                                                      color: lightWhite,
-                                                      fontSize: kText.scale(
-                                                        // (isKwidth >
-                                                        //         1200) // full desktop
-                                                        //     ? 12
-                                                        //     : (isKwidth <
-                                                        //             500) // mobile
-                                                        //         ?
-                                                        12
-                                                        // :
-                                                        // 10
-                                                        , // tablet / in-between
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                      height: isKwidth > 700
-                                                          ? 6
-                                                          : getWidgetHeight(
-                                                              height: 8)),
-                                                  AnimatedContainer(
-                                                    duration: Duration(
-                                                        milliseconds: 300),
-                                                    height: isKwidth > 700
-                                                        ? 90
+                                                duration:
+                                                    Duration(microseconds: 300),
+                                                width: isKwidth > 800
+                                                    ? 240
+                                                    : getWidgetWidth(
+                                                        width: 218),
+                                                height:
+                                                    displayWidth(context) > 800
+                                                        ? 180
                                                         : getWidgetHeight(
-                                                            height: 78),
-                                                    child: Text(
-                                                      hController
-                                                          .cardNames[index],
-                                                      textAlign:
-                                                          TextAlign.start,
-                                                      overflow:
-                                                          TextOverflow.fade,
-                                                      style: GoogleFonts.inter(
-                                                        fontWeight:
-                                                            FontWeight.w600,
+                                                            height: 157),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      const BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(16),
+                                                    topRight:
+                                                        Radius.circular(16),
+                                                  ),
+                                                  child: index == 4
+                                                      ? Image.network(
+                                                          hController
+                                                                  .cardImages[
+                                                              index],
+                                                          fit: BoxFit.fill,
+                                                        )
+                                                      : SvgPicture.asset(
+                                                          hController
+                                                                  .cardImages[
+                                                              index],
+                                                          fit: isKwidth > 800
+                                                              ? BoxFit.fill
+                                                              : BoxFit.fitWidth,
+                                                        ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  height: isKwidth > 700
+                                                      ? 5
+                                                      : getWidgetHeight(
+                                                          height: 8)),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: isKwidth > 700
+                                                        ? 10
+                                                        : getWidgetWidth(
+                                                            width: 10)),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      index == 4
+                                                          ? "Institute Specific Content"
+                                                          : "Hotel Management",
+                                                      style: TextStyle(
+                                                        color: lightWhite,
                                                         fontSize: kText.scale(
-                                                          // (isKwidth > 1200)
-                                                          //     ? 16
+                                                          // (isKwidth >
+                                                          //         1200) // full desktop
+                                                          //     ? 12
                                                           //     : (isKwidth <
                                                           //             500) // mobile
                                                           //         ?
-                                                          16
+                                                          12
                                                           // :
-                                                          // 13
+                                                          // 10
                                                           , // tablet / in-between
                                                         ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  SizedBox(
+                                                    SizedBox(
+                                                        height: isKwidth > 700
+                                                            ? 6
+                                                            : getWidgetHeight(
+                                                                height: 8)),
+                                                    AnimatedContainer(
+                                                      duration: Duration(
+                                                          milliseconds: 300),
                                                       height: isKwidth > 700
-                                                          ? 5
+                                                          ? 90
                                                           : getWidgetHeight(
-                                                              height: 5)),
-                                                  SizedBox(
-                                                    height: isKwidth > 700
-                                                        ? 18
-                                                        : getWidgetHeight(
-                                                            height: 15),
-                                                    child: Row(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          "View Details",
-                                                          textAlign:
-                                                              TextAlign.start,
-                                                          style: TextStyle(
-                                                            fontSize:
-                                                                kText.scale(12),
-                                                            color: linearColor,
-                                                            fontWeight:
-                                                                FontWeight.w600,
+                                                              height: 78),
+                                                      child: Text(
+                                                        hController
+                                                            .cardNames[index],
+                                                        textAlign:
+                                                            TextAlign.start,
+                                                        overflow:
+                                                            TextOverflow.fade,
+                                                        style:
+                                                            GoogleFonts.inter(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: kText.scale(
+                                                            // (isKwidth > 1200)
+                                                            //     ? 16
+                                                            //     : (isKwidth <
+                                                            //             500) // mobile
+                                                            //         ?
+                                                            16
+                                                            // :
+                                                            // 13
+                                                            , // tablet / in-between
                                                           ),
                                                         ),
-                                                        // LinearPercentIndicator(
-                                                        //   center: Text(
-                                                        //     "20%",
-                                                        //     style: TextStyle(
-                                                        //         color: Colors.white,
-                                                        //         fontSize: kText
-                                                        //             .scale(10)),
-                                                        //   ),
-                                                        //   barRadius:
-                                                        //       Radius.circular(6),
-                                                        //   width: getWidgetWidth(
-                                                        //       width: 150),
-                                                        //   lineHeight:
-                                                        //       getWidgetHeight(
-                                                        //           height: 14),
-                                                        //   percent: 0.2,
-                                                        //   backgroundColor:
-                                                        //       Colors.grey,
-                                                        //   progressColor:
-                                                        //       linearColor,
-                                                        // ),
-                                                      ],
+                                                      ),
                                                     ),
-                                                  ),
-                                                  // if (!kIsWeb)
-                                                  SizedBox(
+                                                    SizedBox(
+                                                        height: isKwidth > 700
+                                                            ? 5
+                                                            : getWidgetHeight(
+                                                                height: 5)),
+                                                    SizedBox(
                                                       height: isKwidth > 700
-                                                          ? 14
+                                                          ? 18
                                                           : getWidgetHeight(
-                                                              height: 10))
-                                                ],
+                                                              height: 15),
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            "View Details",
+                                                            textAlign:
+                                                                TextAlign.start,
+                                                            style: TextStyle(
+                                                              fontSize: kText
+                                                                  .scale(12),
+                                                              color:
+                                                                  linearColor,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                          // LinearPercentIndicator(
+                                                          //   center: Text(
+                                                          //     "20%",
+                                                          //     style: TextStyle(
+                                                          //         color: Colors.white,
+                                                          //         fontSize: kText
+                                                          //             .scale(10)),
+                                                          //   ),
+                                                          //   barRadius:
+                                                          //       Radius.circular(6),
+                                                          //   width: getWidgetWidth(
+                                                          //       width: 150),
+                                                          //   lineHeight:
+                                                          //       getWidgetHeight(
+                                                          //           height: 14),
+                                                          //   percent: 0.2,
+                                                          //   backgroundColor:
+                                                          //       Colors.grey,
+                                                          //   progressColor:
+                                                          //       linearColor,
+                                                          // ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    // if (!kIsWeb)
+                                                    SizedBox(
+                                                        height: isKwidth > 700
+                                                            ? 14
+                                                            : getWidgetHeight(
+                                                                height: 10))
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        );
-                                      }),
+                                            ],
+                                          );
+                                        }),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            }),
-                          ),
-                        ),
-                      );
+                                );
+                              }),
+                            ),
+                          ));
                     }),
                 Container(
                   padding: EdgeInsets.symmetric(
