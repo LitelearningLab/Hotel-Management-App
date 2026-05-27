@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/model/university_model.dart';
 import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/view/university_lab_sub.dart';
 
 class UniversityLab extends StatefulWidget {
@@ -17,6 +18,7 @@ class UniversityLab extends StatefulWidget {
 class _UniversityLabState extends State<UniversityLab> {
   @override
   Widget build(BuildContext context) {
+    double isKwidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
           forceMaterialTransparency: true,
@@ -25,9 +27,10 @@ class _UniversityLabState extends State<UniversityLab> {
           title: Text(
             widget.universityModel.collegeName,
             textAlign: TextAlign.left,
-            style: GoogleFonts.inter(
+            style: TextStyle(
+              fontFamily: Keys.fontFamily,
               fontWeight: FontWeight.w600,
-              fontSize: 20,
+              fontSize: kText.scale(isKwidth > 700 ? 25 : 20),
               color: Colors.black,
             ),
           )),
@@ -101,9 +104,10 @@ class _UniversityLabState extends State<UniversityLab> {
                               ),
                               Text(
                                 widget.universityModel.category[index].name,
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
+                                  fontFamily: Keys.fontFamily,
                                   fontWeight: FontWeight.w500,
-                                  fontSize: 16,
+                                  fontSize: kText.scale(isKwidth > 700 ? 16 : 14),
                                 ),
                               ),
                             ],

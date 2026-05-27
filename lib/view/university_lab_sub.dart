@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotelmanagementapp/model/university_model.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/keys.dart';
+import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/utility/pdf_viewer_page.dart';
 
@@ -16,6 +19,7 @@ class UniversityLabSub extends StatefulWidget {
 class _UniversityLabSubState extends State<UniversityLabSub> {
   @override
   Widget build(BuildContext context) {
+    double isKwidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
           forceMaterialTransparency: true,
@@ -24,9 +28,10 @@ class _UniversityLabSubState extends State<UniversityLabSub> {
           title: Text(
             widget.category.name,
             textAlign: TextAlign.left,
-            style: GoogleFonts.inter(
+            style: TextStyle(
+              fontFamily: Keys.fontFamily,
               fontWeight: FontWeight.w600,
-              fontSize: 20,
+              fontSize: kText.scale(isKwidth > 700 ? 25 : 20),
               color: Colors.black,
             ),
           )),
@@ -42,16 +47,15 @@ class _UniversityLabSubState extends State<UniversityLabSub> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => PdfViewerPage(
-                      //       title: widget.category.subcategory[index].text,
-                      //       url:
-                      //           "https://www.pearsonhighered.com/assets/samplechapter/0/1/3/4/0134151909.pdf",
-                      //     ),
-                      //   ),
-                      // );
+                      final sub = widget.category.subcategory[index];
+                      if (sub.link.isNotEmpty) {
+                        Get.toNamed(
+                          AppRoutes.inAppWebView,
+                          arguments: {
+                            "url": sub.link,
+                          },
+                        );
+                      }
                     },
                     child: Container(
                       width: getWidgetWidth(width: 375),
@@ -102,9 +106,10 @@ class _UniversityLabSubState extends State<UniversityLabSub> {
                               ),
                               Text(
                                 widget.category.subcategory[index].text,
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
+                                  fontFamily: Keys.fontFamily,
                                   fontWeight: FontWeight.w500,
-                                  fontSize: kText.scale(14),
+                                  fontSize: kText.scale(isKwidth > 700 ? 16 : 14),
                                 ),
                               ),
                             ],

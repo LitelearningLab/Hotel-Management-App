@@ -55,11 +55,13 @@ class UniversityCategory {
 
 class Subject {
   final String text;
+  final String link;
 
-  Subject({required this.text});
+  Subject({required this.text, required this.link});
 
   factory Subject.fromMap(Map<String, dynamic> map) {
     return Subject(
+      link: map['link'] ?? '',
       text: map['text'] ?? '',
     );
   }
