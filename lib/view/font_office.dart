@@ -537,7 +537,7 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                     child: Row(
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
-                                                              .spaceBetween,
+                                                              .spaceAround,
                                                       children: [
                                                         _actionItem(
                                                           label: "E-Learning",
@@ -761,42 +761,42 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                             ),
                                                           ),
                                                         ),
-                                                        _actionItem(
-                                                          label:
-                                                              "Knowledge Check",
-                                                          labelColor: (isExpanded)
-                                                              ? linearColor
-                                                              : linkAvailable2
-                                                                  ? Colors.black
-                                                                  : Colors.grey,
-                                                          onTap: linkAvailable2
-                                                              ? () {
-                                                                  controller
-                                                                          .glossaryIndex =
-                                                                      glossaryIndex
-                                                                          ? -1
-                                                                          : index;
-                                                                  controller
-                                                                      .update();
-                                                                }
-                                                              : null,
-                                                          icon: Image.asset(
-                                                            AllAssets.approval,
-                                                            color: (isExpanded)
-                                                                ? linearColor
-                                                                : linkAvailable2
-                                                                    ? Colors
-                                                                        .black
-                                                                    : Colors
-                                                                        .grey,
-                                                            width:
-                                                                getWidgetWidth(
-                                                                    width: 22),
-                                                            height:
-                                                                getWidgetHeight(
-                                                                    height: 26),
-                                                          ),
-                                                        ),
+                                                        // _actionItem(
+                                                        //   label:
+                                                        //       "Knowledge Check",
+                                                        //   labelColor: (isExpanded)
+                                                        //       ? linearColor
+                                                        //       : linkAvailable2
+                                                        //           ? Colors.black
+                                                        //           : Colors.grey,
+                                                        //   onTap: linkAvailable2
+                                                        //       ? () {
+                                                        //           controller
+                                                        //                   .glossaryIndex =
+                                                        //               glossaryIndex
+                                                        //                   ? -1
+                                                        //                   : index;
+                                                        //           controller
+                                                        //               .update();
+                                                        //         }
+                                                        //       : null,
+                                                        //   icon: Image.asset(
+                                                        //     AllAssets.approval,
+                                                        //     color: (isExpanded)
+                                                        //         ? linearColor
+                                                        //         : linkAvailable2
+                                                        //             ? Colors
+                                                        //                 .black
+                                                        //             : Colors
+                                                        //                 .grey,
+                                                        //     width:
+                                                        //         getWidgetWidth(
+                                                        //             width: 22),
+                                                        //     height:
+                                                        //         getWidgetHeight(
+                                                        //             height: 26),
+                                                        //   ),
+                                                        // ),
                                                       ],
                                                     ),
                                                   ),
@@ -806,8 +806,9 @@ class _FrontOfficeHotelReceptionState extends State<FrontOfficeHotelReception> {
                                                         left: getWidgetWidth(
                                                             width: 10),
                                                         right: getWidgetWidth(
-                                                            width: 80)),
+                                                            width: 10)),
                                                     child: const Divider(
+                                                      thickness: 0.3,
                                                       // height: 1,
                                                       color: Color.fromARGB(
                                                           255, 107, 107, 107),
