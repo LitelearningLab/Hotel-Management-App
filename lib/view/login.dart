@@ -57,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _loadAppVersion() async {
     if (Platform.isIOS) {
       setState(() {
-        appVersion = "1.0.0";
+        appVersion = "1.0.4";
       });
     } else {
       // For Android and others, fetch from package info
