@@ -148,6 +148,12 @@ class _LoginPageState extends State<LoginPage> {
     Overlay.of(context).insert(_bottomMessageEntry!);
   }
 
+  String _safeString(dynamic value) {
+    if (value == null) return '';
+    if (value is List) return value.join(', ');
+    return value.toString();
+  }
+
   Future<void> login() async {
     if (!_isLogin) {
       if (_formKey.currentState!.validate()) {
@@ -194,41 +200,49 @@ class _LoginPageState extends State<LoginPage> {
       final userData = doc.data();
       final userId = doc.id;
 
-      // 🔹 Step 1: Fetch Company Data
-      final companyId = userData['companyid'];
-      if (companyId == null || companyId.toString().isEmpty) {
-        showBottomStickyMessage(context, "Company information missing.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red,
-        //       content: Text("Company information missing.")),
-        // );
-        _isLoading = false;
-        isLoading = true;
-        setState(() {});
-        return;
+      final String? access = userData['access'];
+      final String companyId;
+      final Map<String, dynamic> companyData;
+
+      if (access == "company") {
+        companyId = userId;
+        companyData = userData;
+      } else {
+        final rawCompanyId = userData['companyid'];
+        if (rawCompanyId == null || rawCompanyId.toString().isEmpty) {
+          showBottomStickyMessage(context, "Company information missing.");
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //       backgroundColor: Colors.red,
+          //       content: Text("Company information missing.")),
+          // );
+          _isLoading = false;
+          isLoading = true;
+          setState(() {});
+          return;
+        }
+        companyId = rawCompanyId.toString();
+
+        final companySnapshot = await FirebaseFirestore.instance
+            .collection('UserNode')
+            .where('_id', isEqualTo: companyId)
+            .limit(1)
+            .get();
+
+        if (companySnapshot.docs.isEmpty) {
+          showBottomStickyMessage(context, "Company not found.");
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //       backgroundColor: Colors.red, content: Text("Company not found.")),
+          // );
+          _isLoading = false;
+          isLoading = true;
+          setState(() {});
+          return;
+        }
+
+        companyData = companySnapshot.docs.first.data();
       }
-
-      final companySnapshot = await FirebaseFirestore.instance
-          .collection('UserNode')
-          .where('_id', isEqualTo: companyId)
-          .limit(1)
-          .get();
-
-      if (companySnapshot.docs.isEmpty) {
-        showBottomStickyMessage(context, "Company not found.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red, content: Text("Company not found.")),
-        // );
-        _isLoading = false;
-        isLoading = true;
-        setState(() {});
-        return;
-      }
-
-      final companyData = companySnapshot.docs.first.data();
-      log("${companyData['status']} make printing the company status here and here im printing the imei ${userData["imei"]}");
 
       // 🔹 Step 2: Check company status
       if (companyData['status'] != "1") {
@@ -244,62 +258,68 @@ class _LoginPageState extends State<LoginPage> {
         return;
       }
 
-      // 🔹 Step 3: Check subscription dates
-      final userSubDate =
-          DateTime.tryParse(userData['subscriptionenddate'] ?? '');
-      final companySubDate =
-          DateTime.tryParse(companyData['subscriptionenddate'] ?? '');
-      final now = DateTime.now();
-      log("user sub date $userSubDate company sub date $companySubDate  now $now");
+      if (access == "Trainer Login" || access == "company") {
+        // Skip subscription date validation for Trainer Login and company
+      } else {
+        // Check subscription end date as usual for "App User" and other/null accesses
+        final userSubDate =
+            DateTime.tryParse(_safeString(userData['subscriptionenddate']));
+        final companySubDate =
+            DateTime.tryParse(_safeString(companyData['subscriptionenddate']));
+        final now = DateTime.now();
+        log("user sub date $userSubDate company sub date $companySubDate  now $now");
 
-      bool isUserActive = userSubDate != null && userSubDate.isAfter(now);
-      bool isCompanyActive =
-          companySubDate != null && companySubDate.isAfter(now);
+        bool isUserActive = userSubDate != null && userSubDate.isAfter(now);
+        bool isCompanyActive =
+            companySubDate != null && companySubDate.isAfter(now);
 
-      if (!isUserActive && !isCompanyActive) {
-        showBottomStickyMessage(
-            context, "Subscription date has been finished.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red,
-        //       content: Text("Subscription date has been finished.")),
-        // );
-        _isLoading = false;
-        isLoading = true;
-        setState(() {});
-        return;
+        if (!isUserActive && !isCompanyActive) {
+          showBottomStickyMessage(
+              context, "Subscription date has been finished.");
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //       backgroundColor: Colors.red,
+          //       content: Text("Subscription date has been finished.")),
+          // );
+          _isLoading = false;
+          isLoading = true;
+          setState(() {});
+          return;
+        }
       }
 
       // 🔹 Step 4: Device verification (same as before)
       final prefs = await SharedPreferences.getInstance();
       if (!kIsWeb) {
-        final deviceId = Platform.isAndroid
-            ? await const AndroidId().getId()
-            : await getPermanentDeviceId();
-        final deviceName = await DeviceScreenInfo.getModelName();
+        try {
+          final deviceId = Platform.isAndroid
+              ? await const AndroidId().getId()
+              : await getPermanentDeviceId();
+          final deviceName = await DeviceScreenInfo.getModelName();
 
-        if (userData.containsKey('imei')) {
-          if (userData['imei'] != deviceId) {
-            showBottomStickyMessage(context,
-                "Your account is linked to another mobile device. Contact your administrator to register a new device.");
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(
-            //       backgroundColor: Colors.red,
-            //       content: Text("Login denied: Device not recognized.")),
-            // );
-            _isLoading = false;
-            isLoading = true;
-            setState(() {});
-            return;
+          if (userData.containsKey('imei')) {
+            if (userData['imei'] != deviceId) {
+              showBottomStickyMessage(context,
+                  "Your account is linked to another mobile device. Contact your administrator to register a new device.");
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   SnackBar(
+              //       backgroundColor: Colors.red,
+              //       content: Text("Login denied: Device not recognized.")),
+              // );
+              _isLoading = false;
+              isLoading = true;
+              setState(() {});
+              return;
+            }
+          } else {
+            log("checking whether is going now");
+            await doc.reference.update({
+              'imei': deviceId,
+              'model': deviceName,
+              // 'firstTImeLogin': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+            });
           }
-        } else {
-          log("checking whether is going now");
-          await doc.reference.update({
-            'imei': deviceId,
-            'model': deviceName,
-            // 'firstTImeLogin': DateFormat('yyyy-MM-dd').format(DateTime.now()),
-          });
-        }
+        } catch (_) {}
       }
 
       // 🔹 Step 5: Save prefs
@@ -307,21 +327,46 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString('password', password);
       await prefs.setBool("loginInfo", true);
       await prefs.setString("userId", userId);
-      await prefs.setString("collegeId", userData['collegeId'] ?? '');
-      print(
-          "Here im printing the user data company id ${userData['companyid']}");
-      await prefs.setString("batchName", userData['batchName'] ?? '');
-      await prefs.setString("userName", userData['username'] ?? '');
-      await prefs.setString("collegeName", userData['college'] ?? '');
-      await prefs.setString("city", userData['city'] ?? '');
-      await prefs.setString("country", userData['country'] ?? '');
-      await prefs.setString("mobile", userData['mobile'] ?? '');
-      await prefs.setString("joindate", userData['joindate'] ?? '');
-      await prefs.setString("enddate", userData['subscriptionenddate'] ?? '');
-      await prefs.setString('course', userData['course'] ?? "");
+      await prefs.setString("collegeId", companyId);
+      await prefs.setString("batchName", _safeString(userData['batchName']));
+      String userName = '';
+      if (access == "company") {
+        final compName = _safeString(userData['companyname']);
+        userName =
+            compName.isNotEmpty ? compName : _safeString(userData['college']);
+      } else if (access == "Trainer Login") {
+        userName = _safeString(userData['name']);
+      } else {
+        userName = _safeString(userData['username']);
+      }
+      await prefs.setString("userName", userName);
+      String collegeName = _safeString(userData['college']);
+      if (access == "Trainer Login" || access == "company") {
+        try {
+          final univSnapshot = await FirebaseFirestore.instance
+              .collection('UniversityCollection')
+              .where('collegeId', isEqualTo: companyId)
+              .limit(1)
+              .get();
+          if (univSnapshot.docs.isNotEmpty) {
+            collegeName =
+                _safeString(univSnapshot.docs.first.data()['collegeName']);
+          }
+        } catch (e) {
+          log("Error fetching collegeName from UniversityCollection: $e");
+        }
+      }
+      await prefs.setString("collegeName", collegeName);
+      await prefs.setString("city", _safeString(userData['city']));
+      await prefs.setString("country", _safeString(userData['country']));
+      await prefs.setString("mobile", _safeString(userData['mobile']));
+      await prefs.setString("joindate", _safeString(userData['joindate']));
+      await prefs.setString(
+          "enddate", _safeString(userData['subscriptionenddate']));
+      await prefs.setString('course', _safeString(userData['course']));
+      await prefs.setString('access', _safeString(userData['access']));
 
-      log("User ID saved: $userId");
-      bool session = true; // default for mobile
+      bool session = true;
 
       if (kIsWeb) {
         // Only run login session logic on Web
@@ -427,10 +472,32 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  Future<void> _loadSavedCredentials() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? email = prefs.getString("email");
+      String? password = prefs.getString("password");
+
+      if (email != null && email.isNotEmpty) {
+        emailController.text = email;
+        setState(() {
+          _isLogin = true;
+        });
+      }
+
+      if (password != null && password.isNotEmpty) {
+        passwordController.text = password;
+      }
+    } catch (e) {
+      log("Error loading saved credentials: $e");
+    }
+  }
+
   @override
   void initState() {
     _loginFailed();
     _loadAppVersion();
+    _loadSavedCredentials();
     super.initState();
   }
 

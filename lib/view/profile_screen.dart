@@ -51,6 +51,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {});
   }
 
+  String formatDateSafely(String dateStr) {
+    if (dateStr.isEmpty) return "N/A";
+    
+    final trimmed = dateStr.trim();
+    if (trimmed.isEmpty) return "N/A";
+
+    if (trimmed.startsWith('Timestamp(')) {
+      final match = RegExp(r'seconds=(\d+)').firstMatch(trimmed);
+      if (match != null) {
+        final seconds = int.tryParse(match.group(1) ?? '');
+        if (seconds != null) {
+          final dt = DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+          return DateFormat('dd-MM-yyyy').format(dt);
+        }
+      }
+    }
+
+    DateTime? parsed = DateTime.tryParse(trimmed);
+    if (parsed != null) {
+      return DateFormat('dd-MM-yyyy').format(parsed);
+    }
+
+    List<String> formats = [
+      'dd-MM-yyyy',
+      'dd/MM/yyyy',
+      'yyyy/MM/dd',
+      'yyyy-MM-dd',
+      'MM-dd-yyyy',
+      'MM/dd/yyyy',
+    ];
+
+    for (String format in formats) {
+      try {
+        final dt = DateFormat(format).parseStrict(trimmed);
+        return DateFormat('dd-MM-yyyy').format(dt);
+      } catch (_) {}
+    }
+
+    return trimmed;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -177,12 +218,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                               SizedBox(width: getWidgetWidth(width: 4)),
-                              Text(
-                                email,
-                                style: TextStyle(
-                                    fontFamily: Keys.fontFamily,
-                                    color: Colors.black87,
-                                    fontSize: 15),
+                              Expanded(
+                                child: Text(
+                                  email,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontFamily: Keys.fontFamily,
+                                      color: Colors.black87,
+                                      fontSize: 15),
+                                ),
                               ),
                             ],
                           ),
@@ -227,12 +272,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               SizedBox(
                                 width: getWidgetWidth(width: 4),
                               ),
-                              Text(
-                                collegeName,
-                                style: TextStyle(
-                                  fontFamily: Keys.fontFamily,
-                                  color: Colors.black87,
-                                  fontSize: 15,
+                              Expanded(
+                                child: Text(
+                                  collegeName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontFamily: Keys.fontFamily,
+                                    color: Colors.black87,
+                                    fontSize: 15,
+                                  ),
                                 ),
                               ),
                             ],
@@ -279,12 +328,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               SizedBox(
                                 width: getWidgetWidth(width: 4),
                               ),
-                              Text(
-                                "${toBeginningOfSentenceCase(city) ?? ''}, ${toBeginningOfSentenceCase(country) ?? ''}",
-                                style: TextStyle(
-                                  fontFamily: Keys.fontFamily,
-                                  color: Colors.black87,
-                                  fontSize: 15,
+                              Expanded(
+                                child: Text(
+                                  "${toBeginningOfSentenceCase(city) ?? ''}, ${toBeginningOfSentenceCase(country) ?? ''}",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontFamily: Keys.fontFamily,
+                                    color: Colors.black87,
+                                    fontSize: 15,
+                                  ),
                                 ),
                               ),
                             ],
@@ -334,8 +387,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         Expanded(
                           child: Text(
-                            "Active from ${DateFormat('dd-MM-yyyy').format(DateTime.parse(joinDate))} "
-                            "to ${DateFormat('dd-MM-yyyy').format(DateTime.parse(endDate))}",
+                            "Active from ${formatDateSafely(joinDate)} "
+                            "to ${formatDateSafely(endDate)}",
                             maxLines: 2,
                             softWrap: true,
                             // overflow: TextOverflow.ellipsis,
