@@ -6,6 +6,7 @@ import 'package:hotelmanagementapp/controller/university_lab_sub_controller.dart
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/keys.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
+import 'package:hotelmanagementapp/utility/web_view_page.dart';
 
 class UniversityLabSub extends StatefulWidget {
   const UniversityLabSub({super.key});
@@ -62,12 +63,30 @@ class _UniversityLabSubState extends State<UniversityLabSub> {
                       onTap: () {
                         final sub = controller.category.subcategory[index];
                         if (sub.link.isNotEmpty) {
-                          Get.toNamed(
-                            AppRoutes.inAppWebView,
-                            arguments: {
-                              "url": sub.link,
-                            },
-                          );
+                          mainCategoryTitle = controller.collegeName.isNotEmpty
+                              ? controller.collegeName
+                              : "university lab";
+                          subCategoryTitle = controller.category.name;
+                          activityName = "university lab";
+                          timestampIndex = 8;
+                          sessionName = sub.text;
+
+                          if (kIsWeb) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => WebContentPage(
+                                    title: sub.text, url: sub.link),
+                              ),
+                            );
+                          } else {
+                            Get.toNamed(
+                              AppRoutes.inAppWebView,
+                              arguments: {
+                                "url": sub.link,
+                              },
+                            );
+                          }
                         }
                       },
                       child: Container(

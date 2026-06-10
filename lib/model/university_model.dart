@@ -16,7 +16,7 @@ class UniversityModel {
       collegeName: map['collegeName'] ?? '',
       collegeId: map['collegeId'] ?? '',
       category: (map['category'] as List<dynamic>?)
-              ?.map((item) => UniversityCategory.fromMap(item))
+              ?.map((item) => UniversityCategory.fromMap(Map<String, dynamic>.from(item)))
               .toList() ??
           [],
       photo: map['photo'] ?? '',
@@ -31,6 +31,9 @@ class UniversityModel {
       'photo': photo,
     };
   }
+
+  factory UniversityModel.fromJson(Map<String, dynamic> json) => UniversityModel.fromMap(json);
+  Map<String, dynamic> toJson() => toMap();
 }
 
 class UniversityCategory {
@@ -55,7 +58,7 @@ class UniversityCategory {
       id: map['id'] ?? '',
       key: map['key'] ?? '',
       subcategory: (map['subcategory'] as List<dynamic>?)
-              ?.map((item) => Subject.fromMap(item))
+              ?.map((item) => Subject.fromMap(Map<String, dynamic>.from(item)))
               .toList() ??
           [],
     );
@@ -70,6 +73,9 @@ class UniversityCategory {
       'subcategory': subcategory.map((x) => x.toMap()).toList(),
     };
   }
+
+  factory UniversityCategory.fromJson(Map<String, dynamic> json) => UniversityCategory.fromMap(json);
+  Map<String, dynamic> toJson() => toMap();
 }
 
 class Subject {
@@ -91,4 +97,7 @@ class Subject {
       'link': link,
     };
   }
+
+  factory Subject.fromJson(Map<String, dynamic> json) => Subject.fromMap(json);
+  Map<String, dynamic> toJson() => toMap();
 }

@@ -5,28 +5,42 @@ import 'package:hotelmanagementapp/route/route_name.dart';
 
 class UniversityLabSubController extends GetxController {
   late UniversityCategory category;
+  late String collegeName = "";
   final RxBool isLoading = false.obs;
 
   @override
   void onInit() {
+    super.onInit();
     final args = Get.arguments;
     final box = GetStorage();
-    if (args != null) {
-      if (args is UniversityCategory) {
-        category = args;
-      } else if (args is Map<String, dynamic>) {
-        category = UniversityCategory.fromMap(args);
-      } else {
-        category = UniversityCategory(name: '', order: 0, id: '', key: '', subcategory: []);
+
+    if (args != null && args is Map) {
+      final rawCat = args['category'];
+      if (rawCat is UniversityCategory) {
+        category = rawCat;
+      } else if (rawCat is Map) {
+        category = UniversityCategory.fromMap(Map<String, dynamic>.from(rawCat));
       }
+      collegeName = args['collegeName'] ?? "";
+      box.write(AppRoutes.universityLabSub, {
+        'category': category.toMap(),
+        'collegeName': collegeName,
+      });
+    } else if (args is UniversityCategory) {
+      category = args;
+      collegeName = "";
     } else {
-      final saved = box.read(AppRoutes.universityLabSub);
-      if (saved != null && saved is Map<String, dynamic>) {
-        category = UniversityCategory.fromMap(saved);
+      final saved = box.read(AppRoutes.universityLabSub) ?? {};
+      collegeName = saved['collegeName'] ?? "";
+      final catJson = saved['category'];
+      if (catJson != null && catJson is Map) {
+        category = UniversityCategory.fromMap(Map<String, dynamic>.from(catJson));
+      } else if (saved is Map && saved.containsKey('name')) {
+        category = UniversityCategory.fromMap(Map<String, dynamic>.from(saved));
       } else {
         category = UniversityCategory(name: '', order: 0, id: '', key: '', subcategory: []);
       }
     }
-    super.onInit();
+    update();
   }
 }

@@ -59,17 +59,26 @@ class _UniversityLabState extends State<UniversityLab> {
                         mainCategoryTitle = controller.universityModel.collegeName;
                         GetStorage().write(
                           AppRoutes.universityLabSub,
-                          controller.universityModel.category[index].toMap(),
+                          {
+                            "category": controller.universityModel.category[index].toMap(),
+                            "collegeName": controller.universityModel.collegeName,
+                          },
                         );
                         if (kIsWeb) {
                           Get.rootDelegate.offNamed(
                             AppRoutes.universityLabSub,
-                            arguments: controller.universityModel.category[index],
+                            arguments: {
+                              "category": controller.universityModel.category[index],
+                              "collegeName": controller.universityModel.collegeName,
+                            },
                           );
                         } else {
                           Get.toNamed(
                             AppRoutes.universityLabSub,
-                            arguments: controller.universityModel.category[index],
+                            arguments: {
+                              "category": controller.universityModel.category[index],
+                              "collegeName": controller.universityModel.collegeName,
+                            },
                           );
                         }
                       },
