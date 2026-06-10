@@ -614,16 +614,20 @@ class _HomeState extends State<Home>
                                             }
                                           });
                                         } else {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  UniversityLab(
-                                                universityModel:
-                                                    hController.universityModel,
-                                              ),
-                                            ),
-                                          );
+                                          GetStorage().write(
+                                              AppRoutes.universityLab,
+                                              hController.universityModel.toMap());
+                                          if (kIsWeb) {
+                                            Get.rootDelegate.offNamed(
+                                              AppRoutes.universityLab,
+                                              arguments: hController.universityModel,
+                                            );
+                                          } else {
+                                            Get.toNamed(
+                                              AppRoutes.universityLab,
+                                              arguments: hController.universityModel,
+                                            );
+                                          }
                                         }
                                       },
                                       child: AnimatedContainer(

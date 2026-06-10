@@ -25,6 +25,8 @@ import 'package:hotelmanagementapp/view/simulation_sub.dart';
 import 'package:hotelmanagementapp/view/sound_lab.dart';
 import 'package:hotelmanagementapp/view/sound_page.dart';
 import 'package:hotelmanagementapp/view/splash.dart';
+import 'package:hotelmanagementapp/view/university_lab.dart';
+import 'package:hotelmanagementapp/view/university_lab_sub.dart';
 
 import '../view/grammer_lab.dart';
 
@@ -131,6 +133,18 @@ class RouteService {
             name: AppRoutes.feedbackpage,
             page: () => FeedbackFormScreen(),
             binding: FeedbackViewBinding(),
+            middlewares: [AuthMiddleware()],
+          ),
+          GetPage(
+            name: AppRoutes.universityLab,
+            page: () => const UniversityLab(),
+            binding: UniversityLabBinding(),
+            middlewares: [AuthMiddleware()],
+          ),
+          GetPage(
+            name: AppRoutes.universityLabSub,
+            page: () => const UniversityLabSub(),
+            binding: UniversityLabSubBinding(),
             middlewares: [AuthMiddleware()],
           )
         ]
@@ -251,6 +265,16 @@ class RouteService {
             name: AppRoutes.feedbackpage,
             page: () => FeedbackFormScreen(),
             binding: FeedbackViewBinding(),
+          ),
+          GetPage(
+            name: AppRoutes.universityLab,
+            page: () => const UniversityLab(),
+            binding: UniversityLabBinding(),
+          ),
+          GetPage(
+            name: AppRoutes.universityLabSub,
+            page: () => const UniversityLabSub(),
+            binding: UniversityLabSubBinding(),
           )
         ];
 }

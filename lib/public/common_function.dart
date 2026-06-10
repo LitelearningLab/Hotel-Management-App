@@ -228,7 +228,9 @@ Future<void> startPracticeTime({
                             ? CollectionNames.langauqeLabTimestamp
                             : index == 7
                                 ? CollectionNames.contentLabTimestamp
-                                : throw Exception('Invalid index: $index');
+                                : index == 8
+                                    ? CollectionNames.universityTimestamp
+                                    : throw Exception('Invalid index: $index');
     print('📂 Collection Name: $collectionName');
 
     // 3. Prepare Firestore instance

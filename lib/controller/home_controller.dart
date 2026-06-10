@@ -37,6 +37,7 @@ class HomeController extends GetxController {
     "InteractiveSimulationTimeStamp": "Interactive Simulations",
     "LanguageLabTimeStamp": "Language Lab",
     "ContentLabTimeStamp": "Content Lab",
+    "UniversityTimeStamp": "University Lab",
   };
 
   List<String> cardNames = [

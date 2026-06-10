@@ -19,8 +19,17 @@ class UniversityModel {
               ?.map((item) => UniversityCategory.fromMap(item))
               .toList() ??
           [],
-      photo: map['photo'],
+      photo: map['photo'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'collegeName': collegeName,
+      'collegeId': collegeId,
+      'category': category.map((x) => x.toMap()).toList(),
+      'photo': photo,
+    };
   }
 }
 
@@ -51,6 +60,16 @@ class UniversityCategory {
           [],
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'order': order,
+      'id': id,
+      'key': key,
+      'subcategory': subcategory.map((x) => x.toMap()).toList(),
+    };
+  }
 }
 
 class Subject {
@@ -64,5 +83,12 @@ class Subject {
       link: map['link'] ?? '',
       text: map['text'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'text': text,
+      'link': link,
+    };
   }
 }

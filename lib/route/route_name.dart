@@ -19,4 +19,6 @@ class AppRoutes {
   static const login = '/auth-login';
   static const sentenceLabSubCat = '/lab-sen-cat';
   static const feedbackpage = '/feedback-session';
+  static const universityLab = '/lab-university';
+  static const universityLabSub = '/lab-university-sub';
 }

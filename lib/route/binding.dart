@@ -19,6 +19,8 @@ import 'package:hotelmanagementapp/controller/simulation_sub_controller.dart';
 import 'package:hotelmanagementapp/controller/sound_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/sound_page_controller.dart';
 import 'package:hotelmanagementapp/controller/splash_controller.dart';
+import 'package:hotelmanagementapp/controller/university_lab_controller.dart';
+import 'package:hotelmanagementapp/controller/university_lab_sub_controller.dart';
 
 class InitialBinding with Bindings {
   @override
@@ -150,5 +152,19 @@ class FeedbackViewBinding with Bindings {
   @override
   void dependencies() {
     Get.put(FeedbackController());
+  }
+}
+
+class UniversityLabBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(UniversityLabController());
+  }
+}
+
+class UniversityLabSubBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(UniversityLabSubController());
   }
 }
