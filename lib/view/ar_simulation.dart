@@ -247,111 +247,133 @@ class ARCallSimulation extends StatelessWidget {
                                         padding: EdgeInsets.symmetric(
                                             horizontal:
                                                 getWidgetWidth(width: 20)),
-                                        child: GridView.builder(
-                                          shrinkWrap: true,
-                                          gridDelegate:
-                                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 4,
-                                            mainAxisSpacing: 20,
-                                            crossAxisSpacing: 20,
-                                            childAspectRatio: 1.5,
-                                          ),
-                                          itemCount: controller.simulations
-                                              .length, // change as needed
-                                          itemBuilder: (context, index) {
-                                            return ARGridTile(
-                                              onTap: () async {
-                                                subCategoryTitle = controller
-                                                    .simulations[index]
-                                                    .category;
-                                                if (!controller.isLabActive(
-                                                    subCategoryTitle
-                                                        .toLowerCase()
-                                                        .replaceAll(
-                                                            ' ', '_'))) {
-                                                  controller
-                                                      .showReviewPopup(context);
-                                                  return;
-                                                }
-                                                // GetStorage().write(
-                                                //     AppRoutes.simulationSub, {
-                                                //   'title': controller
-                                                //       .simulations[0]
-                                                //       .category,
-                                                //   'simulation': controller
-                                                //       .simulations[0]
-                                                // });
-                                                WidgetsBinding.instance
-                                                    .addPostFrameCallback((_) {
-                                                  final data = {
-                                                    'title': controller
+                                        child: LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            final double width = constraints.maxWidth;
+                                            int crossAxisCount = 4;
+                                            double childAspectRatio = 1.5;
+
+                                            if (width > 1200) {
+                                              crossAxisCount = 4;
+                                              childAspectRatio = 1.2;
+                                            } else if (width >= 900) {
+                                              crossAxisCount = 4;
+                                              childAspectRatio = 1.15;
+                                            } else if (width >= 600) {
+                                              crossAxisCount = 3;
+                                              childAspectRatio = 1.1;
+                                            } else {
+                                              crossAxisCount = 2;
+                                              childAspectRatio = 0.85;
+                                            }
+
+                                            return GridView.builder(
+                                              shrinkWrap: true,
+                                              gridDelegate:
+                                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: crossAxisCount,
+                                                mainAxisSpacing: 20,
+                                                crossAxisSpacing: 20,
+                                                childAspectRatio: childAspectRatio,
+                                              ),
+                                              itemCount: controller.simulations
+                                                  .length, // change as needed
+                                              itemBuilder: (context, index) {
+                                                return ARGridTile(
+                                                  onTap: () async {
+                                                    subCategoryTitle = controller
                                                         .simulations[index]
-                                                        .category,
-                                                    'simulation': controller
-                                                        .simulations[index]
-                                                  };
-                                                  GetStorage().write(
-                                                      AppRoutes.simulationSub, {
-                                                    'title': data['title'],
-                                                    'simulation': controller
-                                                        .simulations[index]
-                                                        .toJson(), // ✅ ensure JSON safe
-                                                  });
-                                                  kIsWeb
-                                                      ? Get.rootDelegate
-                                                          .offNamed(
+                                                        .category;
+                                                    if (!controller.isLabActive(
+                                                        subCategoryTitle
+                                                            .toLowerCase()
+                                                            .replaceAll(
+                                                                ' ', '_'))) {
+                                                      controller
+                                                          .showReviewPopup(context);
+                                                      return;
+                                                    }
+                                                    // GetStorage().write(
+                                                    //     AppRoutes.simulationSub, {
+                                                    //   'title': controller
+                                                    //       .simulations[0]
+                                                    //       .category,
+                                                    //   'simulation': controller
+                                                    //       .simulations[0]
+                                                    // });
+                                                    WidgetsBinding.instance
+                                                        .addPostFrameCallback((_) {
+                                                      final data = {
+                                                        'title': controller
+                                                            .simulations[index]
+                                                            .category,
+                                                        'simulation': controller
+                                                            .simulations[index]
+                                                      };
+                                                      GetStorage().write(
+                                                          AppRoutes.simulationSub, {
+                                                        'title': data['title'],
+                                                        'simulation': controller
+                                                            .simulations[index]
+                                                            .toJson(), // ✅ ensure JSON safe
+                                                      });
+                                                      kIsWeb
+                                                          ? Get.rootDelegate
+                                                              .offNamed(
+                                                                  AppRoutes
+                                                                      .simulationSub,
+                                                                  arguments: {
+                                                                  'title': controller
+                                                                      .simulations[
+                                                                          index]
+                                                                      .category,
+                                                                  'simulation':
+                                                                      controller
+                                                                              .simulations[
+                                                                          index]
+                                                                })
+                                                          : Get.toNamed(
                                                               AppRoutes
                                                                   .simulationSub,
                                                               arguments: {
-                                                              'title': controller
-                                                                  .simulations[
-                                                                      index]
-                                                                  .category,
-                                                              'simulation':
-                                                                  controller
-                                                                          .simulations[
-                                                                      index]
-                                                            })
-                                                      : Get.toNamed(
-                                                          AppRoutes
-                                                              .simulationSub,
-                                                          arguments: {
-                                                              'title': controller
-                                                                  .simulations[
-                                                                      index]
-                                                                  .category,
-                                                              'simulation':
-                                                                  controller
-                                                                          .simulations[
-                                                                      index]
-                                                            });
-                                                });
-                                                // Navigator.push(
-                                                //     context,
-                                                //     MaterialPageRoute(
-                                                //         builder: (context) =>
-                                                //             SimulationSub(
-                                                //                 title:
-                                                //                     controller
-                                                //                         .simulations[0]
-                                                //                         .category,
-                                                //                 simulation: controller
-                                                //                     .simulations[0])));
+                                                                  'title': controller
+                                                                      .simulations[
+                                                                          index]
+                                                                      .category,
+                                                                  'simulation':
+                                                                      controller
+                                                                              .simulations[
+                                                                          index]
+                                                                });
+                                                    });
+                                                    // Navigator.push(
+                                                    //     context,
+                                                    //     MaterialPageRoute(
+                                                    //         builder: (context) =>
+                                                    //             SimulationSub(
+                                                    //                 title:
+                                                    //                     controller
+                                                    //                         .simulations[0]
+                                                    //                         .category,
+                                                    //                 simulation: controller
+                                                    //                     .simulations[0])));
+                                                  },
+                                                  isUnderConstruction: !controller
+                                                      .isLabActive(controller
+                                                          .simulations[index]
+                                                          .category
+                                                          .toLowerCase()
+                                                          .replaceAll(' ', '_')),
+                                                  tileColor: gridTileDatas[index]
+                                                      ['tileColor'],
+                                                  title: controller
+                                                      .simulations[index].category,
+                                                  icon: gridTileDatas[index]
+                                                      ['image'],
+                                                  ellipse: gridTileDatas[index]
+                                                    ['ellipse'],
+                                                );
                                               },
-                                              isUnderConstruction: !controller
-                                                  .isLabActive(controller
-                                                      .simulations[index]
-                                                      .category
-                                                      .toLowerCase()
-                                                      .replaceAll(' ', '_')),
-                                              tileColor: gridTileDatas[index]
-                                                  ['tileColor'],
-                                              title: controller
-                                                  .simulations[index].category,
-                                              icon: gridTileDatas[index]
-                                                  ['image'],
-                                              ellipse: gridTileDatas[index]
-                                                  ['ellipse'],
                                             );
                                           },
                                         ),
