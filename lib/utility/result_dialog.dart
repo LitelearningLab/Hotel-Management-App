@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
@@ -32,11 +33,20 @@ class _SentenceResultDialogState extends State<SentenceResultDialog> {
 
   @override
   void initState() {
+    if (kDebugMode) {
+      print("init state called");
+    }
     super.initState();
     endPractice(practiceType: widget.practiceType);
     if (widget.score >= 90) {
+      if (kDebugMode) {
+        print("scoreee:${widget.score}");
+      }
       resultText = "WELL DONE!";
     } else {
+      if (kDebugMode) {
+        print("scoreee:${widget.score}");
+      }
       resultText = "Need More Practice!";
     }
   }
@@ -53,10 +63,22 @@ class _SentenceResultDialogState extends State<SentenceResultDialog> {
   }
 
   endPractice({required practiceType}) async {
+    if (kDebugMode) {
+      print("practice Type: $practiceType");
+      print("end practice Tappeddd");
+    }
     String userId = await SharedPref.getSavedString('userId');
-
+    if (kDebugMode) {
+      print("userIddd:$userId");
+    }
     String url = "baseUrl" + "endPracticeApi";
-
+    if (kDebugMode) {
+      print("url : $url");
+    }
+    if (kDebugMode) {
+      print("scoreeeeetypeee:${widget.score.runtimeType}");
+      print("scoreeee:${widget.score}");
+    }
     try {
       var response = await http.post(Uri.parse(url), body: {
         "userid": userId,
@@ -64,8 +86,14 @@ class _SentenceResultDialogState extends State<SentenceResultDialog> {
         "score": widget.score.toString(),
         "action": "practice"
       });
+
+      if (kDebugMode) {
+        print("response : ${response.body}");
+      }
     } catch (e) {
-      print("Error in endPractice: $e");
+      if (kDebugMode) {
+        print("error login : $e");
+      }
     }
   }
 

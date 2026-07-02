@@ -379,7 +379,7 @@ class SoundLabController extends GetxController {
           date: "",
           lastAttempt: "",
           listAtt: 1,
-          load: mianCategoryTitile,
+          load: mainCategoryTitle,
           pracAtt: 0,
           time: 0,
           timeCal: DateTime.now().millisecondsSinceEpoch,
@@ -392,12 +392,16 @@ class SoundLabController extends GetxController {
       }
       errorPlaying = -1;
     } on PlayerException catch (e) {
-      print(
-          "❌ Audio player error: ${e.message} ${soundSubcategory.soundsPractice![index].file}");
+      if (kDebugMode) {
+        print(
+            "❌ Audio player error: ${e.message} ${soundSubcategory.soundsPractice![index].file}");
+      }
       errorPlaying = index;
       currentlyPlayingIndex = null;
     } on Exception catch (e) {
-      print("❌ General audio error: $e");
+      if (kDebugMode) {
+        print("❌ General audio error: $e");
+      }
       errorPlaying = index;
       currentlyPlayingIndex = null;
     } finally {

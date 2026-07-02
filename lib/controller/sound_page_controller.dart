@@ -25,6 +25,9 @@ class SoundPageController extends GetxController {
   int selected = 0;
   bool pageLoading = true;
   late SoundSubcategory soundModel;
+  Timer? _hoverTimer;
+  bool isMouseIdle = false;
+
   RxInt currentPlayingIndex = (-1).obs; // -1 means nothing is playing
   RxBool isPlay = false.obs;
   RxBool isPlayAllRunning = false.obs;
@@ -64,6 +67,24 @@ class SoundPageController extends GetxController {
     log("❌ SoundPageController closed");
     videoPlayerController.dispose();
     super.onClose();
+  }
+
+  void onMouseMove() {
+    isMouseIdle = false;
+    isControllerVisible = true;
+    _hoverTimer?.cancel();
+
+    _hoverTimer = Timer(const Duration(seconds: 1), () {
+      isMouseIdle = true;
+      isControllerVisible = false;
+      update();
+    });
+
+    update();
+  }
+
+  void disposeHoverTimer() {
+    _hoverTimer?.cancel();
   }
 
   Future<void> playItem(int index) async {
@@ -209,7 +230,7 @@ class SoundPageController extends GetxController {
     Overlay.of(overlay).insert(entry);
   }
 
-  void onClick(int index) async {
+  void onClick(int index, Offset globalPosition) async {
     isLoading = true;
     isPlaying = false;
     selected = index;
@@ -218,8 +239,10 @@ class SoundPageController extends GetxController {
       await videoPlayerController.pause();
       await videoPlayerController.dispose();
     }
-    print(
-        "index clicked on clikc $index --------------------------------------------------------------- ${index >= 0 && index <= 4}  ");
+    if (kDebugMode) {
+      print(
+          "index clicked on clikc $index --------------------------------------------------------------- ${index >= 0 && index <= 4}  ");
+    }
     // Handle based on index
     String? url;
     if (index >= 0 && index <= 4) {

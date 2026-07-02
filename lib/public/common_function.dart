@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:hotelmanagementapp/model/grammer_lab_model.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/model/sound_model.dart';
@@ -18,6 +19,8 @@ import 'package:uuid/uuid.dart';
 
 double kHeight = 0.0;
 double kWidth = 0.0;
+String pathTitle = '';
+const String _pathTitleStorageKey = 'path_title';
 DateTime startTime = DateTime.now();
 List<Map<String, DateTime>> timings = [];
 DateTime startTimings = DateTime.now();
@@ -28,7 +31,7 @@ bool isTimerActive = false;
 Timer? mainCatTimer;
 Duration _timeSpent = Duration.zero;
 Duration finalDuration = Duration.zero;
-String mianCategoryTitile = "";
+String mainCategoryTitle = "";
 String sessionName2 = "";
 String sessionName = "";
 String subCategoryTitle = "";
@@ -42,6 +45,37 @@ final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 Size displaySize(BuildContext context) {
   //debugPrint('Size = ' + MediaQuery.of(context).size.toString());
   return MediaQuery.of(context).size;
+}
+
+String normalizePathTitle(String value) {
+  return value
+      .trim()
+      .toLowerCase()
+      .replaceAll('&', '-')
+      .replaceAll(RegExp(r'\s+'), '-')
+      .replaceAll(RegExp(r'-+'), '-')
+      .replaceAll(RegExp(r'^-|-$'), '');
+}
+
+void setPathTitle(String value) {
+  pathTitle = normalizePathTitle(value);
+  if (pathTitle.isNotEmpty) {
+    GetStorage().write(_pathTitleStorageKey, pathTitle);
+  }
+}
+
+String getCurrentPathTitle() {
+  if (pathTitle.trim().isNotEmpty) {
+    return normalizePathTitle(pathTitle);
+  }
+
+  final stored = GetStorage().read(_pathTitleStorageKey);
+  if (stored is String && stored.trim().isNotEmpty) {
+    pathTitle = normalizePathTitle(stored);
+    return pathTitle;
+  }
+
+  return '';
 }
 
 double getWidgetHeight({required double height}) {
@@ -89,7 +123,7 @@ void recordTiming(String state) {
 
 void startTimerMainCategory(String name) {
   log("entering to the start timer main category");
-  // mianCategoryTitile = name;
+  mainCategoryTitle = name;
   if (!isTimerActive) {
     count = 1;
     startTimings = DateTime.now();
@@ -121,7 +155,7 @@ Future<void> stopTimerMainCategory() async {
     await startPracticeTime(
       index: timestampIndex,
       duration: finalDuration,
-      mainCategory: mianCategoryTitile,
+      mainCategory: mainCategoryTitle,
       subCategory: subCategoryTitle, type: sessionName,
       activityName: activityName,
       topicNames: [],
@@ -131,7 +165,7 @@ Future<void> stopTimerMainCategory() async {
     activityName = "";
     sessionName = "";
 
-    log("printing the timing is working or not $finalDuration ${mianCategoryTitile}");
+    log("printing the timing is working or not $finalDuration ${mainCategoryTitle}");
   }
 }
 
@@ -210,7 +244,10 @@ Future<void> startPracticeTime({
     if (connectivityResult == ConnectivityResult.none) {
       throw Exception('No internet connection. Please check your network.');
     }
-    print('✅ Internet connectivity verified.');
+    if (kDebugMode) {
+      print(
+          '✅ Internet connection available. Proceeding to save session data...');
+    }
 
     // 2. Determine Firestore collection name based on index
     final String collectionName = index == 0
@@ -228,7 +265,9 @@ Future<void> startPracticeTime({
                             : index == 7
                                 ? CollectionNames.contentLabTimestamp
                                 : throw Exception('Invalid index: $index');
-    print('📂 Collection Name: $collectionName');
+    if (kDebugMode) {
+      print('📂 Collection Name: $collectionName');
+    }
 
     // 3. Prepare Firestore instance
     final firestore = FirebaseFirestore.instance;
@@ -240,8 +279,8 @@ Future<void> startPracticeTime({
         mainCategory == "French Pronunciation" ||
         mainCategory == "Sentence Lab") {
       activityName = "Pronunciation Lab";
-      type = "null";
-    } else if (mianCategoryTitile == "Grammer Lab") {
+      // type = "null";
+    } else if (mainCategoryTitle == "Grammer Lab") {
       activityName = "Grammer Lab";
       type = "null";
     }
@@ -255,15 +294,20 @@ Future<void> startPracticeTime({
         // .where('topicNames', isEqualTo: topicNames)
         .limit(1)
         .get();
-    print('🔍 Query completed. Docs found: ${querySnapshot.docs.length}');
+    if (kDebugMode) {
+      print(
+          '🔍 Query executed. Found ${querySnapshot.docs.length} matching document(s).');
+    }
 
     // 5. Prepare session data
-    print('⏱️ Duration (seconds): ${duration.inSeconds}');
-    print('📌 Main Category: $mainCategory');
-    print('📌 Sub Category: $subCategory');
-    print('📌 Type: $type');
-    print('📌 Activity Name: $activityName');
-    print('📌 Topic Names: $topicNames');
+    if (kDebugMode) {
+      print('⏱️ Duration (seconds): ${duration.inSeconds}');
+      print('📌 Main Category: $mainCategory');
+      print('📌 Sub Category: $subCategory');
+      print('📌 Type: $type');
+      print('📌 Activity Name: $activityName');
+      print('📌 Topic Names: $topicNames');
+    }
 
     final newSession = {
       'duration': duration.inSeconds,
@@ -272,20 +316,27 @@ Future<void> startPracticeTime({
       // 'mainCategory': mainCategory,
       'recordTimings': timings,
     };
-    print('📘 New session data: $newSession');
+    if (kDebugMode) {
+      print('📘 New session data: $newSession');
+    }
 
     // 6. Update or Create Firestore document
     if (querySnapshot.docs.isNotEmpty) {
       final docRef = querySnapshot.docs.first.reference;
-      print('📝 Updating existing document: ${docRef.id}');
+      if (kDebugMode) {
+        print('📝 Updating existing document: ${docRef.id}');
+      }
 
       await docRef.update({
         'sessions': FieldValue.arrayUnion([newSession]),
         'totalPracticeTime': FieldValue.increment(duration.inSeconds),
         'lastUpdated': FieldValue.serverTimestamp(),
+        'docId': docRef.id,
       });
 
-      print('✅ Existing document updated.');
+      if (kDebugMode) {
+        print('✅ Document ${docRef.id} updated successfully.');
+      }
     } else {
       // Get Shared Preferences
       final prefs = await SharedPreferences.getInstance();
@@ -293,15 +344,17 @@ Future<void> startPracticeTime({
       final collegeId = prefs.getString("collegeId") ?? "";
       final batchName = prefs.getString("batchName") ?? "";
 
-      print('👤 User ID: $userId');
-      print('🏫 College ID: $collegeId');
-      print('🎓 Batch Name: $batchName');
+      if (kDebugMode) {
+        print('👤 User ID: $userId');
+        print('🏫 College ID: $collegeId');
+        print('🎓 Batch Name: $batchName');
+      }
 
       if (userId.isEmpty) {
         throw Exception('User ID is empty. Please log in again.');
       }
 
-      await firestore.collection(collectionName).add({
+      final docRef = await firestore.collection(collectionName).add({
         'userId': userId,
         'category': mainCategory,
         'subCategory': subCategory,
@@ -316,13 +369,21 @@ Future<void> startPracticeTime({
         'collegeId': collegeId,
         'batchName': batchName,
       });
-
-      print('✅ New document created successfully.');
+      await docRef.update({
+        'docId': docRef.id,
+      });
+      if (kDebugMode) {
+        print('✅ New document created with ID: ${docRef.id}');
+      }
     }
 
-    print('📌 Practice session recorded completely.');
+    if (kDebugMode) {
+      print('📌 Practice session recorded completely.');
+    }
   } on FirebaseException catch (e) {
-    print('🔥 Firestore Error: ${e.code} - ${e.message}');
+    if (kDebugMode) {
+      print('🔥 Firestore Error: ${e.code} - ${e.message}');
+    }
     throw Exception('Failed to save session data: ${e.message}');
   } catch (e, stack) {
     print('❌ Unexpected Error: $e\nStack Trace: $stack');
@@ -447,10 +508,11 @@ void addToRecentHistory({
   required String category,
   required String section,
   required String link,
-  required String proLabTitle,
+  String proLabTitle = "",
   List<SubCategoryModel>? subCategories,
   GrammarDoc? grammarDocs,
   SoundSubcategory? soundSubcategory,
+  Map<String, dynamic>? extraStorageData,
 }) async {
   final newEntry = {
     'path': path,
@@ -461,6 +523,7 @@ void addToRecentHistory({
     'subCategories': subCategories?.map((e) => e.toJson()).toList() ?? [],
     'grammarDocs': grammarDocs != null ? grammarDocs.toJson() : {},
     'soundSub': soundSubcategory != null ? soundSubcategory.toJson() : {},
+    if (extraStorageData != null) 'extraStorageData': extraStorageData,
   };
 
   // Safe remove

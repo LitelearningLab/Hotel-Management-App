@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hotelmanagementapp/public/firebase_service.dart';
 
 class UserM implements Jsonable {
@@ -118,7 +119,9 @@ class UserM implements Jsonable {
 
   factory UserM.fromJson(DocumentSnapshot doc) {
     final map = doc.data() as Map<String, dynamic>;
-    print('Firestore Document Fields: ${map.keys}'); // Debugging
+    if (kDebugMode) {
+      print('Firestore Document Fields: ${map.keys}');
+    } // Debugging
 
     return UserM(
         id: doc.id,

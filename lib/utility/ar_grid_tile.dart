@@ -35,7 +35,7 @@ class ARGridTile extends StatelessWidget {
 
       onTap: () {
         if (!isUnderConstruction) {
-          mianCategoryTitile = title;
+          mainCategoryTitle = title;
         }
         onTap();
       },
@@ -61,25 +61,28 @@ class ARGridTile extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      SizedBox(
+                        height: 10,
+                      ),
                       Padding(
                         padding: EdgeInsets.symmetric(
                             horizontal: getWidgetWidth(width: 10)),
                         child: SizedBox(
-                            height: getWidgetHeight(height: 180),
+                            height: getWidgetHeight(height: 210),
                             child: Image.asset(icon)),
                       ),
                       Padding(
                         padding:
-                            const EdgeInsets.only(left: 10, top: 20, right: 20),
+                            const EdgeInsets.only(left: 10, top: 10, right: 20),
                         child: Text(
                           title,
                           style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: Colors.black,
-                          ),
+                              fontSize: 18,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500),
                         ),
                       ),
-                      SizedBox(height: getWidgetHeight(height: 20)),
+                      SizedBox(height: getWidgetHeight(height: 10)),
                     ],
                   ),
                 ),

@@ -1,24 +1,19 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
-import 'package:get/instance_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'package:hotelmanagementapp/controller/home_controller.dart';
-import 'package:hotelmanagementapp/controller/simulation_controller.dart';
 import 'package:hotelmanagementapp/controller/simulation_sub_controller.dart';
-import 'package:hotelmanagementapp/model/simulation_model.dart';
-import 'package:hotelmanagementapp/public/all_asset.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
-import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
+import 'package:hotelmanagementapp/utility/web_top_nav.dart';
 import 'package:hotelmanagementapp/utility/web_view_page.dart';
 
 class SimulationSub extends StatefulWidget {
-  final SimulationSubController controller = Get.put(SimulationSubController());
+  final SimulationSubController controller =
+      Get.put(SimulationSubController());
 
   SimulationSub({super.key});
 
@@ -27,164 +22,227 @@ class SimulationSub extends StatefulWidget {
 }
 
 class _SimulationSubState extends State<SimulationSub> {
-  late List<bool> isExpanded;
-  int expandedIndex = -1;
-  HomeController homeController = Get.put(HomeController());
+  late final HomeController homeController;
+
+  @override
+  void initState() {
+    super.initState();
+    homeController = Get.isRegistered<HomeController>()
+        ? Get.find<HomeController>()
+        : Get.put(HomeController(), permanent: true);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    /// Responsive horizontal padding
+    final horizontalPadding = screenWidth > 1400
+        ? 120.0
+        : screenWidth > 1000
+            ? 64.0
+            : 24.0;
+
     return PopScope(
-      onPopInvoked: (didpop) {
+      onPopInvoked: (_) {
         sessionName = "";
         homeController.loadRecentHistory();
       },
       child: Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: Align(
-          alignment: Alignment.bottomCenter,
-          child: CustomeBottomNavigation(),
-        ),
-        appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () {
-                sessionName = "";
-                kIsWeb
-                    ? Get.rootDelegate.offNamed(AppRoutes.simulation)
-                    : Navigator.pop(context);
-              }, // or Get.back()
-            ),
-            forceMaterialTransparency: true,
-            backgroundColor: Colors.white,
-            titleSpacing: 0,
-            title: GetBuilder<SimulationSubController>(builder: (controller) {
-              return Text(
-                controller.title,
-                textAlign: TextAlign.left,
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 20,
-                  color: Colors.black,
-                ),
-              );
-            })),
-        body: SafeArea(
-            child: Column(
-          children: [
-            GetBuilder<SimulationSubController>(builder: (controller) {
-              return Expanded(
-                child: ListView.builder(
-                  padding: EdgeInsets.symmetric(
-                      vertical: getWidgetHeight(height: 10),
-                      horizontal: getWidgetWidth(width: 20)),
-                  itemCount: controller.simulation.subcategory.length,
-                  itemBuilder: (context, index) {
-                    final isExpanded = controller.expandedIndex == index;
+        backgroundColor: const Color(0xFFF9FAFB),
 
-                    final linkAvailable = (controller.simulation
-                            .subcategory[index].links[0].isNotEmpty &&
-                        controller.simulation.subcategory[index].links[0] !=
-                            "link1");
-
-                    final linkAvailable1 = (controller.simulation
-                            .subcategory[index].links[1].isNotEmpty &&
-                        controller.simulation.subcategory[index].links[1] !=
-                            "link2");
-
-                    final linkAvailable2 = (controller.simulation
-                            .subcategory[index].links[2].isNotEmpty &&
-                        controller.simulation.subcategory[index].links[2] !=
-                            "link3");
-
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: getWidgetHeight(height: 5)),
-                          child: GestureDetector(
-                              onTap: () {
-                                subCategoryTitle = controller
-                                    .simulation.subcategory[index].title;
-                                activityName = 'Interactive Simulation';
-                                addToRecentHistory(
-                                    path:
-                                        "Interactive  Simulation > $subCategoryTitle",
-                                    category: controller
-                                        .simulation.subcategory[index].title,
-                                    section: activityName,
-                                    link: controller
-                                        .simulation.subcategory[index].links[0],
-                                    proLabTitle: "");
-                                if (kIsWeb) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => WebContentPage(
-                                          title: controller.simulation
-                                              .subcategory[index].title,
-                                          url: controller.simulation
-                                              .subcategory[index].links[0]),
-                                    ),
-                                  );
-                                } else {
-                                  Get.toNamed(AppRoutes.inAppWebView,
-                                      arguments: {
-                                        "isSimulation": true,
-                                        "url": controller.simulation
-                                            .subcategory[index].links[0],
-                                      });
-                                }
-
-                                setState(() {});
-                                // controller.update();
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      offset: const Offset(0, 4),
-                                      blurRadius: 10,
-                                    ),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: getWidgetHeight(height: 12),
-                                    horizontal: getWidgetWidth(
-                                        width: displayWidth(context) > 500
-                                            ? 5
-                                            : 20),
-                                  ),
-                                  child: Text(
-                                    controller.simulation.subcategory[index]
-                                            .title.isNotEmpty
-                                        ? controller.simulation
-                                                .subcategory[index].title[0]
-                                                .toUpperCase() +
-                                            controller.simulation
-                                                .subcategory[index].title
-                                                .substring(1)
-                                        : '',
-                                    style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              )),
-                        ),
-                      ],
-                    );
+        // ---------------- WEB HEADER ----------------
+        appBar: kIsWeb
+            ? PreferredSize(
+                preferredSize: const Size.fromHeight(72),
+                child: WebHeaderWithNav(title: "Front Office Scenarios",onBack: (){
+                    sessionName = "";
+                    Get.rootDelegate.offNamed(AppRoutes.simulation);
+                },),
+              )
+            : AppBar(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.black),
+                  onPressed: () {
+                    sessionName = "";
+                    kIsWeb
+                        ? Get.rootDelegate.offNamed(AppRoutes.simulation)
+                        : Get.back();
                   },
                 ),
+                title: GetBuilder<SimulationSubController>(
+                  builder: (controller) => Text(
+                    controller.title,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.centerDocked,
+        floatingActionButton:
+            kIsWeb ? null : const CustomeBottomNavigation(),
+
+        // ---------------- BODY ----------------
+        body: SafeArea(
+          child: GetBuilder<SimulationSubController>(
+            builder: (controller) {
+              return ListView.builder(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  32,
+                  horizontalPadding,
+                  40,
+                ),
+                itemCount: controller.simulation.subcategory.length,
+                itemBuilder: (context, index) {
+                  final item =
+                      controller.simulation.subcategory[index];
+
+                  return _ScenarioCard(
+                    index: index + 1,
+                    title: item.title,
+                    onTap: () {
+                      subCategoryTitle = item.title;
+                      activityName = 'Interactive Simulation';
+
+                      addToRecentHistory(
+                        path:
+                            "Interactive Simulation > $subCategoryTitle",
+                        category: item.title,
+                        section: activityName,
+                        link: item.links[0],
+                        proLabTitle: "",
+                      );
+
+                      if (kIsWeb) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => WebContentPage(
+                              title: item.title,
+                              url: item.links[0],
+                            ),
+                          ),
+                        );
+                      } else {
+                        Get.toNamed(
+                          AppRoutes.inAppWebView,
+                          arguments: {
+                            "isSimulation": true,
+                            "url": item.links[0],
+                          },
+                        );
+                      }
+                    },
+                  );
+                },
               );
-            }),
-            SizedBox(height: getWidgetHeight(height: 80)),
-          ],
-        )),
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/* ============================================================
+   SCENARIO CARD – WIDE / MODERN
+============================================================ */
+
+class _ScenarioCard extends StatefulWidget {
+  final int index;
+  final String title;
+  final VoidCallback onTap;
+
+  const _ScenarioCard({
+    required this.index,
+    required this.title,
+    required this.onTap,
+  });
+
+  @override
+  State<_ScenarioCard> createState() => _ScenarioCardState();
+}
+
+class _ScenarioCardState extends State<_ScenarioCard> {
+  bool hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => hover = true),
+      onExit: (_) => setState(() => hover = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          margin: const EdgeInsets.only(bottom: 16),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+            boxShadow: hover
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 22,
+                      offset: const Offset(0, 10),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Row(
+            children: [
+              // LEFT INDEX / ACCENT
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  widget.index.toString(),
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 16),
+
+              // TITLE
+              Expanded(
+                child: Text(
+                  widget.title,
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+
+              const Icon(
+                Icons.chevron_right,
+                size: 22,
+                color: Colors.black45,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

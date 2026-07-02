@@ -328,8 +328,8 @@ class PronunciationLabController extends GetxController {
       // 🔁 If no search, show all subcategories from all categories
       subcategories = base.expand((cat) => cat.subcategories).toList();
     }
-    print(
-        "jhere im printing the search length after searching ${subcategories.length}");
+    // print(
+    //     "jhere im printing the search length after searching ${subcategories.length}");
 
     isPriorityList =
         subcategories.map((e) => e.downloadStatus == true).toList();
@@ -416,7 +416,7 @@ class PronunciationLabController extends GetxController {
           date: "",
           lastAttempt: "",
           listAtt: 1,
-          load: mianCategoryTitile,
+          load: mainCategoryTitle,
           pracAtt: 0,
           time: 0,
           timeCal: DateTime.now().millisecondsSinceEpoch,
@@ -430,13 +430,12 @@ class PronunciationLabController extends GetxController {
       errorPlaying = -1;
       update();
     } on PlayerException catch (e) {
-      print(
-          "❌ Audio player error: ${e.message} | file=${subcategories[index].file} | localPath=${subcategories[index].localPath}");
+      // print("❌ Audio player error: ${e.message} ${subcategories[index].file}");
       errorPlaying = index;
       currentlyPlayingIndex = null;
       playingIs = -1;
     } on Exception catch (e) {
-      print("❌ General audio error: $e");
+      // print("❌ General audio error: $e");
       errorPlaying = index;
       currentlyPlayingIndex = null;
       playingIs = -1;
@@ -540,7 +539,7 @@ class PronunciationLabController extends GetxController {
           date: "",
           lastAttempt: "",
           listAtt: 0,
-          load: mianCategoryTitile,
+          load: mainCategoryTitle,
           pracAtt: 1,
           time: 0,
           timeCal: DateTime.now().millisecondsSinceEpoch,

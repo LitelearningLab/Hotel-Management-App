@@ -49,8 +49,21 @@ class SentenceLabSubCatController extends GetxController {
   String batchName = "";
   String? currentKey;
   Map<String, AudioStatus> audioStatusMap = {};
+  int _playbackRequestId = 0;
 
   Map<String, DownloadStatus> downloadStatusMap = {};
+
+  int _parseSafeIndex(dynamic value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? fallback;
+    return fallback;
+  }
+
+  late String subCategoryTitle;
+  late String mainCategoryTitle;
+  late int timestampIndex;
+  late String activityName;
+  late String sessionName;
 
   @override
   void onInit() {
@@ -63,26 +76,14 @@ class SentenceLabSubCatController extends GetxController {
       final saved = box.read(AppRoutes.sentenceLabSubCat) ?? {};
       title = saved['title'] ?? "";
     }
+    final ssaved = box.read(AppRoutes.sentenceLabSub) ?? {};
+    subCategoryTitle = ssaved['subCategoryTitle'] ?? "";
+    mainCategoryTitle = ssaved['mainCategoryTitle'] ?? "";
+    timestampIndex = _parseSafeIndex(ssaved['index']);
+    activityName = "";
+    sessionName = title;
 
-    audioPlayer.playerStateStream.listen((state) async {
-      if (state.processingState == ProcessingState.completed ||
-          state.processingState == ProcessingState.idle) {
-        if (currentKey != null) {
-          audioStatusMap[currentKey!] = AudioStatus.idle;
-          update();
-          currentKey = null;
-        }
-      }
-
-      // Optional: handle player stopped manually
-      if (state.playing == false &&
-          state.processingState == ProcessingState.ready) {
-        if (currentKey != null) {
-          audioStatusMap[currentKey!] = AudioStatus.idle;
-          update();
-        }
-      }
-    });
+    _attachPlayerListener();
 
     reloadFromDB(title);
     super.onInit();
@@ -290,22 +291,63 @@ class SentenceLabSubCatController extends GetxController {
 
   // track currently playing audio
 
+  bool _isRemoteUrl(String path) {
+    return path.startsWith('http://') || path.startsWith('https://');
+  }
+
+  bool _isFileUri(String path) {
+    return path.startsWith('file://');
+  }
+
+  /// Dispose the current player, create a fresh one, and re-attach the
+  /// stream listener. This guarantees the web HTML5 audio element is fully
+  /// replaced — the only reliable way to switch sources in release builds.
+  Future<void> _resetAudioPlayer() async {
+    try {
+      if (audioPlayer.playing) {
+        await audioPlayer.stop();
+      }
+      await audioPlayer.dispose();
+    } catch (_) {}
+
+    audioPlayer = AudioPlayer();
+    _attachPlayerListener();
+  }
+
+  /// Attach the completion listener to the current audioPlayer instance.
+  void _attachPlayerListener() {
+    audioPlayer.playerStateStream.listen((state) {
+      if (state.processingState == ProcessingState.completed) {
+        if (currentKey != null) {
+          audioStatusMap[currentKey!] = AudioStatus.idle;
+          currentKey = null;
+          update();
+        }
+      }
+    });
+  }
+
   void handlePlayPause(int index, int subIndex) async {
+    final requestId = ++_playbackRequestId;
     final newKey = "$index-$subIndex";
 
-    // If tapped same item
+    // If tapped same item — toggle pause/resume
     if (currentKey == newKey) {
       if (audioPlayer.playing) {
         await audioPlayer.pause();
         audioStatusMap[newKey] = AudioStatus.idle;
       } else {
+        if (audioStatusMap[newKey] == AudioStatus.loading) return;
         audioStatusMap[newKey] = AudioStatus.loading;
         update();
 
         try {
+          if (requestId != _playbackRequestId) return;
           await audioPlayer.play();
+          if (requestId != _playbackRequestId) return;
           audioStatusMap[newKey] = AudioStatus.playing;
         } catch (e) {
+          if (requestId != _playbackRequestId) return;
           audioStatusMap[newKey] = AudioStatus.error;
         }
       }
@@ -313,12 +355,19 @@ class SentenceLabSubCatController extends GetxController {
       return;
     }
 
-    // Stop previous playback
+    // ── Switching to a different audio ──
+    // Mark old key idle
     if (currentKey != null) {
       audioStatusMap[currentKey!] = AudioStatus.idle;
-      await audioPlayer.stop();
-      currentKey = null;
     }
+    currentKey = null;
+    update();
+
+    // Dispose + recreate the player so the web audio element is fully reset.
+    // This fixes the release-mode bug where stop()+setUrl() still plays the
+    // previously loaded source.
+    await _resetAudioPlayer();
+    if (requestId != _playbackRequestId) return;
 
     // Set loading state for new audio
     currentKey = newKey;
@@ -329,33 +378,47 @@ class SentenceLabSubCatController extends GetxController {
       final sentence = subcategories[index].sentence[subIndex];
       String? filePathToPlay;
 
-      if (sentence.localPath != null && sentence.localPath!.isNotEmpty) {
+      if (!kIsWeb &&
+          sentence.localPath != null &&
+          sentence.localPath!.isNotEmpty) {
         final localFile = File(sentence.localPath!);
         if (await localFile.exists()) {
+          final outputName =
+              sentence.localPath!.split('/').last.split('.enc').first;
           filePathToPlay = await AudioCryptoHelper.decryptFile(
             sentence.localPath!,
-            sentence.text
-                .replaceAll(' ', '_')
-                .replaceAll(RegExp(r'[<>:"/\\|?*]'), ''),
+            outputName,
           );
         }
       }
 
       filePathToPlay ??= sentence.file;
-      print("$filePathToPlay attempting to play this file");
-      // Set URL and wait until ready
-      await audioPlayer.setUrl(filePathToPlay);
-      // await audioPlayer.load(); // <- ensures it's fully buffered before play
+      if (kDebugMode) {
+        print("$filePathToPlay attempting to play this file");
+      }
+      if (requestId != _playbackRequestId) return;
 
-      // Start playing immediately after loaded
+      // Set the audio source
+      if (_isRemoteUrl(filePathToPlay) || _isFileUri(filePathToPlay)) {
+        await audioPlayer.setUrl(filePathToPlay);
+      } else {
+        await audioPlayer.setFilePath(filePathToPlay);
+      }
+      if (requestId != _playbackRequestId) return;
+
+      // Ensure we start from the beginning
+      await audioPlayer.seek(Duration.zero);
+      if (requestId != _playbackRequestId) return;
+
       audioStatusMap[newKey] = AudioStatus.playing;
       update();
       await audioPlayer.play();
 
-      // ✅ Mark as playing here
-
-      print("▶️ Playing: $filePathToPlay");
+      if (kDebugMode) {
+        print("▶️ Playing: $filePathToPlay");
+      }
     } catch (e) {
+      if (requestId != _playbackRequestId) return;
       log("❌ Audio load error: $e");
       audioStatusMap[newKey] = AudioStatus.error;
       update();
@@ -369,14 +432,10 @@ class SentenceLabSubCatController extends GetxController {
 
     switch (status) {
       case AudioStatus.loading:
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: getWidgetWidth(width: 4)),
-          child: SizedBox(
-            width: kIsWeb ? 18 : getWidgetWidth(width: 18),
-            height: getWidgetHeight(height: 18),
-            child:
-                CircularProgressIndicator(strokeWidth: 2, color: linearColor),
-          ),
+        return SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(strokeWidth: 2, color: linearColor),
         );
       case AudioStatus.playing:
         return Icon(Icons.pause_circle_outline, color: Colors.black);
@@ -485,5 +544,32 @@ class SentenceLabSubCatController extends GetxController {
         kShowDialog(main, word, false, context);
       }
     });
+  }
+
+  @override
+  void onClose() async {
+    try {
+      // Stop audio if playing
+      if (audioPlayer.playing) {
+        await audioPlayer.stop();
+      }
+
+      // Dispose audio player
+      await audioPlayer.dispose();
+    } catch (e) {
+      log("Error disposing audio player: $e");
+    }
+
+    // Dispose text controller
+    searchController.dispose();
+
+    // Clear maps (optional but clean)
+    audioStatusMap.clear();
+    downloadStatusMap.clear();
+
+    // Reset current playing key
+    currentKey = null;
+
+    super.onClose();
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hotelmanagementapp/model/front_office_model.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 
@@ -20,7 +21,9 @@ class FrontOfficeResponse {
 
       return documents;
     } catch (e) {
-      print('Error fetching FrontOfficeCollection: $e');
+      if (kDebugMode) {
+        print('Error fetching FrontOfficeCollection: $e');
+      }
       return [];
     }
   }

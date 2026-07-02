@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
+import 'dart:io' show Platform;
 
 import 'package:android_id/android_id.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,7 +30,6 @@ import 'package:hotelmanagementapp/utility/in_aapp_web.dart';
 import 'package:hotelmanagementapp/view/blocked_device_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-// import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -44,7 +43,6 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
   final emailAuth = EmailAuthService();
   OverlayEntry? _bottomMessageEntry;
-  // final googleAuth = GoogleAuthService();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   bool _isLogin = false;
@@ -55,15 +53,26 @@ class _LoginPageState extends State<LoginPage> {
   Timer? _hideTimer;
 
   Future<void> _loadAppVersion() async {
-    if (Platform.isIOS) {
+    if (kIsWeb) {
+      setState(() {
+        appVersion = "Web";
+      });
+      return;
+    }
+    try {
+      if (Platform.isIOS) {
+        setState(() {
+          appVersion = "1.0.0";
+        });
+      } else {
+        PackageInfo packageInfo = await PackageInfo.fromPlatform();
+        setState(() {
+          appVersion = packageInfo.version;
+        });
+      }
+    } catch (_) {
       setState(() {
         appVersion = "1.0.0";
-      });
-    } else {
-      // For Android and others, fetch from package info
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      setState(() {
-        appVersion = packageInfo.version; // e.g. "1.0.3"
       });
     }
   }
@@ -92,22 +101,19 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void showBottomStickyMessage(BuildContext context, String message) {
-    // If a message is already showing, remove it first
     _bottomMessageEntry?.remove();
 
     _bottomMessageEntry = OverlayEntry(
       builder: (context) => Positioned(
         left: 0,
         right: 0,
-        bottom: displayHeight(context) / 6,
-        // top: displayHeight(context) / 18,
+        bottom: 40,
         child: Material(
           color: Colors.transparent,
           child: AnimatedSlide(
             duration: const Duration(milliseconds: 300),
             offset: const Offset(0, 0),
             child: Container(
-              // height: 120,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               margin: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -156,9 +162,6 @@ class _LoginPageState extends State<LoginPage> {
         await isUserRegistered(emailController.text.toLowerCase());
       } else {
         showBottomStickyMessage(context, "Please enter a valid email address.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text('Please enter a valid email')),
-        // );
       }
       return;
     }
@@ -178,12 +181,7 @@ class _LoginPageState extends State<LoginPage> {
           .get();
 
       if (snapshot.docs.isEmpty) {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red, content: Text("Invalid password.")),
-        // );
         showBottomStickyMessage(context, "Invalid password.");
-        // showCenterToast("Invalid password.");
         _isLoading = false;
         isLoading = true;
         setState(() {});
@@ -194,15 +192,9 @@ class _LoginPageState extends State<LoginPage> {
       final userData = doc.data();
       final userId = doc.id;
 
-      // 🔹 Step 1: Fetch Company Data
       final companyId = userData['companyid'];
       if (companyId == null || companyId.toString().isEmpty) {
         showBottomStickyMessage(context, "Company information missing.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red,
-        //       content: Text("Company information missing.")),
-        // );
         _isLoading = false;
         isLoading = true;
         setState(() {});
@@ -217,10 +209,6 @@ class _LoginPageState extends State<LoginPage> {
 
       if (companySnapshot.docs.isEmpty) {
         showBottomStickyMessage(context, "Company not found.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red, content: Text("Company not found.")),
-        // );
         _isLoading = false;
         isLoading = true;
         setState(() {});
@@ -228,29 +216,20 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       final companyData = companySnapshot.docs.first.data();
-      log("${companyData['status']} make printing the company status here and here im printing the imei ${userData["imei"]}");
 
-      // 🔹 Step 2: Check company status
       if (companyData['status'] != "1") {
         showBottomStickyMessage(context, "Company status is invalid.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red,
-        //       content: Text("Company status is invalid.")),
-        // );
         _isLoading = false;
         isLoading = true;
         setState(() {});
         return;
       }
 
-      // 🔹 Step 3: Check subscription dates
       final userSubDate =
           DateTime.tryParse(userData['subscriptionenddate'] ?? '');
       final companySubDate =
           DateTime.tryParse(companyData['subscriptionenddate'] ?? '');
       final now = DateTime.now();
-      log("user sub date $userSubDate company sub date $companySubDate  now $now");
 
       bool isUserActive = userSubDate != null && userSubDate.isAfter(now);
       bool isCompanyActive =
@@ -259,57 +238,43 @@ class _LoginPageState extends State<LoginPage> {
       if (!isUserActive && !isCompanyActive) {
         showBottomStickyMessage(
             context, "Subscription date has been finished.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       backgroundColor: Colors.red,
-        //       content: Text("Subscription date has been finished.")),
-        // );
         _isLoading = false;
         isLoading = true;
         setState(() {});
         return;
       }
 
-      // 🔹 Step 4: Device verification (same as before)
       final prefs = await SharedPreferences.getInstance();
       if (!kIsWeb) {
-        final deviceId = Platform.isAndroid
-            ? await const AndroidId().getId()
-            : await getPermanentDeviceId();
-        final deviceName = await DeviceScreenInfo.getModelName();
+        try {
+          final deviceId = Platform.isAndroid
+              ? await const AndroidId().getId()
+              : await getPermanentDeviceId();
+          final deviceName = await DeviceScreenInfo.getModelName();
 
-        if (userData.containsKey('imei')) {
-          if (userData['imei'] != deviceId) {
-            showBottomStickyMessage(context,
-                "Your account is linked to another mobile device. Contact your administrator to register a new device.");
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(
-            //       backgroundColor: Colors.red,
-            //       content: Text("Login denied: Device not recognized.")),
-            // );
-            _isLoading = false;
-            isLoading = true;
-            setState(() {});
-            return;
+          if (userData.containsKey('imei')) {
+            if (userData['imei'] != deviceId) {
+              showBottomStickyMessage(context,
+                  "Your account is linked to another mobile device. Contact your administrator to register a new device.");
+              _isLoading = false;
+              isLoading = true;
+              setState(() {});
+              return;
+            }
+          } else {
+            await doc.reference.update({
+              'imei': deviceId,
+              'model': deviceName,
+            });
           }
-        } else {
-          log("checking whether is going now");
-          await doc.reference.update({
-            'imei': deviceId,
-            'model': deviceName,
-            // 'firstTImeLogin': DateFormat('yyyy-MM-dd').format(DateTime.now()),
-          });
-        }
+        } catch (_) {}
       }
 
-      // 🔹 Step 5: Save prefs
       await prefs.setString('email', email);
       await prefs.setString('password', password);
       await prefs.setBool("loginInfo", true);
       await prefs.setString("userId", userId);
-      await prefs.setString("collegeId", userData['collegeId'] ?? '');
-      print(
-          "Here im printing the user data company id ${userData['companyid']}");
+      await prefs.setString("collegeId", userData['companyid'] ?? '');
       await prefs.setString("batchName", userData['batchName'] ?? '');
       await prefs.setString("userName", userData['username'] ?? '');
       await prefs.setString("collegeName", userData['college'] ?? '');
@@ -320,11 +285,9 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString("enddate", userData['subscriptionenddate'] ?? '');
       await prefs.setString('course', userData['course'] ?? "");
 
-      log("User ID saved: $userId");
-      bool session = true; // default for mobile
+      bool session = true;
 
       if (kIsWeb) {
-        // Only run login session logic on Web
         session = await SessionService.loginUser(email, password);
       }
       if (session) {
@@ -340,19 +303,11 @@ class _LoginPageState extends State<LoginPage> {
                           "Your account is already active on another device.",
                     )));
       }
-
-      // Get.offAllNamed(AppRoutes.home);
     } catch (e) {
-      print("Login error: $e");
       log("Login error: $e");
       isLoading = true;
       setState(() {});
       showBottomStickyMessage(context, "Login failed. Please try again.");
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //       backgroundColor: Colors.red,
-      //       content: Text("Login failed. Please try again.")),
-      // );
     }
 
     _isLoading = false;
@@ -362,7 +317,6 @@ class _LoginPageState extends State<LoginPage> {
   Future<bool> isUserRegistered(String email) async {
     _isLoading = true;
     setState(() {});
-    log("Checking email: $email");
 
     try {
       final snapshot = await FirebaseFirestore.instance
@@ -378,14 +332,9 @@ class _LoginPageState extends State<LoginPage> {
         _isLogin = true;
         _isLoading = false;
         setState(() {});
-        log("User exists in database");
         return true;
       } else {
-        log("User not found in database");
         showBottomStickyMessage(context, "User not registered.");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text("User not registered.")),
-        // );
         return false;
       }
     } catch (e) {
@@ -412,7 +361,6 @@ class _LoginPageState extends State<LoginPage> {
       final prefs = await SharedPreferences.getInstance();
       final lastRoute = prefs.getString('lastFailedRoute');
       if (lastRoute != null && lastRoute.isNotEmpty) {
-        debugPrint("printing where it is coming here or not");
         Get.snackbar(
           'Load Failed',
           'Please log in first.',
@@ -434,269 +382,201 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
   }
 
-  @override
   Widget build(BuildContext context) {
+    final isWeb = kIsWeb;
+
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF7F8FA),
       body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: SizedBox(
-          height: kHeight,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 25),
-            child: Form(
-              key: _formKey,
-              child: Container(
-                padding: EdgeInsets.only(
-                    top:
-                        //  isSplitScreen
-                        //     ? getFullWidgetHeight(height: 30)
-                        //     :
-                        getWidgetHeight(height: 20),
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                width: kWidth,
-                decoration: BoxDecoration(color: Colors.white),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      height: getWidgetHeight(height: 35),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Form(
+                key: _formKey,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 28,
+                    vertical: 32,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 24,
+                        offset: const Offset(0, 12),
                       ),
-                      child: SizedBox(
-                        width: getWidgetWidth(width: kWidth > 500 ? 200 : 375),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            SizedBox(
-                              // height: getWidgetHeight(height: 140),
-                              width: getWidgetWidth(
-                                  width: kWidth > 1200 ? 80 : 200),
-                              child: Image.asset(
-                                AllAssets.splashLogo,
-                                fit: BoxFit.contain,
-                                // width: getWidgetWidth(width: 200),
-                                // height: getWidgetHeight(height: 200),
-                              ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        AllAssets.splashLogo,
+                        height: 70,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (_isLogin)
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back_ios_new,
+                                  size: 18),
+                              onPressed: () {
+                                passwordController.clear();
+                                setState(() {
+                                  _isLogin = false;
+                                  error = false;
+                                });
+                              },
+                            )
+                          else
+                            const SizedBox(width: 40),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                Text(
+                                  _isLogin
+                                      ? "Welcome back"
+                                      : "Login to continue",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  _isLogin
+                                      ? "Enter your password"
+                                      : "Enter your registered email address",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
-                            // if (displayWidth(context) > 1200)
-                            //   SizedBox(
-                            //       height: getWidgetHeight(height: 200),
-                            //       width: getWidgetWidth(
-                            //           width: kWidth > 1200 ? 100 : 375),
-                            //       child: !_isLogin
-                            //           ? SvgPicture.asset(
-                            //               'assets/emailScreen.svg')
-                            //           : SvgPicture.asset(
-                            //               'assets/pasScreen.svg')),
-                            // Container(
-                            //     height: 40,
-                            //     width: 40,
-                            //     child: Image.asset(
-                            //         "assets/images/profluent_ar_icon.png"))
-                          ],
+                          ),
+                          const SizedBox(width: 40),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+                      if (!isWeb)
+                        SizedBox(
+                          height: 160,
+                          child: SvgPicture.asset(
+                            _isLogin
+                                ? 'assets/pasScreen.svg'
+                                : 'assets/emailScreen.svg',
+                          ),
                         ),
-                      ),
-                    ),
-                    SizedBox(height: getWidgetHeight(height: 30)),
-
-                    if (displayWidth(context) < 1200)
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: getWidgetHeight(height: 25),
-                        ),
-                        child: SizedBox(
-                            height: getWidgetHeight(height: 200),
-                            child: !_isLogin
-                                ? SvgPicture.asset('assets/emailScreen.svg')
-                                : SvgPicture.asset('assets/pasScreen.svg')),
-                      ),
-                    SizedBox(height: getWidgetHeight(height: 20)),
-                    if (!kIsWeb || _isLogin)
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: getWidgetHeight(height: 25),
-                        ),
-                        child: Text(
-                          _isLogin
-                              ? "Enter Your Password"
-                              : "Enter Your Email Address",
-                          style: TextStyle(color: Color(0XFFF8F8F8F)),
-                        ),
-                      ),
-                    SizedBox(height: getWidgetHeight(height: 23)),
-
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
-                      ),
-                      child: SizedBox(
-                        width: getWidgetWidth(width: kWidth > 500 ? 200 : 375),
-                        // height: getWidgetHeight(height: kWidth > 500 ? 75 : 50),
-                        child: TextFormField(
-                          cursorColor: Colors.black,
-                          controller:
-                              _isLogin ? passwordController : emailController,
-                          keyboardType: _isLogin
-                              ? TextInputType.text
-                              : TextInputType.emailAddress,
-                          obscureText: _isLogin ? _obscurePassword : false,
-                          textInputAction: TextInputAction.done,
-                          onFieldSubmitted: (value) {
-                            _bottomMessageEntry?.remove();
-                            _bottomMessageEntry = null;
-                            if (_isLogin) {
-                              isLoading = false;
-                              setState(() {});
-                            }
-                            login();
-                          },
-                          validator: (val) {
-                            if (!_isLogin) {
-                              return validateEmail(val);
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            counterText: "",
-                            hintText: _isLogin ? "Password" : "Email Address",
-                            hintStyle: TextStyle(color: Colors.grey[600]),
-                            fillColor: Color(0XFFE8E8E8),
-                            filled: true,
-                            prefixIcon: Icon(
-                              _isLogin ? Icons.lock : Icons.email,
-                              color: Colors.grey,
-                            ),
-                            suffixIcon: _isLogin
-                                ? IconButton(
-                                    icon: Icon(
-                                      _obscurePassword
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                      color: Colors.grey,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _obscurePassword = !_obscurePassword;
-                                      });
-
-                                      if (!_obscurePassword) {
-                                        _hideTimer?.cancel();
-
-                                        _hideTimer =
-                                            Timer(Duration(seconds: 1), () {
-                                          if (mounted) {
-                                            setState(() {
-                                              _obscurePassword = true;
-                                            });
-                                          }
-                                        });
-                                      }
-                                    },
-                                  )
-                                : null,
-                            contentPadding: EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 10,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0XFFE8E8E8)),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0XFFE8E8E8)),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
+                      if (!isWeb) const SizedBox(height: 24),
+                      TextFormField(
+                        controller:
+                            _isLogin ? passwordController : emailController,
+                        obscureText: _isLogin ? _obscurePassword : false,
+                        keyboardType: _isLogin
+                            ? TextInputType.text
+                            : TextInputType.emailAddress,
+                        cursorColor: Colors.black,
+                        validator: (val) {
+                          if (!_isLogin) return validateEmail(val);
+                          return null;
+                        },
+                        onFieldSubmitted: (_) => login(),
+                        decoration: InputDecoration(
+                          hintText: _isLogin ? "Password" : "Email address",
+                          prefixIcon: Icon(
+                            _isLogin
+                                ? Icons.lock_outline
+                                : Icons.email_outlined,
+                          ),
+                          suffixIcon: _isLogin
+                              ? IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                )
+                              : null,
+                          filled: true,
+                          fillColor: const Color(0xFFF1F1F1),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
                           ),
                         ),
                       ),
-                    ),
-
-                    SizedBox(height: 23),
-                    // if (!_isLoading)
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: getWidgetHeight(height: 25),
-                      ),
-                      child: _isLoading
-                          ? CircularProgressIndicator(
-                              color: linearColor,
-                            )
+                      const SizedBox(height: 24),
+                      _isLoading
+                          ? CircularProgressIndicator(color: linearColor)
                           : SizedBox(
-                              width: getWidgetWidth(
-                                  width: kWidth > 500 ? 200 : 375),
-                              height: getWidgetHeight(
-                                  height: kWidth > 500 ? 40 : 50),
+                              width: double.infinity,
+                              height: 48,
                               child: CustomButton(
                                 buttonText: _isLogin
                                     ? "Verify Login"
                                     : "Verify & Login",
-                                onPressed: () async {
-                                  _bottomMessageEntry?.remove();
-                                  _bottomMessageEntry = null;
-                                  if (_isLogin) {
-                                    isLoading = false;
-                                    setState(() {});
-                                  }
-                                  login();
-                                },
+                                onPressed: login,
                               ),
                             ),
-                    ),
-                    if (_isLogin && isLoading)
-                      TextButton(
-                        onPressed: () {
-                          passwordController.clear();
-                          _isLogin = false;
-                          setState(() {});
-                        },
-                        child: const Text(
-                          "<< Back",
-                          style: TextStyle(color: Colors.black),
+                      if (_isLogin && isLoading)
+                        TextButton(
+                          onPressed: () {
+                            passwordController.clear();
+                            _isLogin = false;
+                            setState(() {});
+                          },
+                          child: const Text("← Back"),
                         ),
+                      const SizedBox(height: 24),
+                      Column(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              isWeb
+                                  ? Get.rootDelegate.offNamed(
+                                      AppRoutes.inAppWebView,
+                                      arguments: {
+                                        "url": ApiRoutes.privacyPolicy,
+                                      },
+                                    )
+                                  : Get.to(() => InAppWebViewPage(),
+                                      arguments: {
+                                          "url": ApiRoutes.privacyPolicy,
+                                        });
+                            },
+                            child: const Text(
+                              "Privacy & Policy",
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          if (!isWeb && appVersion != null)
+                            Text(
+                              "App version $appVersion",
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey,
+                              ),
+                            ),
+                        ],
                       ),
-                    Spacer(),
-
-                    TextButton(
-                      onPressed: () async {
-                        kIsWeb
-                            ? Get.rootDelegate
-                                .offNamed(AppRoutes.inAppWebView, arguments: {
-                                "url": ApiRoutes.privacyPolicy,
-                              })
-                            : Get.to(() => InAppWebViewPage(), arguments: {
-                                "url": ApiRoutes.privacyPolicy,
-                              });
-                      },
-                      child: Text(
-                        "Privacy & Policy",
-                        style: GoogleFonts.inter(
-                          height: 0.5,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: lightWhite,
-                        ),
-                      ),
-                    ),
-                    if (!kIsWeb)
-                      Text(
-                        "App version $appVersion",
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w300,
-                          height: 0.5,
-                          fontSize: 12,
-                          color: lightWhite,
-                        ),
-                      ),
-                    SizedBox(height: 30),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

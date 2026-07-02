@@ -6,15 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hotelmanagementapp/firebase_options.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
+import 'package:hotelmanagementapp/public/sessio_service.dart';
 import 'package:hotelmanagementapp/route/app_router_delegate.dart';
 import 'package:hotelmanagementapp/route/binding.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/route/route_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 //for web only
-// import 'dart:html' as html;
+import 'dart:html' as html;
 import 'package:get_storage/get_storage.dart';
 import 'package:hotelmanagementapp/view/blocked_device_screen.dart';
+// import 'package:webview_flutter_web/webview_flutter_web.dart';
 
 bool isOnNoInternetPage = false;
 void main() async {
@@ -24,7 +26,7 @@ void main() async {
   Get.lazyPut<AppRouterDelegate>(() => AppRouterDelegate());
 
   // WebView.platform = WebWebViewPlatform();
-  // WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: FirebaseOptions(
@@ -39,10 +41,12 @@ void main() async {
       ),
     );
     // // for web only
-    // if (_isMobileOrTabletDevice()) {
-    //   runApp(const BlockedDeviceScreen());
-    //   return;
-    // }
+    if (_isMobileOrTabletDevice()) {
+      runApp(const BlockedDeviceScreen(
+        reason: "Your account is already active on another device.",
+      ));
+      return;
+    }
   } else {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -55,22 +59,22 @@ void main() async {
 }
 
 // // for web only
-// bool _isMobileOrTabletDevice() {
-//   try {
-//     final userAgent = html.window.navigator.userAgent.toLowerCase();
-//     final screenWidth = html.window.screen?.width ?? 0;
+bool _isMobileOrTabletDevice() {
+  try {
+    final userAgent = html.window.navigator.userAgent.toLowerCase();
+    final screenWidth = html.window.screen?.width ?? 0;
 
-//     // Common mobile/tablet indicators
-//     return userAgent.contains('mobile') ||
-//         userAgent.contains('android') ||
-//         userAgent.contains('iphone') ||
-//         userAgent.contains('ipad') ||
-//         userAgent.contains('tablet') ||
-//         screenWidth < 900;
-//   } catch (_) {
-//     return false;
-//   }
-// }
+    // Common mobile/tablet indicators
+    return userAgent.contains('mobile') ||
+        userAgent.contains('android') ||
+        userAgent.contains('iphone') ||
+        userAgent.contains('ipad') ||
+        userAgent.contains('tablet') ||
+        screenWidth < 900;
+  } catch (_) {
+    return false;
+  }
+}
 
 class MyApp extends StatefulWidget {
   final AppRouterDelegate appRouterDelegate;
@@ -93,6 +97,13 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    if (kIsWeb) {
+      SessionService.startWebSessionGuard(onSessionBlocked: () {
+        if (Get.currentRoute != AppRoutes.login) {
+          Get.rootDelegate.offNamed(AppRoutes.login);
+        }
+      });
+    }
 
     _connectivitySub = _connectivity.onConnectivityChanged.listen((results) {
       final isConnected = _isConnected(results);
@@ -119,8 +130,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    _offlineDebounceTimer?.cancel();
-    _connectivitySub?.cancel();
+    if (kIsWeb) {
+      SessionService.stopWebSessionGuard();
+    }
     super.dispose();
   }
 

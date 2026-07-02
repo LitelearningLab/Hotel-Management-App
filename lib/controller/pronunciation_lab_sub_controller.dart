@@ -76,6 +76,8 @@ class PronunciationLabSubController extends GetxController {
   int expandedIndex = -1;
   bool isProcessing = false;
   int dialogCount = 0;
+  String mainCategoryTitle = '';
+  int index = 0;
   String? subTitle;
   String _sanitizeLocalPath(String path) {
     final trimmed = path.trim();
@@ -92,6 +94,12 @@ class PronunciationLabSubController extends GetxController {
     return parsed.toString();
   }
 
+  int _parseSafeIndex(dynamic value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? fallback;
+    return fallback;
+  }
+
   @override
   void onInit() {
     readyFirs();
@@ -101,6 +109,10 @@ class PronunciationLabSubController extends GetxController {
 
   void readyFirs() async {
     audioPlayer = AudioPlayer();
+    final routePathTitle = Get.parameters['pathTitle'];
+    if (routePathTitle != null && routePathTitle.isNotEmpty) {
+      setPathTitle(routePathTitle);
+    }
     final args = Get.arguments;
     final box = GetStorage();
     var argList = [];
@@ -108,9 +120,11 @@ class PronunciationLabSubController extends GetxController {
       title = args['title'];
       argList = args['subcategories'] as List;
       collectionName = args['pronunCollectionName'] ?? '';
+      mainCategoryTitle = args['mainCategoryTitle'] ?? '';
       id = args['id'] ?? "";
+      index = _parseSafeIndex(args['index']);
     } else {
-      final saved = box.read(AppRoutes.pronunciationLabSub) ?? {};
+      final saved = box.read(AppRoutes.pronunciationLabSubStoreKey) ?? {};
       title = saved['title'] ?? "";
       final subList = saved['subcategories'] ?? [];
       argList = subList
@@ -118,10 +132,9 @@ class PronunciationLabSubController extends GetxController {
           .toList();
       collectionName = saved['pronunCollectionName'] ?? '';
       id = saved['id'] ?? "";
+      mainCategoryTitle = saved['mainCategoryTitle'] ?? '';
+      index = _parseSafeIndex(saved['index']);
     }
-    debugPrint("collection name is $collectionName");
-    debugPrint("argument list is $argList");
-    debugPrint("title is $title");
 
     ogSubCategories = argList
         .map((item) => item is SubcategoryPro
@@ -146,6 +159,7 @@ class PronunciationLabSubController extends GetxController {
         elseCase();
       } else {
         subcategories = ogSubCategories;
+        masterList = List.from(ogSubCategories);
         isLoading = false;
       }
 
@@ -194,7 +208,7 @@ class PronunciationLabSubController extends GetxController {
             isShowDidNotCatch: notCatch,
             word: word,
             title: title,
-            load: mianCategoryTitile,
+            load: mainCategoryTitle,
           ),
         ),
       );
@@ -214,7 +228,7 @@ class PronunciationLabSubController extends GetxController {
             date: DateTime.now().toIso8601String().substring(0, 10),
             lastAttempt: DateTime.now().toIso8601String(),
             listAtt: 0,
-            load: mianCategoryTitile,
+            load: mainCategoryTitle,
             pracAtt: 1,
             time: 0,
             timeCal: DateTime.now().millisecondsSinceEpoch,
@@ -248,9 +262,16 @@ class PronunciationLabSubController extends GetxController {
   void searchSubcategories(String query) {
     isSearching = query.trim().isNotEmpty;
 
-    List<SubcategoryPro> base = isFiltering ? filterBaseList : masterList;
+    List<SubcategoryPro> base =
+        isFiltering && !kIsWeb ? filterBaseList : masterList;
 
     if (isSearching) {
+      if (kDebugMode) {
+        print("Searching for: $query");
+        print("Base list count: ${masterList.length}");
+      }
+      searchTerm = query;
+      update();
       searchBaseList = base
           .where(
               (item) => item.text.toLowerCase().contains(query.toLowerCase()))
@@ -340,7 +361,9 @@ class PronunciationLabSubController extends GetxController {
       currentlyPlayingIndex = null;
       update();
     } catch (e) {
-      print('Error stopping audio: $e');
+      if (kDebugMode) {
+        print("Error stopping audio: $e");
+      }
     }
   }
 
@@ -578,7 +601,7 @@ class PronunciationLabSubController extends GetxController {
           date: "",
           lastAttempt: "",
           listAtt: 1,
-          load: mianCategoryTitile,
+          load: mainCategoryTitle,
           pracAtt: 0,
           time: 0,
           timeCal: DateTime.now().millisecondsSinceEpoch,
@@ -597,7 +620,9 @@ class PronunciationLabSubController extends GetxController {
       currentlyPlayingIndex = null;
       playingIs = -1;
     } on Exception catch (e) {
-      print("❌ General audio error: $e");
+      if (kDebugMode) {
+        print("❌ General audio error: $e");
+      }
       errorPlaying = index;
       currentlyPlayingIndex = null;
       playingIs = -1;
@@ -789,8 +814,10 @@ class PronunciationLabSubController extends GetxController {
 
           for (var item in category.subcategories) {
             String url = item.file;
-            print(
-                "$url printing the url for to show how the thing is start with http or not");
+            if (kDebugMode) {
+              print(
+                  "$url printing the url for to show how the thing is start with http or not");
+            }
 
             if (!url.startsWith("http")) {
               try {
@@ -798,7 +825,9 @@ class PronunciationLabSubController extends GetxController {
                     .ref(item.file)
                     .getDownloadURL();
               } catch (e) {
-                print("❌ Could not fetch URL for ${item.file}: $e");
+                if (kDebugMode) {
+                  print("❌ Could not fetch URL for ${item.file}: $e");
+                }
               }
             }
 
