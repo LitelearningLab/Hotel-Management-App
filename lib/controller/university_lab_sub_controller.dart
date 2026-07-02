@@ -19,7 +19,8 @@ class UniversityLabSubController extends GetxController {
       if (rawCat is UniversityCategory) {
         category = rawCat;
       } else if (rawCat is Map) {
-        category = UniversityCategory.fromMap(Map<String, dynamic>.from(rawCat));
+        category =
+            UniversityCategory.fromMap(Map<String, dynamic>.from(rawCat));
       }
       collegeName = args['collegeName'] ?? "";
       box.write(AppRoutes.universityLabSub, {
@@ -34,11 +35,13 @@ class UniversityLabSubController extends GetxController {
       collegeName = saved['collegeName'] ?? "";
       final catJson = saved['category'];
       if (catJson != null && catJson is Map) {
-        category = UniversityCategory.fromMap(Map<String, dynamic>.from(catJson));
+        category =
+            UniversityCategory.fromMap(Map<String, dynamic>.from(catJson));
       } else if (saved is Map && saved.containsKey('name')) {
         category = UniversityCategory.fromMap(Map<String, dynamic>.from(saved));
       } else {
-        category = UniversityCategory(name: '', order: 0, id: '', key: '', subcategory: []);
+        category = UniversityCategory(
+            name: '', order: "0", id: '', key: '', subcategory: []);
       }
     }
     update();

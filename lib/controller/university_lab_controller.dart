@@ -27,6 +27,13 @@ class UniversityLabController extends GetxController {
         universityModel = UniversityModel(collegeName: '', collegeId: '', category: [], photo: '');
       }
     }
+    if (universityModel.category.isNotEmpty) {
+      universityModel.category.sort((a, b) {
+        final aOrder = int.tryParse(a.order) ?? 0;
+        final bOrder = int.tryParse(b.order) ?? 0;
+        return aOrder.compareTo(bOrder);
+      });
+    }
     super.onInit();
   }
 }

@@ -12,13 +12,21 @@ class UniversityModel {
   });
 
   factory UniversityModel.fromMap(Map<String, dynamic> map) {
+    final categoryList = (map['category'] as List<dynamic>?)
+            ?.map((item) =>
+                UniversityCategory.fromMap(Map<String, dynamic>.from(item)))
+            .toList() ??
+        [];
+    categoryList.sort((a, b) {
+      final aOrder = int.tryParse(a.order) ?? 0;
+      final bOrder = int.tryParse(b.order) ?? 0;
+      return aOrder.compareTo(bOrder);
+    });
+
     return UniversityModel(
       collegeName: map['collegeName'] ?? '',
       collegeId: map['collegeId'] ?? '',
-      category: (map['category'] as List<dynamic>?)
-              ?.map((item) => UniversityCategory.fromMap(Map<String, dynamic>.from(item)))
-              .toList() ??
-          [],
+      category: categoryList,
       photo: map['photo'] ?? '',
     );
   }
@@ -32,13 +40,14 @@ class UniversityModel {
     };
   }
 
-  factory UniversityModel.fromJson(Map<String, dynamic> json) => UniversityModel.fromMap(json);
+  factory UniversityModel.fromJson(Map<String, dynamic> json) =>
+      UniversityModel.fromMap(json);
   Map<String, dynamic> toJson() => toMap();
 }
 
 class UniversityCategory {
   final String name;
-  final int order;
+  final String order;
   final String id;
   final String key;
   final List<Subject> subcategory;
@@ -54,7 +63,7 @@ class UniversityCategory {
   factory UniversityCategory.fromMap(Map<String, dynamic> map) {
     return UniversityCategory(
       name: map['name'] ?? '',
-      order: map['order'] ?? 0,
+      order: map['order'] ?? "0",
       id: map['id'] ?? '',
       key: map['key'] ?? '',
       subcategory: (map['subcategory'] as List<dynamic>?)
@@ -74,7 +83,8 @@ class UniversityCategory {
     };
   }
 
-  factory UniversityCategory.fromJson(Map<String, dynamic> json) => UniversityCategory.fromMap(json);
+  factory UniversityCategory.fromJson(Map<String, dynamic> json) =>
+      UniversityCategory.fromMap(json);
   Map<String, dynamic> toJson() => toMap();
 }
 
