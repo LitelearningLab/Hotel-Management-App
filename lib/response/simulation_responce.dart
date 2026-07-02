@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hotelmanagementapp/model/simulation_model.dart';
 
 class SimulationResponse {
@@ -20,7 +21,9 @@ class SimulationResponse {
 
       return documents;
     } catch (e) {
-      print('Error fetching SimulationCollection: $e');
+      if (kDebugMode) {
+        print('Error fetching SimulationCollection: $e');
+      }
       return [];
     }
   }

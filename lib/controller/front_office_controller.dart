@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -37,6 +38,12 @@ class FrontOfficeController extends GetxController {
   double particularPercentage = 0;
   Map<String, ProgressModel> progressData = {};
 
+  int _parseSafeIndex(dynamic value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? fallback;
+    return fallback;
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -51,6 +58,11 @@ class FrontOfficeController extends GetxController {
       loading = true;
       update();
 
+      final routePathTitle = Get.parameters['pathTitle'];
+      if (routePathTitle != null && routePathTitle.isNotEmpty) {
+        setPathTitle(routePathTitle);
+      }
+
       final args = Get.arguments;
       final box = GetStorage();
 
@@ -58,16 +70,16 @@ class FrontOfficeController extends GetxController {
         // Mobile navigation ✅
         title = args['title'] ?? "";
         image = args['image'] ?? "";
-        index = args['index'] ?? "";
+        index = _parseSafeIndex(args['index']);
 
         // Store for web refresh
         box.write('pageData', args);
       } else {
         // Web refresh fallback ✅
-        final saved = box.read(AppRoutes.frontOffice) ?? {};
+        final saved = box.read(AppRoutes.frontOfficeStoreKey) ?? {};
         title = saved['title'] ?? "";
         image = saved['image'] ?? "";
-        index = saved['index'] ?? "";
+        index = _parseSafeIndex(saved['index']);
       }
 
       isExpanded = List.generate(itemCount, (_) => false);
@@ -91,7 +103,7 @@ class FrontOfficeController extends GetxController {
                   : index == 3
                       ? CollectionNames.houseKeeping
                       : "";
-
+      timestampIndex = index;
       log("Collection Name: $collectionName");
 
       frontOfficeData =
@@ -170,11 +182,12 @@ class FrontOfficeController extends GetxController {
         .where(
             (item) => item.category.toLowerCase().contains(query.toLowerCase()))
         .toList();
-
-    // Debug
-    for (var item in frontOfficeData) {
-      print(
-          "Filtered Item Category: ${item.category}"); // Should print the original casing
+// Debug
+    if (kDebugMode) {
+      for (var item in frontOfficeData) {
+        print(
+            "Filtered Item Category: ${item.category}"); // Should print the original casing
+      }
     }
 
     update();

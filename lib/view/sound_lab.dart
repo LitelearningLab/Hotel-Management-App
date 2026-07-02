@@ -35,7 +35,7 @@ class _SoundLabState extends State<SoundLab> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: Align(
           alignment: Alignment.bottomCenter,
-          child: !controller.isSearching ? CustomeBottomNavigation() : null,
+          child: controller.isSearching || kIsWeb ? null : CustomeBottomNavigation(),
         ),
         appBar: AppBar(
           forceMaterialTransparency: true,
@@ -44,19 +44,74 @@ class _SoundLabState extends State<SoundLab> {
           backgroundColor: Colors.white,
           titleSpacing: 0,
           title: controller.isSearching
-              ? TextField(
-                  cursorColor: Colors.grey,
-                  controller: controller.searchController,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: 'Search...',
-                    border: InputBorder.none,
-                    hintStyle: TextStyle(color: Colors.grey),
-                  ),
-                  onChanged: (value) {
-                    controller.searchSubcategories(value); // Your search logic
-                  },
-                )
+              ?Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 50),
+                    child: SizedBox(
+                      height: 44,
+                      child: TextField(
+                        controller: controller.searchController,
+                        autofocus: true,
+                        cursorColor: Colors.black,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Search...',
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 14,
+                          ),
+
+                          /// 🔍 Left icon
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            size: 18,
+                            color: Colors.grey,
+                          ),
+
+                          /// ❌ Clear button
+                          suffixIcon:
+                              controller.searchController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(
+                                        Icons.close,
+                                        size: 18,
+                                        color: Colors.grey,
+                                      ),
+                                      onPressed: () {
+                                        controller.searchController.clear();
+                                        controller.clearSearch();
+                                        controller.update();
+                                      },
+                                    )
+                                  : null,
+
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 10),
+
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE0E0E0),
+                              width: 1,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.black54,
+                              width: 1.2,
+                            ),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          controller.searchSubcategories(value);
+                          controller.update();
+                        },
+                      ),
+                    ),
+                  )
               : Padding(
                   padding: EdgeInsets.only(right: getWidgetWidth(width: 12)),
                   child: Row(
@@ -129,41 +184,15 @@ class _SoundLabState extends State<SoundLab> {
                             // width: 25,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-          leading: IconButton(
-            onPressed: () {
-              if (controller.isSearching) {
-                controller.isSearching = false;
-                controller.searchController.clear();
-                controller.clearSearch();
-                controller.update();
-              } else {
-                final box = GetStorage();
-                final saved = box.read(AppRoutes.soundPage) ?? {};
-
-                late SoundSubcategory soundModel;
-                final storedSound = saved['soundModel'];
-                if (storedSound is Map<String, dynamic>) {
-                  soundModel = SoundSubcategory.fromJson(storedSound);
-                } else if (storedSound is SoundSubcategory) {
-                  soundModel = storedSound;
-                }
-                kIsWeb
-                    ? Get.rootDelegate
-                        .offNamed(AppRoutes.soundPage, arguments: {
-                        'title': saved['title'] ?? "Sound Page",
-                        'soundModel': soundModel,
-                      })
-                    : Navigator.pop(context);
-              }
-            },
-            icon: const Icon(Icons.arrow_back),
-          ),
-          actions: [
-            SizedBox(
+                      ),  kIsWeb
+                                ? IconButton(
+                                    onPressed: () {
+                                      controller.isSearching = true;
+                                      controller.update();
+                                    },
+                                    icon: Icon(Icons.search),
+                                  )
+                                :     SizedBox(
               width: getWidgetWidth(width: 30),
               child: PopupMenuButton<String>(
                 padding: EdgeInsets.zero,
@@ -226,6 +255,40 @@ class _SoundLabState extends State<SoundLab> {
                 ],
               ),
             ),
+                    ],
+                  ),
+                ),
+          leading: IconButton(
+            onPressed: () {
+              if (controller.isSearching) {
+                controller.isSearching = false;
+                controller.searchController.clear();
+                controller.clearSearch();
+                controller.update();
+              } else {
+                final box = GetStorage();
+                final saved = box.read(AppRoutes.soundPage) ?? {};
+
+                late SoundSubcategory soundModel;
+                final storedSound = saved['soundModel'];
+                if (storedSound is Map<String, dynamic>) {
+                  soundModel = SoundSubcategory.fromJson(storedSound);
+                } else if (storedSound is SoundSubcategory) {
+                  soundModel = storedSound;
+                }
+                kIsWeb
+                    ? Get.rootDelegate
+                        .offNamed(AppRoutes.soundPage, arguments: {
+                        'title': saved['title'] ?? "Sound Page",
+                        'soundModel': soundModel,
+                      })
+                    : Navigator.pop(context);
+              }
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
+          actions: [
+          
           ],
         ),
         body: controller.isLoading
@@ -742,5 +805,45 @@ class _SoundLabState extends State<SoundLab> {
                   ),
       );
     });
+  }
+}
+
+class _HoverCard extends StatefulWidget {
+  final Widget child;
+  const _HoverCard({required this.child});
+
+  @override
+  State<_HoverCard> createState() => _HoverCardState();
+}
+
+class _HoverCardState extends State<_HoverCard> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!kIsWeb) return widget.child;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: _hovered
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
+                  ),
+                ]
+              : [],
+        ),
+        child: widget.child,
+      ),
+    );
   }
 }

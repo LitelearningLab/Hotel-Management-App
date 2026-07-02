@@ -76,7 +76,29 @@ class PronunciationLabSubController extends GetxController {
   int expandedIndex = -1;
   bool isProcessing = false;
   int dialogCount = 0;
+  String mainCategoryTitle = '';
+  int index = 0;
   String? subTitle;
+  String _sanitizeLocalPath(String path) {
+    final trimmed = path.trim();
+    if (trimmed.startsWith('file://')) {
+      return trimmed.replaceFirst('file://', '');
+    }
+    return trimmed;
+  }
+
+  String _normalizeRemoteUrl(String url) {
+    final trimmed = url.trim();
+    final parsed = Uri.tryParse(trimmed);
+    if (parsed == null) return trimmed;
+    return parsed.toString();
+  }
+
+  int _parseSafeIndex(dynamic value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? fallback;
+    return fallback;
+  }
 
   @override
   void onInit() {
@@ -87,6 +109,10 @@ class PronunciationLabSubController extends GetxController {
 
   void readyFirs() async {
     audioPlayer = AudioPlayer();
+    final routePathTitle = Get.parameters['pathTitle'];
+    if (routePathTitle != null && routePathTitle.isNotEmpty) {
+      setPathTitle(routePathTitle);
+    }
     final args = Get.arguments;
     final box = GetStorage();
     var argList = [];
@@ -99,9 +125,11 @@ class PronunciationLabSubController extends GetxController {
       title = args['title'];
       argList = args['subcategories'] as List;
       collectionName = args['pronunCollectionName'] ?? '';
+      mainCategoryTitle = args['mainCategoryTitle'] ?? '';
       id = args['id'] ?? "";
+      index = _parseSafeIndex(args['index']);
     } else {
-      final saved = box.read(AppRoutes.pronunciationLabSub) ?? {};
+      final saved = box.read(AppRoutes.pronunciationLabSubStoreKey) ?? {};
       title = saved['title'] ?? "";
       final subList = saved['subcategories'] ?? [];
       argList = subList
@@ -109,15 +137,14 @@ class PronunciationLabSubController extends GetxController {
           .toList();
       collectionName = saved['pronunCollectionName'] ?? '';
       id = saved['id'] ?? "";
+      mainCategoryTitle = saved['mainCategoryTitle'] ?? '';
+      index = _parseSafeIndex(saved['index']);
     }
     debugPrint("collection name is $collectionName");
     debugPrint("argument list is $argList");
     debugPrint("title is $title");
     mainCategoryTitle = title;
 
-    audioPlayer.setUrl(
-        "https://firebasestorage.googleapis.com/v0/b/lite-learning-lab.appspot.com/o/Hotel%20Management%2FWhatsApp%20Audio%202025-09-09%20at%203.41.09%20PM.mp4?alt=media&token=b99d9096-211b-45cc-b157-4582c7fc3312");
-    audioPlayer.play();
     ogSubCategories = argList
         .map((item) => item is SubcategoryPro
             ? item
@@ -126,10 +153,12 @@ class PronunciationLabSubController extends GetxController {
 
     audioPlayer.playerStateStream.listen((state) {
       if (state.playing && state.processingState == ProcessingState.ready) {
+        playingIs = -1;
         update();
       }
       if (state.processingState == ProcessingState.completed) {
         currentlyPlayingIndex = null;
+        playingIs = -1;
         update();
       }
     });
@@ -139,6 +168,7 @@ class PronunciationLabSubController extends GetxController {
         elseCase();
       } else {
         subcategories = ogSubCategories;
+        masterList = List.from(ogSubCategories);
         isLoading = false;
       }
 
@@ -241,9 +271,16 @@ class PronunciationLabSubController extends GetxController {
   void searchSubcategories(String query) {
     isSearching = query.trim().isNotEmpty;
 
-    List<SubcategoryPro> base = isFiltering ? filterBaseList : masterList;
+    List<SubcategoryPro> base =
+        isFiltering && !kIsWeb ? filterBaseList : masterList;
 
     if (isSearching) {
+      if (kDebugMode) {
+        print("Searching for: $query");
+        print("Base list count: ${masterList.length}");
+      }
+      searchTerm = query;
+      update();
       searchBaseList = base
           .where(
               (item) => item.text.toLowerCase().contains(query.toLowerCase()))
@@ -271,8 +308,13 @@ class PronunciationLabSubController extends GetxController {
     // Toggle current UI state first
     bool newValue = !isPriorityList[index];
     isPriorityList[index] = newValue;
-    ogSubCategories[index].downloadStatus =
-        !ogSubCategories[index].downloadStatus;
+    subcategories[index].downloadStatus = newValue;
+    for (final item in ogSubCategories) {
+      if (item.file == subcategories[index].file ||
+          item.text.toLowerCase() == subcategories[index].text.toLowerCase()) {
+        item.downloadStatus = newValue;
+      }
+    }
     try {
       update();
 
@@ -290,8 +332,9 @@ class PronunciationLabSubController extends GetxController {
         log("✅ Downloaded & saved local path: $encryptedPath");
       } else {
         final localPath = subcategories[index].localPath;
-        if (localPath.isNotEmpty && await File(localPath).exists()) {
-          await File(localPath).delete();
+        final sanitized = _sanitizeLocalPath(localPath);
+        if (sanitized.isNotEmpty && await File(sanitized).exists()) {
+          await File(sanitized).delete();
           log("🗑 Deleted local file: $localPath");
         }
 
@@ -327,7 +370,9 @@ class PronunciationLabSubController extends GetxController {
       currentlyPlayingIndex = null;
       update();
     } catch (e) {
-      print('Error stopping audio: $e');
+      if (kDebugMode) {
+        print("Error stopping audio: $e");
+      }
     }
   }
 
@@ -502,24 +547,57 @@ class PronunciationLabSubController extends GetxController {
         await audioPlayer.stop();
         currentlyPlayingIndex = index;
 
-        String? playPath;
-        if (subcategories[index].localPath.isNotEmpty &&
-            await File(subcategories[index].localPath).exists()) {
+        final tableName = title.replaceAll(RegExp(r'[^\w]+'), '').toLowerCase();
+        if (subcategories[index].localPath.isEmpty && !kIsWeb) {
+          final localData = await DBHelper.getAllSubcategoriesValidated(
+            tableName,
+          );
+          final matched = localData
+              .where(
+                (e) =>
+                    e.file == subcategories[index].file ||
+                    e.text.toLowerCase() ==
+                    subcategories[index].text.toLowerCase(),
+              )
+              .toList();
+          if (matched.isNotEmpty && matched.first.localPath.isNotEmpty) {
+            subcategories[index] = subcategories[index].copyWith(
+              localPath: _sanitizeLocalPath(matched.first.localPath),
+            );
+          }
+        }
+
+        bool isLocalSource = false;
+        late String playPath;
+        final localPath = _sanitizeLocalPath(subcategories[index].localPath);
+        final hasLocalFile =
+            localPath.isNotEmpty && await File(localPath).exists();
+
+        if (hasLocalFile) {
+
           log("🔐 Decrypting local file before playing...");
           playPath = await AudioCryptoHelper.decryptFile(
-            subcategories[index].localPath,
+            localPath,
             subcategories[index]
                 .text
                 .replaceAll(' ', '_')
                 .replaceAll(RegExp(r'[<>:"/\\|?*]'), ''),
           );
+          isLocalSource = true;
           log("Decrypted to temp file: $playPath");
         } else {
-          playPath = subcategories[index].file; // URL
+          playPath = _normalizeRemoteUrl(subcategories[index].file);
+          if (localPath.isNotEmpty && !hasLocalFile) {
+            log("⚠️ Local path missing, fallback to remote URL: $localPath");
+          }
           log("Playing from URL: $playPath");
         }
 
-        await audioPlayer.setUrl(playPath);
+        if (isLocalSource) {
+          await audioPlayer.setFilePath(playPath);
+        } else {
+          await audioPlayer.setUrl(playPath);
+        }
         playingIs = -1;
 
         update();
@@ -545,13 +623,18 @@ class PronunciationLabSubController extends GetxController {
       }
       errorPlaying = -1;
     } on PlayerException catch (e) {
-      print("❌ Audio player error: ${e.message} ${subcategories[index].file}");
+      print(
+          "❌ Audio player error: ${e.message} | file=${subcategories[index].file} | localPath=${subcategories[index].localPath}");
       errorPlaying = index;
       currentlyPlayingIndex = null;
+      playingIs = -1;
     } on Exception catch (e) {
-      print("❌ General audio error: $e");
+      if (kDebugMode) {
+        print("❌ General audio error: $e");
+      }
       errorPlaying = index;
       currentlyPlayingIndex = null;
+      playingIs = -1;
     } finally {
       // loadingIndex = null;
       isPlaying = false;
@@ -582,7 +665,7 @@ class PronunciationLabSubController extends GetxController {
     await DBHelper.ensureTableExists(tableName);
 
     // Fetch local data
-    final localData = await DBHelper.getAllSubcategories(tableName);
+    final localData = await DBHelper.getAllSubcategoriesValidated(tableName);
     log("📥 Local has ${localData.length} items, Firebase has ${ogSubCategories.length}");
 
     final localFiles = localData.map((e) => e.file).toSet();
@@ -630,7 +713,7 @@ class PronunciationLabSubController extends GetxController {
     log("🔧 Duplicates removed, if any.");
 
     // 4️⃣ Reload final synced data
-    subcategories = await DBHelper.getAllSubcategories(tableName);
+    subcategories = await DBHelper.getAllSubcategoriesValidated(tableName);
 
     // ✅ Sort alphabetically by `text`
     // subcategories
@@ -711,7 +794,7 @@ class PronunciationLabSubController extends GetxController {
       }
     } else {
       // ✅ Mobile: Local DB first, fallback to Firebase
-      final localData = await DBHelper.getAllSubcategories(tableName);
+      final localData = await DBHelper.getAllSubcategoriesValidated(tableName);
 
       if (localData.isNotEmpty) {
         log('Loaded from local database for $id');
@@ -740,8 +823,10 @@ class PronunciationLabSubController extends GetxController {
 
           for (var item in category.subcategories) {
             String url = item.file;
-            print(
-                "$url printing the url for to show how the thing is start with http or not");
+            if (kDebugMode) {
+              print(
+                  "$url printing the url for to show how the thing is start with http or not");
+            }
 
             if (!url.startsWith("http")) {
               try {
@@ -749,7 +834,9 @@ class PronunciationLabSubController extends GetxController {
                     .ref(item.file)
                     .getDownloadURL();
               } catch (e) {
-                print("❌ Could not fetch URL for ${item.file}: $e");
+                if (kDebugMode) {
+                  print("❌ Could not fetch URL for ${item.file}: $e");
+                }
               }
             }
 

@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,7 +8,6 @@ import 'package:hotelmanagementapp/public/common_function.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/view/home.dart';
-import 'package:hotelmanagementapp/view/search_screen.dart';
 
 class CustomeBottomNavigation extends StatelessWidget {
   const CustomeBottomNavigation({
@@ -22,18 +20,19 @@ class CustomeBottomNavigation extends StatelessWidget {
         Get.find<BottomNavigationController>();
     return Padding(
       padding: EdgeInsets.only(
-          left: getWidgetWidth(width: 20),
-          right: getWidgetWidth(width: 20),
-          bottom: getWidgetHeight(height: 20)),
+        left: getWidgetWidth(width: 20),
+        right: getWidgetWidth(width: 20),
+        bottom: getWidgetHeight(height: 20),
+      ),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(kIsWeb ? 0.5 : 0.1),
-              blurRadius: 15,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.12),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -114,5 +113,37 @@ class CustomeBottomNavigation extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // ==================================================
+  // NAVIGATION LOGIC (UNTOUCHED)
+  // ==================================================
+  void _onTap(int index) {
+    stopTimerMainCategory();
+    log('BottomNavigationBar tapped: $index');
+
+    if (index == 0) {
+      currentIndex = index;
+      kIsWeb
+          ? Get.rootDelegate.offNamed(AppRoutes.home)
+          : Get.offAndToNamed(AppRoutes.home);
+    } else if (index == 1) {
+      kIsWeb
+          ? Get.rootDelegate.toNamed(AppRoutes.searchScreen)
+          : Get.toNamed(AppRoutes.searchScreen);
+    } else if (index == 2) {
+      currentIndex = index;
+      kIsWeb
+          ? Get.rootDelegate.toNamed(AppRoutes.simulation)
+          : Get.toNamed(AppRoutes.simulation);
+    } else if (index == 3) {
+      currentIndex = index;
+      setPathTitle('language-lab');
+      kIsWeb
+          ? Get.rootDelegate.toNamed(AppRoutes.languageLab)
+          : Get.toNamed(AppRoutes.languageLab);
+    }
+
+    setState(() {});
   }
 }

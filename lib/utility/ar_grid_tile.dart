@@ -60,6 +60,9 @@ class ARGridTile extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      SizedBox(
+                        height: 10,
+                      ),
                       Padding(
                         padding: EdgeInsets.symmetric(
                             horizontal: getWidgetWidth(width: 10)),

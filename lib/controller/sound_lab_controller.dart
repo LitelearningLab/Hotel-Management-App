@@ -421,7 +421,9 @@ class SoundLabController extends GetxController {
       errorPlaying = index;
       currentlyPlayingIndex = null;
     } on Exception catch (e) {
-      print("❌ General audio error: $e");
+      if (kDebugMode) {
+        print("❌ General audio error: $e");
+      }
       errorPlaying = index;
       currentlyPlayingIndex = null;
     } finally {

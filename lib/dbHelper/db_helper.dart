@@ -14,6 +14,14 @@ import 'package:http/http.dart' as http;
 class DBHelper {
   static Database? _db;
 
+  static String _sanitizeLocalPath(String path) {
+    final trimmed = path.trim();
+    if (trimmed.startsWith('file://')) {
+      return trimmed.replaceFirst('file://', '');
+    }
+    return trimmed;
+  }
+
   static Future<Database> get database async {
     if (_db != null) return _db!;
     _db = await initDB();
@@ -51,11 +59,22 @@ class DBHelper {
     await ensureTableExists(tableId);
 
     // Check if it already exists
-    final existing = await db.query(
+    final existingByFile = await db.query(
       '"$tableId"',
       where: 'file = ?',
       whereArgs: [item.file],
     );
+    List<Map<String, Object?>> existing = existingByFile;
+
+    // Fallback: backend file/url may change between sessions, so recover
+    // persisted localPath/downloadStatus using stable display text.
+    if (existing.isEmpty) {
+      existing = await db.query(
+        '"$tableId"',
+        where: 'LOWER(text) = ?',
+        whereArgs: [item.text.toLowerCase()],
+      );
+    }
 
     String localPath = item.localPath;
     int downloadStatus = item.downloadStatus ? 1 : 0;
@@ -64,6 +83,16 @@ class DBHelper {
       localPath = existing.first['localPath'] as String? ?? localPath;
       downloadStatus =
           existing.first['downloadStatus'] as int? ?? downloadStatus;
+    }
+
+    // If matched by text but file changed, remove stale row before inserting
+    // the new key to avoid duplicate records for the same word.
+    if (existingByFile.isEmpty && existing.isNotEmpty) {
+      await db.delete(
+        '"$tableId"',
+        where: 'LOWER(text) = ?',
+        whereArgs: [item.text.toLowerCase()],
+      );
     }
 
     await db.insert(
@@ -89,11 +118,20 @@ class DBHelper {
     await ensureTableExists(tableId);
 
     // Check if it already exists
-    final existing = await db.query(
+    final existingByFile = await db.query(
       '"$tableId"',
       where: 'file = ?',
       whereArgs: [item.file],
     );
+    List<Map<String, Object?>> existing = existingByFile;
+
+    if (existing.isEmpty) {
+      existing = await db.query(
+        '"$tableId"',
+        where: 'LOWER(text) = ?',
+        whereArgs: [item.text.toLowerCase()],
+      );
+    }
 
     String localPath = item.localPath;
     int downloadStatus = item.downloadStatus ? 1 : 0;
@@ -102,6 +140,14 @@ class DBHelper {
       localPath = existing.first['localPath'] as String? ?? localPath;
       downloadStatus =
           existing.first['downloadStatus'] as int? ?? downloadStatus;
+    }
+
+    if (existingByFile.isEmpty && existing.isNotEmpty) {
+      await db.delete(
+        '"$tableId"',
+        where: 'LOWER(text) = ?',
+        whereArgs: [item.text.toLowerCase()],
+      );
     }
 
     await db.insert(
@@ -208,6 +254,52 @@ class DBHelper {
     await ensureTableExists(id);
     final result = await db.rawQuery('SELECT * FROM "$id"');
     return result.map((e) => SubcategoryPro.fromMap(e)).toList();
+  }
+
+  static Future<List<SubcategoryPro>> getAllSubcategoriesValidated(
+      String id) async {
+    final db = await database;
+    await ensureTableExists(id);
+    final rows = await db.rawQuery('SELECT * FROM "$id"');
+    final items = rows.map((e) => SubcategoryPro.fromMap(e)).toList();
+
+    for (final item in items) {
+      final sanitizedPath = _sanitizeLocalPath(item.localPath);
+      final hasLocalFile =
+          sanitizedPath.isNotEmpty && await File(sanitizedPath).exists();
+
+      if (hasLocalFile) {
+        if (!item.downloadStatus || item.localPath != sanitizedPath) {
+          await db.update(
+            '"$id"',
+            {
+              'downloadStatus': 1,
+              'localPath': sanitizedPath,
+            },
+            where: 'file = ?',
+            whereArgs: [item.file],
+          );
+        }
+        item.downloadStatus = true;
+        item.localPath = sanitizedPath;
+      } else {
+        if (item.downloadStatus || item.localPath.isNotEmpty) {
+          await db.update(
+            '"$id"',
+            {
+              'downloadStatus': 0,
+              'localPath': '',
+            },
+            where: 'file = ?',
+            whereArgs: [item.file],
+          );
+        }
+        item.downloadStatus = false;
+        item.localPath = '';
+      }
+    }
+
+    return items;
   }
 
   static Future<List<Map<String, dynamic>>> getAllSoundcategories(

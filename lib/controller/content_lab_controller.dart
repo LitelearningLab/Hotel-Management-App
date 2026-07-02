@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:get/get.dart';
 import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -11,107 +11,99 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import '../public/common_function.dart';
 
 class ContentLabController extends GetxController {
+  /// ---------------- DATABASE ----------------
+  final database = FirebaseDatabase.instance;
+
+  /// ---------------- DATA ----------------
+  final List<Map<String, dynamic>> posts = []; // master list
+  List<Map<String, dynamic>> showPosts = []; // visible list
+
+  /// ---------------- STATE ----------------
+  bool isLoading = true;
+  bool isSearching = false;
+  bool filterApplied = false;
+
   String selectedSort = "Relevance (Default)";
-  late DataSnapshot snapshot;
-  List<WebViewController?> controllers = [];
-  List<bool> expandedDescriptions = [];
-  bool isloading = true;
-  bool controllerInitialized = false;
   String? selectedCategory;
   Set<String> selectedSubcategories = {};
-  DateTime? checkInDate;
-  DateTime? checkOutDate;
-  bool demoOptionSelected = false;
-  bool isSearching = false;
-  List<Map<String, dynamic>> showPosts = [];
-  TextEditingController searchController = TextEditingController();
-  bool filterApplied = false;
-  Set<String> likedVideoUrls = {};
-  List<Map<String, dynamic>> posts = [];
-  bool fetchMore = false;
-  final database = FirebaseDatabase.instance;
-  int _batchSize = 2;
-  int _currentIndex = 0;
-  bool isFetchingMore = false;
-  bool hasMorePosts = true;
-  String? _lastFetchedKey;
-  bool _hasMoreData = true;
-  List<YoutubePlayerController?> ytControllers = [];
 
-  ScrollController scrollController = ScrollController();
+  final TextEditingController searchController = TextEditingController();
+
+  /// ---------------- HELPERS ----------------
+  final List<WebViewController?> webControllers = [];
+  final List<YoutubePlayerController?> ytControllers = [];
+  final List<bool> expandedDescriptions = [];
+
+  final Set<String> likedVideoUrls = {};
+
+  /// ---------------- INIT ----------------
+  @override
+  void onReady() {
+    super.onReady();
+    mainCategoryTitle = "Content Library";
+    timestampIndex = 7;
+    subCategoryTitle = "";
+    activityName = "Content Library";
+    sessionName = "";
+    startTimerMainCategory("");
+    fetchPostsFromFirebase();
+  }
+
+  /// ---------------- FETCH ----------------
   Future<void> fetchPostsFromFirebase() async {
-    isloading = true;
-    _lastFetchedKey = null;
-    hasMorePosts = false; // Since we're loading everything at once
-    showPosts.clear();
-    posts.clear();
-    expandedDescriptions.clear();
-    controllers.clear();
+    isLoading = true;
     update();
+
+    posts.clear();
+    showPosts.clear();
 
     try {
       final ref = database.ref('ContentLibraryCollection');
-
-      // 🔄 No pagination - get all data
       final snapshot = await ref.orderByKey().get();
 
-      if (snapshot.exists) {
-        final data = snapshot.value as Map<dynamic, dynamic>;
-        final entries = data.entries.toList();
+      if (!snapshot.exists) return;
 
-        final List<Map<String, dynamic>> loadedPosts = [];
+      final raw = Map<dynamic, dynamic>.from(snapshot.value as Map);
 
-        for (final entry in entries) {
-          final postMap = Map<String, dynamic>.from(entry.value);
-          postMap['id'] = entry.key;
+      for (final entry in raw.entries) {
+        final map = Map<String, dynamic>.from(entry.value);
 
-          DateTime uploadDate;
-          try {
-            final rawDate = postMap['uploadDate'];
-            if (rawDate is String) {
-              uploadDate = DateTime.parse(rawDate);
-            } else if (rawDate is DateTime) {
-              uploadDate = rawDate;
-            } else {
-              uploadDate = DateTime.now();
-            }
-          } catch (_) {
-            uploadDate = DateTime.now();
-          }
-
-          loadedPosts.add({
-            ...postMap,
-            'uploadDate': uploadDate,
-            'isLike': false,
-            'likes': postMap['likes'] ?? 0,
-            'views': postMap['views'] ?? 0,
-            'description': postMap['description'] ?? '',
-            'category': postMap['category'] ?? '',
-            'subcategory': postMap['subcategory'] ?? '',
-          });
-        }
-
-        showPosts.addAll(loadedPosts);
-        posts.addAll(loadedPosts);
-        expandedDescriptions
-            .addAll(List<bool>.filled(loadedPosts.length, false));
-        controllers.addAll(List.filled(loadedPosts.length, null));
-
-        await loadLikedPosts();
+        posts.add({
+          ...map,
+          'id': entry.key,
+          'uploadDate': _parseDate(map['uploadDate']),
+          'likes': map['likes'] ?? 0,
+          'views': map['views'] ?? 0,
+          'isLike': false,
+          'description': map['description'] ?? '',
+          'category': map['category'] ?? '',
+          'subcategory': map['subcategory'] ?? '',
+        });
       }
+
+      await _loadLikedPosts();
+      _rebuildVisibleList();
     } catch (e) {
-      debugPrint("Error fetching all emergency posts: $e");
+      log("Fetch error: $e");
     }
 
-    isloading = false;
+    isLoading = false;
     update();
   }
 
-  Future<void> loadLikedPosts() async {
-    final prefs = await SharedPreferences.getInstance();
-    likedVideoUrls = prefs.getStringList('likedPosts')?.toSet() ?? {};
-    for (var post in showPosts) {
-      post['isLike'] = likedVideoUrls.contains(post['videoUrl']);
+  /// ---------------- CORE PIPELINE ----------------
+  void _rebuildVisibleList() {
+    List<Map<String, dynamic>> result = List.from(posts);
+
+    /// SEARCH
+    final q = searchController.text.trim().toLowerCase();
+    if (q.isNotEmpty) {
+      result = result.where((p) {
+        return p['title'].toString().toLowerCase().contains(q) ||
+            p['description'].toString().toLowerCase().contains(q) ||
+            p['category'].toString().toLowerCase().contains(q) ||
+            p['subcategory'].toString().toLowerCase().contains(q);
+      }).toList();
     }
 
     showPosts = [...posts];
@@ -128,123 +120,84 @@ class ContentLabController extends GetxController {
     sessionName2 = "";
     timestampIndex = 7;
 
-    startTimerMainCategory("");
-    fetchPostsFromFirebase();
-    // showPosts = posts;
-    // sortPosts();
-    // loadLikedPosts();
-    // expandedDescriptions = List.filled(showPosts.length, false);
-    // scrollController.addListener(() {
-    //   if (scrollController.position.pixels >=
-    //       scrollController.position.maxScrollExtent - 100) {
-    //     // fetchPostsFromFirebase(loadMore: true);
-    //   }
-    // });
+    if (selectedSubcategories.isNotEmpty) {
+      result = result
+          .where((p) => selectedSubcategories.contains(p['subcategory']))
+          .toList();
+    }
 
+    showPosts = result;
+
+    /// SORT (original behavior)
+    _applySort();
+
+    _syncHelpers();
+  }
+
+  /// ---------------- SEARCH ----------------
+  void applySearch(String _) {
+    isSearching = true;
+    _rebuildVisibleList();
     update();
   }
 
-  List<Map<String, dynamic>> searchPosts(String query) {
-    if (query.trim().isEmpty && !filterApplied) {
-      return posts;
-    } else {
-      _applyCategorySubcategoryFilter(
-          selectedCategory, selectedSubcategories.toList());
-    }
+  /// ---------------- CLEAR ALL ----------------
+  void clearAll() {
+    isSearching = false;
+    filterApplied = false;
 
-    final lowerQuery = query.toLowerCase().trim();
-    return showPosts.where((post) {
-      final category = post['category']?.toLowerCase() ?? '';
-      final subcategory = post['subcategory']?.toLowerCase() ?? '';
-      final description = post['description']?.toLowerCase() ?? '';
-      final title = post['title'] ?? "";
-      // final title = subcategory;
-      return category.contains(lowerQuery) ||
-          subcategory.contains(lowerQuery) ||
-          title.contains(lowerQuery) ||
-          description.contains(lowerQuery);
-    }).toList();
-  }
+    searchController.clear();
+    selectedCategory = null;
+    selectedSubcategories.clear();
+    selectedSort = "Relevance (Default)";
 
-  Future<void> toggleLike(Map<String, dynamic> post) async {
-    final prefs = await SharedPreferences.getInstance();
-    final videoUrl = post['videoUrl'];
-
-    // Toggle local like status
-    if (likedVideoUrls.contains(videoUrl)) {
-      likedVideoUrls.remove(videoUrl);
-      post['isLike'] = false;
-      post['likes'] = (post['likes'] ?? 1) - 1;
-    } else {
-      likedVideoUrls.add(videoUrl);
-      post['isLike'] = true;
-      post['likes'] = (post['likes'] ?? 0) + 1;
-    }
-
-    await prefs.setStringList('likedPosts', likedVideoUrls.toList());
-    try {
-      final data = snapshot.value;
-      if (data is List) {
-        for (int i = 0; i < data.length; i++) {
-          final item = data[i];
-          if (item == null || item is! Map) continue;
-
-          if (item['videoUrl'] == videoUrl) {
-            final postRef = database.ref('ContentLibraryCollection/$i');
-            await postRef.update({
-              'likes': post['likes'],
-            });
-            break;
-          }
-        }
-      } else {
-        debugPrint("Snapshot is not a List. Cannot update post.");
-      }
-    } catch (e) {
-      debugPrint("Error updating Firebase: $e");
-    }
-
+    _rebuildVisibleList();
     update();
   }
 
+  /// ---------------- SORT ----------------
   void sortPosts() {
-    isloading = true;
-    update();
-
-    if (selectedSort == "Relevance (Default)") {
-      // showPosts.shuffle();
-    } else if (selectedSort == "Most Liked") {
-      showPosts
-          .sort((a, b) => (b["likes"] as int).compareTo(a["likes"] as int));
-    } else if (selectedSort == "Recent Uploaded") {
-      showPosts.sort((a, b) =>
-          (b["uploadDate"] as DateTime).compareTo(a["uploadDate"] as DateTime));
-    }
-
-    controllers = [];
-    controllerInitialized = false;
-    expandedDescriptions = List.generate(showPosts.length, (_) => false);
-    controllers = List.filled(showPosts.length, null);
-
-    // // Delay WebViewController creation
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   controllers = showPosts.map((post) {
-    //     final embedUrl = convertToEmbedUrl(post["videoUrl"]);
-    //     debugPrint("Loading WebView for $embedUrl");
-    //     final controller = WebViewController()
-    //       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-    //       ..loadHtmlString(_buildHtmlForUrl(embedUrl));
-    //     return controller;
-    //   }).toList();
-    //   // Future.delayed(const Duration(seconds: 2), () {});
-    //   controllerInitialized = true;
-    //   isloading = false;
-    //   update();
-    // });
-    isloading = false;
+    _applySort();
+    _syncHelpers();
     update();
   }
 
+  void _applySort() {
+    if (selectedSort == "Most Liked") {
+      showPosts.sort(
+        (a, b) => (b['likes'] as int).compareTo(a['likes'] as int),
+      );
+    } else if (selectedSort == "Recent Uploaded") {
+      showPosts.sort(
+        (a, b) => (b['uploadDate'] as DateTime)
+            .compareTo(a['uploadDate'] as DateTime),
+      );
+    }
+  }
+
+  /// ---------------- FILTER ----------------
+  void applyCategorySubcategoryFilter(
+    String? category,
+    List<String> subcategories,
+  ) {
+    selectedCategory = category;
+    selectedSubcategories = subcategories.toSet();
+    filterApplied = true;
+
+    _rebuildVisibleList();
+    update();
+  }
+
+  void clearAllFilters() {
+    selectedCategory = null;
+    selectedSubcategories.clear();
+    filterApplied = false;
+
+    _rebuildVisibleList();
+    update();
+  }
+
+  /// ---------------- SORT SHEET ----------------
   void openSortBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -252,115 +205,82 @@ class ContentLabController extends GetxController {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<String>(
-                title: Text(
-                  "Relevance (Default)",
-                  style: TextStyle(
-                    fontSize: kText.scale(14),
-                  ),
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _sortTile(
+                  title: "Relevance (Default)",
+                  value: "Relevance (Default)",
+                  // setSheetState: setSheetState,
+                  sheetContext: context,
                 ),
-                value: "Relevance (Default)",
-                groupValue: selectedSort,
-                activeColor: linearColor,
-                onChanged: (value) {
-                  selectedSort = value!;
-                  sortPosts();
-                  Navigator.pop(context);
-                  update();
-                }),
-            RadioListTile<String>(
-                title: Text(
-                  "Most Liked",
-                  style: TextStyle(
-                    fontSize: kText.scale(14),
-                  ),
+                _sortTile(
+                  title: "Most Liked",
+                  value: "Most Liked",
+                  // setSheetState: setSheetState,
+                  sheetContext: context,
                 ),
-                value: "Most Liked",
-                groupValue: selectedSort,
-                activeColor: linearColor,
-                onChanged: (value) {
-                  selectedSort = value!;
-                  sortPosts();
-                  Navigator.pop(context);
-                }),
-            RadioListTile<String>(
-                title: Text(
-                  "Recent Uploaded",
-                  style: TextStyle(
-                    fontSize: kText.scale(14),
-                  ),
+                _sortTile(
+                  title: "Recent Uploaded",
+                  value: "Recent Uploaded",
+                  // setSheetState: setSheetState,
+                  sheetContext: context,
                 ),
-                value: "Recent Uploaded",
-                groupValue: selectedSort,
-                activeColor: linearColor,
-                onChanged: (value) {
-                  selectedSort = value!;
-                  sortPosts();
-                  Navigator.pop(context);
-                }),
-          ],
-        ),
-      ),
+                const SizedBox(height: 8),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
-  Future<void> refreshPosts() async {
-    clearAll();
+  Widget _sortTile({
+    required String title,
+    required String value,
+    required BuildContext sheetContext,
+  }) {
+    return RadioListTile<String>(
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: kText.scale(14),
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      value: value,
+      groupValue: selectedSort,
+      activeColor: linearColor,
+      onChanged: (val) async {
+        if (val == null || val == selectedSort) return;
 
-    // await fetchPostsFromFirebase();
-    update();
+        // ✅ 1. Close sheet first (VERY IMPORTANT)
+        Navigator.pop(sheetContext);
+
+        // ✅ 2. Show loader in main UI
+        isLoading = true;
+        update();
+
+        // ✅ 3. Let UI paint loader
+        await Future.delayed(const Duration(milliseconds: 80));
+
+        // ✅ 4. Update state
+        selectedSort = val;
+
+        // ✅ 5. FULL rebuild (safe)
+        _rebuildVisibleList();
+
+        // ✅ 6. Hide loader
+        isLoading = false;
+        update();
+      },
+    );
   }
 
-  clearAllFilters() {
-    isloading = true;
-    update();
-    if (filterApplied) {
-      filterApplied = false;
-
-      selectedCategory = null;
-      selectedSubcategories.clear();
-
-      if (searchController.text.isEmpty) {
-        showPosts = posts;
-      }
-
-      sortPosts();
-
-      // controllers = showPosts.map((post) {
-      //   final embedUrl = convertToEmbedUrl(post["videoUrl"]);
-      //   debugPrint("Loading WebView for $embedUrl");
-
-      //   final controller = WebViewController()
-      //     ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      //     ..loadHtmlString(_buildHtmlForUrl(embedUrl));
-      //   return controller;
-      // }).toList();
-
-      update();
-    }
-    isloading = false;
-    update();
-  }
-
-  clearAll() async {
-    isloading = true;
-    update();
-
-    isSearching = false;
-    searchController.clear();
-    clearAllFilters();
-    selectedSort = "Relevance (Default)";
-    sortPosts();
-    await Future.delayed(Duration(seconds: 2));
-    isloading = false;
-    update();
-  }
-
+  /// ---------------- FILTER SHEET ----------------
   void openFilterBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -370,327 +290,166 @@ class ContentLabController extends GetxController {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (_) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            final categories = searchController.text.isNotEmpty
-                ? showPosts
-                    .map((post) => post["category"] as String)
-                    .toSet()
-                    .toList()
-                : posts
-                    .map((post) => post["category"] as String)
-                    .toSet()
-                    .toList();
+        final categories =
+            posts.map((p) => p['category'] as String).toSet().toList();
 
-            final subcategories = selectedCategory != null
-                ? searchController.text.isNotEmpty
-                    ? showPosts
-                        .where((post) => post["category"] == selectedCategory)
-                        .map((post) => post["subcategory"] as String)
-                        .toSet()
-                        .toList()
-                    : posts
-                        .where((post) => post["category"] == selectedCategory)
-                        .map((post) => post["subcategory"] as String)
-                        .toSet()
-                        .toList()
-                : [];
+        final subcategories = selectedCategory == null
+            ? <String>[]
+            : posts
+                .where((p) => p['category'] == selectedCategory)
+                .map((p) => p['subcategory'] as String)
+                .toSet()
+                .toList();
 
-            return Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: getWidgetWidth(width: 16),
-                vertical: getWidgetHeight(height: 10),
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("Category"),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: categories.map((c) {
+                  return ChoiceChip(
+                    label: Text(c),
+                    selected: selectedCategory == c,
+                    selectedColor: linearColor,
+                    onSelected: (_) {
+                      selectedCategory = c;
+                      selectedSubcategories.clear();
+                      update();
+                    },
+                  );
+                }).toList(),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              if (selectedCategory != null) ...[
+                const SizedBox(height: 20),
+                const Text("Subcategory"),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: subcategories.map((s) {
+                    return FilterChip(
+                      label: Text(s),
+                      selected: selectedSubcategories.contains(s),
+                      selectedColor: linearColor,
+                      onSelected: (_) {
+                        selectedSubcategories.contains(s)
+                            ? selectedSubcategories.remove(s)
+                            : selectedSubcategories.add(s);
+                        update();
+                      },
+                    );
+                  }).toList(),
+                ),
+              ],
+              const SizedBox(height: 24),
+              Row(
                 children: [
-                  Text(
-                    "Category",
-                    style: TextStyle(
-                      fontSize: kText.scale(12),
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[400],
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        clearAllFilters();
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Clear"),
                     ),
                   ),
-                  SizedBox(height: getWidgetHeight(height: 10)),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: categories.map((category) {
-                      final isSelected = selectedCategory == category;
-
-                      return GestureDetector(
-                        onTap: () {
-                          setModalState(() {
-                            selectedCategory = category;
-                            selectedSubcategories.clear();
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                offset: const Offset(0, 4),
-                                blurRadius: 10,
-                              ),
-                            ],
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: getWidgetWidth(width: 10),
-                              vertical: getWidgetHeight(height: 8),
-                            ),
-                            decoration: BoxDecoration(
-                              color: selectedCategory == category
-                                  ? linearColor
-                                  : Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Text(
-                              category,
-                              style: TextStyle(
-                                color: selectedCategory == category
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  SizedBox(height: getWidgetHeight(height: 20)),
-                  if (selectedCategory != null) ...[
-                    Text(
-                      "Subcategory",
-                      style: TextStyle(
-                        fontSize: kText.scale(12),
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[400],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: linearColor,
                       ),
+                      onPressed: () {
+                        _rebuildVisibleList();
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Apply"),
                     ),
-                    SizedBox(height: getWidgetHeight(height: 12)),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: subcategories.map((subcategory) {
-                        final isChecked =
-                            selectedSubcategories.contains(subcategory);
-                        return GestureDetector(
-                          onTap: () {
-                            setModalState(() {
-                              if (isChecked) {
-                                selectedSubcategories.remove(subcategory);
-                              } else {
-                                selectedSubcategories.add(subcategory);
-                              }
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  offset: const Offset(0, 4),
-                                  blurRadius: 10,
-                                ),
-                              ],
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: getWidgetWidth(width: 10),
-                                vertical: getWidgetHeight(height: 8),
-                              ),
-                              decoration: BoxDecoration(
-                                color: isChecked ? linearColor : Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Text(
-                                subcategory,
-                                style: TextStyle(
-                                  color:
-                                      isChecked ? Colors.white : Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                  SizedBox(height: getWidgetHeight(height: 30)),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {
-                            setModalState(() {
-                              clearAllFilters();
-                            });
-                            Navigator.pop(context);
-                          },
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            elevation: 0,
-                            shadowColor: Colors.transparent,
-                          ),
-                          child: const Text(
-                            "Clear",
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: getWidgetWidth(width: 12)),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _applyCategorySubcategoryFilter(
-                              selectedCategory,
-                              selectedSubcategories.toList(),
-                            );
-                            filterApplied = true;
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: linearColor,
-                            shadowColor: Colors.white,
-                            elevation: 4,
-                          ),
-                          child: const Text(
-                            "Apply",
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
-              ),
-            );
-          },
+              )
+            ],
+          ),
         );
       },
     );
   }
 
-  void _applyCategorySubcategoryFilter(
-      String? category, List<String> subcategories) {
-    List<Map<String, dynamic>> filtered = posts;
+  /// ---------------- LIKE ----------------
+  Future<void> toggleLike(Map<dynamic, dynamic> post) async {
+    final prefs = await SharedPreferences.getInstance();
+    final url = post['videoUrl'];
 
-    if (category != null) {
-      filtered =
-          filtered.where((post) => post['category'] == category).toList();
+    if (likedVideoUrls.contains(url)) {
+      likedVideoUrls.remove(url);
+      post['isLike'] = false;
+      post['likes']--;
+    } else {
+      likedVideoUrls.add(url);
+      post['isLike'] = true;
+      post['likes']++;
     }
 
-    if (subcategories.isNotEmpty) {
-      filtered = filtered
-          .where((post) => subcategories.contains(post['subcategory']))
-          .toList();
-    }
-
-    showPosts = filtered;
-    // controllers = filtered.map((post) {
-    //   final embedUrl = convertToEmbedUrl(post["videoUrl"]);
-    //   final controller = WebViewController()
-    //     ..setJavaScriptMode(JavaScriptMode.unrestricted)
-    //     ..loadHtmlString(_buildHtmlForUrl(embedUrl));
-    //   return controller;
-    // }).toList();
-    controllers = List.filled(showPosts.length, null);
-    // Optionally, reset or update expandedDescriptions too
-    expandedDescriptions = List.generate(showPosts.length, (_) => false);
+    await prefs.setStringList('likedPosts', likedVideoUrls.toList());
     update();
   }
 
+  Future<void> _loadLikedPosts() async {
+    final prefs = await SharedPreferences.getInstance();
+    likedVideoUrls.addAll(prefs.getStringList('likedPosts') ?? []);
+    for (final p in posts) {
+      p['isLike'] = likedVideoUrls.contains(p['videoUrl']);
+    }
+  }
+
+  /// ---------------- HELPERS ----------------
+  void _syncHelpers() {
+    _resize<WebViewController?>(webControllers, null);
+    _resize<YoutubePlayerController?>(ytControllers, null);
+    _resize<bool>(expandedDescriptions, false);
+  }
+
+  void _resize<T>(List<T?> list, T? fill) {
+    while (list.length < showPosts.length) {
+      list.add(fill);
+    }
+
+    if (list.length > showPosts.length) {
+      list.removeRange(showPosts.length, list.length);
+    }
+  }
+
+  DateTime _parseDate(dynamic raw) {
+    try {
+      if (raw is String) return DateTime.parse(raw);
+      if (raw is DateTime) return raw;
+    } catch (_) {}
+    return DateTime.now();
+  }
+
+  /// ---------------- VIDEO ----------------
   String convertToEmbedUrl(String url) {
     final uri = Uri.parse(url);
-
     if (uri.host.contains("youtu.be")) {
-      // https://youtu.be/VIDEO_ID
-      final videoId = uri.pathSegments.first;
-      return "https://www.youtube.com/embed/$videoId";
-    } else if (uri.host.contains("youtube.com") &&
-        uri.queryParameters.containsKey("v")) {
-      // https://www.youtube.com/watch?v=VIDEO_ID
+      return "https://www.youtube.com/embed/${uri.pathSegments.first}";
+    }
+    if (uri.queryParameters.containsKey("v")) {
       return "https://www.youtube.com/embed/${uri.queryParameters['v']}";
     }
-
-    return url; // fallback
+    return url;
   }
 
-  String buildHtmlForUrl(String url) {
-    return '''
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <style>
-            html, body {
-              margin: 0;
-              padding: 0;
-              height: 100%;
-              background-color: black;
-            }
-            iframe {
-              display: block;
-              width: 100%;
-              height: 100%;
-              border: none;
-            }
-          </style>
-        </head>
-        <body>
-          <iframe 
-            src="$url" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            allowfullscreen>
-          </iframe>
-        </body>
-      </html>
-    ''';
-  }
-
-  String formatTimeAgo(DateTime dateTime) {
-    final now = DateTime.now();
-    final diff = now.difference(dateTime);
-
-    if (diff.inSeconds < 60) {
-      final seconds = diff.inSeconds;
-      return '$seconds${seconds == 1 ? 'second' : 'seconds'} ago';
-    }
-
-    if (diff.inMinutes < 60) {
-      final minutes = diff.inMinutes;
-      return '$minutes${minutes == 1 ? 'minute' : 'minutes'} ago';
-    }
-
-    if (diff.inHours < 24) {
-      final hours = diff.inHours;
-      return '$hours${hours == 1 ? 'hour' : 'hours'} ago';
-    }
-
-    if (diff.inDays < 30) {
-      final days = diff.inDays;
-      return '$days${days == 1 ? 'day' : 'days'} ago';
-    }
-
-    if (diff.inDays < 365) {
-      final months = (diff.inDays / 30).floor();
-      return '$months${months == 1 ? 'month' : 'months'} ago';
-    }
-
-    final years = (diff.inDays / 365).floor();
-    return '$years${years == 1 ? 'year' : 'years'} ago';
-  }
-
-  String truncateText(String text, int maxChars) {
-    if (text.length <= maxChars) return text;
-    return "${text.substring(0, maxChars).trim()}...";
+  String formatTimeAgo(DateTime d) {
+    final diff = DateTime.now().difference(d);
+    if (diff.inMinutes < 1) return "${diff.inSeconds}s ago";
+    if (diff.inHours < 1) return "${diff.inMinutes}m ago";
+    if (diff.inDays < 1) return "${diff.inHours}h ago";
+    if (diff.inDays < 30) return "${diff.inDays}d ago";
+    if (diff.inDays < 365) return "${(diff.inDays / 30).floor()}mo ago";
+    return "${(diff.inDays / 365).floor()}y ago";
   }
 }

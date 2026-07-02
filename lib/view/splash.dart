@@ -25,16 +25,6 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    // Delay until build completes
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final results = await Connectivity().checkConnectivity();
-      bool isConnected = results.any((e) => e != ConnectivityResult.none);
-
-      if (!isConnected) {
-        Get.toNamed(AppRoutes.noInternet);
-        return;
-      }
-    });
     // FirebaseUploader firebaseUploader = FirebaseUploader();
     // firebaseUploader.uploadJsonData(
     //     'assets/EnglishLab.json', 'FrenchLabCollection');
@@ -53,9 +43,14 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> startTimer() async {
-    // Check internet at app launch
-    final connectivity = await Connectivity().checkConnectivity();
-    bool hasInternet = connectivity.any((e) => e != ConnectivityResult.none);
+    // Check internet at app launch with retry to avoid transient iOS false offline.
+    bool hasInternet = false;
+    for (int attempt = 0; attempt < 3; attempt++) {
+      final connectivity = await Connectivity().checkConnectivity();
+      hasInternet = connectivity.any((e) => e != ConnectivityResult.none);
+      if (hasInternet) break;
+      await Future.delayed(const Duration(milliseconds: 700));
+    }
 
     if (!hasInternet) {
       // Go to No Internet screen immediately
@@ -69,10 +64,19 @@ class _SplashScreenState extends State<SplashScreen>
     final email = prefs.getString('email');
     final password = prefs.getString('password');
 
-    print('B - Email: $email');
-    print('C - Password: $password');
+    // CRITICAL: Log the state immediately after fetching data
+    if (kDebugMode) {
+      print(
+          'B - SharedPreferences Check: Email is: ${email != null ? 'SET (${email.length} chars) $email' : 'NULL'}'); // Log B
+      print(
+          'C - SharedPreferences Check: Password is: ${password != null ? 'SET (${password.length} chars) $password' : 'NULL'}'); // Log C
+    }
 
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(Duration(seconds: 2)); // Wait for the splash animation
+
+    if (kDebugMode) {
+      print("D - DELAY FINISHED. Navigating now."); // Log D
+    }
 
     if (email != null && password != null) {
       bool session = true;
@@ -80,7 +84,9 @@ class _SplashScreenState extends State<SplashScreen>
       if (kIsWeb) {
         session = await SessionService.loginUser(email, password);
       }
-
+      if (kDebugMode) {
+        print('E - Conditional check TRUE: Navigating to HOME'); // Log E
+      }
       if (session) {
         kIsWeb
             ? Get.rootDelegate.offNamed(AppRoutes.home)
@@ -96,6 +102,9 @@ class _SplashScreenState extends State<SplashScreen>
         );
       }
     } else {
+      if (kDebugMode) {
+        print('F - Conditional check FALSE: Navigating to LOGIN'); // Log F
+      }
       kIsWeb
           ? Get.rootDelegate.offNamed(AppRoutes.login)
           : Get.offAllNamed(AppRoutes.login);

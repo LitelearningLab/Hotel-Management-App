@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
+import 'dart:io' show Platform; // Use specific import
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -22,7 +22,7 @@ import 'package:url_launcher/url_launcher.dart';
 class HomeController extends GetxController {
   List<dynamic> categories = [];
   late UniversityModel universityModel;
-  late String userName;
+  String userName = '';
   List<Map<String, dynamic>> homeRecentHistory = [];
   bool recentHistoryLoaded = true;
   OverlayEntry? _bottomMessageEntry;
@@ -103,11 +103,24 @@ class HomeController extends GetxController {
     final jsonString = prefs.getString('recentHistory');
 
     if (jsonString != null) {
-      final List<dynamic> decoded = jsonDecode(jsonString);
-      recentHistory = decoded
-          .map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e))
-          .toList();
-      homeRecentHistory = recentHistory;
+      try {
+        final decoded = jsonDecode(jsonString);
+        if (decoded is List) {
+          recentHistory = decoded
+              .whereType<Map>()
+              .map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e))
+              .toList();
+          homeRecentHistory = recentHistory;
+        } else {
+          recentHistory = [];
+          homeRecentHistory = [];
+        }
+      } catch (e) {
+        log("Invalid recentHistory payload. Clearing local cache: $e");
+        recentHistory = [];
+        homeRecentHistory = [];
+        await prefs.remove('recentHistory');
+      }
     }
 
     recentHistoryLoaded = false;
@@ -211,7 +224,7 @@ class HomeController extends GetxController {
   }
 
   Future<void> fetchCollegeSyllabus() async {
-    await loadRecentHistory();
+    loadRecentHistory();
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString("userId") ?? "";
     userName = prefs.getString("userName") ?? "";
@@ -396,24 +409,26 @@ class HomeController extends GetxController {
   }
 
   Future<void> openAppStore() async {
+    if (kIsWeb) return;
+
     const androidAppId = "com.profluent.hotelier.app";
     const iosAppUrl =
         "https://apps.apple.com/in/app/profluent-hotelier/id6754444749";
 
-    if (Platform.isAndroid) {
-      final url = Uri.parse("market://details?id=$androidAppId");
-      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-        // Fallback to web Play Store if Play Store not found
-        final webUrl = Uri.parse(
-            "https://play.google.com/store/apps/details?id=$androidAppId");
-        await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+    try {
+      if (Platform.isAndroid) {
+        final url = Uri.parse("market://details?id=$androidAppId");
+        if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+          final webUrl = Uri.parse(
+              "https://play.google.com/store/apps/details?id=$androidAppId");
+          await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+        }
+      } else if (Platform.isIOS) {
+        final url = Uri.parse(iosAppUrl);
+        await launchUrl(url, mode: LaunchMode.externalApplication);
       }
-    } else if (Platform.isIOS) {
-      final url = Uri.parse(iosAppUrl);
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
-      // optional fallback for other platforms
-      print("Unsupported platform");
+    } catch (e) {
+      debugPrint("Store link error: $e");
     }
   }
 

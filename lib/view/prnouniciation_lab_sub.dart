@@ -20,6 +20,7 @@ import 'package:hotelmanagementapp/utility/boom_menu.dart';
 
 import 'package:hotelmanagementapp/utility/boom_menu_item.dart' as bm;
 import 'package:hotelmanagementapp/utility/custome_bottom_navigation.dart';
+import 'package:hotelmanagementapp/view/home.dart';
 
 import '../utility/boom_menu_item.dart';
 import '../utility/boom_menu_item.dart';
@@ -44,6 +45,10 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
     return GetBuilder<PronunciationLabSubController>(builder: (controller) {
       return PopScope(
         onPopInvoked: (didPop) {
+          subCategoryTitle = controller.title;
+          activityName = "Pronunciation Lab";
+          mainCategoryTitle = controller.mainCategoryTitle;
+          timestampIndex = controller.index;
           stopTimerMainCategory();
         },
         child: Scaffold(
@@ -52,7 +57,7 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
               FloatingActionButtonLocation.centerDocked,
           floatingActionButton: Align(
             alignment: Alignment.bottomCenter,
-            child: CustomeBottomNavigation(),
+            child: kIsWeb ? null : CustomeBottomNavigation(),
           ),
           appBar: AppBar(
             forceMaterialTransparency: true,
@@ -61,185 +66,256 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
             backgroundColor: Colors.white,
             titleSpacing: 0,
             title: controller.isSearching
-                ? TextField(
-                    cursorColor: Colors.grey,
-                    controller: controller.searchController,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      hintText: 'Search...',
-                      border: InputBorder.none,
-                      hintStyle: TextStyle(color: Colors.grey),
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 50),
+                    child: SizedBox(
+                      height: 44,
+                      child: TextField(
+                        controller: controller.searchController,
+                        autofocus: true,
+                        cursorColor: Colors.black,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Search...',
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 14,
+                          ),
+
+                          /// 🔍 Left icon
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            size: 18,
+                            color: Colors.grey,
+                          ),
+
+                          /// ❌ Clear button
+                          suffixIcon:
+                              controller.searchController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(
+                                        Icons.close,
+                                        size: 18,
+                                        color: Colors.grey,
+                                      ),
+                                      onPressed: () {
+                                        controller.searchController.clear();
+                                        controller.clearSearch();
+                                        controller.update();
+                                      },
+                                    )
+                                  : null,
+
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 10),
+
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE0E0E0),
+                              width: 1,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.black54,
+                              width: 1.2,
+                            ),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          controller.searchSubcategories(value);
+                          controller.update();
+                        },
+                      ),
                     ),
-                    onChanged: (value) {
-                      controller
-                          .searchSubcategories(value); // Your search logic
-                    },
                   )
-                : Padding(
-                    padding: EdgeInsets.only(right: getWidgetWidth(width: 12)),
+                : Container(
+                    height: 56,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFFEDEDED)),
+                    ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Flexible(
+                        /// ---------------- LEFT: BACK / CLOSE ----------------
+                        IconButton(
+                          onPressed: () {
+                            if (controller.isSearching) {
+                              controller.isSearching = false;
+                              controller.searchController.clear();
+                              controller.clearSearch();
+                              controller.update();
+                            } else {
+                              subCategoryTitle = controller.title;
+                              activityName = "Pronunciation Lab";
+                              mainCategoryTitle = controller.mainCategoryTitle;
+                              timestampIndex = controller.index;
+
+                              stopTimerMainCategory();
+                              if (kIsWeb) {
+                                final box = GetStorage();
+
+                                if (controller.id != "") {
+                                  final saved =
+                                      box.read(AppRoutes.frontOfficeStoreKey) ??
+                                          {};
+                                  Get.rootDelegate.offNamed(
+                                    AppRoutes.frontOffice,
+                                    arguments: {
+                                      'title': saved['title'] ?? "Front Office",
+                                      'image': saved['image'],
+                                      'index': saved['index'],
+                                    },
+                                  );
+                                } else {
+                                  final saved =
+                                      box.read(AppRoutes.pronunciationLab) ??
+                                          {};
+                                  Get.rootDelegate.offNamed(
+                                    AppRoutes.pronunciationLab,
+                                    arguments: {
+                                      'title':
+                                          saved['title'] ?? "Pronunciation Lab",
+                                    },
+                                  );
+                                }
+                              } else {
+                                Navigator.pop(context);
+                              }
+                            }
+                          },
+                          icon: Icon(
+                            controller.isSearching
+                                ? Icons.close
+                                : Icons.arrow_back,
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        /// ---------------- TITLE ----------------
+                        Expanded(
                           child: Text(
                             controller.title,
-                            maxLines: 2,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: kText.scale(isKwidth > 700 ? 20 : 18),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
-                        // Spacer(),
-                        kIsWeb
-                            ? Spacer()
-                            : SizedBox(
-                                width: 5,
+
+                        /// ---------------- RIGHT ACTIONS ----------------
+                        Row(
+                          children: [
+                            /// Play 3 times
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () {
+                                if (controller.isPlayingThree) return;
+                                controller.isPlayingThree = true;
+                                controller.isPlayingOne = false;
+                                controller.playThreeTimes();
+                                controller.update();
+                              },
+                              icon: Image.asset(
+                                AllAssets.playThree,
+                                height: 32,
                               ),
-                        SizedBox(
-                          width: getWidgetWidth(width: 30),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              if (controller.isPlayingThree) return;
-                              controller.isPlayingThree = true;
-                              controller.isPlayingOne = false;
-                              controller.playThreeTimes();
-                              controller.update();
-                            },
-                            icon: Image.asset(
-                              AllAssets.playThree,
-                              height: 35,
-                              // width: 25,
                             ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        SizedBox(
-                          width: getWidgetWidth(width: 30),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              if (controller.isPlayingOne) return;
-                              controller.playOneTime();
-                              controller.isPlayingOne = true;
-                              controller.isPlayingThree = false;
-                              controller.update();
-                            },
-                            icon: Image.asset(
-                              AllAssets.playOne,
-                              height: 35,
-                              // width: 25,
+
+                            const SizedBox(width: 8),
+
+                            /// Play once
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () {
+                                if (controller.isPlayingOne) return;
+                                controller.playOneTime();
+                                controller.isPlayingOne = true;
+                                controller.isPlayingThree = false;
+                                controller.update();
+                              },
+                              icon: Image.asset(
+                                AllAssets.playOne,
+                                height: 32,
+                              ),
                             ),
-                          ),
+
+                            const SizedBox(width: 12),
+
+                            /// MENU
+                            kIsWeb
+                                ? IconButton(
+                                    onPressed: () {
+                                      controller.isSearching = true;
+                                      controller.update();
+                                    },
+                                    icon: Icon(Icons.search),
+                                  )
+                                : PopupMenuButton<String>(
+                                    padding: EdgeInsets.zero,
+                                    color: Colors.white,
+                                    onSelected: (value) {
+                                      controller.selectedMenuOption = value;
+
+                                      if (value == 'priority') {
+                                        controller.applyDownloadedFilter(true);
+                                      } else if (value == 'all_priority') {
+                                        controller.applyDownloadedFilter(false);
+                                      } else if (value == 'search') {
+                                        controller.isSearching = true;
+                                      }
+
+                                      controller.update();
+                                    },
+                                    itemBuilder: (context) => [
+                                      PopupMenuItem<String>(
+                                        value: 'search',
+                                        child: Text(
+                                          'Search',
+                                          style: TextStyle(
+                                            fontWeight:
+                                                controller.selectedMenuOption ==
+                                                        'search'
+                                                    ? FontWeight.w600
+                                                    : FontWeight.normal,
+                                          ),
+                                        ),
+                                      ),
+                                      if (!kIsWeb)
+                                        PopupMenuItem<String>(
+                                          value: 'priority',
+                                          child: Text(
+                                            'Filter Priority',
+                                            style: TextStyle(
+                                              fontWeight: controller
+                                                          .selectedMenuOption ==
+                                                      'priority'
+                                                  ? FontWeight.w600
+                                                  : FontWeight.normal,
+                                            ),
+                                          ),
+                                        ),
+                                      if (!kIsWeb)
+                                        const PopupMenuItem<String>(
+                                          value: 'all_priority',
+                                          child: Text('Clear Filter'),
+                                        ),
+                                    ],
+                                  ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-            leading: IconButton(
-              onPressed: () {
-                if (controller.isSearching) {
-                  controller.isSearching = false;
-                  controller.searchController.clear();
-                  controller.clearSearch();
-                  controller.update();
-                } else {
-                  if (kIsWeb) {
-                    final box = GetStorage();
-
-                    if (controller.id != "") {
-                      final saved = box.read(AppRoutes.frontOffice) ?? {};
-                      Get.rootDelegate
-                          .offNamed(AppRoutes.frontOffice, arguments: {
-                        'title': saved['title'] ?? "Front Office",
-                        'image': saved['image'],
-                        'index': saved['index'],
-                      });
-                    } else {
-                      final saved = box.read(AppRoutes.pronunciationLab) ?? {};
-                      Get.rootDelegate
-                          .offNamed(AppRoutes.pronunciationLab, arguments: {
-                        'title': saved['title'] ?? "Pronunciation Lab",
-                      });
-                      debugPrint("No data found in storage for front office");
-                    }
-                  } else {
-                    Navigator.pop(context);
-                  }
-                }
-              },
-              icon:
-                  Icon(controller.isSearching ? Icons.close : Icons.arrow_back),
-            ),
-            actions: [
-              SizedBox(
-                width: getWidgetWidth(width: 30),
-                child: PopupMenuButton<String>(
-                  padding: EdgeInsets.zero,
-                  color: Colors.white,
-                  onSelected: (value) {
-                    controller.selectedMenuOption = value;
-
-                    if (value == 'Filter Priority') {
-                      controller.subTitle = "Filter Priority";
-                      controller.applyDownloadedFilter(true);
-                    } else if (value == 'clear') {
-                      controller.applyDownloadedFilter(false);
-                      controller.subTitle = null;
-                    } else if (value == 'search') {
-                      controller.isSearching = true;
-                    }
-
-                    controller.update();
-                  },
-                  itemBuilder: (BuildContext context) => [
-                    PopupMenuItem<String>(
-                      value: 'search',
-                      child: Text(
-                        'Search',
-                        style: TextStyle(
-                          fontWeight: controller.selectedMenuOption == 'search'
-                              ? FontWeight.w600
-                              : FontWeight.normal,
-                          color: controller.selectedMenuOption == 'search'
-                              ? Colors.black
-                              : Colors.grey[800],
-                        ),
-                      ),
-                    ),
-                    if (!kIsWeb)
-                      PopupMenuItem<String>(
-                        value: 'Filter Priority',
-                        child: Text(
-                          'Filter Priority',
-                          style: TextStyle(
-                            fontWeight:
-                                controller.selectedMenuOption == 'priority'
-                                    ? FontWeight.w600
-                                    : FontWeight.normal,
-                            color: controller.selectedMenuOption == 'priority'
-                                ? Colors.black
-                                : Colors.grey[800],
-                          ),
-                        ),
-                      ),
-                    if (!kIsWeb)
-                      PopupMenuItem<String>(
-                        value: 'clear',
-                        child: Text(
-                          'Clear Filter',
-                          style: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
           ),
           body: controller.isLoading
               ? Center(
@@ -333,235 +409,229 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
 
                                         return Column(
                                           children: [
-                                            GestureDetector(
-                                              onTap: () async {
-                                                // await controller
-                                                //     .scrollToIndex(180);
-                                                controller.expandedIndex =
-                                                    isExpanded ? -1 : index;
-                                                controller.update();
-                                              },
-                                              child: Container(
-                                                width:
-                                                    getWidgetWidth(width: 375),
-                                                // height: getWidgetHeight(height: 60),
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.black
-                                                          .withOpacity(0.1),
-                                                      offset:
-                                                          const Offset(0, 4),
-                                                      blurRadius: 10,
-                                                    ),
-                                                  ],
-                                                ),
+                                            _HoverCard(
+                                              child: GestureDetector(
+                                                onTap: () async {
+                                                  // await controller
+                                                  //     .scrollToIndex(180);
+                                                  controller.expandedIndex =
+                                                      isExpanded ? -1 : index;
+                                                  controller.update();
+                                                },
                                                 child: Container(
                                                   width: getWidgetWidth(
                                                       width: 375),
-                                                  // height: getWidgetHeight(height: 75),
+                                                  // height: getWidgetHeight(height: 60),
+                                                  margin: const EdgeInsets
+                                                      .symmetric(vertical: 5),
                                                   decoration: BoxDecoration(
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             12),
-                                                    color: Colors.white,
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withOpacity(0.1),
+                                                        offset:
+                                                            const Offset(0, 4),
+                                                        blurRadius: 10,
+                                                      ),
+                                                    ],
                                                   ),
-                                                  child: Padding(
-                                                    padding: EdgeInsets.symmetric(
-                                                        vertical: displayWidth(
-                                                                    context) >
-                                                                500
-                                                            ? displayHeight(
-                                                                    context) *
-                                                                0.02
-                                                            : getWidgetHeight(
-                                                                height: 6),
-                                                        horizontal: displayWidth(
-                                                                    context) >
-                                                                500
-                                                            ? displayWidth(
-                                                                    context) *
-                                                                0.01
-                                                            : getWidgetWidth(
-                                                                width: 10)),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Row(
-                                                          children: [
-                                                            // (controller.loadingIndex == index)
-                                                            //     ? SizedBox(
-                                                            //         height: getWidgetHeight(
-                                                            //             height: 25),
-                                                            //         width:
-                                                            //             getWidgetWidth(width: 25),
-                                                            //         child: Padding(
-                                                            //           padding:
-                                                            //               const EdgeInsets.all(
-                                                            //                   3.0),
-                                                            //           child:
-                                                            //               CircularProgressIndicator(
-                                                            //             strokeWidth: 2,
-                                                            //             color: linearColor,
-                                                            //           ),
-                                                            //         ),
-                                                            //       )
-                                                            //     :
-                                                            (controller.currentlyPlayingIndex ==
-                                                                    index
-                                                                //      &&
-                                                                // controller.isPlaying
-                                                                )
-                                                                ? InkWell(
-                                                                    onTap: () {
-                                                                      controller
-                                                                          .handlePlayPause(
-                                                                              index);
-                                                                    },
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .pause_circle_outline,
-                                                                      color:
-                                                                          linearColor,
-                                                                      size: 26,
-                                                                    ),
+                                                  child: Container(
+                                                    width: getWidgetWidth(
+                                                        width: 375),
+                                                    // height: getWidgetHeight(height: 75),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      color: Colors.white,
+                                                    ),
+                                                    child: Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                          vertical: displayWidth(
+                                                                      context) >
+                                                                  500
+                                                              ? displayHeight(
+                                                                      context) *
+                                                                  0.02
+                                                              : getWidgetHeight(
+                                                                  height: 6),
+                                                          horizontal: displayWidth(
+                                                                      context) >
+                                                                  500
+                                                              ? displayWidth(
+                                                                      context) *
+                                                                  0.01
+                                                              : getWidgetWidth(
+                                                                  width: 10)),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              // (controller.loadingIndex == index)
+                                                              //     ? SizedBox(
+                                                              //         height: getWidgetHeight(
+                                                              //             height: 25),
+                                                              //         width:
+                                                              //             getWidgetWidth(width: 25),
+                                                              //         child: Padding(
+                                                              //           padding:
+                                                              //               const EdgeInsets.all(
+                                                              //                   3.0),
+                                                              //           child:
+                                                              //               CircularProgressIndicator(
+                                                              //             strokeWidth: 2,
+                                                              //             color: linearColor,
+                                                              //           ),
+                                                              //         ),
+                                                              //       )
+                                                              //     :
+                                                              (controller.currentlyPlayingIndex ==
+                                                                      index
+                                                                  //      &&
+                                                                  // controller.isPlaying
                                                                   )
-                                                                : controller.errorPlaying ==
-                                                                        index
-                                                                    ? GestureDetector(
-                                                                        onTap:
-                                                                            () {
-                                                                          controller
-                                                                              .handlePlayPause(index);
-                                                                        },
-                                                                        child:
-                                                                            Icon(
-                                                                          Icons
-                                                                              .info_outline,
-                                                                          color:
-                                                                              Colors.red,
-                                                                          size:
-                                                                              25,
+                                                                  ? InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        controller
+                                                                            .handlePlayPause(index);
+                                                                      },
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .pause_circle_outline,
+                                                                        color:
+                                                                            linearColor,
+                                                                        size:
+                                                                            26,
+                                                                      ),
+                                                                    )
+                                                                  : controller.errorPlaying ==
+                                                                          index
+                                                                      ? GestureDetector(
+                                                                          onTap:
+                                                                              () {
+                                                                            controller.handlePlayPause(index);
+                                                                          },
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.info_outline,
+                                                                            color:
+                                                                                Colors.red,
+                                                                            size:
+                                                                                25,
+                                                                          ),
+                                                                        )
+                                                                      : GestureDetector(
+                                                                          onTap:
+                                                                              () {
+                                                                            controller.handlePlayPause(index);
+                                                                          },
+                                                                          child: controller.playingIs == index
+                                                                              ? SizedBox(
+                                                                                  height: getWidgetHeight(height: displayWidth(context) > 500 ? 20 : 20),
+                                                                                  width: getWidgetWidth(width: displayWidth(context) > 500 ? 5 : 22),
+                                                                                  child: CircularProgressIndicator(
+                                                                                    strokeWidth: 2.0,
+                                                                                    color: linearColor,
+                                                                                  ),
+                                                                                )
+                                                                              : ImageIcon(
+                                                                                  const AssetImage(AllAssets.roundPlay),
+                                                                                  color: linearColor,
+                                                                                ),
                                                                         ),
-                                                                      )
-                                                                    : GestureDetector(
-                                                                        onTap:
-                                                                            () {
-                                                                          controller
-                                                                              .handlePlayPause(index);
-                                                                        },
-                                                                        child: controller.playingIs ==
+                                                              SizedBox(
+                                                                width: getWidgetWidth(
+                                                                    width: isKwidth >
+                                                                            500
+                                                                        ? 2
+                                                                        : 10),
+                                                              ),
+                                                              Text(
+                                                                  controller
+                                                                      .subcategories[
+                                                                          index]
+                                                                      .text,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        Keys.fontFamily,
+                                                                    letterSpacing:
+                                                                        0,
+                                                                  )),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              // GestureDetector(
+                                                              //   onTap: () {
+                                                              //     controller.saveUpdate(index);
+                                                              //   },
+                                                              //   child: SizedBox(
+                                                              //     // width: displayWidth(context) / 18.75,
+                                                              //     // height: displayHeight(context) / 40.6,
+                                                              //     height: 19,
+                                                              //     width: 19,
+                                                              //     child: ImageIcon(
+                                                              //       AssetImage(AllAssets.download),
+                                                              //       color: controller
+                                                              //               .isPriorityList[index]
+                                                              //           ? linearColor
+                                                              //           : Colors.black,
+                                                              //       // size: size.height * 0.03,
+                                                              //     ),
+                                                              //   ),
+                                                              // ),
+                                                              kIsWeb
+                                                                  ? Icon(isExpanded
+                                                                      ? Icons
+                                                                          .keyboard_arrow_up
+                                                                      : Icons
+                                                                          .keyboard_arrow_down)
+                                                                  : IconButton(
+                                                                      onPressed:
+                                                                          () {
+                                                                        controller
+                                                                            .saveUpdate(index);
+                                                                      },
+                                                                      icon:
+                                                                          SizedBox(
+                                                                        // width: displayWidth(context) / 18.75,
+                                                                        // height: displayHeight(context) / 40.6,
+                                                                        height: getWidgetHeight(
+                                                                            height:
+                                                                                19),
+                                                                        width: getWidgetWidth(
+                                                                            width:
+                                                                                19),
+                                                                        child: controller.isSaving ==
                                                                                 index
                                                                             ? SizedBox(
-                                                                                height: getWidgetHeight(height: displayWidth(context) > 500 ? 20 : 20),
-                                                                                width: getWidgetWidth(width: displayWidth(context) > 500 ? 5 : 22),
+                                                                                height: getWidgetHeight(height: 19),
+                                                                                width: getWidgetWidth(width: 19),
                                                                                 child: CircularProgressIndicator(
                                                                                   strokeWidth: 2.0,
                                                                                   color: linearColor,
                                                                                 ),
                                                                               )
-                                                                            : ImageIcon(
-                                                                                const AssetImage(AllAssets.roundPlay),
-                                                                                color: linearColor,
+                                                                            : Image.asset(
+                                                                                AllAssets.save,
+                                                                                width: 18,
+                                                                                color: controller.isPriorityList[index] ? linearColor : Colors.black,
                                                                               ),
                                                                       ),
-                                                            SizedBox(
-                                                              width: getWidgetWidth(
-                                                                  width:
-                                                                      isKwidth >
-                                                                              500
-                                                                          ? 2
-                                                                          : 10),
-                                                            ),
-                                                            Text(
-                                                                controller
-                                                                    .subcategories[
-                                                                        index]
-                                                                    .text,
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontFamily: Keys
-                                                                      .fontFamily,
-                                                                  letterSpacing:
-                                                                      0,
-                                                                )),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            // GestureDetector(
-                                                            //   onTap: () {
-                                                            //     controller.saveUpdate(index);
-                                                            //   },
-                                                            //   child: SizedBox(
-                                                            //     // width: displayWidth(context) / 18.75,
-                                                            //     // height: displayHeight(context) / 40.6,
-                                                            //     height: 19,
-                                                            //     width: 19,
-                                                            //     child: ImageIcon(
-                                                            //       AssetImage(AllAssets.download),
-                                                            //       color: controller
-                                                            //               .isPriorityList[index]
-                                                            //           ? linearColor
-                                                            //           : Colors.black,
-                                                            //       // size: size.height * 0.03,
-                                                            //     ),
-                                                            //   ),
-                                                            // ),
-                                                            kIsWeb
-                                                                ? SizedBox(
-                                                                    height: getWidgetHeight(
-                                                                        height:
-                                                                            20),
-                                                                    width: getWidgetWidth(
-                                                                        width:
-                                                                            19),
-                                                                  )
-                                                                : IconButton(
-                                                                    onPressed:
-                                                                        () {
-                                                                      controller
-                                                                          .saveUpdate(
-                                                                              index);
-                                                                    },
-                                                                    icon:
-                                                                        SizedBox(
-                                                                      // width: displayWidth(context) / 18.75,
-                                                                      // height: displayHeight(context) / 40.6,
-                                                                      height: getWidgetHeight(
-                                                                          height:
-                                                                              19),
-                                                                      width: getWidgetWidth(
-                                                                          width:
-                                                                              19),
-                                                                      child: controller.isSaving ==
-                                                                              index
-                                                                          ? SizedBox(
-                                                                              height: getWidgetHeight(height: 19),
-                                                                              width: getWidgetWidth(width: 19),
-                                                                              child: CircularProgressIndicator(
-                                                                                strokeWidth: 2.0,
-                                                                                color: linearColor,
-                                                                              ),
-                                                                            )
-                                                                          : Image
-                                                                              .asset(
-                                                                              AllAssets.save,
-                                                                              width: 18,
-                                                                              color: controller.isPriorityList[index] ? linearColor : Colors.black,
-                                                                            ),
-                                                                    ),
-                                                                  )
-                                                          ],
-                                                        ),
-                                                      ],
+                                                                    )
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -1142,4 +1212,82 @@ class _PronunciationLabSubState extends State<PronunciationLabSub> {
           ]),
     );
   }
+}
+
+class _HoverCard extends StatefulWidget {
+  final Widget child;
+  const _HoverCard({required this.child});
+
+  @override
+  State<_HoverCard> createState() => _HoverCardState();
+}
+
+class _HoverCardState extends State<_HoverCard> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!kIsWeb) return widget.child;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: _hovered
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
+                  ),
+                ]
+              : [],
+        ),
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+Widget _navItem({
+  required String label,
+  required String icon,
+  required int index,
+  required String route,
+}) {
+  final active = currentIndex == index;
+
+  return InkWell(
+    borderRadius: BorderRadius.circular(10),
+    onTap: () {
+      currentIndex = index;
+      Get.rootDelegate.offNamed(route);
+    },
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      child: Row(
+        children: [
+          ImageIcon(
+            AssetImage(icon),
+            size: 18,
+            color: active ? linearColor : Colors.grey,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: active ? linearColor : Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }

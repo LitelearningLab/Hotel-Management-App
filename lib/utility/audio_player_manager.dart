@@ -1,6 +1,7 @@
 import 'dart:async';
 
 // import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AudioPlayerManager {
@@ -62,7 +63,9 @@ class AudioPlayerManager {
         if (decodedPath != null) decodedPath(newPth!);
       }
 
-      print("Playing: ${newPth ?? url}");
+      if (kDebugMode) {
+        print("Playing: ${newPth ?? url}");
+      }
 
       // await _audioPlayer.play(
       //   newPth != null && newPth != "ERROR"
@@ -70,7 +73,9 @@ class AudioPlayerManager {
       //       // : UrlSource(url),
       // );
     } catch (e) {
-      print('AUDIO FAILED: $e');
+      if (kDebugMode) {
+        print('Audio playback failed: $e');
+      }
     }
   }
 
@@ -89,18 +94,23 @@ class AudioPlayerManager {
           decodedPath(newPth);
         }
       }
-      print('***********//////AUDIO Done');
-      ;
+      if (kDebugMode) {
+        print('***********//////AUDIO Done');
+      }
       // audioController.isAudioDone = true;
-      print(
-          "local Path>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+      if (kDebugMode) {
+        print(
+            "local Path>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+      }
       // print(localPath);
       // await _audioPlayer.setPlaybackRate(0.8);
       // return await _audioPlayer.play(localPath != null && localPath != "ERROR"
       //     ? DeviceFileSource(newPth)
       //     : UrlSource(url));
     } catch (e) {
-      print('***********//////AUDIO FAILED');
+      if (kDebugMode) {
+        print('Audio playback failed: $e');
+      }
       // audioController.isAudioDone = false;
     }
   }

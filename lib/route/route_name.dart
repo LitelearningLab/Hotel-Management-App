@@ -1,3 +1,5 @@
+import 'package:hotelmanagementapp/public/common_function.dart';
+
 class AppRoutes {
   static const home = '/dash-home';
   static const frontOffice = '/dash-front-office';
