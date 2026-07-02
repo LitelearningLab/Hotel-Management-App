@@ -116,9 +116,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // --------------------------------------------------
-  // BUILD
-  // --------------------------------------------------
+  String formatDateSafely(String dateStr) {
+    if (dateStr.isEmpty) return "N/A";
+    
+    final trimmed = dateStr.trim();
+    if (trimmed.isEmpty) return "N/A";
+
+    if (trimmed.startsWith('Timestamp(')) {
+      final match = RegExp(r'seconds=(\d+)').firstMatch(trimmed);
+      if (match != null) {
+        final seconds = int.tryParse(match.group(1) ?? '');
+        if (seconds != null) {
+          final dt = DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+          return DateFormat('dd-MM-yyyy').format(dt);
+        }
+      }
+    }
+
+    DateTime? parsed = DateTime.tryParse(trimmed);
+    if (parsed != null) {
+      return DateFormat('dd-MM-yyyy').format(parsed);
+    }
+
+    List<String> formats = [
+      'dd-MM-yyyy',
+      'dd/MM/yyyy',
+      'yyyy/MM/dd',
+      'yyyy-MM-dd',
+      'MM-dd-yyyy',
+      'MM/dd/yyyy',
+    ];
+
+    for (String format in formats) {
+      try {
+        final dt = DateFormat(format).parseStrict(trimmed);
+        return DateFormat('dd-MM-yyyy').format(dt);
+      } catch (_) {}
+    }
+
+    return trimmed;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -154,20 +192,275 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         userName.isNotEmpty ? userName : "User Name",
                         style: TextStyle(
                           fontFamily: Keys.fontFamily,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                          fontSize: 25),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 10),
+                  child: Container(
+                      height: getWidgetHeight(height: 50),
+                      decoration: BoxDecoration(
+                        // color: Color(0XFF314162),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            offset: const Offset(0, 4),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(7),
+                                topRight: Radius.circular(7))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 20,
+                                backgroundColor: Color(0XFF5248fe),
+                                child: Image.asset(
+                                  "assets/images/mobile_profile.png",
+                                  height: getWidgetHeight(height: 20),
+                                  width: getWidgetWidth(width: 20),
+                                ),
+                              ),
+                              SizedBox(width: getWidgetWidth(width: 4)),
+                              Text(
+                                "+91 $mobileNumber",
+                                style: TextStyle(
+                                    fontFamily: Keys.fontFamily,
+                                    color: Colors.black87,
+                                    fontSize: 15),
+                              ),
+                            ],
+                          ),
                         ),
+                      )),
+                ),
+                SizedBox(height: getWidgetHeight(height: 3)),
+                Container(
+                  margin: EdgeInsets.symmetric(
+                      horizontal: getWidgetWidth(width: 10)),
+                  child: Container(
+                      height: getWidgetHeight(height: 50),
+                      decoration: BoxDecoration(
+                        // color: Color(0XFF314162),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            offset: const Offset(0, 4),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(7),
+                                topRight: Radius.circular(7))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 20,
+                                backgroundColor: Color(0XFF47bad0),
+                                child: Image.asset(
+                                  "assets/images/arroba_profile.png",
+                                  height: getWidgetHeight(height: 15),
+                                  width: getWidgetWidth(width: 15),
+                                ),
+                              ),
+                              SizedBox(width: getWidgetWidth(width: 4)),
+                              Expanded(
+                                child: Text(
+                                  email,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontFamily: Keys.fontFamily,
+                                      color: Colors.black87,
+                                      fontSize: 15),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )),
+                ),
+                SizedBox(height: getWidgetHeight(height: 3)),
+                Container(
+                  margin: EdgeInsets.symmetric(
+                      horizontal: getWidgetWidth(width: 10)),
+                  child: Container(
+                      height: getWidgetHeight(height: 50),
+                      decoration: BoxDecoration(
+                        // color: Color(0XFF314162),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            offset: const Offset(0, 4),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(7),
+                                topRight: Radius.circular(7))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 20,
+                                backgroundColor: Color(0XFF47da6d),
+                                child: Image.asset(
+                                  "assets/images/hierarchical_profile.png",
+                                  height: getWidgetHeight(height: 15),
+                                  width: getWidgetWidth(width: 15),
+                                ),
+                              ),
+                              SizedBox(
+                                width: getWidgetWidth(width: 4),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  collegeName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontFamily: Keys.fontFamily,
+                                    color: Colors.black87,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )),
+                ),
+                SizedBox(height: getWidgetHeight(height: 3)),
+                Container(
+                  margin: EdgeInsets.symmetric(
+                      horizontal: getWidgetWidth(width: 10)),
+                  child: Container(
+                      height: getWidgetHeight(height: 50),
+                      decoration: BoxDecoration(
+                        // color: Color(0XFF314162)
+                        // ,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            offset: const Offset(0, 4),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(7),
+                                topRight: Radius.circular(7))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 20,
+                                backgroundColor: Color(0XFFf5a716),
+                                child: Image.asset(
+                                  "assets/images/maps_flags_profile.png",
+                                  height: getWidgetHeight(height: 15),
+                                  width: getWidgetWidth(width: 15),
+                                ),
+                              ),
+                              SizedBox(
+                                width: getWidgetWidth(width: 4),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "${toBeginningOfSentenceCase(city) ?? ''}, ${toBeginningOfSentenceCase(country) ?? ''}",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontFamily: Keys.fontFamily,
+                                    color: Colors.black87,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )),
+                ),
+                SizedBox(height: getWidgetHeight(height: 3)),
+                Container(
+                  decoration: BoxDecoration(
+                    // color: Color(0XFF314162)
+                    // ,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        offset: const Offset(0, 4),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+                  margin: EdgeInsets.symmetric(
+                      horizontal: getWidgetWidth(width: 10)),
+                  child: Container(
+                    height: getWidgetHeight(height: 50),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(7),
+                        bottomRight: Radius.circular(7),
                       ),
                     ),
-                    const SizedBox(height: 24),
-
-                    // -------------------------------
-                    // PROFILE INFO
-                    // -------------------------------
-                    _infoTile(
-                      icon: Icons.phone,
-                      color: Colors.indigo,
-                      value: "+91 $mobileNumber",
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundColor: const Color(0XFFf66b5c),
+                          child: Image.asset(
+                            "assets/images/calendar_profile.png",
+                            height: getWidgetHeight(height: 15),
+                            width: getWidgetWidth(width: 15),
+                          ),
+                        ),
+                        SizedBox(
+                          width: getWidgetWidth(width: 4),
+                        ),
+                        Expanded(
+                          child: Text(
+                            "Active from ${formatDateSafely(joinDate)} "
+                            "to ${formatDateSafely(endDate)}",
+                            maxLines: 2,
+                            softWrap: true,
+                            // overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: Keys.fontFamily,
+                              color: Colors.black87,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
 

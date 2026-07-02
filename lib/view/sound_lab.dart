@@ -120,7 +120,7 @@ class _SoundLabState extends State<SoundLab> {
                       Expanded(
                         child: Text(
                           controller.soundSubcategory.name,
-                          maxLines: 2,
+                          maxLines: 1,
                           style: TextStyle(
                             fontSize: kText
                                 .scale(displayWidth(context) > 700 ? 20 : 18),
@@ -297,112 +297,210 @@ class _SoundLabState extends State<SoundLab> {
                   color: linearColor,
                 ),
               )
-            : Stack(
-                children: [
-                  ListView.builder(
-                    controller: controller.scrollController,
-                    padding: EdgeInsets.symmetric(
-                        vertical: getWidgetHeight(height: 10),
-                        horizontal: getWidgetWidth(width: 10)),
-                    itemCount: controller.soundsPractice?.length,
-                    itemBuilder: (context, index) {
-                      final isExpanded = controller.expandedIndex == index;
-                      final soundPractice = controller.soundsPractice![index];
+            : (controller.soundsPractice == null ||
+                    controller.soundsPractice!.isEmpty)
+                ? Center(
+                    child: Text(
+                      "No data available",
+                      style: TextStyle(
+                        fontFamily: Keys.fontFamily,
+                        fontSize: 16,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  )
+                : Stack(
+                    children: [
+                      ListView.builder(
+                        controller: controller.scrollController,
+                        padding: EdgeInsets.symmetric(
+                            vertical: getWidgetHeight(height: 10),
+                            horizontal: getWidgetWidth(width: 10)),
+                        itemCount: controller.soundsPractice?.length,
+                        itemBuilder: (context, index) {
+                          final isExpanded = controller.expandedIndex == index;
+                          final soundPractice =
+                              controller.soundsPractice![index];
 
-                      return Column(
-                        children: [
-                          _HoverCard(
-                            child: GestureDetector(
-                              onTap: () {
-                                controller.expandedIndex =
-                                    isExpanded ? -1 : index;
-                                controller.update();
-                              },
-                              child: Container(
-                                width: getWidgetWidth(width: 375),
-                                // height: getWidgetHeight(height: 60),
-                                margin: const EdgeInsets.symmetric(vertical: 5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      offset: const Offset(0, 4),
-                                      blurRadius: 10,
-                                    ),
-                                  ],
-                                ),
+                          return Column(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  controller.expandedIndex =
+                                      isExpanded ? -1 : index;
+                                  controller.update();
+                                },
                                 child: Container(
                                   width: getWidgetWidth(width: 375),
+                                  // height: getWidgetHeight(height: 60),
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 5),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
-                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        offset: const Offset(0, 4),
+                                        blurRadius: 10,
+                                      ),
+                                    ],
                                   ),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: displayWidth(context) > 500
-                                            ? displayHeight(context) * 0.02
-                                            : getWidgetHeight(height: 6),
-                                        horizontal: displayWidth(context) > 500
-                                            ? displayWidth(context) * 0.01
-                                            : getWidgetWidth(width: 10)),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            (controller.currentlyPlayingIndex ==
-                                                    index
-                                                //      &&
-                                                // controller.isPlaying
-                                                )
-                                                ? InkWell(
-                                                    onTap: () {
-                                                      controller
-                                                          .handlePlayPause(index);
-                                                    },
-                                                    child: Icon(
-                                                      Icons.pause_circle_outline,
-                                                      color: linearColor,
-                                                      size: 26,
-                                                    ),
+                                  child: Container(
+                                    width: getWidgetWidth(width: 375),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: Colors.white,
+                                    ),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: displayWidth(context) > 500
+                                              ? displayHeight(context) * 0.02
+                                              : getWidgetHeight(height: 6),
+                                          horizontal:
+                                              displayWidth(context) > 500
+                                                  ? displayWidth(context) * 0.01
+                                                  : getWidgetWidth(width: 10)),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              (controller.currentlyPlayingIndex ==
+                                                      index
+                                                  //      &&
+                                                  // controller.isPlaying
                                                   )
-                                                : controller.errorPlaying == index
-                                                    ? GestureDetector(
-                                                        onTap: () {
-                                                          controller
-                                                              .handlePlayPause(
-                                                                  index);
-                                                        },
-                                                        child: Icon(
-                                                          Icons.info_outline,
-                                                          color: Colors.red,
-                                                          size: 25,
+                                                  ? InkWell(
+                                                      onTap: () {
+                                                        controller
+                                                            .handlePlayPause(
+                                                                index);
+                                                      },
+                                                      child: Icon(
+                                                        Icons
+                                                            .pause_circle_outline,
+                                                        color: linearColor,
+                                                        size: 26,
+                                                      ),
+                                                    )
+                                                  : controller.errorPlaying ==
+                                                          index
+                                                      ? GestureDetector(
+                                                          onTap: () {
+                                                            controller
+                                                                .handlePlayPause(
+                                                                    index);
+                                                          },
+                                                          child: Icon(
+                                                            Icons.info_outline,
+                                                            color: Colors.red,
+                                                            size: 25,
+                                                          ),
+                                                        )
+                                                      : GestureDetector(
+                                                          onTap: () {
+                                                            controller
+                                                                .handlePlayPause(
+                                                                    index);
+                                                          },
+                                                          child: controller
+                                                                      .playingIs ==
+                                                                  index
+                                                              ? SizedBox(
+                                                                  height: getWidgetHeight(
+                                                                      height: displayWidth(context) >
+                                                                              500
+                                                                          ? 20
+                                                                          : 20),
+                                                                  width: getWidgetWidth(
+                                                                      width: displayWidth(context) >
+                                                                              500
+                                                                          ? 5
+                                                                          : 22),
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                    strokeWidth:
+                                                                        2.0,
+                                                                    color:
+                                                                        linearColor,
+                                                                  ),
+                                                                )
+                                                              : ImageIcon(
+                                                                  const AssetImage(
+                                                                      AllAssets
+                                                                          .roundPlay),
+                                                                  color:
+                                                                      linearColor,
+                                                                ),
                                                         ),
-                                                      )
-                                                    : GestureDetector(
-                                                        onTap: () {
-                                                          controller
-                                                              .handlePlayPause(
-                                                                  index);
-                                                        },
+                                              SizedBox(
+                                                width: getWidgetWidth(
+                                                    width:
+                                                        displayWidth(context) >
+                                                                500
+                                                            ? 4
+                                                            : 10),
+                                              ),
+                                              Text(soundPractice.text,
+                                                  style: TextStyle(
+                                                    fontFamily: Keys.fontFamily,
+                                                    letterSpacing: 0,
+                                                  )),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              // GestureDetector(
+                                              //   onTap: () {
+                                              //     controller.saveUpdate(index);
+                                              //   },
+                                              //   child: SizedBox(
+                                              //     // width: displayWidth(context) / 18.75,
+                                              //     // height: displayHeight(context) / 40.6,
+                                              //     height: 19,
+                                              //     width: 19,
+                                              //     child: ImageIcon(
+                                              //       AssetImage(AllAssets.download),
+                                              //       color: controller
+                                              //               .isPriorityList[index]
+                                              //           ? linearColor
+                                              //           : Colors.black,
+                                              //       // size: size.height * 0.03,
+                                              //     ),
+                                              //   ),
+                                              // ),
+                                              kIsWeb
+                                                  ? SizedBox(
+                                                      height: getWidgetHeight(
+                                                          height: 20),
+                                                      width: getWidgetWidth(
+                                                          width: 19),
+                                                    )
+                                                  : IconButton(
+                                                      onPressed: () {
+                                                        controller
+                                                            .saveUpdate(index);
+                                                      },
+                                                      icon: SizedBox(
+                                                        // width: displayWidth(context) / 18.75,
+                                                        // height: displayHeight(context) / 40.6,
+                                                        height: getWidgetHeight(
+                                                            height: 19),
+                                                        width: getWidgetWidth(
+                                                            width: 19),
                                                         child: controller
-                                                                    .playingIs ==
+                                                                    .isSaving ==
                                                                 index
                                                             ? SizedBox(
-                                                                height: getWidgetHeight(
-                                                                    height:
-                                                                        displayWidth(context) >
-                                                                                500
-                                                                            ? 20
-                                                                            : 20),
-                                                                width: getWidgetWidth(
-                                                                    width:
-                                                                        displayWidth(context) >
-                                                                                500
-                                                                            ? 5
-                                                                            : 22),
+                                                                height:
+                                                                    getWidgetHeight(
+                                                                        height:
+                                                                            19),
+                                                                width:
+                                                                    getWidgetWidth(
+                                                                        width:
+                                                                            19),
                                                                 child:
                                                                     CircularProgressIndicator(
                                                                   strokeWidth:
@@ -411,361 +509,300 @@ class _SoundLabState extends State<SoundLab> {
                                                                       linearColor,
                                                                 ),
                                                               )
-                                                            : ImageIcon(
-                                                                const AssetImage(
-                                                                    AllAssets
-                                                                        .roundPlay),
-                                                                color:
-                                                                    linearColor,
+                                                            : Image.asset(
+                                                                AllAssets.save,
+                                                                width: 18,
+                                                                color: controller
+                                                                            .isPriorityList[
+                                                                        index]
+                                                                    ? linearColor
+                                                                    : Colors
+                                                                        .black,
                                                               ),
                                                       ),
-                                            SizedBox(
-                                              width: getWidgetWidth(
-                                                  width:
-                                                      displayWidth(context) > 500
-                                                          ? 4
-                                                          : 10),
-                                            ),
-                                            Text(soundPractice.text,
-                                                style: TextStyle(
-                                                  fontFamily: Keys.fontFamily,
-                                                  letterSpacing: 0,
-                                                )),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            // GestureDetector(
-                                            //   onTap: () {
-                                            //     controller.saveUpdate(index);
-                                            //   },
-                                            //   child: SizedBox(
-                                            //     // width: displayWidth(context) / 18.75,
-                                            //     // height: displayHeight(context) / 40.6,
-                                            //     height: 19,
-                                            //     width: 19,
-                                            //     child: ImageIcon(
-                                            //       AssetImage(AllAssets.download),
-                                            //       color: controller
-                                            //               .isPriorityList[index]
-                                            //           ? linearColor
-                                            //           : Colors.black,
-                                            //       // size: size.height * 0.03,
-                                            //     ),
-                                            //   ),
-                                            // ),
-                                            kIsWeb
-                                                ? SizedBox(
-                                                    height: getWidgetHeight(
-                                                        height: 20),
-                                                    width:
-                                                        getWidgetWidth(width: 19),
-                                                  )
-                                                : IconButton(
-                                                    onPressed: () {
-                                                      controller
-                                                          .saveUpdate(index);
-                                                    },
-                                                    icon: SizedBox(
-                                                      // width: displayWidth(context) / 18.75,
-                                                      // height: displayHeight(context) / 40.6,
-                                                      height: getWidgetHeight(
-                                                          height: 19),
-                                                      width: getWidgetWidth(
-                                                          width: 19),
-                                                      child: controller
-                                                                  .isSaving ==
-                                                              index
-                                                          ? SizedBox(
-                                                              height:
-                                                                  getWidgetHeight(
-                                                                      height: 19),
-                                                              width:
-                                                                  getWidgetWidth(
-                                                                      width: 19),
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                strokeWidth: 2.0,
-                                                                color:
-                                                                    linearColor,
-                                                              ),
-                                                            )
-                                                          : Image.asset(
-                                                              AllAssets.save,
-                                                              width: 18,
-                                                              color: controller
-                                                                          .isPriorityList[
-                                                                      index]
-                                                                  ? linearColor
-                                                                  : Colors.black,
-                                                            ),
-                                                    ),
-                                                  )
-                                          ],
-                                        ),
-                                      ],
+                                                    )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
 
-                          // Expandable Section
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.fastOutSlowIn,
-                            width: double.infinity,
-                            child: isExpanded
-                                ? Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: getWidgetWidth(width: 15),
-                                      vertical: getWidgetHeight(height: 10),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "PRONUNCIATION",
-                                          style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 12,
-                                              color: linearColor),
+                              // Expandable Section
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.fastOutSlowIn,
+                                width: double.infinity,
+                                child: isExpanded
+                                    ? Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: getWidgetWidth(width: 15),
+                                          vertical: getWidgetHeight(height: 10),
                                         ),
-                                        SizedBox(
-                                          height: getWidgetHeight(height: 6),
-                                        ),
-                                        SizedBox(
-                                          width: getWidgetWidth(width: 180),
-                                          child: Text(
-                                            soundPractice.pronun == ""
-                                                ? "no data"
-                                                : soundPractice.pronun
-                                                    .replaceAll("/", ""),
-                                            maxLines: 2,
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 20,
-                                              fontFamily: Keys.fontFamily,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: getWidgetHeight(height: 20),
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "IPA",
-                                                  style: GoogleFonts.inter(
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      fontSize: 12,
-                                                      color: lightWhite),
-                                                ),
-                                                SizedBox(
-                                                  height: getWidgetHeight(
-                                                      height: 6),
-                                                ),
-                                                RichText(
-                                                  textAlign: TextAlign.justify,
-                                                  text: TextSpan(
-                                                    children: buildTextSpans(
-                                                        soundPractice
-                                                            .syllables),
-                                                  ),
-                                                ),
-                                              ],
+                                            Text(
+                                              "PRONUNCIATION",
+                                              style: GoogleFonts.inter(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 12,
+                                                  color: linearColor),
                                             ),
-                                            if (!kIsWeb)
-                                              GestureDetector(
-                                                onTap: () {
-                                                  controller.kShowDialog(
-                                                      soundPractice.text,
-                                                      false,
-                                                      context);
-                                                },
-                                                child: Container(
-                                                  width: getWidgetWidth(
-                                                      width: 130),
-                                                  height: getWidgetHeight(
-                                                      height: 45),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                    color: Colors.white,
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withOpacity(0.1),
-                                                        offset:
-                                                            const Offset(0, 4),
-                                                        blurRadius: 10,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceAround,
-                                                    children: [
-                                                      const Icon(
-                                                        Icons.mic,
-                                                        color: Color.fromARGB(
-                                                            255, 112, 112, 112),
-                                                      ),
-                                                      Text(
-                                                        "Practice",
-                                                        style:
-                                                            GoogleFonts.inter(
-                                                          color: const Color
-                                                              .fromARGB(255,
-                                                              112, 112, 112),
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          fontSize: 16,
-                                                        ),
-                                                      ),
-                                                      const SizedBox()
-                                                    ],
-                                                  ),
+                                            SizedBox(
+                                              height:
+                                                  getWidgetHeight(height: 6),
+                                            ),
+                                            SizedBox(
+                                              width: getWidgetWidth(width: 180),
+                                              child: Text(
+                                                soundPractice.pronun == ""
+                                                    ? "no data"
+                                                    : soundPractice.pronun
+                                                        .replaceAll("/", ""),
+                                                maxLines: 2,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 20,
+                                                  fontFamily: Keys.fontFamily,
                                                 ),
                                               ),
+                                            ),
+                                            SizedBox(
+                                              height:
+                                                  getWidgetHeight(height: 20),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "IPA",
+                                                      style: GoogleFonts.inter(
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          fontSize: 12,
+                                                          color: lightWhite),
+                                                    ),
+                                                    SizedBox(
+                                                      height: getWidgetHeight(
+                                                          height: 6),
+                                                    ),
+                                                    RichText(
+                                                      textAlign:
+                                                          TextAlign.justify,
+                                                      text: TextSpan(
+                                                        children:
+                                                            buildTextSpans(
+                                                                soundPractice
+                                                                    .syllables),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                if (!kIsWeb)
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      controller.kShowDialog(
+                                                          soundPractice.text,
+                                                          false,
+                                                          context);
+                                                    },
+                                                    child: Container(
+                                                      width: getWidgetWidth(
+                                                          width: 130),
+                                                      height: getWidgetHeight(
+                                                          height: 45),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                        color: Colors.white,
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.1),
+                                                            offset:
+                                                                const Offset(
+                                                                    0, 4),
+                                                            blurRadius: 10,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceAround,
+                                                        children: [
+                                                          const Icon(
+                                                            Icons.mic,
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    112,
+                                                                    112,
+                                                                    112),
+                                                          ),
+                                                          Text(
+                                                            "Practice",
+                                                            style: GoogleFonts
+                                                                .inter(
+                                                              color: const Color
+                                                                  .fromARGB(
+                                                                  255,
+                                                                  112,
+                                                                  112,
+                                                                  112),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                          const SizedBox()
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                            if (controller.selectedWord
+                                                    .toLowerCase() ==
+                                                soundPractice.text
+                                                    .toLowerCase())
+                                              ListTile(
+                                                contentPadding: EdgeInsets.zero,
+                                                title: Text(
+                                                  "Pronunciation Analysis Result",
+                                                  style: TextStyle(
+                                                      color: Color(0xFF6C63FF),
+                                                      fontSize: kText.scale(13),
+                                                      fontFamily:
+                                                          Keys.fontFamily),
+                                                ),
+                                                subtitle: Text(
+                                                  "Note: This result only indicates intelligibility and does not confirm the accuracy of pronunciation.",
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: kText.scale(10),
+                                                      fontFamily:
+                                                          Keys.fontFamily),
+                                                ),
+                                                trailing: Icon(
+                                                  controller.isCorrect
+                                                      ? Icons.check_circle
+                                                      : Icons.cancel,
+                                                  color: controller.isCorrect
+                                                      ? Colors.green
+                                                      : Colors.red,
+                                                  size: 45,
+                                                ),
+                                              ),
+                                            // SPH(10)
                                           ],
                                         ),
-                                        if (controller.selectedWord
-                                                .toLowerCase() ==
-                                            soundPractice.text.toLowerCase())
-                                          ListTile(
-                                            contentPadding: EdgeInsets.zero,
-                                            title: Text(
-                                              "Pronunciation Analysis Result",
-                                              style: TextStyle(
-                                                  color: Color(0xFF6C63FF),
-                                                  fontSize: kText.scale(13),
-                                                  fontFamily: Keys.fontFamily),
-                                            ),
-                                            subtitle: Text(
-                                              "Note: This result only indicates intelligibility and does not confirm the accuracy of pronunciation.",
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: kText.scale(10),
-                                                  fontFamily: Keys.fontFamily),
-                                            ),
-                                            trailing: Icon(
-                                              controller.isCorrect
-                                                  ? Icons.check_circle
-                                                  : Icons.cancel,
-                                              color: controller.isCorrect
-                                                  ? Colors.green
-                                                  : Colors.red,
-                                              size: 45,
-                                            ),
-                                          ),
-                                        // SPH(10)
-                                      ],
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                              if ((controller.soundsPractice?.length ?? 0) ==
+                                  index + 1)
+                                SizedBox(
+                                  height: getWidgetHeight(height: 180),
+                                )
+                            ],
+                          );
+                        },
+                      ),
+                      controller.isPlayingOne || controller.isPlayingThree
+                          ? Positioned(
+                              right: kIsWeb
+                                  ? displayWidth(context) / 3
+                                  : displayWidth(context) / 4,
+                              child: Container(
+                                width: kIsWeb
+                                    ? getWidgetWidth(width: 120)
+                                    : getWidgetWidth(width: 180),
+                                height: kIsWeb
+                                    ? getWidgetHeight(height: 55)
+                                    : getWidgetHeight(height: 50),
+                                decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.3),
+                                        offset: const Offset(0, 4),
+                                        blurRadius: 10,
+                                      ),
+                                    ],
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(30)),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 15, top: 5),
+                                      child: Image.asset(
+                                        controller.isPlayingOne
+                                            ? AllAssets.playOne
+                                            : controller.isPlayingThree
+                                                ? AllAssets.playThree
+                                                : "",
+                                        // height: 30,
+                                        width: 30,
+                                      ),
                                     ),
-                                  )
-                                : const SizedBox.shrink(),
-                          ),
-                          if (controller
-                                  .soundSubcategory.soundsPractice?.length ==
-                              index + 1)
-                            SizedBox(
-                              height: getWidgetHeight(height: 180),
-                            )
-                        ],
-                      );
-                    },
-                  ),
-                  controller.isPlayingOne || controller.isPlayingThree
-                      ? Positioned(
-                          right: kIsWeb
-                              ? displayWidth(context) / 3
-                              : displayWidth(context) / 4,
-                          child: Container(
-                            width: kIsWeb
-                                ? getWidgetWidth(width: 120)
-                                : getWidgetWidth(width: 180),
-                            height: kIsWeb
-                                ? getWidgetHeight(height: 55)
-                                : getWidgetHeight(height: 50),
-                            decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    offset: const Offset(0, 4),
-                                    blurRadius: 10,
-                                  ),
-                                ],
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(30)),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 15, top: 5),
-                                  child: Image.asset(
-                                    controller.isPlayingOne
-                                        ? AllAssets.playOne
-                                        : controller.isPlayingThree
-                                            ? AllAssets.playThree
-                                            : "",
-                                    // height: 30,
-                                    width: 30,
-                                  ),
+                                    InkWell(
+                                        splashColor: Colors.transparent,
+                                        focusColor: Colors.transparent,
+                                        hoverColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        onTap: () {
+                                          controller.isPaused =
+                                              !controller.isPaused;
+                                          controller.update();
+                                        },
+                                        child: Icon(
+                                            controller.isPaused
+                                                ? Icons.play_arrow
+                                                : Icons.pause,
+                                            color: Color(0XFF34425D),
+                                            size: 30)),
+                                    IconButton(
+                                        disabledColor: Colors.transparent,
+                                        color: Colors.transparent,
+                                        splashColor: Colors.transparent,
+                                        focusColor: Colors.transparent,
+                                        hoverColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        onPressed: () {
+                                          controller.isPlayingOne = false;
+                                          controller.isPlayingThree = false;
+                                          controller.isCancelled = true;
+                                          controller.stopAllPlaying();
+                                          controller.update();
+                                        },
+                                        icon: Icon(
+                                          Icons.stop,
+                                          color: Color(0XFF34425D),
+                                          size: 30,
+                                        )),
+                                  ],
                                 ),
-                                InkWell(
-                                    splashColor: Colors.transparent,
-                                    focusColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    onTap: () {
-                                      controller.isPaused =
-                                          !controller.isPaused;
-                                      controller.update();
-                                    },
-                                    child: Icon(
-                                        controller.isPaused
-                                            ? Icons.play_arrow
-                                            : Icons.pause,
-                                        color: Color(0XFF34425D),
-                                        size: 30)),
-                                IconButton(
-                                    disabledColor: Colors.transparent,
-                                    color: Colors.transparent,
-                                    splashColor: Colors.transparent,
-                                    focusColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    onPressed: () {
-                                      controller.isPlayingOne = false;
-                                      controller.isPlayingThree = false;
-                                      controller.isCancelled = true;
-                                      controller.stopAllPlaying();
-                                      controller.update();
-                                    },
-                                    icon: Icon(
-                                      Icons.stop,
-                                      color: Color(0XFF34425D),
-                                      size: 30,
-                                    )),
-                              ],
-                            ),
-                          ),
-                        )
-                      : SizedBox.shrink()
-                ],
-              ),
+                              ),
+                            )
+                          : SizedBox.shrink()
+                    ],
+                  ),
       );
     });
   }

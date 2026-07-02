@@ -1,5 +1,6 @@
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
+import 'package:hotelmanagementapp/controller/bottom_navigation_controller.dart';
 import 'package:hotelmanagementapp/controller/content_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/feedback_controller.dart';
 import 'package:hotelmanagementapp/controller/front_office_controller.dart';
@@ -18,19 +19,14 @@ import 'package:hotelmanagementapp/controller/simulation_sub_controller.dart';
 import 'package:hotelmanagementapp/controller/sound_lab_controller.dart';
 import 'package:hotelmanagementapp/controller/sound_page_controller.dart';
 import 'package:hotelmanagementapp/controller/splash_controller.dart';
+import 'package:hotelmanagementapp/controller/university_lab_controller.dart';
+import 'package:hotelmanagementapp/controller/university_lab_sub_controller.dart';
 
 class InitialBinding with Bindings {
   @override
   void dependencies() {
-    Get.put(HomeController(), permanent: true);
-    // Get.put(LanguageDropDownController(), permanent: true);
-  }
-}
-
-class HomeBinding with Bindings {
-  @override
-  void dependencies() {
-    Get.put(HomeController());
+    Get.put(BottomNavigationController(), permanent: true);
+    // Get.put(HomeController(), permanent: true);
     // Get.put(LanguageDropDownController(), permanent: true);
   }
 }
@@ -156,5 +152,19 @@ class FeedbackViewBinding with Bindings {
   @override
   void dependencies() {
     Get.put(FeedbackController());
+  }
+}
+
+class UniversityLabBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(UniversityLabController());
+  }
+}
+
+class UniversityLabSubBinding with Bindings {
+  @override
+  void dependencies() {
+    Get.put(UniversityLabSubController());
   }
 }

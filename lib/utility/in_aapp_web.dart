@@ -337,16 +337,64 @@ class _InAppWebViewPageState extends State<InAppWebViewPage>
                     child: CircularProgressIndicator(color: linearColor),
                   ),
                 ),
-
+              // Positioned(
+              //     top: getWidgetHeight(height: 35),
+              //     left: getWidgetWidth(width: 5),
+              //     child: IconButton(
+              //       focusColor: Colors.transparent,
+              //       hoverColor: Colors.transparent,
+              //       highlightColor: Colors.transparent,
+              //       splashColor: Colors.transparent,
+              //       color: Colors.transparent,
+              //       onPressed: () {
+              //         stopTimerMainCategory();
+              //         Navigator.pop(context);
+              //       },
+              //       icon: Stack(
+              //         alignment: Alignment.center,
+              //         children: [
+              //           Container(
+              //             width: getWidgetWidth(width: 36),
+              //             height: getWidgetHeight(height: 36),
+              //             decoration: BoxDecoration(
+              //               shape: BoxShape.circle,
+              //               color: Colors.black.withOpacity(0.3),
+              //               //   boxShadow: [
+              //               //     BoxShadow(
+              //               //       color: Colors.black.withOpacity(0.3),
+              //               //       blurRadius: 5,
+              //               //       spreadRadius: 0,
+              //               //     ),
+              //               //   ],
+              //             ),
+              //           ),
+              //           // Icon with shadow
+              //           const Icon(
+              //             Icons.arrow_back,
+              //             color: Colors.white,
+              //             // shadows: [
+              //             //   Shadow(
+              //             //     color: Colors.black.withOpacity(0.5),
+              //             //     blurRadius: 4,
+              //             //     offset: Offset(2, 2),
+              //             //   ),
+              //             // ],
+              //           ),
+              //         ],
+              //       ),
+              //       iconSize: 30,
+              //       padding: EdgeInsets.zero,
+              //     )),
               Positioned(
                 top: controller.isSimulation
                     ? getWidgetHeight(height: 60)
-                    : null,
-                bottom: controller.isSimulation
-                    ? null
-                    : getWidgetHeight(height: 20),
+                    : getWidgetHeight(height: 35),
+                // bottom: controller.isSimulation
+                //     ? null
+                //     : getWidgetHeight(height: 20),
                 left: getWidgetWidth(width: 10),
                 child: Container(
+                  width: getWidgetWidth(width: 40),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white,

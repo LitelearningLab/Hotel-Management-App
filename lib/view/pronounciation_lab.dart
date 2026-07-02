@@ -752,24 +752,55 @@ class _PronounciationLabState extends State<PronounciationLab> {
                                       SizedBox(
                                         height: getWidgetHeight(height: 80),
                                       )
-                                  ],
-                                );
-                              },
-                            )
-                          : ListView.builder(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: getWidgetHeight(height: 10),
-                                  horizontal: getWidgetWidth(width: 15)),
-                              itemCount: controller.categories.length,
-                              itemBuilder: (context, index) {
-                                return Column(
-                                  children: [
-                                    _HoverCard(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          subCategoryTitle = controller
-                                              .categories[index].category;
-                                          final storageData = {
+                                    : const SizedBox.shrink(),
+                              ),
+                              if (controller.subcategories.length - 1 == index)
+                                SizedBox(
+                                  height: getWidgetHeight(height: 80),
+                                )
+                            ],
+                          );
+                        },
+                      )
+                    : ListView.builder(
+                        padding: EdgeInsets.symmetric(
+                            vertical: getWidgetHeight(height: 10),
+                            horizontal: getWidgetWidth(width: 15)),
+                        itemCount: controller.categories.length,
+                        itemBuilder: (context, index) {
+                          return Column(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  subCategoryTitle =
+                                      controller.categories[index].category;
+                                  addToRecentHistory(
+                                      path:
+                                          "Language Lab > ${controller.title.value} > ${controller.categories[index].category}",
+                                      category:
+                                          controller.categories[index].category,
+                                      section: "Pronunciation Lab",
+                                      link: "",
+                                      proLabTitle: "",
+                                      proSubcategories: controller
+                                          .categories[index].subcategories,
+                                      pronunCollectionName:
+                                          controller.collectionName,
+                                      proId: controller
+                                          .categories[index].category);
+                                  GetStorage()
+                                      .write(AppRoutes.pronunciationLabSub, {
+                                    'title':
+                                        controller.categories[index].category,
+                                    'subcategories': controller
+                                        .categories[index].subcategories
+                                        .map((e) => e.toMap())
+                                        .toList(),
+                                  });
+                                  kIsWeb
+                                      ? Get.rootDelegate.offNamed(
+                                          AppRoutes.pronunciationLabSub,
+                                          arguments: {
                                             'title': controller
                                                 .categories[index].category,
                                             'subcategories': controller

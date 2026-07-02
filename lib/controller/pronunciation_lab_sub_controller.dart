@@ -116,6 +116,11 @@ class PronunciationLabSubController extends GetxController {
     final args = Get.arguments;
     final box = GetStorage();
     var argList = [];
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString("userId") ?? "";
+    collegeId = prefs.getString("collegeId") ?? "";
+    batchName = prefs.getString("batchName") ?? "";
+
     if (args != null) {
       title = args['title'];
       argList = args['subcategories'] as List;
@@ -135,6 +140,10 @@ class PronunciationLabSubController extends GetxController {
       mainCategoryTitle = saved['mainCategoryTitle'] ?? '';
       index = _parseSafeIndex(saved['index']);
     }
+    debugPrint("collection name is $collectionName");
+    debugPrint("argument list is $argList");
+    debugPrint("title is $title");
+    mainCategoryTitle = title;
 
     ogSubCategories = argList
         .map((item) => item is SubcategoryPro
@@ -169,7 +178,7 @@ class PronunciationLabSubController extends GetxController {
     } else {
       fetchPronunById(id);
     }
-    final prefs = await SharedPreferences.getInstance();
+    // final prefs = await SharedPreferences.getInstance();
     userId = prefs.getString("userId") ?? "";
     collegeId = prefs.getString("collegeId") ?? "";
     batchName = prefs.getString("batchName") ?? "";
@@ -222,7 +231,7 @@ class PronunciationLabSubController extends GetxController {
           log("Attempt made. Word: $word, Correct: $isCorrect");
 
           final attempt = WordAttempt(
-            batch: "CurrentBatchId",
+            batch: batchName,
             companyId: collegeId,
             correct: isCorrect ? 1 : 0,
             date: DateTime.now().toIso8601String().substring(0, 10),
@@ -595,7 +604,7 @@ class PronunciationLabSubController extends GetxController {
         await audioPlayer.play();
 
         final attempt = WordAttempt(
-          batch: "yourBatch",
+          batch: batchName,
           companyId: collegeId,
           correct: 0,
           date: "",

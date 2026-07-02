@@ -30,7 +30,6 @@ class ARGridTile extends StatelessWidget {
       hoverColor: Colors.transparent,
       splashColor: Colors.transparent,
       focusColor: Colors.transparent,
-      // overlayColor: Colors.transparent,
       highlightColor: Colors.transparent,
 
       onTap: () {
@@ -44,7 +43,6 @@ class ARGridTile extends StatelessWidget {
               children: [
                 Container(
                   width: getWidgetWidth(width: 100),
-                  // height: getWidgetHeight(height: 100),/
                   padding: EdgeInsets.symmetric(
                       vertical: getWidgetHeight(height: 5)),
                   decoration: BoxDecoration(
@@ -59,6 +57,7 @@ class ARGridTile extends StatelessWidget {
                     ],
                   ),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
@@ -68,47 +67,53 @@ class ARGridTile extends StatelessWidget {
                         padding: EdgeInsets.symmetric(
                             horizontal: getWidgetWidth(width: 10)),
                         child: SizedBox(
-                            height: getWidgetHeight(height: 210),
+                            height: getWidgetHeight(height: 180).clamp(90.0, 130.0),
                             child: Image.asset(icon)),
                       ),
+                      const SizedBox(height: 12),
                       Padding(
-                        padding:
-                            const EdgeInsets.only(left: 10, top: 10, right: 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12),
                         child: Text(
                           title,
+                          textAlign: TextAlign.center,
                           style: GoogleFonts.inter(
-                              fontSize: 18,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                      SizedBox(height: getWidgetHeight(height: 10)),
                     ],
                   ),
                 ),
 
                 // 🔹 Overlay Layer for "Under Construction"
                 if (isUnderConstruction)
-                  Container(
-                      width: getWidgetWidth(width: 100),
+                  Positioned.fill(
+                    child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.75),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Center(
                         child: Container(
-                          width: displayWidth(context) > 1200
-                              ? getWidgetWidth(width: 140)
-                              : getWidgetWidth(width: 160),
+                          width: double.infinity,
                           color: linearColor,
-                          child: Text("Under Review",
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.normal)),
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Text(
+                            "Under Review",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
-                      )),
+                      ),
+                    ),
+                  ),
               ],
             )
           : Stack(
@@ -131,89 +136,64 @@ class ARGridTile extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: displayWidth(context) > 1200
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: getWidgetWidth(width: 10)),
-                              child: SizedBox(
-                                height: getWidgetHeight(height: 100),
-                                child: Image.asset(icon),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 10, top: 10, right: 20),
-                              child: Text(
-                                title,
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  color: isUnderConstruction
-                                      ? Colors.grey
-                                      : Colors.black, // 🔹 title color
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: getWidgetWidth(width: 10)),
-                              child: SizedBox(
-                                height: getWidgetHeight(height: 100),
-                                child: Image.asset(icon),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 10, top: 10, right: 20),
-                              child: Text(
-                                title,
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  color: isUnderConstruction
-                                      ? Colors.grey
-                                      : Colors.black,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: getWidgetHeight(height: 20)),
-                          ],
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: getWidgetWidth(width: 10)),
+                        child: SizedBox(
+                          height: getWidgetHeight(height: 100).clamp(50.0, 90.0),
+                          child: Image.asset(icon),
                         ),
+                      ),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12),
+                        child: Text(
+                          title,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: isUnderConstruction
+                                ? Colors.grey
+                                : Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 // 🔹 Overlay Layer for "Under Construction"
                 if (isUnderConstruction)
-                  Container(
-                      width: displayWidth(context) > 1200
-                          ? getWidgetWidth(width: 140)
-                          : getWidgetWidth(width: 160),
-                      height: displayWidth(context) > 1200
-                          ? getWidgetHeight(height: 110)
-                          : getWidgetHeight(height: 180),
+                  Positioned.fill(
+                    child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.75),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Center(
                         child: Container(
-                          width: displayWidth(context) > 1200
-                              ? getWidgetWidth(width: 140)
-                              : getWidgetWidth(width: 160),
+                          width: double.infinity,
                           color: linearColor,
-                          child: Text("Under Review",
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.normal)),
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Text(
+                            "Under Review",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
-                      )),
+                      ),
+                    ),
+                  ),
               ],
             ),
     );

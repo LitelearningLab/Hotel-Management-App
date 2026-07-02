@@ -16,6 +16,7 @@ import 'package:hotelmanagementapp/public/constant.dart';
 import 'package:hotelmanagementapp/route/route_name.dart';
 import 'package:hotelmanagementapp/utility/speech_analytics_dialog.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class SoundLabController extends GetxController {
@@ -58,6 +59,8 @@ class SoundLabController extends GetxController {
 
   bool isFiltering = false;
   bool isSearching = false;
+
+  List<SoundPractice> get _activePracticeList => soundsPractice ?? [];
   @override
   void onInit() {
     audioPlayer = AudioPlayer();
@@ -90,7 +93,18 @@ class SoundLabController extends GetxController {
         update();
       }
     });
+
+    _initIds();
     super.onInit();
+  }
+
+  Future<void> _initIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString("userId") ?? "";
+    collegeId = prefs.getString("collegeId") ?? "";
+    batchName = prefs.getString("batchName") ?? "";
+    mainCategoryTitle = soundSubcategory.name;
+    update();
   }
 
   Future<void> fetchLocalOrSave() async {
@@ -160,6 +174,14 @@ class SoundLabController extends GetxController {
     } catch (e, stack) {
       log("🔥 FATAL ERROR inside fetchLocalOrSave(): $e");
       log(stack.toString());
+      // Fallback to in-memory payload so UI does not stay in loading state.
+      soundsPractice =
+          List<SoundPractice>.from(soundSubcategory.soundsPractice ?? []);
+      isPriorityList =
+          soundsPractice!.map((item) => item.downloadStatus == true).toList();
+      masterList = List<SoundPractice>.from(soundsPractice!);
+      isLoading = false;
+      update();
     }
   }
 
@@ -335,6 +357,9 @@ class SoundLabController extends GetxController {
   }
 
   Future<void> handlePlayPause(int index) async {
+    final activeList = _activePracticeList;
+    if (index < 0 || index >= activeList.length) return;
+
     loadingIndex = index;
     isPlaying = true;
     errorPlaying = -1;
@@ -349,20 +374,20 @@ class SoundLabController extends GetxController {
         await audioPlayer.stop();
         currentlyPlayingIndex = index;
 
+        final currentItem = activeList[index];
         String? playPath;
-        if (soundSubcategory.soundsPractice![index].localPath.isNotEmpty &&
-            await File(soundSubcategory.soundsPractice![index].localPath)
-                .exists()) {
+        if (currentItem.localPath.isNotEmpty &&
+            await File(currentItem.localPath).exists()) {
           log("🔐 Decrypting local file before playing...");
           playPath = await AudioCryptoHelper.decryptFile(
-            soundSubcategory.soundsPractice![index].localPath,
-            soundSubcategory.soundsPractice![index].text
+            currentItem.localPath,
+            currentItem.text
                 .replaceAll(' ', '_')
                 .replaceAll(RegExp(r'[<>:"/\\|?*]'), ''),
           );
           log("Decrypted to temp file: $playPath");
         } else {
-          playPath = soundSubcategory.soundsPractice![index].file; // URL
+          playPath = currentItem.file; // URL
           log("Playing from URL: $playPath");
         }
 
@@ -373,7 +398,7 @@ class SoundLabController extends GetxController {
         await audioPlayer.play();
 
         final attempt = WordAttempt(
-          batch: "yourBatch",
+          batch: batchName,
           companyId: collegeId,
           correct: 0,
           date: "",
@@ -385,17 +410,14 @@ class SoundLabController extends GetxController {
           timeCal: DateTime.now().millisecondsSinceEpoch,
           title: soundSubcategory.name,
           userId: userId,
-          word: soundSubcategory.soundsPractice![index].text,
+          word: currentItem.text,
         );
 
         await WordAttempt.saveAttempt(attempt);
       }
       errorPlaying = -1;
     } on PlayerException catch (e) {
-      if (kDebugMode) {
-        print(
-            "❌ Audio player error: ${e.message} ${soundSubcategory.soundsPractice![index].file}");
-      }
+      print("❌ Audio player error: ${e.message}");
       errorPlaying = index;
       currentlyPlayingIndex = null;
     } on Exception catch (e) {
@@ -440,10 +462,13 @@ class SoundLabController extends GetxController {
   }
 
   Future<void> scrollToIndex(int index) async {
-    if (!scrollController.hasClients || index < 5) return;
-    double offset = (index - 5) * 80.0;
+    if (!scrollController.hasClients || index < 0) return;
+    const double rowExtent = 80.0;
+    final viewport = scrollController.position.viewportDimension;
+    double offset = (index * rowExtent) - ((viewport - rowExtent) / 2);
 
     final maxScroll = scrollController.position.maxScrollExtent;
+    if (offset < 0) offset = 0;
     if (offset > maxScroll) offset = maxScroll;
 
     await scrollController.animateTo(
@@ -477,6 +502,9 @@ class SoundLabController extends GetxController {
   }
 
   Future playOneTime() async {
+    final activeList = _activePracticeList;
+    if (activeList.isEmpty) return;
+
     await stopAllPlaying();
     // await resetState();
     isPlayingOne = true;
@@ -486,9 +514,7 @@ class SoundLabController extends GetxController {
     currentIndex = 0;
     await WakelockPlus.enable();
     update();
-    for (int i = currentIndex;
-        i < soundSubcategory.soundsPractice!.length;
-        i++) {
+    for (int i = currentIndex; i < activeList.length; i++) {
       if (isCancelled || isPlayingThree) break;
       while (isPaused) {
         await Future.delayed(const Duration(milliseconds: 200));
@@ -496,6 +522,7 @@ class SoundLabController extends GetxController {
       currentIndex = i;
       expandedIndex = i;
       update();
+      await Future.delayed(const Duration(milliseconds: 120));
       await scrollToIndex(currentIndex);
       await handlePlayPause(currentIndex);
       while (currentlyPlayingIndex != null && !isCancelled) {
@@ -516,6 +543,9 @@ class SoundLabController extends GetxController {
   }
 
   Future<void> playThreeTimes() async {
+    final activeList = _activePracticeList;
+    if (activeList.isEmpty) return;
+
     await stopAllPlaying();
     // await resetState();
     isPlayingThree = true;
@@ -526,9 +556,7 @@ class SoundLabController extends GetxController {
     currentRepeat = 0;
     await WakelockPlus.enable();
     update();
-    for (int index = currentIndex;
-        index < soundSubcategory.soundsPractice!.length;
-        index++) {
+    for (int index = currentIndex; index < activeList.length; index++) {
       for (int i = currentRepeat; i < 3; i++) {
         if (isCancelled || isPlayingOne) break;
         while (isPaused) {
@@ -538,6 +566,7 @@ class SoundLabController extends GetxController {
         expandedIndex = index;
         currentRepeat = i;
         update();
+        await Future.delayed(const Duration(milliseconds: 120));
         await scrollToIndex(currentIndex);
         await handlePlayPause(index);
         while (currentlyPlayingIndex != null && !isCancelled) {

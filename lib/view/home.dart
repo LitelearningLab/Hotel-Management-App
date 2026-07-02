@@ -1,9 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_launcher_icons/xml_templates.dart';
+// import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hotelmanagementapp/controller/bottom_navigation_controller.dart';
+import 'package:hotelmanagementapp/controller/home_controller.dart';
 import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
@@ -25,8 +33,6 @@ import 'package:hotelmanagementapp/model/sound_model.dart';
 import 'package:hotelmanagementapp/view/grammer_lab_sub.dart';
 import 'package:hotelmanagementapp/utility/web_view_page.dart';
 
-int currentIndex = 0;
-
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -34,9 +40,12 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with WidgetsBindingObserver {
-  late final HomeController ctr;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+class _HomeState extends State<Home>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  late TabController _tabController;
+  HomeController historyController = Get.put(HomeController());
+  BottomNavigationController bottomNavController =
+      Get.find<BottomNavigationController>();
   String? appVersion;
 
   // --------------------------------------------------
@@ -45,14 +54,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-
-    /// ✅ KEEP HOME CONTROLLER ALIVE
-    ctr = Get.find<HomeController>();
-
-    currentIndex = 0;
     _loadAppVersion();
-    ctr.loadRecentHistory();
+    bottomNavController.setIndex(0);
     UpdateChecker.checkForUpdate(context);
   }
 
@@ -318,49 +321,56 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      ctr.loadRecentHistory();
+    // if (state == AppLifecycleState.resumed) {
+    // This is like onResume
+    historyController.loadRecentHistory();
+    // }
+  }
+
+  Future<void> _loadAppVersion() async {
+    if (Platform.isIOS) {
+      setState(() {
+        appVersion = "1.0.4";
+      });
+    } else {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      setState(() {
+        appVersion = packageInfo.version;
+      });
     }
   }
 
-  // --------------------------------------------------
-  // BUILD
-  // --------------------------------------------------
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF9FAFB),
-      endDrawer: _mainDrawer(),
-      body: Column(
-        children: [
-          /// ✅ WEB HEADER SAFE
-          if (kIsWeb)
-            WebHeaderWithNav(
-              title: 'Home',
-              onDrawer: () {
-                _scaffoldKey.currentState?.openEndDrawer();
-              },
-            )
-          else
-            _mobileHeader(),
-
-          /// ✅ BODY MUST BE EXPANDED
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32,
-                vertical: 24,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _fiveCardRow(context),
-                  const SizedBox(height: 32),
-                  _dashboardRow(),
-                ],
-              ),
+  Future<void> exitPop() async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white, // White background
+        title: Text(
+          'Exit',
+          style: TextStyle(color: Colors.black), // Black title text
+        ),
+        content: Text(
+          'Are you sure you want to Exit?',
+          style: TextStyle(color: Colors.black), // Black content text
+        ),
+        actions: [
+          TextButton(
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.black), // Black button text
             ),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: Text(
+              'Exit',
+              style: TextStyle(color: Colors.black), // Black button text
+            ),
+            onPressed: () async {
+              Navigator.pop(context);
+              await SystemNavigator.pop();
+            },
           ),
         ],
       ),
@@ -402,19 +412,11 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     final width = MediaQuery.of(context).size.width;
     final cardWidth = (width - 160) / 5;
 
-    return GetBuilder<HomeController>(
-      builder: (c) {
-        return Row(
-          children: List.generate(c.cardNames.length, (index) {
-            return Padding(
-              padding: EdgeInsets.only(right: index == 4 ? 0 : 20),
-              child: SizedBox(
-                width: cardWidth,
-                child: _CourseCard(index, c),
-              ),
-            );
-          }),
-        );
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        await exitPop();
       },
     );
   }
@@ -941,14 +943,388 @@ class _CourseCardState extends State<_CourseCard> {
                           ),
                         ),
                       ),
-                      const Text(
-                        "View Details",
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Spacer(),
+                      Builder(builder: (context) {
+                        return GestureDetector(
+                          onTap: () {
+                            _scaffoldKey.currentState?.openEndDrawer();
+                          },
+                          child: Container(
+                            height: getWidgetHeight(height: 40),
+                            width: getWidgetWidth(width: 40),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: getWidgetWidth(width: 8),
+                                vertical: getWidgetHeight(height: 10)),
+                            decoration: BoxDecoration(
+                                color: const Color(0xFFF7F8F8),
+                                borderRadius: BorderRadius.circular(16)),
+                            child: Image.asset(
+                              AllAssets.drawerIcon,
+                              color: Colors.black,
+                            ),
+                          ),
+                        );
+                      })
+                    ],
+                  ),
+                ),
+                SizedBox(height: getWidgetHeight(height: 5)),
+                if (kIsWeb) SizedBox(height: getWidgetHeight(height: 20)),
+                GetBuilder<HomeController>(
+                    init: HomeController(),
+                    builder: (hController) {
+                      return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                right: getWidgetWidth(width: 20),
+                                left: getWidgetWidth(
+                                    width: isKwidth > 700 ? 18 : 0)),
+                            child: Row(
+                              children: List.generate(
+                                  hController.cardNames.length, (index) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      left: getWidgetWidth(
+                                          width: isKwidth > 700 ? 5 : 20),
+                                      bottom: getWidgetHeight(height: 20),
+                                      top: getWidgetHeight(height: 10)),
+                                  child: AnimatedContainer(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    height: displayWidth(context) > 800
+                                        ? 340
+                                        : getWidgetHeight(height: 300),
+                                    width: isKwidth > 800
+                                        ? 240
+                                        : getWidgetWidth(width: 218),
+                                    duration: const Duration(milliseconds: 300),
+                                    child: InkWell(
+                                      highlightColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      splashColor: Colors.transparent,
+                                      onTap: () {
+                                        timestampIndex = index;
+                                        mainCategoryTitle =
+                                            hController.cardNames[index];
+                                        if (index != 4) {
+                                          debugPrint(
+                                              "Card name is and the click is happening or not ${hController.cardNames[index]}");
+                                          GetStorage()
+                                              .write(AppRoutes.frontOffice, {
+                                            'title': hController
+                                                        .cardNames[index] ==
+                                                    "Front Office\nManagement"
+                                                ? "Front Office Management"
+                                                : hController
+                                                            .cardNames[index] ==
+                                                        "Food & Beverage Service\nManagement"
+                                                    ? "Food & Beverage Service Management"
+                                                    : hController.cardNames[
+                                                                index] ==
+                                                            "Accommodation\nManagement - Housekeeping"
+                                                        ? "Accommodation Management - Housekeeping"
+                                                        : hController
+                                                            .cardNames[index],
+                                            'image':
+                                                hController.cardImages[index],
+                                            'index': index,
+                                          });
+                                          WidgetsBinding.instance
+                                              .addPostFrameCallback((_) {
+                                            if (kIsWeb) {
+                                              Get.rootDelegate.offNamed(
+                                                  AppRoutes.frontOffice,
+                                                  arguments: {
+                                                    'title': hController
+                                                                    .cardNames[
+                                                                index] ==
+                                                            "Front Office\nManagement"
+                                                        ? "Front Office Management"
+                                                        : hController.cardNames[
+                                                                    index] ==
+                                                                "Food & Beverage Service\nManagement"
+                                                            ? "Food & Beverage Service Management"
+                                                            : hController.cardNames[
+                                                                        index] ==
+                                                                    "Accommodation\nManagement - Housekeeping"
+                                                                ? "Accommodation Management - Housekeeping"
+                                                                : hController
+                                                                        .cardNames[
+                                                                    index],
+                                                    'image': hController
+                                                        .cardImages[index],
+                                                    'index': index,
+                                                  });
+                                            } else {
+                                              Get.toNamed(AppRoutes.frontOffice,
+                                                  arguments: {
+                                                    'title': hController
+                                                                    .cardNames[
+                                                                index] ==
+                                                            "Front Office\nManagement"
+                                                        ? "Front Office Management"
+                                                        : hController.cardNames[
+                                                                    index] ==
+                                                                "Food & Beverage Service\nManagement"
+                                                            ? "Food & Beverage Service Management"
+                                                            : hController.cardNames[
+                                                                        index] ==
+                                                                    "Accommodation\nManagement - Housekeeping"
+                                                                ? "Accommodation Management - Housekeeping"
+                                                                : hController
+                                                                        .cardNames[
+                                                                    index],
+                                                    'image': hController
+                                                        .cardImages[index],
+                                                    'index': index,
+                                                  });
+                                            }
+                                          });
+                                        } else {
+                                          GetStorage().write(
+                                              AppRoutes.universityLab,
+                                              hController.universityModel.toMap());
+                                          if (kIsWeb) {
+                                            Get.rootDelegate.offNamed(
+                                              AppRoutes.universityLab,
+                                              arguments: hController.universityModel,
+                                            );
+                                          } else {
+                                            Get.toNamed(
+                                              AppRoutes.universityLab,
+                                              arguments: hController.universityModel,
+                                            );
+                                          }
+                                        }
+                                      },
+                                      child: AnimatedContainer(
+                                        duration: Duration(milliseconds: 300),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              offset: const Offset(0, 4),
+                                              blurRadius: 10,
+                                            ),
+                                          ],
+                                        ),
+                                        child: GetBuilder<HomeController>(
+                                            builder: (ctr) {
+                                          return Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              AnimatedContainer(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                ),
+                                                duration:
+                                                    Duration(microseconds: 300),
+                                                width: isKwidth > 800
+                                                    ? 240
+                                                    : getWidgetWidth(
+                                                        width: 218),
+                                                height:
+                                                    displayWidth(context) > 800
+                                                        ? 180
+                                                        : getWidgetHeight(
+                                                            height: 157),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      const BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(16),
+                                                    topRight:
+                                                        Radius.circular(16),
+                                                  ),
+                                                  child: index == 4
+                                                      ? Image.network(
+                                                          hController
+                                                                  .cardImages[
+                                                              index],
+                                                          fit: BoxFit.fill,
+                                                        )
+                                                      : SvgPicture.asset(
+                                                          hController
+                                                                  .cardImages[
+                                                              index],
+                                                          fit: isKwidth > 800
+                                                              ? BoxFit.fill
+                                                              : BoxFit.fitWidth,
+                                                        ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  height: isKwidth > 700
+                                                      ? 5
+                                                      : getWidgetHeight(
+                                                          height: 8)),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: isKwidth > 700
+                                                        ? 10
+                                                        : getWidgetWidth(
+                                                            width: 10)),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      index == 4
+                                                          ? "Institute Specific Content"
+                                                          : "Hotel Management",
+                                                      style: TextStyle(
+                                                        color: lightWhite,
+                                                        fontSize: kText.scale(
+                                                          // (isKwidth >
+                                                          //         1200) // full desktop
+                                                          //     ? 12
+                                                          //     : (isKwidth <
+                                                          //             500) // mobile
+                                                          //         ?
+                                                          12
+                                                          // :
+                                                          // 10
+                                                          , // tablet / in-between
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                        height: isKwidth > 700
+                                                            ? 6
+                                                            : getWidgetHeight(
+                                                                height: 8)),
+                                                    AnimatedContainer(
+                                                      duration: Duration(
+                                                          milliseconds: 300),
+                                                      height: isKwidth > 700
+                                                          ? 90
+                                                          : getWidgetHeight(
+                                                              height: 78),
+                                                      child: Text(
+                                                        hController
+                                                            .cardNames[index],
+                                                        textAlign:
+                                                            TextAlign.start,
+                                                        overflow:
+                                                            TextOverflow.fade,
+                                                        style:
+                                                            GoogleFonts.inter(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: kText.scale(
+                                                            // (isKwidth > 1200)
+                                                            //     ? 16
+                                                            //     : (isKwidth <
+                                                            //             500) // mobile
+                                                            //         ?
+                                                            16
+                                                            // :
+                                                            // 13
+                                                            , // tablet / in-between
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                        height: isKwidth > 700
+                                                            ? 5
+                                                            : getWidgetHeight(
+                                                                height: 5)),
+                                                    SizedBox(
+                                                      height: isKwidth > 700
+                                                          ? 18
+                                                          : getWidgetHeight(
+                                                              height: 15),
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            "View Details",
+                                                            textAlign:
+                                                                TextAlign.start,
+                                                            style: TextStyle(
+                                                              fontSize: kText
+                                                                  .scale(12),
+                                                              color:
+                                                                  linearColor,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                          // LinearPercentIndicator(
+                                                          //   center: Text(
+                                                          //     "20%",
+                                                          //     style: TextStyle(
+                                                          //         color: Colors.white,
+                                                          //         fontSize: kText
+                                                          //             .scale(10)),
+                                                          //   ),
+                                                          //   barRadius:
+                                                          //       Radius.circular(6),
+                                                          //   width: getWidgetWidth(
+                                                          //       width: 150),
+                                                          //   lineHeight:
+                                                          //       getWidgetHeight(
+                                                          //           height: 14),
+                                                          //   percent: 0.2,
+                                                          //   backgroundColor:
+                                                          //       Colors.grey,
+                                                          //   progressColor:
+                                                          //       linearColor,
+                                                          // ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    // if (!kIsWeb)
+                                                    SizedBox(
+                                                        height: isKwidth > 700
+                                                            ? 14
+                                                            : getWidgetHeight(
+                                                                height: 10))
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ));
+                    }),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: getWidgetWidth(width: 20)),
+                  child: TabBar(
+                    controller: _tabController,
+                    labelPadding: EdgeInsets.zero,
+                    indicatorPadding: EdgeInsets.zero,
+                    labelColor: darkBlack,
+                    unselectedLabelColor: lightWhite,
+                    indicatorColor: linearColor,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    tabs: const [
+                      Tab(text: 'Smart Shots'),
+                      Tab(text: 'Recent History'),
+                      Tab(text: 'To Do'),
                     ],
                   ),
                 ),
@@ -1044,7 +1420,145 @@ class _SmartTileState extends State<_SmartTile> {
                   ),
                 ),
 
-                const SizedBox(width: 14),
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                GrammerLabSub(
+                                                                  title: item[
+                                                                      'category'],
+                                                                  doc:
+                                                                      grammerDocs,
+                                                                )));
+                                                  } else if (item['section'] ==
+                                                      'Sentence Lab') {
+                                                    final subCategories = (item[
+                                                                'subCategories']
+                                                            as List)
+                                                        .map((e) => SubCategoryModel
+                                                            .fromJson(Map<
+                                                                String,
+                                                                dynamic>.from(e)))
+                                                        .toList();
+                                                    WidgetsBinding.instance
+                                                        .addPostFrameCallback(
+                                                            (_) {
+                                                      !kIsWeb
+                                                          ? Get.toNamed(
+                                                              AppRoutes
+                                                                  .sentenceLabSubCat,
+                                                              arguments: {
+                                                                "title": item[
+                                                                    'category'],
+                                                                "CategoryModel":
+                                                                    subCategories,
+                                                              },
+                                                            )
+                                                          : Get.rootDelegate
+                                                              .offNamed(
+                                                              AppRoutes
+                                                                  .sentenceLabSubCat,
+                                                              arguments: {
+                                                                "title": item[
+                                                                    'category'],
+                                                                "CategoryModel":
+                                                                    subCategories,
+                                                              },
+                                                            );
+                                                    });
+                                                  } else if (item['section'] ==
+                                                      'Pronunciation Lab') {
+                                                    log("proLab tapped");
+                                                    final proSubcategories = (item[
+                                                                    'proSubcategories']
+                                                                as List<
+                                                                    dynamic>?)
+                                                            ?.map((e) => SubcategoryPro
+                                                                .fromJson(e
+                                                                    as Map<
+                                                                        String,
+                                                                        dynamic>))
+                                                            .toList() ??
+                                                        <SubcategoryPro>[];
+                                                    Get.toNamed(
+                                                        AppRoutes
+                                                            .pronunciationLabSub,
+                                                        arguments: {
+                                                          'title':
+                                                              item['category'],
+                                                          'subcategories':
+                                                              proSubcategories,
+                                                          'pronunCollectionName':
+                                                              item['pronunCollectionName'] ??
+                                                                  '',
+                                                          'id': item['proId'] ??
+                                                              '',
+                                                        });
+                                                  } else {
+                                                    if (kIsWeb) {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              WebContentPage(
+                                                                  title: item[
+                                                                      'category'],
+                                                                  url: item[
+                                                                      'link']),
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      Get.toNamed(
+                                                          AppRoutes
+                                                              .inAppWebView,
+                                                          arguments: {
+                                                            "isSimulation":
+                                                                item['section'] ==
+                                                                        'simulation'
+                                                                    ? true
+                                                                    : false,
+                                                            "url": item['link'],
+                                                          });
+                                                    }
+                                                  }
+                                                },
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Flexible(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            item['section'] ??
+                                                                '',
+                                                            style: TextStyle(
+                                                              fontSize: kText
+                                                                  .scale(12),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              color: Colors
+                                                                  .grey[700],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Icon(
+                                                      Icons
+                                                          .arrow_forward_ios_outlined,
+                                                      size: 16,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
 
                 Expanded(
                   child: Column(

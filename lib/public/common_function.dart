@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:hotelmanagementapp/model/category_model.dart';
 import 'package:hotelmanagementapp/model/grammer_lab_model.dart';
 import 'package:hotelmanagementapp/model/sentence_model.dart';
 import 'package:hotelmanagementapp/model/sound_model.dart';
@@ -123,7 +123,7 @@ void recordTiming(String state) {
 
 void startTimerMainCategory(String name) {
   log("entering to the start timer main category");
-  mainCategoryTitle = name;
+  // mainCategoryTitle = name;
   if (!isTimerActive) {
     count = 1;
     startTimings = DateTime.now();
@@ -264,10 +264,10 @@ Future<void> startPracticeTime({
                             ? CollectionNames.langauqeLabTimestamp
                             : index == 7
                                 ? CollectionNames.contentLabTimestamp
-                                : throw Exception('Invalid index: $index');
-    if (kDebugMode) {
-      print('📂 Collection Name: $collectionName');
-    }
+                                : index == 8
+                                    ? CollectionNames.universityTimestamp
+                                    : throw Exception('Invalid index: $index');
+    print('📂 Collection Name: $collectionName');
 
     // 3. Prepare Firestore instance
     final firestore = FirebaseFirestore.instance;
@@ -512,7 +512,9 @@ void addToRecentHistory({
   List<SubCategoryModel>? subCategories,
   GrammarDoc? grammarDocs,
   SoundSubcategory? soundSubcategory,
-  Map<String, dynamic>? extraStorageData,
+  List<dynamic>? proSubcategories,
+  String? pronunCollectionName,
+  String? proId,
 }) async {
   final newEntry = {
     'path': path,
@@ -523,7 +525,12 @@ void addToRecentHistory({
     'subCategories': subCategories?.map((e) => e.toJson()).toList() ?? [],
     'grammarDocs': grammarDocs != null ? grammarDocs.toJson() : {},
     'soundSub': soundSubcategory != null ? soundSubcategory.toJson() : {},
-    if (extraStorageData != null) 'extraStorageData': extraStorageData,
+    'proSubcategories': proSubcategories
+            ?.map((e) => e is SubcategoryPro ? e.toJson() : e)
+            .toList() ??
+        [],
+    'pronunCollectionName': pronunCollectionName ?? '',
+    'proId': proId ?? '',
   };
 
   // Safe remove

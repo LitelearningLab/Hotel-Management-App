@@ -100,6 +100,8 @@ class SubcategoryPro {
     };
   }
 
+  Map<String, dynamic> toJson() => toMap();
+
   SubcategoryPro copyWith({
     List<String>? sentenceSamples,
     String? localPath,

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hotelmanagementapp/controller/bottom_navigation_controller.dart';
 import 'package:hotelmanagementapp/model/simulation_model.dart';
 import 'package:hotelmanagementapp/public/api.dart';
 import 'package:hotelmanagementapp/public/common_function.dart';
@@ -20,7 +21,7 @@ class SimulationController extends GetxController {
     init();
     fetchInReviewStatus();
     timestampIndex = 4;
-    currentIndex = 2;
+    Get.find<BottomNavigationController>().setIndex(2);
     super.onInit();
   }
 

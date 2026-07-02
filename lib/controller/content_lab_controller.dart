@@ -106,10 +106,19 @@ class ContentLabController extends GetxController {
       }).toList();
     }
 
-    /// FILTER
-    if (selectedCategory != null) {
-      result = result.where((p) => p['category'] == selectedCategory).toList();
-    }
+    showPosts = [...posts];
+    update();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    mainCategoryTitle = "Content Library";
+    subCategoryTitle = "";
+    activityName = "";
+    sessionName = "";
+    sessionName2 = "";
+    timestampIndex = 7;
 
     if (selectedSubcategories.isNotEmpty) {
       result = result

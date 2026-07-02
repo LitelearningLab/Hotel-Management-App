@@ -25,6 +25,8 @@ import 'package:hotelmanagementapp/view/simulation_sub.dart';
 import 'package:hotelmanagementapp/view/sound_lab.dart';
 import 'package:hotelmanagementapp/view/sound_page.dart';
 import 'package:hotelmanagementapp/view/splash.dart';
+import 'package:hotelmanagementapp/view/university_lab.dart';
+import 'package:hotelmanagementapp/view/university_lab_sub.dart';
 
 import '../view/grammer_lab.dart';
 
@@ -124,15 +126,17 @@ class RouteService {
             middlewares: [AuthMiddleware()],
           ),
           GetPage(
-              name: AppRoutes.pronunciationLabSubPattern,
-              page: () => PronunciationLabSub(),
-              binding: PronunciationLabSubBinding(),
-              middlewares: [AuthMiddleware()]),
+            name: AppRoutes.universityLab,
+            page: () => const UniversityLab(),
+            binding: UniversityLabBinding(),
+            middlewares: [AuthMiddleware()],
+          ),
           GetPage(
-              name: AppRoutes.frontOfficePattern,
-              page: () => const FrontOfficeHotelReception(),
-              binding: FrontOfficeBinding(),
-              middlewares: [AuthMiddleware()]),
+            name: AppRoutes.universityLabSub,
+            page: () => const UniversityLabSub(),
+            binding: UniversityLabSubBinding(),
+            middlewares: [AuthMiddleware()],
+          )
         ]
       : [
           GetPage(
@@ -241,16 +245,14 @@ class RouteService {
             binding: FeedbackViewBinding(),
           ),
           GetPage(
-            name: AppRoutes.pronunciationLabSubPattern,
-            page: () => PronunciationLabSub(),
-            binding: PronunciationLabSubBinding(),
-            // middlewares: [AuthMiddleware()],
+            name: AppRoutes.universityLab,
+            page: () => const UniversityLab(),
+            binding: UniversityLabBinding(),
           ),
           GetPage(
-            name: AppRoutes.frontOfficePattern,
-            page: () => const FrontOfficeHotelReception(),
-            binding: FrontOfficeBinding(),
-            // middlewares: [AuthMiddleware()],
-          ),
+            name: AppRoutes.universityLabSub,
+            page: () => const UniversityLabSub(),
+            binding: UniversityLabSubBinding(),
+          )
         ];
 }

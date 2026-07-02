@@ -34,12 +34,15 @@ class _WebContentPageState extends State<WebContentPage> {
       return PopScope(
         onPopInvoked: (didPop) => stopTimerMainCategory(),
         child: Scaffold(
-          appBar: AppBar(leading: BackButton(onPressed: () {
-            stopTimerMainCategory();
-            Navigator.of(context).pop();
-          }),
-     
-          ),
+          appBar: AppBar(
+              title: Text(
+            widget.title,
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w600,
+              fontSize: kText.scale(20),
+              color: Colors.black,
+            ),
+          )),
           body: WebViewWidget(
             controller: WebViewController()
               ..loadRequest(Uri.parse(widget.url)), // only safe call

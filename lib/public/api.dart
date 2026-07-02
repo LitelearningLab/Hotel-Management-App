@@ -23,10 +23,10 @@ class CollectionNames {
       'InteractiveSimulationTimeStamp';
   static String langauqeLabTimestamp = 'LanguageLabTimeStamp';
   static String contentLabTimestamp = 'ContentLabTimeStamp';
+  static String universityTimestamp = 'UniversityTimeStamp';
 }
 
 class ApiRoutes {
   static String privacyPolicy =
       'https://litelearninglab.github.io/privacy-policy/';
 }
- 

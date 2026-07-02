@@ -37,6 +37,7 @@ class HomeController extends GetxController {
     "InteractiveSimulationTimeStamp": "Interactive Simulations",
     "LanguageLabTimeStamp": "Language Lab",
     "ContentLabTimeStamp": "Content Lab",
+    "UniversityTimeStamp": "University Lab",
   };
 
   List<String> cardNames = [
@@ -140,19 +141,28 @@ class HomeController extends GetxController {
       if (!userSnapshot.exists) return false;
 
       final userData = userSnapshot.data()!;
-      final companyId = userData['companyid'];
+      final String? access = userData['access'];
+      final String companyId;
+      final Map<String, dynamic> companyData;
 
-      if (companyId == null || companyId.toString().isEmpty) return false;
+      if (access == "company") {
+        companyId = userId;
+        companyData = userData;
+      } else {
+        final rawCompanyId = userData['companyid'];
+        if (rawCompanyId == null || rawCompanyId.toString().isEmpty)
+          return false;
+        companyId = rawCompanyId.toString();
 
-      final companySnapshot = await FirebaseFirestore.instance
-          .collection('UserNode')
-          .where('_id', isEqualTo: companyId)
-          .limit(1)
-          .get();
+        final companySnapshot = await FirebaseFirestore.instance
+            .collection('UserNode')
+            .where('_id', isEqualTo: companyId)
+            .limit(1)
+            .get();
 
-      if (companySnapshot.docs.isEmpty) return false;
-
-      final companyData = companySnapshot.docs.first.data();
+        if (companySnapshot.docs.isEmpty) return false;
+        companyData = companySnapshot.docs.first.data();
+      }
 
       // Company status check
       if (companyData['status'] != "1") return false;
@@ -164,6 +174,10 @@ class HomeController extends GetxController {
       }
 
       log("Here printing the access links: $accessLinks");
+
+      if (access == "Trainer Login" || access == "company") {
+        return true;
+      }
 
       // Subscription dates check
       final userSubDate =
@@ -177,9 +191,8 @@ class HomeController extends GetxController {
       bool isCompanyActive =
           companySubDate != null && companySubDate.isAfter(now);
       log("$isUserActive this is user active $isCompanyActive is company active");
-      if (!isUserActive) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.clear();
+      if (!isUserActive && !isCompanyActive) {
+        await SessionService.logoutUser();
         Fluttertoast.showToast(
             msg: "Subscription date has been finished.",
             toastLength: Toast.LENGTH_SHORT,
@@ -227,8 +240,10 @@ class HomeController extends GetxController {
           FirebaseFirestore.instance.collection('UserNode').doc(userId);
       final userSnapshot = await userRef.get();
       final userData = userSnapshot.data() ?? {};
-      final String collegeId =
-          userData['companyid'] ?? userData['collegeId'] ?? '';
+      final String? access = userData['access'];
+      final String collegeId = (access == "company")
+          ? userId
+          : (userData['companyid'] ?? userData['collegeId'] ?? '');
       log("College ID: $collegeId");
       if (collegeId.isNotEmpty) {
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -323,10 +338,8 @@ class HomeController extends GetxController {
               width: displayWidth(context) > 700 ? kWidth / 10 : kWidth / 2.5,
               child: TextButton(
                   onPressed: () async {
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.clear();
                     debugPrint("printing the clickings");
-                    SessionService.logoutUser();
+                    await SessionService.logoutUser();
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       kIsWeb
                           ? Get.rootDelegate.offNamed(AppRoutes.login)

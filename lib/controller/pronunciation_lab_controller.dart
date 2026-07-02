@@ -31,6 +31,7 @@ class PronunciationLabController extends GetxController {
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
   RxString title = "Pronunciation Lab".obs;
+  String collectionName = "";
   bool isSearching = false;
   TextEditingController searchController = TextEditingController();
   int? currentlyPlayingIndex;
@@ -201,6 +202,9 @@ class PronunciationLabController extends GetxController {
       final saved = box.read(AppRoutes.pronunciationLab) ?? {};
       title.value = saved['title'] ?? "";
     }
+    collectionName = title.value == "English Pronunciation"
+        ? "EnglishLabCollection"
+        : "FrenchLabCollection";
     debugPrint("PronunciationLabController title: ${title.value}");
 
     audioPlayer = AudioPlayer();
@@ -220,9 +224,19 @@ class PronunciationLabController extends GetxController {
             ? "EnglishLabCollection"
             : "FrenchLabCollection");
     _fetchData();
+    _initIds();
     log("PronunciationLabController initialized with title: ${title.value}");
 
     super.onInit();
+  }
+
+  Future<void> _initIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString("userId") ?? "";
+    collegeId = prefs.getString("collegeId") ?? "";
+    batchName = prefs.getString("batchName") ?? "";
+    mainCategoryTitle = title.value;
+    update();
   }
 
   Future<void> _fetchData() async {
@@ -410,7 +424,7 @@ class PronunciationLabController extends GetxController {
         await audioPlayer.play();
 
         final attempt = WordAttempt(
-          batch: "yourBatch",
+          batch: batchName,
           companyId: collegeId,
           correct: 0,
           date: "",
@@ -533,7 +547,7 @@ class PronunciationLabController extends GetxController {
         log("is correct or not $isCorrect");
 
         final attempt = WordAttempt(
-          batch: "yourBatch",
+          batch: batchName,
           companyId: collegeId,
           correct: isCorrect ? 1 : 0,
           date: "",

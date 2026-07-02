@@ -83,10 +83,39 @@ class SentenceLabSubCatController extends GetxController {
     activityName = "";
     sessionName = title;
 
-    _attachPlayerListener();
+    activityName = "";
+    sessionName = title;
+    audioPlayer.playerStateStream.listen((state) async {
+      if (state.processingState == ProcessingState.completed ||
+          state.processingState == ProcessingState.idle) {
+        if (currentKey != null) {
+          audioStatusMap[currentKey!] = AudioStatus.idle;
+          update();
+          currentKey = null;
+        }
+      }
 
+      // Optional: handle player stopped manually
+      if (state.playing == false &&
+          state.processingState == ProcessingState.ready) {
+        if (currentKey != null) {
+          audioStatusMap[currentKey!] = AudioStatus.idle;
+          update();
+        }
+      }
+    });
+
+    _initIds();
     reloadFromDB(title);
     super.onInit();
+  }
+
+  Future<void> _initIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString("userId") ?? "";
+    collegeId = prefs.getString("collegeId") ?? "";
+    batchName = prefs.getString("batchName") ?? "";
+    update();
   }
 
   Future<void> reloadFromDB(String categoryName) async {
@@ -130,10 +159,6 @@ class SentenceLabSubCatController extends GetxController {
       }
       allSubcategories = List.from(subcategories);
     }
-    final prefs = await SharedPreferences.getInstance();
-    userId = prefs.getString("userId") ?? "";
-    collegeId = prefs.getString("collegeId") ?? "";
-    batchName = prefs.getString("batchName") ?? "";
     isLoading = false;
     update();
   }
@@ -414,9 +439,31 @@ class SentenceLabSubCatController extends GetxController {
       update();
       await audioPlayer.play();
 
-      if (kDebugMode) {
-        print("▶️ Playing: $filePathToPlay");
-      }
+      // ✅ Mark as playing here
+
+      print("▶️ Playing: $filePathToPlay");
+
+      // ✅ Log listening attempt
+      final attempt = SentenceAttempt(
+        batch: batchName,
+        companyId: collegeId,
+        correct: 0,
+        dateTime: DateTime.now().toString(),
+        focusWord: [],
+        lastAttempt: DateTime.now().toString(),
+        lastScore: 0,
+        listAtt: 1,
+        load: title,
+        main: subcategories[index].id,
+        pracAtt: 0,
+        score: 0,
+        sentence: sentence.text,
+        time: 1,
+        timeCal: DateTime.now().millisecondsSinceEpoch,
+        title: title,
+        userId: userId,
+      );
+      await SentenceAttempt.saveAttempt(attempt);
     } catch (e) {
       if (requestId != _playbackRequestId) return;
       log("❌ Audio load error: $e");
@@ -493,30 +540,28 @@ class SentenceLabSubCatController extends GetxController {
     ).then((value) async {
       if (value != null &&
           (value.isCorrect == "true" || value.isCorrect == "false")) {
+        subCategoryTitle = main; // Set global subCategoryTitle
         final attempt = SentenceAttempt(
-          batch: "Your-Batch",
+          batch: batchName,
           companyId: collegeId,
           correct: value.isCorrect == "true" ? 1 : 0,
           dateTime: DateTime.now().toString(),
           focusWord: [
             {
-              DateTime.now().toIso8601String(): [
-                ...(value.correctWords ?? []),
-                value.wordPer,
-              ],
+              DateTime.now().toIso8601String(): value.correctWords ?? [],
             }
           ],
           lastAttempt: DateTime.now().toString(),
           lastScore: value.wordPer,
           listAtt: 0,
           load: title,
-          main: subCategoryTitle,
+          main: main, // subname (e.g. Airport)
           pracAtt: 1,
           score: value.wordPer,
           sentence: word,
           time: 1,
           timeCal: DateTime.now().millisecondsSinceEpoch,
-          title: main,
+          title: title, // Category title (e.g. Sentence Construction Lab)
           userId: userId,
         );
 
@@ -547,29 +592,9 @@ class SentenceLabSubCatController extends GetxController {
   }
 
   @override
-  void onClose() async {
-    try {
-      // Stop audio if playing
-      if (audioPlayer.playing) {
-        await audioPlayer.stop();
-      }
-
-      // Dispose audio player
-      await audioPlayer.dispose();
-    } catch (e) {
-      log("Error disposing audio player: $e");
-    }
-
-    // Dispose text controller
-    searchController.dispose();
-
-    // Clear maps (optional but clean)
-    audioStatusMap.clear();
-    downloadStatusMap.clear();
-
-    // Reset current playing key
-    currentKey = null;
-
+  void onClose() {
+    audioPlayer.stop();
+    audioPlayer.dispose();
     super.onClose();
   }
 }
