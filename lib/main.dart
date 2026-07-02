@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -84,7 +86,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final Connectivity _connectivity = Connectivity();
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
+  Timer? _offlineDebounceTimer;
   String? lastRoute;
+
+  bool _isConnected(List<ConnectivityResult> results) {
+    return results.any((result) => result != ConnectivityResult.none);
+  }
 
   @override
   void initState() {
@@ -97,18 +105,25 @@ class _MyAppState extends State<MyApp> {
       });
     }
 
-    _connectivity.onConnectivityChanged.listen((results) {
-      bool isConnected =
-          results.any((result) => result != ConnectivityResult.none);
+    _connectivitySub = _connectivity.onConnectivityChanged.listen((results) {
+      final isConnected = _isConnected(results);
 
-      if (!isConnected) {
-        if (Get.currentRoute != AppRoutes.noInternet) {
-          Get.toNamed(AppRoutes.noInternet);
-        }
-      } else {
+      if (isConnected) {
+        _offlineDebounceTimer?.cancel();
         if (Get.currentRoute == AppRoutes.noInternet) {
           Get.back();
         }
+      } else {
+        // iOS (especially in debug/hot-restart) can emit transient `none`.
+        // Re-check after a short delay before routing to No Internet screen.
+        _offlineDebounceTimer?.cancel();
+        _offlineDebounceTimer = Timer(const Duration(seconds: 2), () async {
+          final recheck = await _connectivity.checkConnectivity();
+          final stillOffline = !_isConnected(recheck);
+          if (stillOffline && Get.currentRoute != AppRoutes.noInternet) {
+            Get.toNamed(AppRoutes.noInternet);
+          }
+        });
       }
     });
   }

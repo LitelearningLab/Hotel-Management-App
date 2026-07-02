@@ -17,6 +17,45 @@ class CustomeBottomNavigation extends StatefulWidget {
 }
 
 class _CustomeBottomNavigationState extends State<CustomeBottomNavigation> {
+  int _tabIndexForRoute(String route) {
+    if (route == AppRoutes.searchScreen) {
+      return 1;
+    }
+
+    if (route == AppRoutes.simulation || route == AppRoutes.simulationSub) {
+      return 2;
+    }
+
+    if (route == AppRoutes.languageLab ||
+        route == AppRoutes.pronunciationLab ||
+        route == AppRoutes.sentenceLab ||
+        route == AppRoutes.pronunciationLabSub ||
+        route == AppRoutes.grmmaerLab ||
+        route == AppRoutes.soundPage ||
+        route == AppRoutes.soundLab ||
+        route == AppRoutes.sentenceLabSub ||
+        route == AppRoutes.sentenceLabSubCat) {
+      return 3;
+    }
+
+    return 0;
+  }
+
+  String _routeForTab(int index) {
+    switch (index) {
+      case 0:
+        return AppRoutes.home;
+      case 1:
+        return AppRoutes.searchScreen;
+      case 2:
+        return AppRoutes.simulation;
+      case 3:
+        return AppRoutes.languageLab;
+      default:
+        return AppRoutes.home;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return kIsWeb ? _webTopNav() : _mobileBottomNav();

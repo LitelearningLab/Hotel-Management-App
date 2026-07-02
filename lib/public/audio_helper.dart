@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:path_provider/path_provider.dart';
 import "package:path/path.dart" as p;
@@ -31,11 +30,8 @@ class AudioCryptoHelper {
     final tempDir = await getTemporaryDirectory();
     final outputPath = p.join(tempDir.path, "$outputFileName.mp3");
     await File(outputPath).writeAsBytes(decryptedBytes);
-   if (Platform.isIOS) {
-    return "file://${outputPath}";
-  } else {
+    // just_audio.setFilePath expects a plain filesystem path on both iOS/Android.
     return outputPath;
-  }// Return path for playback
   }
 
   static Future<String> downloadAndEncryptAudio(
